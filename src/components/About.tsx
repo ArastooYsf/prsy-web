@@ -95,9 +95,11 @@ export default function About({ title, body }: AboutProps) {
                 <motion.li
                   key={principle.title}
                   variants={fadeInUp}
-                  className="rounded-xl border border-transparent bg-white/[0.03] p-4"
+                  whileHover={{ y: -4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="rounded-xl border border-transparent bg-white/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10">
                     {principle.icon}
                   </div>
                   <p className="mt-3 text-sm font-bold">{principle.title}</p>
@@ -114,7 +116,7 @@ export default function About({ title, body }: AboutProps) {
             whileInView="visible"
             viewport={viewportOnce}
             variants={fadeInUp}
-            className="rounded-2xl border border-transparent bg-white/[0.03] p-8"
+            className="rounded-2xl border border-transparent bg-white/[0.03] p-8 shadow-xl shadow-black/10"
           >
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
@@ -134,7 +136,7 @@ export default function About({ title, body }: AboutProps) {
             </div>
 
             <div className="mt-8 flex items-start gap-4 rounded-xl border border-accent-500/30 bg-accent-500/10 p-5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400 shadow-md shadow-accent-500/10">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 2.5l2.9 5.9 6.5 1-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-1 2.9-5.9z"

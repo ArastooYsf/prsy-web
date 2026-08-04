@@ -206,20 +206,20 @@ export default function ProductCategories({ images = {} }: ProductCategoriesProp
               variants={fadeInUp}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="scroll-mt-28 flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-colors hover:border-accent-500/40"
+              className="group scroll-mt-28 flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
             >
               {images[category.id] && (
                 <div className="aspect-video w-full overflow-hidden">
                   <img
                     src={getMediaUrl(images[category.id]!)}
                     alt={category.title}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
               )}
               <div className="flex flex-1 flex-col p-7">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20">
                   {category.icon}
                 </div>
                 <div className="flex flex-wrap justify-end gap-1.5">

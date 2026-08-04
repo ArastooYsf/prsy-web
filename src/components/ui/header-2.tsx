@@ -21,10 +21,6 @@ export function Header() {
 			href: '/products',
 		},
 		{
-			label: 'ویژگی‌ها',
-			href: '/#features',
-		},
-		{
 			label: 'درباره ما',
 			href: '/about',
 		},
@@ -66,7 +62,7 @@ export function Header() {
 			className={cn(
 				'sticky top-0 z-50 mx-auto w-full max-w-5xl border-b border-transparent lg:max-w-6xl lg:rounded-md lg:border lg:transition-all lg:ease-out',
 				{
-					'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg lg:top-4 lg:max-w-5xl lg:shadow':
+					'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10':
 						scrolled && !open,
 					'bg-background/90': open,
 				},
@@ -80,8 +76,11 @@ export function Header() {
 					},
 				)}
 			>
-				<Link href="/" className="flex shrink-0 items-center gap-2 text-base font-bold">
-					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-black text-brand-950">
+				<Link
+					href="/"
+					className="group flex shrink-0 items-center gap-2 text-base font-bold transition-transform duration-300 hover:scale-[1.03]"
+				>
+					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-black text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
 						یا
 					</span>
 					<span className={cn('hidden whitespace-nowrap sm:inline', scrolled && 'lg:hidden')}>
@@ -101,19 +100,28 @@ export function Header() {
 					<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
 						<Link href="/contact">تماس با ما</Link>
 					</Button>
-					<Button size="sm" asChild>
+					<Button
+						size="sm"
+						className="transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/30"
+						asChild
+					>
 						<Link href="/consultation">درخواست مشاوره</Link>
 					</Button>
 					<AuthNavLink variant="icon" />
 				</div>
-				<Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="lg:hidden">
+				<Button
+					size="icon"
+					variant="outline"
+					onClick={() => setOpen(!open)}
+					className="transition-transform duration-300 hover:scale-105 lg:hidden"
+				>
 					<MenuToggleIcon open={open} className="size-5" duration={300} />
 				</Button>
 			</nav>
 
 			<div
 				className={cn(
-					'bg-background/90 fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y lg:hidden',
+					'bg-background fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-y-auto border-y lg:hidden',
 					open ? 'block' : 'hidden',
 				)}
 			>
@@ -121,7 +129,7 @@ export function Header() {
 					data-slot={open ? 'open' : 'closed'}
 					className={cn(
 						'data-[slot=open]:animate-in data-[slot=open]:zoom-in-95 data-[slot=closed]:animate-out data-[slot=closed]:zoom-out-95 ease-out',
-						'flex h-full w-full flex-col justify-between gap-y-2 p-4',
+						'flex min-h-full w-full flex-col justify-between gap-y-2 p-4',
 					)}
 				>
 					<div className="grid gap-y-2">
@@ -145,7 +153,10 @@ export function Header() {
 								تماس با ما
 							</Link>
 						</Button>
-						<Button className="w-full" asChild>
+						<Button
+							className="w-full transition-all duration-300 hover:shadow-lg hover:shadow-accent-500/30"
+							asChild
+						>
 							<Link href="/consultation" onClick={() => setOpen(false)}>
 								درخواست مشاوره
 							</Link>

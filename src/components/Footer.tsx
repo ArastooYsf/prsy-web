@@ -77,8 +77,8 @@ export default function Footer() {
       >
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <motion.div variants={fadeInUp}>
-            <Link href="/" className="flex items-center gap-2 text-lg font-bold">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-black text-brand-950">
+            <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-black text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
                 یا
               </span>
               پویش راه صنعت
@@ -96,7 +96,7 @@ export default function Footer() {
                   href={social.href}
                   aria-label={social.name}
                   whileHover={{ y: -3, scale: 1.05 }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
                 >
                   {social.icon}
                 </motion.a>
@@ -113,7 +113,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
+                    className="inline-block text-sm text-foreground/60 transition-all duration-200 hover:-translate-x-1 hover:text-accent-400"
                   >
                     {link.label}
                   </Link>
@@ -129,7 +129,7 @@ export default function Footer() {
                 <li key={service.label}>
                   <Link
                     href={service.href}
-                    className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
+                    className="inline-block text-sm text-foreground/60 transition-all duration-200 hover:-translate-x-1 hover:text-accent-400"
                   >
                     {service.label}
                   </Link>
@@ -148,7 +148,7 @@ export default function Footer() {
                   <li key={item.label}>
                     <a
                       href={item.href}
-                      className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
+                      className="inline-block text-sm text-foreground/60 transition-all duration-200 hover:-translate-x-1 hover:text-accent-400"
                     >
                       {item.label}
                     </a>

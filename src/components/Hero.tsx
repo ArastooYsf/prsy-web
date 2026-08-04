@@ -131,7 +131,7 @@ export default function Hero({ overrides = {} }: HeroProps) {
                   opacity: textHovered ? 0.7 : 1,
                 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className={`relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] sm:aspect-[16/10] lg:aspect-square ${
+                className={`relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] shadow-2xl shadow-black/20 ring-1 ring-white/5 sm:aspect-[16/10] lg:aspect-square ${
                   imageFirst ? "lg:order-2" : "lg:order-1"
                 }`}
               >
@@ -154,7 +154,7 @@ export default function Hero({ overrides = {} }: HeroProps) {
                   imageFirst ? "lg:order-1" : "lg:order-2"
                 }`}
               >
-                <h1 className="text-balance text-3xl font-black leading-tight sm:text-5xl">
+                <h1 className="text-balance text-3xl font-black leading-tight tracking-tight sm:text-5xl">
                   {slide.title}
                 </h1>
                 <p className="mt-4 text-balance leading-8 text-foreground/70 sm:text-lg">
@@ -162,10 +162,16 @@ export default function Hero({ overrides = {} }: HeroProps) {
                 </p>
                 <Link
                   href={slide.ctaHref}
-                  className="mt-7 inline-flex items-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 sm:text-base"
+                  className="group mt-7 inline-flex items-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 sm:text-base"
                 >
                   {slide.ctaLabel}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
+                  >
                     <path
                       d="M19 12H5M5 12L11 6M5 12L11 18"
                       stroke="currentColor"
@@ -191,7 +197,7 @@ export default function Hero({ overrides = {} }: HeroProps) {
               className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10"
             >
               {i < index && (
-                <span className="absolute inset-0 bg-accent-500" />
+                <span className="absolute inset-0 bg-accent-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
               )}
               {i === index && (
                 <motion.span
@@ -201,7 +207,7 @@ export default function Hero({ overrides = {} }: HeroProps) {
                   transition={{ duration: SLIDE_DURATION, ease: "linear" }}
                   onAnimationComplete={goNext}
                   style={{ transformOrigin: "right" }}
-                  className="absolute inset-0 bg-accent-500"
+                  className="absolute inset-0 bg-accent-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"
                 />
               )}
             </button>

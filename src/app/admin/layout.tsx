@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import SignOutButton from "@/components/admin/SignOutButton";
+import SignOutButton from "@/components/SignOutButton";
 import AdminNav from "@/components/admin/AdminNav";
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function AdminLayout({
             خوش آمدید، <span className="text-gradient">{session.user.name || session.user.email}</span>
           </h1>
         </div>
-        <SignOutButton />
+        <SignOutButton callbackUrl="/login" />
       </div>
       <AdminNav />
       {children}

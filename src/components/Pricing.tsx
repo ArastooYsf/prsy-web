@@ -63,7 +63,9 @@ export default function Pricing() {
             <motion.div
               key={item.title}
               variants={fadeInUp}
-              className="rounded-2xl border border-transparent bg-white/[0.03] p-6 text-center"
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="rounded-2xl border border-transparent bg-white/[0.03] p-6 text-center transition-all duration-300 hover:border-accent-500/30 hover:shadow-xl hover:shadow-black/10"
             >
               <h3 className="text-base font-bold">{item.title}</h3>
               <p className="mt-2 text-sm leading-6 text-foreground/70">
@@ -82,10 +84,16 @@ export default function Pricing() {
         >
           <Link
             href="/consultation"
-            className="inline-flex items-center gap-2 rounded-full bg-accent-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            className="group inline-flex items-center gap-2 rounded-full bg-accent-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30"
           >
             درخواست مشاوره و استعلام قیمت
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
+            >
               <path
                 d="M19 12H5M5 12L11 6M5 12L11 18"
                 stroke="currentColor"

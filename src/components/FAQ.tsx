@@ -10,7 +10,11 @@ const PREVIEW_COUNT = 4;
 
 function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   return (
-    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10">
+    <span
+      className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
+        isOpen ? "border-accent-500/40 text-accent-400" : "border-white/10"
+      }`}
+    >
       <motion.span
         animate={{ rotate: isOpen ? 45 : 0 }}
         transition={{ duration: 0.3 }}
@@ -75,9 +79,13 @@ export default function FAQ({ full = false }: { full?: boolean }) {
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 py-6 text-right"
+                  className="group flex w-full items-center justify-between gap-4 py-6 text-right"
                 >
-                  <span className="text-base font-semibold sm:text-lg">
+                  <span
+                    className={`text-base font-semibold transition-colors duration-300 sm:text-lg ${
+                      isOpen ? "text-accent-400" : "group-hover:text-accent-400"
+                    }`}
+                  >
                     {faq.question}
                   </span>
                   <ToggleIcon isOpen={isOpen} />
@@ -112,10 +120,16 @@ export default function FAQ({ full = false }: { full?: boolean }) {
           >
             <Link
               href="/faq"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors hover:text-white"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors duration-300 hover:text-white"
             >
               مشاهده همه سوالات متداول
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="transition-transform duration-300 group-hover:-translate-x-1"
+              >
                 <path
                   d="M19 12H5M5 12L11 6M5 12L11 18"
                   stroke="currentColor"

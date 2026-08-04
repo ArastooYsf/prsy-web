@@ -50,7 +50,7 @@ const PRINCIPLES = [
 
 export default function About() {
   return (
-    <section id="about" className="section-padding relative border-t border-graphite-light/40">
+    <section id="about" className="section-padding relative border-t border-white/10">
       <div className="container">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
           <motion.div
@@ -61,7 +61,7 @@ export default function About() {
           >
             <motion.span
               variants={fadeInUp}
-              className="text-sm font-semibold text-accent-amber"
+              className="text-sm font-semibold text-accent-400"
             >
               درباره ما
             </motion.span>
@@ -73,7 +73,7 @@ export default function About() {
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="mt-5 text-balance leading-8 text-text-secondary"
+              className="mt-5 text-balance leading-8 text-foreground/70"
             >
               پویش راه صنعت یاشار (شماره ثبت ۴۷۶۰۶) از سال ۱۳۹۶ فعالیت خود را
               با هدف تأمین باکیفیت‌ترین دیزل ژنراتورها و قطعات مرتبط آغاز کرد.
@@ -88,13 +88,13 @@ export default function About() {
                 <motion.li
                   key={principle.title}
                   variants={fadeInUp}
-                  className="rounded-xl border border-transparent bg-graphite-light p-4"
+                  className="rounded-xl border border-transparent bg-white/[0.03] p-4"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-orange/10 text-accent-orange">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400">
                     {principle.icon}
                   </div>
                   <p className="mt-3 text-sm font-bold">{principle.title}</p>
-                  <p className="mt-1 text-xs leading-5 text-text-secondary">
+                  <p className="mt-1 text-xs leading-5 text-foreground/70">
                     {principle.description}
                   </p>
                 </motion.li>
@@ -107,27 +107,27 @@ export default function About() {
             whileInView="visible"
             viewport={viewportOnce}
             variants={fadeInUp}
-            className="rounded-2xl border border-transparent bg-graphite-light p-8"
+            className="rounded-2xl border border-transparent bg-white/[0.03] p-8"
           >
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="text-4xl font-black text-gradient sm:text-5xl">
                   <Counter value={9} suffix="+" />
                 </div>
-                <p className="mt-2 text-sm text-text-secondary">
+                <p className="mt-2 text-sm text-foreground/70">
                   سال سابقه فعالیت
                 </p>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-black sm:text-5xl">۴۷۶۰۶</div>
-                <p className="mt-2 text-sm text-text-secondary">
+                <p className="mt-2 text-sm text-foreground/70">
                   شماره ثبت رسمی
                 </p>
               </div>
             </div>
 
-            <div className="mt-8 flex items-start gap-4 rounded-xl border border-accent-orange/30 bg-accent-orange/10 p-5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-orange/20 text-accent-orange">
+            <div className="mt-8 flex items-start gap-4 rounded-xl border border-accent-500/30 bg-accent-500/10 p-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 2.5l2.9 5.9 6.5 1-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-1 2.9-5.9z"

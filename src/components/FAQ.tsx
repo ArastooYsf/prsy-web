@@ -39,7 +39,7 @@ const FAQS = [
 
 function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   return (
-    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-graphite-light">
+    <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10">
       <motion.span
         animate={{ rotate: isOpen ? 45 : 0 }}
         transition={{ duration: 0.3 }}
@@ -58,7 +58,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="section-padding relative border-t border-graphite-light/40">
+    <section id="faq" className="section-padding relative border-t border-white/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -69,7 +69,7 @@ export default function FAQ() {
         >
           <motion.span
             variants={fadeInUp}
-            className="text-sm font-semibold text-accent-amber"
+            className="text-sm font-semibold text-accent-400"
           >
             سوالات متداول
           </motion.span>
@@ -81,7 +81,7 @@ export default function FAQ() {
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="mt-4 text-balance leading-7 text-text-secondary"
+            className="mt-4 text-balance leading-7 text-foreground/70"
           >
             اگر پاسخ سوال خود را پیدا نکردید، از طریق فرم مشاوره با ما در تماس
             باشید.
@@ -93,7 +93,7 @@ export default function FAQ() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer(0.08)}
-          className="mx-auto mt-14 max-w-3xl divide-y divide-graphite-light sm:mt-16"
+          className="mx-auto mt-14 max-w-3xl divide-y divide-white/10 sm:mt-16"
         >
           {FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
@@ -119,7 +119,7 @@ export default function FAQ() {
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-6 leading-7 text-text-secondary">
+                      <p className="pb-6 leading-7 text-foreground/70">
                         {faq.answer}
                       </p>
                     </motion.div>

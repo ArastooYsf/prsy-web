@@ -88,7 +88,7 @@ export default function Features() {
         >
           <motion.span
             variants={fadeInUp}
-            className="text-sm font-semibold text-accent-amber"
+            className="text-sm font-semibold text-accent-400"
           >
             خدمات ما
           </motion.span>
@@ -100,7 +100,7 @@ export default function Features() {
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="mt-4 text-balance leading-7 text-text-secondary"
+            className="mt-4 text-balance leading-7 text-foreground/70"
           >
             از اولین طرح روی کاغذ تا بهره‌برداری نهایی؛ در هر مرحله همراه شما
             هستیم.
@@ -120,20 +120,20 @@ export default function Features() {
               variants={fadeInUp}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="group relative overflow-hidden rounded-2xl border border-transparent bg-graphite-light p-8 transition-colors hover:border-accent-orange/40"
+              className="group relative overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] p-8 transition-colors hover:border-accent-500/40"
             >
-              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-black text-text-primary/[0.06] transition-colors group-hover:text-accent-orange/10">
+              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-black text-white/[0.06] transition-colors group-hover:text-accent-500/10">
                 {feature.index}
               </span>
 
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent-orange/10 text-accent-orange transition-colors group-hover:bg-accent-orange/20">
+              <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 transition-colors group-hover:bg-accent-500/20">
                 {feature.icon}
               </div>
 
               <h3 className="relative mt-6 text-xl font-bold">
                 {feature.title}
               </h3>
-              <p className="relative mt-3 leading-7 text-text-secondary">
+              <p className="relative mt-3 leading-7 text-foreground/70">
                 {feature.description}
               </p>
             </motion.div>

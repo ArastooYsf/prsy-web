@@ -43,7 +43,7 @@ const TESTIMONIALS = [
 
 export default function SocialProof() {
   return (
-    <section id="clients" className="section-padding relative border-t border-graphite-light/40">
+    <section id="clients" className="section-padding relative border-t border-white/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -61,7 +61,7 @@ export default function SocialProof() {
               <div className="text-4xl font-black text-gradient sm:text-5xl">
                 <Counter value={stat.value} suffix={stat.suffix} />
               </div>
-              <p className="mt-2 text-sm text-text-secondary sm:text-base">
+              <p className="mt-2 text-sm text-foreground/70 sm:text-base">
                 {stat.label}
               </p>
             </motion.div>
@@ -79,7 +79,7 @@ export default function SocialProof() {
             <motion.span
               key={sector}
               variants={fadeInUp}
-              className="rounded-full border border-transparent bg-graphite-light px-4 py-2 text-xs font-medium text-text-secondary sm:text-sm"
+              className="rounded-full border border-transparent bg-white/[0.03] px-4 py-2 text-xs font-medium text-foreground/70 sm:text-sm"
             >
               {sector}
             </motion.span>
@@ -97,30 +97,30 @@ export default function SocialProof() {
             <motion.div
               key={testimonial.name}
               variants={fadeInUp}
-              className="flex flex-col rounded-2xl border border-transparent bg-graphite-light p-7"
+              className="flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-7"
             >
               <svg
                 width="28"
                 height="22"
                 viewBox="0 0 28 22"
                 fill="none"
-                className="mb-4 text-accent-orange/50"
+                className="mb-4 text-accent-400/50"
               >
                 <path
                   d="M0 22V13.75C0 6.16 4.62 1.32 11.55 0L13.09 3.19C9.24 4.51 7.04 7.15 7.04 10.34V11H13.09V22H0ZM14.91 22V13.75C14.91 6.16 19.53 1.32 26.46 0L28 3.19C24.15 4.51 21.95 7.15 21.95 10.34V11H28V22H14.91Z"
                   fill="currentColor"
                 />
               </svg>
-              <p className="flex-1 leading-7 text-text-secondary">
+              <p className="flex-1 leading-7 text-foreground/70">
                 {testimonial.quote}
               </p>
-              <div className="mt-6 flex items-center gap-3 border-t border-graphite pt-5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-orange text-sm font-bold text-text-primary">
+              <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500 text-sm font-bold text-white">
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{testimonial.name}</p>
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-xs text-foreground/60">
                     {testimonial.role}
                   </p>
                 </div>

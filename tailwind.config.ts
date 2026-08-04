@@ -41,20 +41,31 @@ const config: Config = {
         accent: {
           DEFAULT: "rgb(var(--accent) / <alpha-value>)",
           foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
+          50: "#fff7ed",
+          100: "#ffedd5",
+          200: "#fed7aa",
+          300: "#fdba74",
+          400: "#fb923c",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410c",
+          800: "#9a3412",
+          900: "#7c2d12",
         },
 
-        // ---- Brand palette (theme.extend.colors) ----
-        // 60% graphite, 30% graphite-light + text colors, 10% accents.
-        // accent-orange / accent-amber are details only (buttons, links,
-        // small highlights) — never large backgrounds or wide surfaces.
-        graphite: "#20242A",
-        "graphite-light": "#3A3F47",
-        "accent-orange": "#C1440E",
-        "accent-amber": "#B8842E",
-        "text-primary": "#F2F2F0",
-        "text-secondary": "#A8ADB4",
-        success: "#5C8A5C",
-        error: "#A63D2F",
+        brand: {
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
+          950: "#172554",
+        },
       },
       fontFamily: {
         sans: ["var(--font-vazirmatn)", "sans-serif"],
@@ -69,7 +80,7 @@ const config: Config = {
       },
       backgroundImage: {
         "grid-pattern":
-          "linear-gradient(to right, rgba(242,242,240,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(242,242,240,0.06) 1px, transparent 1px)",
+          "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
       },
     },
   },

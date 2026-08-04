@@ -76,11 +76,11 @@ export function Header() {
 				)}
 			>
 				<Link href="/" className="flex items-center gap-2 text-base font-bold">
-					<span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-amber to-accent-orange text-xs font-black text-text-primary">
+					<span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-black text-brand-950">
 						یا
 					</span>
 					<span className={cn('hidden whitespace-nowrap sm:inline', scrolled && 'sm:hidden')}>
-						پویش راه صنعت<span className="text-accent-amber"> یاشار</span>
+						پویش راه صنعت<span className="text-accent-400"> یاشار</span>
 					</span>
 				</Link>
 				<div className="hidden items-center gap-2 md:flex">

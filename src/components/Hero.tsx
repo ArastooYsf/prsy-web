@@ -12,13 +12,13 @@ export default function Hero() {
         aria-hidden
         animate={{ y: [0, 24, 0], x: [0, -16, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-graphite-light/50 blur-[110px] sm:h-[560px] sm:w-[560px]"
+        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/20 blur-[110px] sm:h-[560px] sm:w-[560px]"
       />
       <motion.div
         aria-hidden
         animate={{ y: [0, -20, 0], x: [0, 20, 0] }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[380px] w-[380px] rounded-full bg-graphite-light/40 blur-[110px] sm:h-[500px] sm:w-[500px]"
+        className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[380px] w-[380px] rounded-full bg-brand-500/25 blur-[110px] sm:h-[500px] sm:w-[500px]"
       />
 
       <motion.div
@@ -29,9 +29,9 @@ export default function Hero() {
       >
         <motion.span
           variants={fadeInUp}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-graphite-light bg-graphite-light/40 px-4 py-1.5 text-xs font-medium text-text-secondary backdrop-blur-sm sm:text-sm"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-accent-amber" />
+          <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
           پویش راه صنعت یاشار
         </motion.span>
 
@@ -45,7 +45,7 @@ export default function Hero() {
 
         <motion.p
           variants={fadeInUp}
-          className="mt-6 max-w-2xl text-balance text-base leading-8 text-text-secondary sm:text-lg"
+          className="mt-6 max-w-2xl text-balance text-base leading-8 text-foreground/70 sm:text-lg"
         >
           از طراحی مفهومی تا راه‌اندازی نهایی؛ تیم مهندسی یاشار در کنار شماست
           تا پروژه‌های زیرساختی و صنعتی را با کیفیت، ایمنی و در زمان مقرر به
@@ -60,7 +60,7 @@ export default function Hero() {
             href="#pricing"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-accent-orange px-7 py-3.5 text-sm font-semibold text-text-primary shadow-lg shadow-accent-orange/25 transition-colors hover:bg-accent-orange/90 sm:w-auto sm:text-base"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 sm:w-auto sm:text-base"
           >
             درخواست مشاوره رایگان
             <svg
@@ -82,9 +82,9 @@ export default function Hero() {
 
           <motion.a
             href="#features"
-            whileHover={{ scale: 1.04, backgroundColor: "rgba(58,63,71,0.6)" }}
+            whileHover={{ scale: 1.04, backgroundColor: "rgba(255,255,255,0.06)" }}
             whileTap={{ scale: 0.97 }}
-            className="w-full rounded-full border border-graphite-light px-7 py-3.5 text-center text-sm font-semibold text-foreground transition-colors sm:w-auto sm:text-base"
+            className="w-full rounded-full border border-white/15 px-7 py-3.5 text-center text-sm font-semibold text-foreground transition-colors sm:w-auto sm:text-base"
           >
             مشاهده خدمات ما
           </motion.a>
@@ -100,9 +100,9 @@ export default function Hero() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="flex h-9 w-6 items-start justify-center rounded-full border border-text-secondary/40 p-1.5"
+          className="flex h-9 w-6 items-start justify-center rounded-full border border-white/30 p-1.5"
         >
-          <span className="h-1.5 w-1 rounded-full bg-text-secondary" />
+          <span className="h-1.5 w-1 rounded-full bg-white/70" />
         </motion.div>
       </motion.div>
     </section>

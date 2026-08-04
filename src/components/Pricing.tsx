@@ -74,7 +74,7 @@ function CheckIcon() {
 
 export default function Pricing() {
   return (
-    <section id="pricing" className="section-padding relative border-t border-graphite-light/40">
+    <section id="pricing" className="section-padding relative border-t border-white/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -85,7 +85,7 @@ export default function Pricing() {
         >
           <motion.span
             variants={fadeInUp}
-            className="text-sm font-semibold text-accent-amber"
+            className="text-sm font-semibold text-accent-400"
           >
             پلن‌های همکاری
           </motion.span>
@@ -97,7 +97,7 @@ export default function Pricing() {
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="mt-4 text-balance leading-7 text-text-secondary"
+            className="mt-4 text-balance leading-7 text-foreground/70"
           >
             بسته به مقیاس و پیچیدگی پروژه، مسیر همکاری را با هم انتخاب می‌کنیم.
           </motion.p>
@@ -116,20 +116,20 @@ export default function Pricing() {
               variants={fadeInUp}
               whileHover={{ y: plan.popular ? 0 : -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`relative flex h-full flex-col rounded-2xl bg-graphite-light p-8 ${
+              className={`relative flex h-full flex-col rounded-2xl p-8 ${
                 plan.popular
-                  ? "border-2 border-accent-orange shadow-2xl shadow-accent-orange/10 lg:-mt-4 lg:mb-4"
-                  : "border border-transparent hover:border-text-secondary/20"
+                  ? "bg-gradient-to-b from-accent-500/10 to-transparent border-2 border-accent-500 shadow-2xl shadow-accent-500/10 lg:-mt-4 lg:mb-4"
+                  : "bg-white/[0.03] border border-transparent hover:border-white/10"
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-accent-orange px-4 py-1.5 text-xs font-bold text-text-primary">
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-accent-500 px-4 py-1.5 text-xs font-bold text-white">
                   پیشنهاد ویژه
                 </span>
               )}
 
               <h3 className="text-xl font-bold">{plan.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
+              <p className="mt-2 text-sm leading-6 text-foreground/70">
                 {plan.description}
               </p>
 
@@ -142,7 +142,7 @@ export default function Pricing() {
                   {plan.price}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-text-secondary">
+              <p className="mt-1 text-xs text-foreground/70">
                 {plan.priceNote}
               </p>
 
@@ -150,11 +150,11 @@ export default function Pricing() {
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-3 text-sm text-text-secondary"
+                    className="flex items-start gap-3 text-sm text-foreground/70"
                   >
                     <span
                       className={
-                        plan.popular ? "text-accent-orange" : "text-accent-orange/70"
+                        plan.popular ? "text-accent-400" : "text-accent-400/70"
                       }
                     >
                       <CheckIcon />
@@ -170,8 +170,8 @@ export default function Pricing() {
                 whileTap={{ scale: 0.97 }}
                 className={`mt-8 block rounded-full px-6 py-3.5 text-center text-sm font-semibold transition-colors ${
                   plan.popular
-                    ? "bg-accent-orange text-text-primary shadow-lg shadow-accent-orange/25 hover:bg-accent-orange/90"
-                    : "border border-graphite-light text-foreground hover:bg-graphite"
+                    ? "bg-accent-500 text-white shadow-lg shadow-accent-500/25 hover:bg-accent-600"
+                    : "border border-white/15 text-foreground hover:bg-white/5"
                 }`}
               >
                 {plan.cta}
@@ -185,7 +185,7 @@ export default function Pricing() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={fadeInUp}
-          className="mt-10 text-center text-sm text-text-secondary"
+          className="mt-10 text-center text-sm text-foreground/70"
         >
           همه بسته‌ها شامل مشاوره اولیه رایگان هستند. برای دریافت پیش‌فاکتور
           دقیق با کارشناسان ما تماس بگیرید.

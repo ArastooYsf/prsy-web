@@ -5,36 +5,34 @@
 :root {
   /* All tokens are raw "R G B" channel triplets (no rgb()/commas) so Tailwind
      can compose them as rgb(var(--x) / <alpha-value>) and opacity modifiers
-     like bg-background/90 or text-foreground/70 actually work. Values below
-     are the brand palette (see tailwind.config.ts): graphite / graphite-light
-     / accent-orange / accent-amber / text-primary / text-secondary. */
-  --background: 32 36 42; /* graphite */
-  --foreground: 242 242 240; /* text-primary */
+     like bg-background/90 or text-foreground/70 actually work. */
+  --background: 6 10 23;
+  --foreground: 255 255 255;
 
-  --border: 58 63 71; /* graphite-light */
-  --input: 58 63 71; /* graphite-light */
-  --ring: 193 68 14; /* accent-orange */
+  --border: 30 41 59;
+  --input: 30 41 59;
+  --ring: 249 115 22; /* accent-500 */
 
-  --primary: 193 68 14; /* accent-orange */
-  --primary-foreground: 242 242 240; /* text-primary */
+  --primary: 249 115 22; /* accent-500 */
+  --primary-foreground: 255 255 255;
 
-  --secondary: 58 63 71; /* graphite-light */
-  --secondary-foreground: 242 242 240; /* text-primary */
+  --secondary: 30 41 59;
+  --secondary-foreground: 255 255 255;
 
-  --destructive: 166 61 47; /* error */
-  --destructive-foreground: 242 242 240; /* text-primary */
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
 
-  --muted: 58 63 71; /* graphite-light */
-  --muted-foreground: 168 173 180; /* text-secondary */
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184;
 
-  --accent: 58 63 71; /* graphite-light (ghost/outline hover wash) */
-  --accent-foreground: 242 242 240; /* text-primary */
+  --accent: 30 41 59; /* ghost/outline hover wash */
+  --accent-foreground: 255 255 255;
 
-  --popover: 58 63 71; /* graphite-light */
-  --popover-foreground: 242 242 240; /* text-primary */
+  --popover: 15 23 42;
+  --popover-foreground: 255 255 255;
 
-  --card: 58 63 71; /* graphite-light */
-  --card-foreground: 242 242 240; /* text-primary */
+  --card: 15 23 42;
+  --card-foreground: 255 255 255;
 }
 
 html {
@@ -47,8 +45,8 @@ body {
 }
 
 ::selection {
-  background-color: #c1440e;
-  color: #f2f2f0;
+  background-color: #f97316;
+  color: #ffffff;
 }
 
 @layer utilities {
@@ -57,7 +55,7 @@ body {
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, #b8842e 0%, #c1440e 100%);
+    background: linear-gradient(90deg, #fb923c 0%, #ea580c 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;

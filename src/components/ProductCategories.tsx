@@ -143,15 +143,15 @@ const CATEGORIES: Category[] = [
 const CONDITION_BADGE: Record<Condition, { label: string; className: string }> = {
   new: {
     label: "نو",
-    className: "border-transparent bg-accent-orange text-text-primary",
+    className: "border-accent-500/30 bg-accent-500/10 text-accent-400",
   },
   used: {
     label: "دست‌دوم",
-    className: "border-transparent bg-graphite text-text-secondary",
+    className: "border-white/10 bg-white/5 text-foreground/60",
   },
   service: {
     label: "خدمات",
-    className: "border-transparent bg-accent-amber text-graphite",
+    className: "border-brand-400/30 bg-brand-400/10 text-brand-300",
   },
 };
 
@@ -168,7 +168,7 @@ export default function ProductCategories() {
         >
           <motion.span
             variants={fadeInUp}
-            className="text-sm font-semibold text-accent-amber"
+            className="text-sm font-semibold text-accent-400"
           >
             دسته‌بندی محصولات
           </motion.span>
@@ -180,7 +180,7 @@ export default function ProductCategories() {
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="mt-4 text-balance leading-7 text-text-secondary"
+            className="mt-4 text-balance leading-7 text-foreground/70"
           >
             تمامی محصولات به‌صورت نو و دست‌دوم عرضه می‌شوند؛ به‌جز قطعات یدکی
             که فقط به‌صورت نو ارائه می‌شود.
@@ -201,10 +201,10 @@ export default function ProductCategories() {
               variants={fadeInUp}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="scroll-mt-28 flex flex-col rounded-2xl border border-transparent bg-graphite-light p-7 transition-colors hover:border-accent-orange/40"
+              className="scroll-mt-28 flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-7 transition-colors hover:border-accent-500/40"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-orange/10 text-accent-orange">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400">
                   {category.icon}
                 </div>
                 <div className="flex flex-wrap justify-end gap-1.5">
@@ -220,7 +220,7 @@ export default function ProductCategories() {
               </div>
 
               <h3 className="mt-5 text-lg font-bold">{category.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
+              <p className="mt-2 text-sm leading-6 text-foreground/70">
                 {category.description}
               </p>
 
@@ -228,7 +228,7 @@ export default function ProductCategories() {
                 {category.brands.map((brand) => (
                   <span
                     key={brand}
-                    className="rounded-md bg-graphite px-2 py-1 text-xs text-text-secondary"
+                    className="rounded-md bg-white/5 px-2 py-1 text-xs text-foreground/60"
                   >
                     {brand}
                   </span>

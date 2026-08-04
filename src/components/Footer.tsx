@@ -65,7 +65,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-graphite-light/40 bg-graphite">
+    <footer className="border-t border-white/10 bg-black/20">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -76,13 +76,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <motion.div variants={fadeInUp}>
             <Link href="/" className="flex items-center gap-2 text-lg font-bold">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-amber to-accent-orange text-sm font-black text-text-primary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-black text-brand-950">
                 یا
               </span>
               پویش راه صنعت
-              <span className="text-accent-amber"> یاشار</span>
+              <span className="text-accent-400"> یاشار</span>
             </Link>
-            <p className="mt-4 max-w-sm leading-7 text-text-secondary">
+            <p className="mt-4 max-w-sm leading-7 text-foreground/60">
               تأمین‌کننده دیزل ژنراتور، موتور برق و قطعات یدکی با برندهای
               معتبر جهانی؛ به‌صورت نو و دست‌دوم، با بهترین قیمت و سریع‌ترین
               تحویل.
@@ -94,7 +94,7 @@ export default function Footer() {
                   href={social.href}
                   aria-label={social.name}
                   whileHover={{ y: -3, scale: 1.05 }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-graphite-light text-text-secondary transition-colors hover:border-accent-orange/40 hover:text-text-primary"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                 >
                   {social.icon}
                 </motion.a>
@@ -111,7 +111,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+                    className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
                   >
                     {link.label}
                   </Link>
@@ -127,7 +127,7 @@ export default function Footer() {
                 <li key={service.label}>
                   <Link
                     href={service.href}
-                    className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+                    className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
                   >
                     {service.label}
                   </Link>
@@ -146,7 +146,7 @@ export default function Footer() {
                   <li key={item.label}>
                     <a
                       href={item.href}
-                      className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+                      className="text-sm text-foreground/60 transition-colors hover:text-accent-400"
                     >
                       {item.label}
                     </a>
@@ -154,7 +154,7 @@ export default function Footer() {
                 ) : (
                   <li
                     key={item.label}
-                    className="text-sm leading-6 text-text-secondary"
+                    className="text-sm leading-6 text-foreground/60"
                   >
                     {item.label}
                   </li>
@@ -166,17 +166,17 @@ export default function Footer() {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-graphite-light/40 pt-8 text-sm text-text-secondary sm:flex-row"
+          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-foreground/50 sm:flex-row"
         >
           <p>
             © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه
             صنعت یاشار. تمامی حقوق محفوظ است.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="transition-colors hover:text-text-primary">
+            <a href="#" className="transition-colors hover:text-white">
               حریم خصوصی
             </a>
-            <a href="#" className="transition-colors hover:text-text-primary">
+            <a href="#" className="transition-colors hover:text-white">
               قوانین و مقررات
             </a>
           </div>

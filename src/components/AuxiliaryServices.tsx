@@ -64,7 +64,7 @@ const SERVICES = [
 
 export default function AuxiliaryServices() {
   return (
-    <section className="section-padding relative border-t border-graphite-light/40">
+    <section className="section-padding relative border-t border-white/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -75,7 +75,7 @@ export default function AuxiliaryServices() {
         >
           <motion.span
             variants={fadeInUp}
-            className="text-sm font-semibold text-accent-amber"
+            className="text-sm font-semibold text-accent-400"
           >
             خدمات جانبی
           </motion.span>
@@ -98,22 +98,22 @@ export default function AuxiliaryServices() {
             <motion.div
               key={service.title}
               variants={fadeInUp}
-              className="flex flex-col rounded-2xl border border-transparent bg-graphite-light p-7"
+              className="flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-7"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-orange/10 text-accent-orange">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400">
                 {service.icon}
               </div>
               <h3 className="mt-5 text-lg font-bold">{service.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-6 text-text-secondary">
+              <p className="mt-2 flex-1 text-sm leading-6 text-foreground/70">
                 {service.description}
               </p>
               {service.cta && (
                 <Link
                   href={service.cta.href}
-                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:underline"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors hover:text-white"
                 >
                   {service.cta.label}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-accent-orange">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M19 12H5M5 12L11 6M5 12L11 18"
                       stroke="currentColor"

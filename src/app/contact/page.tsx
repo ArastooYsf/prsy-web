@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import ConsultationForm from "@/components/ConsultationForm";
 
 export const metadata: Metadata = {
   title: "تماس با ما",
   description:
-    "راه‌های ارتباطی با پویش راه صنعت یاشار؛ آدرس، تلفن، ایمیل و فرم تماس مستقیم.",
+    "راه‌های ارتباطی با پویش راه صنعت یاشار؛ آدرس، تلفن، ایمیل و شبکه‌های اجتماعی.",
 };
+
+const ADDRESS = "تهران، خیابان ولیعصر، برج صنعت، طبقه ۵";
 
 const CONTACT_ITEMS = [
   {
     label: "آدرس",
-    value: "تهران، خیابان ولیعصر، برج صنعت، طبقه ۵",
+    value: ADDRESS,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path
@@ -51,6 +52,50 @@ const CONTACT_ITEMS = [
   },
 ];
 
+const SOCIALS = [
+  {
+    name: "اینستاگرام",
+    href: "#",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    name: "لینکدین",
+    href: "#",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.6" />
+        <path
+          d="M7.5 10.5V17M7.5 7.5V7.51M11.5 17V10.5M11.5 13c0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5V17"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: "تلگرام",
+    href: "#",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M21 4L3 11.5l6 2m12-9.5l-3.5 16-8.5-6.5m12-9.5L9 13.5m0 0v5.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+];
+
 export default function ContactPage() {
   return (
     <>
@@ -65,15 +110,15 @@ export default function ContactPage() {
             راه‌های <span className="text-gradient">ارتباط با ما</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance leading-7 text-foreground/70">
-            از طریق اطلاعات زیر یا فرم تماس، کارشناسان ما در سریع‌ترین زمان
-            ممکن پاسخگوی شما خواهند بود.
+            از طریق اطلاعات زیر با ما در تماس باشید؛ کارشناسان ما در
+            سریع‌ترین زمان ممکن پاسخگوی شما خواهند بود.
           </p>
         </div>
       </section>
 
       <section className="relative pb-20 pt-4 sm:pb-28">
         <div className="container">
-          <div className="mx-auto mb-14 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+          <div className="mx-auto mb-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
             {CONTACT_ITEMS.map((item) => (
               <div
                 key={item.label}
@@ -100,7 +145,33 @@ export default function ContactPage() {
             ))}
           </div>
 
-          <ConsultationForm />
+          <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-white/10">
+            <iframe
+              title="نقشه موقعیت ما"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`}
+              className="h-72 w-full grayscale invert sm:h-80"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+
+          <div className="mx-auto mt-10 max-w-2xl text-center">
+            <p className="text-sm font-semibold text-foreground/70">
+              ما را در شبکه‌های اجتماعی دنبال کنید
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-3">
+              {SOCIALS.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  aria-label={social.name}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </>

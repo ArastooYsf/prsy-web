@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* All tokens are raw "R G B" channel triplets (no rgb()/commas) so Tailwind
+     can compose them as rgb(var(--x) / <alpha-value>) and opacity modifiers
+     like bg-background/90 or text-foreground/70 actually work. Values below
+     are the brand palette (see tailwind.config.ts): graphite / graphite-light
+     / accent-orange / accent-amber / text-primary / text-secondary. */
+  --background: 32 36 42; /* graphite */
+  --foreground: 242 242 240; /* text-primary */
+
+  --border: 58 63 71; /* graphite-light */
+  --input: 58 63 71; /* graphite-light */
+  --ring: 193 68 14; /* accent-orange */
+
+  --primary: 193 68 14; /* accent-orange */
+  --primary-foreground: 242 242 240; /* text-primary */
+
+  --secondary: 58 63 71; /* graphite-light */
+  --secondary-foreground: 242 242 240; /* text-primary */
+
+  --destructive: 166 61 47; /* error */
+  --destructive-foreground: 242 242 240; /* text-primary */
+
+  --muted: 58 63 71; /* graphite-light */
+  --muted-foreground: 168 173 180; /* text-secondary */
+
+  --accent: 58 63 71; /* graphite-light (ghost/outline hover wash) */
+  --accent-foreground: 242 242 240; /* text-primary */
+
+  --popover: 58 63 71; /* graphite-light */
+  --popover-foreground: 242 242 240; /* text-primary */
+
+  --card: 58 63 71; /* graphite-light */
+  --card-foreground: 242 242 240; /* text-primary */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
+}
+
+::selection {
+  background-color: #c1440e;
+  color: #f2f2f0;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-gradient {
+    background: linear-gradient(90deg, #b8842e 0%, #c1440e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .section-padding {
+    @apply py-20 sm:py-28;
+  }
+}

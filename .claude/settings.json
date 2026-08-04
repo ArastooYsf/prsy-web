@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(CHROME_PATH=/snap/bin/chromium npx --yes lighthouse http://localhost:3000 --output=json --output-path=/tmp/claude-1000/-home-arastooysf-Projects-prsy-website/c169048f-4722-44e6-a1d5-46eaca63fffa/scratchpad/lh-about.json '--chrome-flags=--headless=new --no-sandbox --disable-gpu' --only-categories=performance,accessibility,best-practices,seo --preset=desktop)",
+      "Bash(curl -sf http://localhost:3000/products)",
+      "Bash(CHROME_PATH=/snap/bin/chromium npx --yes lighthouse http://localhost:3000 --output=json --output-path=/tmp/claude-1000/-home-arastooysf-Projects-prsy-website/c169048f-4722-44e6-a1d5-46eaca63fffa/scratchpad/lh-home.json '--chrome-flags=--headless=new --no-sandbox --disable-gpu' --only-categories=performance,accessibility,best-practices,seo --preset=desktop)",
+      "Bash(CHROME_PATH=/snap/bin/chromium npx --yes lighthouse http://localhost:3000/products --output=json --output-path=/tmp/claude-1000/-home-arastooysf-Projects-prsy-website/c169048f-4722-44e6-a1d5-46eaca63fffa/scratchpad/lh-products.json '--chrome-flags=--headless=new --no-sandbox --disable-gpu' --only-categories=performance,accessibility,best-practices,seo --preset=desktop)"
+    ]
+  }
+}

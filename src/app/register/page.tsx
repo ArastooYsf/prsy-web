@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
-import LoginForm from "@/components/LoginForm";
+import RegisterForm from "@/components/RegisterForm";
 
 export const metadata: Metadata = {
-  title: "ورود",
-  description: "ورود به حساب کاربری در پویش راه صنعت یاشار.",
+  title: "ثبت‌نام",
+  description: "ساخت حساب کاربری در پویش راه صنعت یاشار.",
   robots: { index: false, follow: false },
 };
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
 
   if (session?.user) {
@@ -35,18 +34,16 @@ export default async function LoginPage() {
               حساب کاربری
             </span>
             <h1 className="text-balance text-2xl font-black leading-tight sm:text-3xl">
-              ورود به <span className="text-gradient">حساب کاربری</span>
+              ساخت <span className="text-gradient">حساب کاربری</span>
             </h1>
           </div>
 
           <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-            <Suspense fallback={null}>
-              <LoginForm />
-            </Suspense>
+            <RegisterForm />
             <p className="mt-5 text-center text-sm text-foreground/60">
-              حساب کاربری ندارید؟{" "}
-              <Link href="/register" className="font-semibold text-accent-400">
-                ثبت‌نام
+              قبلاً حساب دارید؟{" "}
+              <Link href="/login" className="font-semibold text-accent-400">
+                ورود
               </Link>
             </p>
           </div>

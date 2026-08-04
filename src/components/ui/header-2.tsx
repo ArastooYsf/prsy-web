@@ -5,6 +5,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll } from '@/components/ui/use-scroll';
+import AuthNavLink from '@/components/AuthNavLink';
 
 export function Header() {
 	const [open, setOpen] = React.useState(false);
@@ -103,6 +104,7 @@ export function Header() {
 					<Button size="sm" asChild>
 						<Link href="/consultation">درخواست مشاوره</Link>
 					</Button>
+					<AuthNavLink variant="icon" />
 				</div>
 				<Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="lg:hidden">
 					<MenuToggleIcon open={open} className="size-5" duration={300} />
@@ -148,6 +150,7 @@ export function Header() {
 								درخواست مشاوره
 							</Link>
 						</Button>
+						<AuthNavLink variant="block" onNavigate={() => setOpen(false)} />
 					</div>
 				</div>
 			</div>

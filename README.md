@@ -38,6 +38,29 @@ that host's URL (e.g. `https://media.yasharindustry.com`) and redeploy — every
 image and video on the site will load from the new host automatically, with
 no code changes.
 
+## Google Analytics (GA4)
+
+Analytics is wired up but disabled by default. `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+in `.env.local` is empty, so no GA script ever loads and nothing errors.
+
+To turn it on: create a GA4 property, grab its Measurement ID (looks like
+`G-XXXXXXXXXX`), and set it in `.env.local`:
+
+```
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+Redeploy — `src/app/layout.tsx` picks it up automatically and starts loading
+`gtag.js` on every page. No other code changes needed.
+
+## Sitemap & robots.txt
+
+`src/app/sitemap.ts` and `src/app/robots.ts` use Next.js's built-in
+conventions and are served at `/sitemap.xml` and `/robots.txt`. The sitemap
+scans `src/app` for `page.tsx` files at build time, so adding a new page
+(e.g. `src/app/new-route/page.tsx`) shows up in the sitemap automatically —
+nothing to edit by hand.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

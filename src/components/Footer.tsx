@@ -175,9 +175,9 @@ export default function Footer() {
             صنعت یاشار. تمامی حقوق محفوظ است.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="transition-colors hover:text-white">
+            <Link href="/privacy" className="transition-colors hover:text-white">
               حریم خصوصی
-            </a>
+            </Link>
             <Link href="/terms" className="transition-colors hover:text-white">
               قوانین و مقررات
             </Link>

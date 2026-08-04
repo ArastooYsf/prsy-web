@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
+import Script from "next/script";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
 import "./globals.css";
+
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -50,6 +53,22 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
         <PageLoader />
         <Header />
         <main>{children}</main>

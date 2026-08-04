@@ -165,7 +165,7 @@ export default function Pricing() {
               </ul>
 
               <motion.a
-                href="#top"
+                href="/consultation"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className={`mt-8 block rounded-full px-6 py-3.5 text-center text-sm font-semibold transition-colors ${

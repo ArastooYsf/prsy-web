@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { getMediaUrl } from "@/lib/media";
 
 type Slide = {
   id: string;
@@ -10,7 +11,7 @@ type Slide = {
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  icon: React.ReactNode;
+  image: string;
 };
 
 const SLIDES: Slide[] = [
@@ -21,18 +22,7 @@ const SLIDES: Slide[] = [
       "تأمین انواع دیزل ژنراتور در ظرفیت‌های مختلف، با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم.",
     ctaLabel: "مشاهده محصول",
     ctaHref: "/products#diesel-generators",
-    icon: (
-      <svg width="132" height="132" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="7" width="14" height="11" rx="1.5" stroke="currentColor" strokeWidth="1" />
-        <path
-          d="M11.5 10.5l-3 3.6h2.1l-1 2.9 3.4-3.6h-2l0.5-2.9z"
-          stroke="currentColor"
-          strokeWidth="0.8"
-          strokeLinejoin="round"
-        />
-        <path d="M19 10h2M19 14h2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      </svg>
-    ),
+    image: "products/diesel-generators.svg",
   },
   {
     id: "power-engines",
@@ -41,17 +31,7 @@ const SLIDES: Slide[] = [
       "موتور برق‌های قابل‌حمل و ثابت، مناسب مصارف خانگی و تجاری، با گارانتی و پشتیبانی کامل.",
     ctaLabel: "مشاهده محصول",
     ctaHref: "/products#power-engines",
-    icon: (
-      <svg width="132" height="132" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M7 11h10v3a5 5 0 01-5 5 5 5 0 01-5-5v-3z"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeLinejoin="round"
-        />
-        <path d="M9 7v4M15 7v4M12 19v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      </svg>
-    ),
+    image: "products/power-engines.svg",
   },
   {
     id: "spare-parts",
@@ -60,17 +40,7 @@ const SLIDES: Slide[] = [
       "تأمین قطعات یدکی اورجینال برای انواع دیزل ژنراتور و موتور برق، فقط به‌صورت نو.",
     ctaLabel: "بیشتر بدانید",
     ctaHref: "/products#spare-parts",
-    icon: (
-      <svg width="132" height="132" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1" />
-        <path
-          d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
+    image: "products/spare-parts.svg",
   },
   {
     id: "overhaul",
@@ -79,17 +49,7 @@ const SLIDES: Slide[] = [
       "اورهال و تعمیرات تخصصی دیزل ژنراتور و موتور برق، توسط تیم فنی مجرب.",
     ctaLabel: "بیشتر بدانید",
     ctaHref: "/products#overhaul",
-    icon: (
-      <svg width="132" height="132" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M14.7 6.3a4 4 0 00-5.4 5.4L3.5 17.5l3 3 5.8-5.8a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    image: "products/overhaul.svg",
   },
 ];
 
@@ -151,11 +111,15 @@ export default function Hero() {
                   opacity: textHovered ? 0.7 : 1,
                 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className={`relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] text-accent-400/70 sm:aspect-[16/10] lg:aspect-square ${
+                className={`relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] sm:aspect-[16/10] lg:aspect-square ${
                   imageFirst ? "lg:order-2" : "lg:order-1"
                 }`}
               >
-                {slide.icon}
+                <img
+                  src={getMediaUrl(slide.image)}
+                  alt={slide.title}
+                  className="h-full w-full object-contain p-10 sm:p-14"
+                />
               </motion.div>
 
               <motion.div

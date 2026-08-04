@@ -12,6 +12,8 @@ const QUICK_LINKS = [
   { label: "مشتریان", href: "/#clients" },
   { label: "قیمت‌گذاری", href: "/pricing" },
   { label: "سوالات متداول", href: "/faq" },
+  { label: "درخواست مشاوره", href: "/consultation" },
+  { label: "تماس با ما", href: "/contact" },
 ];
 
 const SERVICES = [
@@ -176,9 +178,9 @@ export default function Footer() {
             <a href="#" className="transition-colors hover:text-white">
               حریم خصوصی
             </a>
-            <a href="#" className="transition-colors hover:text-white">
+            <Link href="/terms" className="transition-colors hover:text-white">
               قوانین و مقررات
-            </a>
+            </Link>
           </div>
         </motion.div>
       </motion.div>

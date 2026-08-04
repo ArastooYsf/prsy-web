@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
+import PageLoader from "@/components/PageLoader";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -49,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <PageLoader />
         <Header />
         <main>{children}</main>
         <Footer />

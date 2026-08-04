@@ -18,6 +18,26 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Product media (images/videos)
+
+All product images and videos are loaded through one environment variable,
+`NEXT_PUBLIC_MEDIA_URL` (set in `.env.local`, template in `.env.example`).
+
+Right now it points at the local `public/media` folder:
+
+```
+NEXT_PUBLIC_MEDIA_URL=/media
+```
+
+Components never hardcode a media URL — they call `getMediaUrl(path)` from
+`src/lib/media.ts`, which joins `NEXT_PUBLIC_MEDIA_URL` with a relative path
+(e.g. `getMediaUrl("products/diesel-generators.svg")`).
+
+When a separate media/CDN host is ready, change `NEXT_PUBLIC_MEDIA_URL` to
+that host's URL (e.g. `https://media.yasharindustry.com`) and redeploy — every
+image and video on the site will load from the new host automatically, with
+no code changes.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

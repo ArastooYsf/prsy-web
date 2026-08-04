@@ -48,7 +48,16 @@ const PRINCIPLES = [
   },
 ];
 
-export default function About() {
+const DEFAULT_TITLE = "شریک مطمئن شما در تأمین دیزل ژنراتور";
+const DEFAULT_BODY =
+  "پویش راه صنعت یاشار (شماره ثبت ۴۷۶۰۶) از سال ۱۳۹۶ فعالیت خود را با هدف تأمین باکیفیت‌ترین دیزل ژنراتورها و قطعات مرتبط آغاز کرد. از همان روز نخست، محور کار ما بر سه اصل استوار بوده است:";
+
+type AboutProps = {
+  title?: string;
+  body?: string;
+};
+
+export default function About({ title, body }: AboutProps) {
   return (
     <section id="about" className="section-padding relative border-t border-white/10">
       <div className="container">
@@ -69,15 +78,13 @@ export default function About() {
               variants={fadeInUp}
               className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
             >
-              شریک مطمئن شما در تأمین دیزل ژنراتور
+              {title || DEFAULT_TITLE}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="mt-5 text-balance leading-8 text-foreground/70"
             >
-              پویش راه صنعت یاشار (شماره ثبت ۴۷۶۰۶) از سال ۱۳۹۶ فعالیت خود را
-              با هدف تأمین باکیفیت‌ترین دیزل ژنراتورها و قطعات مرتبط آغاز کرد.
-              از همان روز نخست، محور کار ما بر سه اصل استوار بوده است:
+              {body || DEFAULT_BODY}
             </motion.p>
 
             <motion.ul

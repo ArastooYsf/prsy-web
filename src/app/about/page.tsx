@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import About from "@/components/About";
+import { getAboutContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "درباره ما",
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
     "پویش راه صنعت یاشار، از سال ۱۳۹۶ تأمین‌کننده دیزل ژنراتور، موتور برق و قطعات یدکی با بالاترین کیفیت، بهترین قیمت و سریع‌ترین تحویل.",
 };
 
-export default function AboutPage() {
-  return <About />;
+export default async function AboutPage() {
+  const { title, body } = await getAboutContent();
+  return <About title={title} body={body} />;
 }

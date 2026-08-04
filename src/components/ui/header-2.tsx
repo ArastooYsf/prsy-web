@@ -36,6 +36,10 @@ export function Header() {
 			href: '/pricing',
 		},
 		{
+			label: 'وبلاگ',
+			href: '/blog',
+		},
+		{
 			label: 'سوالات متداول',
 			href: '/faq',
 		},

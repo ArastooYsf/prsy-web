@@ -1,0 +1,18 @@
+# Local development database only. Production uses the MySQL database
+# provisioned through your host's cPanel (see README.md).
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: yashar
+      MYSQL_USER: yashar
+      MYSQL_PASSWORD: yashar_dev_password
+      MYSQL_ROOT_PASSWORD: yashar_dev_root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:

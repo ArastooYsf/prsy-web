@@ -1,0 +1,71 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { getMediaUrl } from "@/lib/media";
+import { sanitizeRichText } from "@/lib/sanitize";
+
+export const revalidate = 60;
+
+async function getPost(rawSlug: string) {
+  const slug = decodeURIComponent(rawSlug);
+  try {
+    return await prisma.blogPost.findFirst({ where: { slug, published: true } });
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  if (!post) return {};
+
+  return {
+    title: post.title,
+    description: post.excerpt ?? undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      images: post.coverImage ? [getMediaUrl(post.coverImage)] : undefined,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
+
+  if (!post) notFound();
+
+  const safeContent = sanitizeRichText(post.content);
+
+  return (
+    <article className="relative pb-20 pt-14 sm:pb-28 sm:pt-20">
+      <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+      <div className="container relative">
+        <div className="mx-auto max-w-2xl">
+          <Link href="/blog" className="text-sm font-semibold text-accent-400">
+            → بازگشت به وبلاگ
+          </Link>
+
+          {post.publishedAt && (
+            <p dir="ltr" className="mt-6 text-left text-xs text-foreground/50">
+              {post.publishedAt.toLocaleDateString("fa-IR")}
+            </p>
+          )}
+          <h1 className="mt-2 text-balance text-3xl font-black leading-tight sm:text-4xl">{post.title}</h1>
+
+          {post.coverImage && (
+            <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
+              <img src={getMediaUrl(post.coverImage)} alt={post.title} className="w-full object-cover" />
+            </div>
+          )}
+
+          <div
+            className="prose prose-invert prose-sm mt-8 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400"
+            dangerouslySetInnerHTML={{ __html: safeContent }}
+          />
+        </div>
+      </div>
+    </article>
+  );
+}

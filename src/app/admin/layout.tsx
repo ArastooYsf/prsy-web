@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/admin/SignOutButton";
+import AdminNav from "@/components/admin/AdminNav";
 
 export const metadata: Metadata = {
   title: "پنل مدیریت",
@@ -33,6 +34,7 @@ export default async function AdminLayout({
         </div>
         <SignOutButton />
       </div>
+      <AdminNav />
       {children}
     </section>
   );

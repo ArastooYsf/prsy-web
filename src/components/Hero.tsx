@@ -55,7 +55,17 @@ const SLIDES: Slide[] = [
 
 const SLIDE_DURATION = 5;
 
-export default function Hero() {
+type HeroOverride = {
+  title?: string;
+  description?: string;
+  image?: string;
+};
+
+type HeroProps = {
+  overrides?: Record<string, HeroOverride>;
+};
+
+export default function Hero({ overrides = {} }: HeroProps) {
   const [index, setIndex] = useState(0);
   const [imageHovered, setImageHovered] = useState(false);
   const [textHovered, setTextHovered] = useState(false);
@@ -65,11 +75,21 @@ export default function Hero() {
     setCanHover(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
   }, []);
 
-  const slide = SLIDES[index];
+  const slides = SLIDES.map((s) => {
+    const override = overrides[s.id];
+    return {
+      ...s,
+      title: override?.title || s.title,
+      description: override?.description || s.description,
+      image: override?.image || s.image,
+    };
+  });
+
+  const slide = slides[index];
   const imageFirst = index % 2 === 0;
 
   const goNext = () => {
-    setIndex((i) => (i + 1) % SLIDES.length);
+    setIndex((i) => (i + 1) % slides.length);
     setImageHovered(false);
     setTextHovered(false);
   };
@@ -161,7 +181,7 @@ export default function Hero() {
         </div>
 
         <div className="mx-auto mt-10 flex max-w-md items-center gap-2 lg:mt-14">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <button
               key={s.id}
               type="button"

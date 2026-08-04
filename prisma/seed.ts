@@ -1,6 +1,10 @@
+import { config } from "dotenv";
 import bcrypt from "bcryptjs";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient, Role } from "../src/generated/prisma/client";
+
+config({ path: ".env" });
+config({ path: ".env.local", override: true });
 
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL ?? "");
 const prisma = new PrismaClient({ adapter });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
+import { getProductCategoryImages } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "محصولات",
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
     "دیزل ژنراتور، موتور برق، قطعات یدکی، موتور ژنراتور و دینام/آلترناتور با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم.",
 };
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const categoryImages = await getProductCategoryImages();
+
   return (
     <>
       <section className="relative overflow-hidden pb-8 pt-14 sm:pt-20">
@@ -29,7 +32,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      <ProductCategories />
+      <ProductCategories images={categoryImages} />
       <AuxiliaryServices />
     </>
   );

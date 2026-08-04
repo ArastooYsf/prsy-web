@@ -35,6 +35,7 @@ model BlogPost {
   content     String   @db.Text
   coverImage  String?
   published   Boolean  @default(false)
+  publishedAt DateTime?
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
   createdAt   DateTime @default(now())

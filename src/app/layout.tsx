@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -69,10 +70,12 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        <PageLoader />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SessionProviderWrapper>
+          <PageLoader />
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </SessionProviderWrapper>
       </body>
     </html>
   );

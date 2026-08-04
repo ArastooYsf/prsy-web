@@ -1,41 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import { FAQS } from "@/data/faqs";
 
-const FAQS = [
-  {
-    question: "چه نوع پروژه‌هایی را می‌پذیرید؟",
-    answer:
-      "پروژه‌های صنعتی و زیرساختی از جمله خطوط تولید، مجتمع‌های پتروشیمی، نیروگاه‌ها، معادن و واحدهای فرآوری را از مرحله طراحی تا اجرای کامل پوشش می‌دهیم.",
-  },
-  {
-    question: "زمان تحویل یک پروژه معمولی چقدر است؟",
-    answer:
-      "بسته به مقیاس و پیچیدگی پروژه متفاوت است؛ در جلسه ارزیابی اولیه، برآورد دقیقی از زمان‌بندی اجرا بر اساس نقشه راه پروژه شما ارائه می‌کنیم.",
-  },
-  {
-    question: "آیا امکان بازدید حضوری از سایت پروژه وجود دارد؟",
-    answer:
-      "بله، تیم فنی ما پیش از ارائه پیشنهاد نهایی، بازدید میدانی از سایت انجام می‌دهد تا ارزیابی دقیقی از شرایط اجرایی و محدودیت‌های فنی داشته باشیم.",
-  },
-  {
-    question: "هزینه جلسه مشاوره اولیه چقدر است؟",
-    answer:
-      "اولین جلسه مشاوره برای بررسی کلیات پروژه کاملاً رایگان است. هزینه خدمات تخصصی‌تر مانند امکان‌سنجی و طراحی، بر اساس دامنه کار توافق می‌شود.",
-  },
-  {
-    question: "چگونه همکاری را با تیم شما شروع کنم؟",
-    answer:
-      "کافی است فرم درخواست مشاوره را تکمیل کنید؛ کارشناسان ما ظرف ۴۸ ساعت کاری با شما تماس می‌گیرند تا جلسه ارزیابی اولیه هماهنگ شود.",
-  },
-  {
-    question: "آیا در سراسر کشور فعالیت می‌کنید؟",
-    answer:
-      "بله، تیم اجرایی ما آمادگی حضور در پروژه‌های سراسر کشور را دارد و بر اساس موقعیت جغرافیایی پروژه، برنامه‌ریزی لجستیکی لازم انجام می‌شود.",
-  },
-];
+const PREVIEW_COUNT = 4;
 
 function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   return (
@@ -54,8 +25,9 @@ function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   );
 }
 
-export default function FAQ() {
+export default function FAQ({ full = false }: { full?: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const items = full ? FAQS : FAQS.slice(0, PREVIEW_COUNT);
 
   return (
     <section id="faq" className="section-padding relative border-t border-white/10">
@@ -95,7 +67,7 @@ export default function FAQ() {
           variants={staggerContainer(0.08)}
           className="mx-auto mt-14 max-w-3xl divide-y divide-white/10 sm:mt-16"
         >
-          {FAQS.map((faq, index) => {
+          {items.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <motion.div key={faq.question} variants={fadeInUp}>
@@ -129,6 +101,32 @@ export default function FAQ() {
             );
           })}
         </motion.div>
+
+        {!full && (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            variants={fadeInUp}
+            className="mt-10 text-center"
+          >
+            <Link
+              href="/faq"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors hover:text-white"
+            >
+              مشاهده همه سوالات متداول
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M19 12H5M5 12L11 6M5 12L11 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   );

@@ -36,7 +36,7 @@ const SERVICES = [
         <path d="M9 12l2 2 4-4.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    cta: { label: "درخواست مشاوره", href: "/#pricing" },
+    cta: { label: "درخواست مشاوره", href: "/pricing" },
   },
   {
     title: "مشاوره تخصصی",

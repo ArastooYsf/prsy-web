@@ -25,7 +25,7 @@ export function Header() {
 		},
 		{
 			label: 'درباره ما',
-			href: '/#about',
+			href: '/about',
 		},
 		{
 			label: 'مشتریان',
@@ -33,11 +33,11 @@ export function Header() {
 		},
 		{
 			label: 'قیمت‌گذاری',
-			href: '/#pricing',
+			href: '/pricing',
 		},
 		{
 			label: 'سوالات متداول',
-			href: '/#faq',
+			href: '/faq',
 		},
 	];
 
@@ -90,10 +90,10 @@ export function Header() {
 						</Link>
 					))}
 					<Button variant="outline" asChild>
-						<Link href="/#pricing">تماس با ما</Link>
+						<Link href="/pricing">تماس با ما</Link>
 					</Button>
 					<Button asChild>
-						<Link href="/#pricing">درخواست مشاوره</Link>
+						<Link href="/pricing">درخواست مشاوره</Link>
 					</Button>
 				</div>
 				<Button size="icon" variant="outline" onClick={() => setOpen(!open)} className="md:hidden">
@@ -131,12 +131,12 @@ export function Header() {
 					</div>
 					<div className="flex flex-col gap-2">
 						<Button variant="outline" className="w-full" asChild>
-							<Link href="/#pricing" onClick={() => setOpen(false)}>
+							<Link href="/pricing" onClick={() => setOpen(false)}>
 								تماس با ما
 							</Link>
 						</Button>
 						<Button className="w-full" asChild>
-							<Link href="/#pricing" onClick={() => setOpen(false)}>
+							<Link href="/pricing" onClick={() => setOpen(false)}>
 								درخواست مشاوره
 							</Link>
 						</Button>

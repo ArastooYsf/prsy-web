@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 import ContractForm from "@/components/admin/ContractForm";
+import DateRangeDisplay from "@/components/DateRangeDisplay";
+import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -34,17 +36,20 @@ export default async function AdminContractDetailPage({ params }: { params: { id
         </div>
         <p className="text-sm text-foreground/70">مشتری: {contract.user.name || contract.user.email}</p>
         <p className="text-sm text-foreground/70">نوع: {contract.type}</p>
-        <p dir="ltr" className="text-left text-sm text-foreground/70">
-          {contract.startDate.toLocaleDateString("fa-IR")} — {contract.endDate.toLocaleDateString("fa-IR")}
-        </p>
+        <DateRangeDisplay
+          start={contract.startDate.toISOString()}
+          end={contract.endDate.toISOString()}
+          className="text-sm text-foreground/70"
+        />
         {contract.fileUrl && (
           <a
             href={getMediaUrl(contract.fileUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
-            دانلود PDF
+            <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
+            دانلود پیوست
           </a>
         )}
       </div>

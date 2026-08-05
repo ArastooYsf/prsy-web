@@ -53,6 +53,20 @@ async function main() {
 
     console.log(`کاربر پشتیبان آماده شد: ${support.email}`);
   }
+
+  const defaultContractTypes = [
+    "گارانتی",
+    "نگهداری دوره‌ای",
+    "نصب و راه‌اندازی",
+    "تامین قطعات یدکی",
+    "سرویس اضطراری",
+  ];
+
+  for (const label of defaultContractTypes) {
+    await prisma.contractType.upsert({ where: { label }, update: {}, create: { label } });
+  }
+
+  console.log(`انواع قرارداد پیش‌فرض آماده شد (${defaultContractTypes.length} مورد).`);
 }
 
 main()

@@ -7,6 +7,7 @@ type UploadedMedia = {
   id: string;
   url: string;
   filename: string;
+  mimeType: string;
 };
 
 export default function UploadWidget() {
@@ -24,7 +25,7 @@ export default function UploadWidget() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/admin/upload", {
+      const res = await fetch("/api/media/upload", {
         method: "POST",
         body: formData,
       });
@@ -45,16 +46,16 @@ export default function UploadWidget() {
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 className="text-lg font-bold">آپلود تصویر</h2>
+      <h2 className="text-lg font-bold">آپلود سریع به مخزن سایت</h2>
       <p className="mt-1 text-sm text-foreground/60">
-        تصاویر مستقیم روی هاست ذخیره می‌شوند (public/media/uploads).
+        فایل‌ها به مخزن مشترک سایت اضافه می‌شوند و همه‌جا (وبلاگ، محتوای سایت، قرارداد، تیکت) قابل انتخاب هستند.
       </p>
 
       <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-6 py-8 text-center transition-colors hover:border-accent-500/40">
         <input
           ref={inputRef}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
           multiple
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
@@ -63,7 +64,7 @@ export default function UploadWidget() {
         <span className="text-sm font-medium text-foreground/80">
           {uploading ? "در حال آپلود..." : "برای انتخاب تصویر کلیک کنید"}
         </span>
-        <span className="text-xs text-foreground/50">PNG، JPG، WEBP، SVG یا GIF — حداکثر ۸ مگابایت</span>
+        <span className="text-xs text-foreground/50">تصویر (PNG/JPG/WEBP) یا PDF — به مخزن سایت اضافه می‌شود</span>
       </label>
 
       {error && (
@@ -76,11 +77,19 @@ export default function UploadWidget() {
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {uploaded.map((item) => (
             <div key={item.id} className="overflow-hidden rounded-lg border border-white/10">
-              <img
-                src={getMediaUrl(item.url)}
-                alt={item.filename}
-                className="aspect-square w-full object-cover"
-              />
+              {item.mimeType.startsWith("image/") ? (
+                <img
+                  src={getMediaUrl(item.url)}
+                  alt={item.filename}
+                  className="aspect-square w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-square w-full items-center justify-center bg-white/[0.04] p-2">
+                  <span className="line-clamp-3 break-words text-center text-[11px] text-foreground/60">
+                    {item.filename}
+                  </span>
+                </div>
+              )}
               <p dir="ltr" className="truncate px-2 py-1.5 text-[11px] text-foreground/60">
                 {getMediaUrl(item.url)}
               </p>

@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
+import DateRangeDisplay from "@/components/DateRangeDisplay";
+import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +43,11 @@ export default async function AccountContractsPage() {
                 <div>
                   <p className="font-semibold">{contract.title}</p>
                   <p className="mt-1 text-xs text-foreground/50">{contract.type}</p>
-                  <p dir="ltr" className="mt-1 text-left text-xs text-foreground/50">
-                    {contract.startDate.toLocaleDateString("fa-IR")} — {contract.endDate.toLocaleDateString("fa-IR")}
-                  </p>
+                  <DateRangeDisplay
+                    start={contract.startDate.toISOString()}
+                    end={contract.endDate.toISOString()}
+                    className="mt-1 text-xs text-foreground/50"
+                  />
                 </div>
                 <div className="flex items-center gap-2">
                   {expiringSoon && (
@@ -61,9 +65,10 @@ export default async function AccountContractsPage() {
                       href={getMediaUrl(contract.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                      className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                     >
-                      دانلود PDF
+                      <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
+                      دانلود پیوست
                     </a>
                   )}
                 </div>

@@ -2,25 +2,63 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/media";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
 
-type MediaAsset = {
+export type MediaAsset = {
   id: string;
   url: string;
   filename: string;
+  mimeType: string;
+  size: number;
+  canDelete: boolean;
 };
+
+type MediaKind = "image" | "file" | "all";
 
 type MediaPickerModalProps = {
   open: boolean;
   onClose: () => void;
-  onConfirm: (paths: string[]) => void;
+  onConfirm: (assets: MediaAsset[]) => void;
+  kind?: MediaKind;
   multiple?: boolean;
   initialSelected?: string[];
 };
+
+const KIND_LABEL: Record<MediaKind, string> = {
+  image: "انتخاب تصویر",
+  file: "انتخاب فایل",
+  all: "انتخاب فایل یا تصویر",
+};
+
+const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+const KIND_ACCEPT: Record<MediaKind, string> = {
+  image: "image/png,image/jpeg,image/webp",
+  file: `application/pdf,${DOCX_MIME_TYPE}`,
+  all: `image/png,image/jpeg,image/webp,application/pdf,${DOCX_MIME_TYPE}`,
+};
+
+const KIND_HINT: Record<MediaKind, string> = {
+  image: "PNG، JPG یا WEBP — حداکثر ۸ مگابایت",
+  file: "PDF یا DOCX — حداکثر ۱۵ مگابایت",
+  all: "تصویر (PNG/JPG/WEBP) تا ۸ مگابایت، یا PDF/DOCX تا ۱۵ مگابایت",
+};
+
+function isImageMime(mimeType: string) {
+  return mimeType.startsWith("image/");
+}
+
+function formatSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} کیلوبایت`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} مگابایت`;
+}
 
 export default function MediaPickerModal({
   open,
   onClose,
   onConfirm,
+  kind = "image",
   multiple = true,
   initialSelected = [],
 }: MediaPickerModalProps) {
@@ -32,6 +70,11 @@ export default function MediaPickerModal({
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [deleteTarget, setDeleteTarget] = useState<MediaAsset | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+  const [usageMessage, setUsageMessage] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
   useEffect(() => {
     if (!open) return;
     setDraftSelected(initialSelected);
@@ -39,7 +82,7 @@ export default function MediaPickerModal({
     setError("");
     fetchGallery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, kind]);
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +95,7 @@ export default function MediaPickerModal({
 
   const fetchGallery = async () => {
     setLoadingGallery(true);
-    const res = await fetch("/api/admin/media");
+    const res = await fetch(`/api/media?type=${kind}`);
     if (res.ok) {
       const { media } = await res.json();
       setGallery(media);
@@ -79,7 +122,7 @@ export default function MediaPickerModal({
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/media/upload", { method: "POST", body: formData });
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -101,8 +144,39 @@ export default function MediaPickerModal({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const openDeleteConfirm = async (item: MediaAsset) => {
+    setDeleteTarget(item);
+    setUsageMessage("");
+    setUsageLoading(true);
+
+    const res = await fetch(`/api/media/${item.id}/usage`);
+    if (res.ok) {
+      const { usage } = await res.json();
+      if (usage.length > 0) {
+        setUsageMessage(`این فایل هم‌اکنون استفاده شده است:\n${usage.map((u: { label: string }) => `• ${u.label}`).join("\n")}`);
+      }
+    }
+    setUsageLoading(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+
+    const res = await fetch(`/api/media/${deleteTarget.id}`, { method: "DELETE" });
+
+    if (res.ok) {
+      setGallery((prev) => prev.filter((g) => g.id !== deleteTarget.id));
+      setDraftSelected((prev) => prev.filter((p) => p !== deleteTarget.url));
+    }
+
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
   const confirm = () => {
-    onConfirm(draftSelected);
+    const assets = gallery.filter((g) => draftSelected.includes(g.url));
+    onConfirm(assets);
     onClose();
   };
 
@@ -118,7 +192,7 @@ export default function MediaPickerModal({
         className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-          <h3 className="text-base font-bold">انتخاب تصویر</h3>
+          <h3 className="text-base font-bold">{KIND_LABEL[kind]}</h3>
           <button
             type="button"
             onClick={onClose}
@@ -157,35 +231,68 @@ export default function MediaPickerModal({
             loadingGallery ? (
               <p className="py-10 text-center text-sm text-foreground/50">در حال بارگذاری...</p>
             ) : gallery.length === 0 ? (
-              <p className="py-10 text-center text-sm text-foreground/50">هنوز تصویری آپلود نشده است.</p>
+              <p className="py-10 text-center text-sm text-foreground/50">هنوز فایلی آپلود نشده است.</p>
             ) : (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {gallery.map((item) => {
                   const selected = draftSelected.includes(item.url);
+                  const isImage = isImageMime(item.mimeType);
                   return (
-                    <button
-                      type="button"
-                      key={item.id}
-                      onClick={() => toggleSelect(item.url)}
-                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-colors ${
-                        selected ? "border-accent-500" : "border-transparent hover:border-white/20"
-                      }`}
-                    >
-                      <img src={getMediaUrl(item.url)} alt={item.filename} className="h-full w-full object-cover" />
-                      {selected && (
-                        <span className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-500 text-white">
+                    <div key={item.id} className="group relative">
+                      <button
+                        type="button"
+                        onClick={() => toggleSelect(item.url)}
+                        className={`relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-lg border-2 transition-colors ${
+                          selected ? "border-accent-500" : "border-transparent hover:border-white/20"
+                        }`}
+                      >
+                        {isImage ? (
+                          <img src={getMediaUrl(item.url)} alt={item.filename} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-white/[0.04] p-2">
+                            <FileTypeIcon kind={fileKindFromMime(item.mimeType)} className="h-6 w-6" />
+                            <span className="line-clamp-2 w-full break-words text-center text-[10px] text-foreground/60">
+                              {item.filename}
+                            </span>
+                          </div>
+                        )}
+                        {selected && (
+                          <span className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-500 text-white">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                              <path
+                                d="M5 13l4 4L19 7"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                        )}
+                      </button>
+
+                      {item.canDelete && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteConfirm(item);
+                          }}
+                          aria-label="حذف از مخزن"
+                          className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-red-500 group-hover:opacity-100"
+                        >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                             <path
-                              d="M5 13l4 4L19 7"
+                              d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v12a1 1 0 001 1h6a1 1 0 001-1V7"
                               stroke="currentColor"
-                              strokeWidth="2.5"
+                              strokeWidth="1.6"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                           </svg>
-                        </span>
+                        </button>
                       )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -195,7 +302,7 @@ export default function MediaPickerModal({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept={KIND_ACCEPT[kind]}
                 multiple={multiple}
                 className="hidden"
                 disabled={uploading}
@@ -204,7 +311,7 @@ export default function MediaPickerModal({
               <span className="text-sm font-medium text-foreground/80">
                 {uploading ? "در حال آپلود..." : "برای انتخاب فایل کلیک کنید"}
               </span>
-              <span className="text-xs text-foreground/50">PNG، JPG یا WEBP — حداکثر ۸ مگابایت</span>
+              <span className="text-xs text-foreground/50">{KIND_HINT[kind]}</span>
             </label>
           )}
 
@@ -212,7 +319,7 @@ export default function MediaPickerModal({
         </div>
 
         <div className="flex items-center justify-between border-t border-white/10 px-5 py-4">
-          <span className="text-xs text-foreground/50">{draftSelected.length} تصویر انتخاب‌شده</span>
+          <span className="text-xs text-foreground/50">{draftSelected.length} مورد انتخاب‌شده</span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -224,13 +331,31 @@ export default function MediaPickerModal({
             <button
               type="button"
               onClick={confirm}
-              className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+              disabled={draftSelected.length === 0}
+              className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               انتخاب
             </button>
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="حذف از مخزن سایت"
+        message={
+          usageLoading
+            ? "در حال بررسی محل استفاده..."
+            : `مطمئنید می‌خواهید «${deleteTarget?.filename ?? ""}» (${
+                deleteTarget ? formatSize(deleteTarget.size) : ""
+              }) را برای همیشه حذف کنید؟${usageMessage ? `\n\n${usageMessage}` : ""}`
+        }
+        confirmLabel="حذف کن"
+        danger
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

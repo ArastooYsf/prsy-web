@@ -6,9 +6,14 @@ export const TICKET_STATUS: Record<string, { label: string; className: string }>
 };
 
 export const CONTRACT_STATUS: Record<string, { label: string; className: string }> = {
+  PENDING_APPROVAL: { label: "در انتظار تأیید", className: "border-accent-500/30 bg-accent-500/10 text-accent-400" },
   ACTIVE: { label: "فعال", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" },
+  RENEWING: { label: "در حال تمدید", className: "border-brand-400/30 bg-brand-400/10 text-brand-300" },
   EXPIRED: { label: "منقضی‌شده", className: "border-white/10 bg-white/5 text-foreground/60" },
+  CANCELLED: { label: "لغوشده", className: "border-red-500/30 bg-red-500/10 text-red-400" },
 };
+
+export const CONTRACT_STATUSES = Object.keys(CONTRACT_STATUS);
 
 export const ORDER_STATUS: Record<string, { label: string; className: string }> = {
   PENDING: { label: "در انتظار تأیید", className: "border-accent-500/30 bg-accent-500/10 text-accent-400" },

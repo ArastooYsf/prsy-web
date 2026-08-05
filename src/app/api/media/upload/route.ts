@@ -8,9 +8,13 @@ import { prisma } from "@/lib/prisma";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
-const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
-const UPLOAD_SUBDIR = "ticket-attachments";
+const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
+const MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024; // 15MB (PDF and DOCX)
+const UPLOAD_SUBDIR = "uploads";
 
+// Verify actual file bytes, not just the client-supplied name/Content-Type,
+// which are trivial to spoof (e.g. a renamed .php file claiming image/jpeg).
 function matchesImageSignature(bytes: Buffer, mimeType: string): boolean {
   if (mimeType === "image/jpeg") {
     return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
@@ -30,18 +34,17 @@ function isPdf(bytes: Buffer): boolean {
   return bytes.subarray(0, 5).toString("ascii") === "%PDF-";
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+// .docx files are ZIP archives (OOXML); a real ZIP local-file-header signature
+// is a reasonable, cheap authenticity check without parsing the archive.
+function isZipContainer(bytes: Buffer): boolean {
+  return bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
+}
+
+export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
-  }
-
-  const isStaff = session.user.role === "ADMIN" || session.user.role === "SUPPORT";
-
-  const ticket = await prisma.ticket.findUnique({ where: { id: params.id } });
-  if (!ticket || (!isStaff && ticket.userId !== session.user.id)) {
-    return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }
 
   const formData = await request.formData();
@@ -52,24 +55,29 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 
   const extension = path.extname(file.name).toLowerCase();
-  const isImage = ALLOWED_IMAGE_TYPES.includes(file.type) && ALLOWED_IMAGE_EXTENSIONS.includes(extension);
-  const isPdfFile = file.type === "application/pdf" && extension === ".pdf";
+  const isImageCandidate = ALLOWED_IMAGE_TYPES.includes(file.type) && ALLOWED_IMAGE_EXTENSIONS.includes(extension);
+  const isPdfCandidate = file.type === "application/pdf" && extension === ".pdf";
+  const isDocxCandidate = file.type === DOCX_MIME_TYPE && extension === ".docx";
 
-  if (!isImage && !isPdfFile) {
+  if (!isImageCandidate && !isPdfCandidate && !isDocxCandidate) {
     return NextResponse.json({ error: "فرمت فایل مجاز نیست." }, { status: 400 });
   }
 
-  if (file.size > MAX_SIZE_BYTES) {
+  const maxSize = isImageCandidate ? MAX_IMAGE_SIZE_BYTES : MAX_DOCUMENT_SIZE_BYTES;
+  if (file.size > maxSize) {
     return NextResponse.json({ error: "حجم فایل بیش از حد مجاز است." }, { status: 400 });
   }
 
   const bytes = Buffer.from(await file.arrayBuffer());
 
-  if (isImage && !matchesImageSignature(bytes, file.type)) {
+  if (isImageCandidate && !matchesImageSignature(bytes, file.type)) {
     return NextResponse.json({ error: "محتوای فایل با نوع تصویر مطابقت ندارد." }, { status: 400 });
   }
-  if (isPdfFile && !isPdf(bytes)) {
+  if (isPdfCandidate && !isPdf(bytes)) {
     return NextResponse.json({ error: "محتوای فایل با نوع PDF مطابقت ندارد." }, { status: 400 });
+  }
+  if (isDocxCandidate && !isZipContainer(bytes)) {
+    return NextResponse.json({ error: "محتوای فایل با نوع DOCX مطابقت ندارد." }, { status: 400 });
   }
 
   const filename = `${randomUUID()}${extension}`;
@@ -77,5 +85,19 @@ export async function POST(request: Request, { params }: { params: { id: string 
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, filename), bytes);
 
-  return NextResponse.json({ url: `${UPLOAD_SUBDIR}/${filename}`, filename: file.name });
+  const relativePath = `${UPLOAD_SUBDIR}/${filename}`;
+
+  const asset = await prisma.mediaAsset.create({
+    data: {
+      filename: file.name,
+      url: relativePath,
+      mimeType: file.type,
+      size: file.size,
+      uploadedById: session.user.id,
+    },
+  });
+
+  return NextResponse.json({
+    media: { id: asset.id, url: asset.url, filename: asset.filename, mimeType: asset.mimeType, size: asset.size, canDelete: true },
+  });
 }

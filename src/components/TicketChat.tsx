@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { getMediaUrl } from "@/lib/media";
 import EmojiPicker from "@/components/EmojiPicker";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
+import MediaPickerModal from "@/components/MediaPickerModal";
+import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 
 export type ChatMessage = {
   id: string;
@@ -59,13 +61,11 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [pendingAttachment, setPendingAttachment] = useState<{ url: string; name: string } | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [attachmentPickerOpen, setAttachmentPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const seenEndpoint = viewerRole === "customer" ? `/api/account/tickets/${ticketId}/seen` : `/api/admin/tickets/${ticketId}/seen`;
   const replyEndpoint = viewerRole === "customer" ? `/api/account/tickets/${ticketId}/reply` : `/api/admin/tickets/${ticketId}/reply`;
-  const uploadEndpoint = `/api/tickets/${ticketId}/upload`;
 
   useEffect(() => {
     fetch(seenEndpoint, { method: "POST" });
@@ -75,29 +75,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length]);
-
-  const handleFileSelect = async (file: File | undefined) => {
-    if (!file) return;
-    setUploading(true);
-    setError("");
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch(uploadEndpoint, { method: "POST", body: formData });
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در آپلود فایل.");
-      setUploading(false);
-      return;
-    }
-
-    const { url, filename } = await res.json();
-    setPendingAttachment({ url, name: filename });
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,14 +156,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
                     rel="noopener noreferrer"
                     className={`flex items-center gap-2 rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs hover:border-accent-500/40 ${m.message ? "mt-2" : ""}`}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                      <path
-                        d="M8 4h5l5 5v11a1 1 0 01-1 1H8a1 1 0 01-1-1V5a1 1 0 011-1z"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <FileTypeIcon kind={fileKindFromName(m.attachmentUrl)} />
                     <span className="truncate">{m.attachmentName ?? "فایل پیوست"}</span>
                   </a>
                 ))}
@@ -223,10 +193,9 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
             {viewerRole === "staff" && <CannedResponsePicker onSelect={(body) => setText((prev) => (prev ? `${prev}\n${body}` : body))} />}
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
+              onClick={() => setAttachmentPickerOpen(true)}
               aria-label="پیوست فایل"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground disabled:opacity-50"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
@@ -238,15 +207,17 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
                 />
               </svg>
             </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp,application/pdf"
-              className="hidden"
-              onChange={(e) => handleFileSelect(e.target.files?.[0])}
-            />
-            {uploading && <span className="text-xs text-foreground/50">در حال آپلود...</span>}
           </div>
+
+          <MediaPickerModal
+            open={attachmentPickerOpen}
+            onClose={() => setAttachmentPickerOpen(false)}
+            kind="all"
+            multiple={false}
+            onConfirm={(assets) => {
+              if (assets[0]) setPendingAttachment({ url: assets[0].url, name: assets[0].filename });
+            }}
+          />
 
           <div className="flex items-end gap-2">
             <textarea

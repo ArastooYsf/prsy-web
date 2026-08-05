@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getMediaUrl } from "@/lib/media";
-import MediaPickerModal from "@/components/admin/MediaPickerModal";
+import MediaPickerModal from "@/components/MediaPickerModal";
 
 type MediaPickerProps = {
   label: string;
@@ -57,7 +57,8 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
       <MediaPickerModal
         open={open}
         onClose={() => setOpen(false)}
-        onConfirm={onChange}
+        onConfirm={(assets) => onChange(assets.map((a) => a.url))}
+        kind="image"
         multiple={multiple}
         initialSelected={value}
       />

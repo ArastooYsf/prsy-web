@@ -87,8 +87,11 @@ model CannedResponse {
 }
 
 enum ContractStatus {
+  PENDING_APPROVAL
   ACTIVE
+  RENEWING
   EXPIRED
+  CANCELLED
 }
 
 model Contract {
@@ -106,6 +109,14 @@ model Contract {
 
   @@index([userId])
   @@map("contracts")
+}
+
+model ContractType {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("contract_types")
 }
 
 enum OrderStatus {

@@ -6,14 +6,11 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const media = await prisma.mediaAsset.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 200,
-  });
+  const types = await prisma.contractType.findMany({ orderBy: { label: "asc" } });
 
-  return NextResponse.json({ media });
+  return NextResponse.json({ types: types.map((t) => t.label) });
 }

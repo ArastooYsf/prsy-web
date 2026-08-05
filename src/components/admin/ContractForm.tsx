@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContractFileUploadField from "@/components/admin/ContractFileUploadField";
+import DateInputField from "@/components/admin/DateInputField";
+import { CONTRACT_STATUS } from "@/lib/status-labels";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+
+const CUSTOM_TYPE_VALUE = "__custom__";
 
 type Customer = { id: string; label: string };
 
@@ -29,7 +33,9 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
 
   const [userId, setUserId] = useState(contract?.userId ?? customers[0]?.id ?? "");
   const [title, setTitle] = useState(contract?.title ?? "");
-  const [type, setType] = useState(contract?.type ?? "");
+  const [contractTypes, setContractTypes] = useState<string[]>([]);
+  const [typeOption, setTypeOption] = useState(contract?.type ?? "");
+  const [customType, setCustomType] = useState("");
   const [startDate, setStartDate] = useState(contract?.startDate.slice(0, 10) ?? "");
   const [endDate, setEndDate] = useState(contract?.endDate.slice(0, 10) ?? "");
   const [status, setStatus] = useState(contract?.status ?? "ACTIVE");
@@ -37,18 +43,42 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    fetch("/api/admin/contract-types")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const types: string[] = data.types;
+        setContractTypes(types);
+
+        if (contract?.type) {
+          if (types.includes(contract.type)) {
+            setTypeOption(contract.type);
+          } else {
+            setTypeOption(CUSTOM_TYPE_VALUE);
+            setCustomType(contract.type);
+          }
+        } else if (!contract && types.length > 0) {
+          setTypeOption(types[0]);
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!userId || !title.trim() || !type.trim() || !startDate || !endDate) {
+    const finalType = typeOption === CUSTOM_TYPE_VALUE ? customType.trim() : typeOption;
+
+    if (!userId || !title.trim() || !finalType || !startDate || !endDate) {
       setError("همه فیلدهای الزامی را پر کنید.");
       return;
     }
 
     setSaving(true);
 
-    const payload = { userId, title, type, startDate, endDate, status, fileUrl: fileUrl || null };
+    const payload = { userId, title, type: finalType, startDate, endDate, status, fileUrl: fileUrl || null };
 
     const res = await fetch(
       mode === "create" ? "/api/admin/contracts" : `/api/admin/contracts/${contract!.id}`,
@@ -91,35 +121,39 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">نوع قرارداد</label>
-        <input
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className={inputClass}
-          placeholder="مثلاً گارانتی و نگهداری"
-        />
+        <select value={typeOption} onChange={(e) => setTypeOption(e.target.value)} className={inputClass}>
+          {contractTypes.map((t) => (
+            <option key={t} value={t} className="bg-background">
+              {t}
+            </option>
+          ))}
+          <option value={CUSTOM_TYPE_VALUE} className="bg-background">
+            سایر (وارد کردن دستی)
+          </option>
+        </select>
+        {typeOption === CUSTOM_TYPE_VALUE && (
+          <input
+            value={customType}
+            onChange={(e) => setCustomType(e.target.value)}
+            placeholder="نوع قرارداد دلخواه را بنویسید"
+            className={`mt-2 ${inputClass}`}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">تاریخ شروع</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">تاریخ پایان</label>
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={inputClass} />
-        </div>
+        <DateInputField label="تاریخ شروع" value={startDate} onChange={setStartDate} />
+        <DateInputField label="تاریخ پایان" value={endDate} onChange={setEndDate} />
       </div>
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">وضعیت</label>
         <select value={status} onChange={(e) => setStatus(e.target.value)} className={inputClass}>
-          <option value="ACTIVE" className="bg-background">فعال</option>
-          <option value="EXPIRED" className="bg-background">منقضی‌شده</option>
+          {Object.entries(CONTRACT_STATUS).map(([value, { label }]) => (
+            <option key={value} value={value} className="bg-background">
+              {label}
+            </option>
+          ))}
         </select>
       </div>
 

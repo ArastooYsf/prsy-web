@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatGregorian, formatJalali } from "@/lib/jalali";
+import ToggleSwitch from "@/components/ToggleSwitch";
 
 type DateRangeDisplayProps = {
   start: string;
@@ -16,13 +17,12 @@ export default function DateRangeDisplay({ start, end, className }: DateRangeDis
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <span dir="ltr">{end ? `${format(start)} — ${format(end)}` : format(start)}</span>
-      <button
-        type="button"
-        onClick={() => setCalendar((c) => (c === "jalali" ? "gregorian" : "jalali"))}
-        className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[10px] text-foreground/50 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-      >
-        {calendar === "jalali" ? "میلادی" : "شمسی"}
-      </button>
+      <ToggleSwitch
+        checked={calendar === "jalali"}
+        onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
+        onLabel="شمسی"
+        offLabel="میلادی"
+      />
     </span>
   );
 }

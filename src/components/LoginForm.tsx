@@ -31,7 +31,13 @@ export default function LoginForm() {
     setLoading(false);
 
     if (!result || result.error) {
-      setError("ایمیل یا رمز عبور نادرست است.");
+      if (result?.error === "PENDING_APPROVAL") {
+        setError("حساب حقوقی شما هنوز توسط تیم پشتیبانی تأیید نشده است.");
+      } else if (result?.error === "REJECTED") {
+        setError("درخواست حساب شما تأیید نشد. برای اطلاعات بیشتر با پشتیبانی تماس بگیرید.");
+      } else {
+        setError("ایمیل یا رمز عبور نادرست است.");
+      }
       return;
     }
 

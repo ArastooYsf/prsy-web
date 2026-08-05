@@ -1,16 +1,25 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => null);
 
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
   const name = typeof body?.name === "string" ? sanitizePlainText(body.name).slice(0, 100) : null;
+  const phone = typeof body?.phone === "string" ? sanitizePlainText(body.phone).slice(0, 30) : null;
   const customerType = body?.customerType === "LEGAL" ? "LEGAL" : "INDIVIDUAL";
   const companyName =
     customerType === "LEGAL" && typeof body?.companyName === "string"
@@ -20,6 +29,7 @@ export async function POST(request: Request) {
     customerType === "LEGAL" && typeof body?.economicCode === "string"
       ? sanitizePlainText(body.economicCode).slice(0, 50)
       : null;
+  const notes = typeof body?.notes === "string" ? sanitizePlainText(body.notes).slice(0, 4000) : null;
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "ایمیل معتبر نیست." }, { status: 400 });
@@ -33,26 +43,27 @@ export async function POST(request: Request) {
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return NextResponse.json({ error: "کاربری با این ایمیل قبلاً ثبت‌نام کرده است." }, { status: 409 });
+    return NextResponse.json({ error: "کاربری با این ایمیل قبلاً ثبت شده است." }, { status: 409 });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  // Role is always CUSTOMER here — admin/support access is granted separately
-  // (via the seed script / admin panel), never through public self-registration.
-  // Legal (corporate) accounts start PENDING and can't log in until staff
-  // reviews and approves them; individual accounts are active immediately.
-  const user = await prisma.user.create({
+  // Created directly by staff, so it's already vetted — always APPROVED,
+  // regardless of customerType (unlike public self-registration).
+  const customer = await prisma.user.create({
     data: {
       email,
       password: passwordHash,
       name,
+      phone,
+      role: "CUSTOMER",
       customerType,
       companyName,
       economicCode,
-      approvalStatus: customerType === "LEGAL" ? "PENDING" : "APPROVED",
+      notes,
+      approvalStatus: "APPROVED",
     },
   });
 
-  return NextResponse.json({ ok: true, pendingApproval: user.approvalStatus === "PENDING" });
+  return NextResponse.json({ customer: { id: customer.id, email: customer.email } });
 }

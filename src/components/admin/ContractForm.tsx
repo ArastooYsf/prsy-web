@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContractFileUploadField from "@/components/admin/ContractFileUploadField";
-import DateInputField from "@/components/admin/DateInputField";
+import JalaliGregorianDateField from "@/components/admin/JalaliGregorianDateField";
+import ToggleSwitch from "@/components/ToggleSwitch";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 
 const inputClass =
@@ -38,6 +39,7 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
   const [customType, setCustomType] = useState("");
   const [startDate, setStartDate] = useState(contract?.startDate.slice(0, 10) ?? "");
   const [endDate, setEndDate] = useState(contract?.endDate.slice(0, 10) ?? "");
+  const [calendar, setCalendar] = useState<"jalali" | "gregorian">("jalali");
   const [status, setStatus] = useState(contract?.status ?? "ACTIVE");
   const [fileUrl, setFileUrl] = useState(contract?.fileUrl ?? "");
   const [saving, setSaving] = useState(false);
@@ -141,9 +143,15 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <DateInputField label="تاریخ شروع" value={startDate} onChange={setStartDate} />
-        <DateInputField label="تاریخ پایان" value={endDate} onChange={setEndDate} />
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium text-foreground/80">بازه قرارداد</p>
+          <ToggleSwitch checked={calendar === "jalali"} onChange={(v) => setCalendar(v ? "jalali" : "gregorian")} onLabel="شمسی" offLabel="میلادی" />
+        </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <JalaliGregorianDateField label="تاریخ شروع" value={startDate} onChange={setStartDate} calendar={calendar} />
+          <JalaliGregorianDateField label="تاریخ پایان" value={endDate} onChange={setEndDate} calendar={calendar} />
+        </div>
       </div>
 
       <div>

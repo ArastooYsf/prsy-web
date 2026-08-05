@@ -39,6 +39,15 @@ export const authOptions: AuthOptions = {
           return null;
         }
 
+        if (user.role === "CUSTOMER") {
+          if (user.approvalStatus === "PENDING") {
+            throw new Error("PENDING_APPROVAL");
+          }
+          if (user.approvalStatus === "REJECTED") {
+            throw new Error("REJECTED");
+          }
+        }
+
         return {
           id: user.id,
           email: user.email,

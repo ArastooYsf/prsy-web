@@ -13,15 +13,31 @@ enum Role {
   CUSTOMER
 }
 
+enum CustomerType {
+  INDIVIDUAL
+  LEGAL
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  phone     String?
-  role      Role     @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String         @id @default(cuid())
+  email          String         @unique
+  password       String
+  name           String?
+  phone          String?
+  role           Role           @default(CUSTOMER)
+  customerType   CustomerType   @default(INDIVIDUAL)
+  companyName    String?
+  economicCode   String?
+  approvalStatus ApprovalStatus @default(APPROVED)
+  notes          String?        @db.Text
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   posts           BlogPost[]
   mediaAssets     MediaAsset[]

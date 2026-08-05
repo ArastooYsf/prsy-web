@@ -14,8 +14,12 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">("INDIVIDUAL");
+  const [companyName, setCompanyName] = useState("");
+  const [economicCode, setEconomicCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingApprovalMessage, setPendingApprovalMessage] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,19 +33,31 @@ export default function RegisterForm() {
       setError("رمز عبور و تکرار آن یکسان نیستند.");
       return;
     }
+    if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
+      setError("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.");
+      return;
+    }
 
     setLoading(true);
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, customerType, companyName, economicCode }),
     });
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
       setError(body?.error || "خطا در ثبت‌نام.");
       setLoading(false);
+      return;
+    }
+
+    const data = await res.json().catch(() => null);
+
+    if (data?.pendingApproval) {
+      setLoading(false);
+      setPendingApprovalMessage(true);
       return;
     }
 
@@ -57,6 +73,15 @@ export default function RegisterForm() {
     router.push("/account");
     router.refresh();
   };
+
+  if (pendingApprovalMessage) {
+    return (
+      <div className="rounded-lg border border-accent-500/30 bg-accent-500/10 px-4 py-4 text-sm leading-7 text-foreground/80">
+        ثبت‌نام حساب حقوقی شما با موفقیت انجام شد. حساب شما پس از بررسی و تأیید توسط تیم پشتیبانی فعال خواهد شد و
+        می‌توانید پس از آن وارد شوید.
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,6 +154,73 @@ export default function RegisterForm() {
           placeholder="••••••••"
         />
       </div>
+
+      <div>
+        <p className="mb-1.5 block text-sm font-medium text-foreground/80">نوع مشتری</p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setCustomerType("INDIVIDUAL")}
+            className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+              customerType === "INDIVIDUAL"
+                ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
+                : "border-white/10 text-foreground/60 hover:border-white/20"
+            }`}
+          >
+            حقیقی
+          </button>
+          <button
+            type="button"
+            onClick={() => setCustomerType("LEGAL")}
+            className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+              customerType === "LEGAL"
+                ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
+                : "border-white/10 text-foreground/60 hover:border-white/20"
+            }`}
+          >
+            حقوقی
+          </button>
+        </div>
+      </div>
+
+      {customerType === "LEGAL" && (
+        <>
+          <div>
+            <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-foreground/80">
+              نام شرکت
+            </label>
+            <input
+              id="companyName"
+              name="companyName"
+              type="text"
+              required
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className={inputClass}
+              placeholder="نام ثبت‌شده شرکت"
+            />
+          </div>
+          <div>
+            <label htmlFor="economicCode" className="mb-1.5 block text-sm font-medium text-foreground/80">
+              کد اقتصادی / شناسه ملی
+            </label>
+            <input
+              id="economicCode"
+              name="economicCode"
+              type="text"
+              dir="ltr"
+              required
+              value={economicCode}
+              onChange={(e) => setEconomicCode(e.target.value)}
+              className={inputClass}
+              placeholder="مثلاً 14005678901"
+            />
+          </div>
+          <p className="rounded-lg border border-accent-500/20 bg-accent-500/5 px-4 py-2.5 text-xs leading-6 text-foreground/60">
+            حساب‌های حقوقی پس از ثبت‌نام، قبل از فعال شدن باید توسط تیم پشتیبانی بررسی و تأیید شوند.
+          </p>
+        </>
+      )}
 
       {error && (
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">

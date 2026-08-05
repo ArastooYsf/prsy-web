@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import { getMediaUrl } from "@/lib/media";
+import MediaPickerModal from "@/components/admin/MediaPickerModal";
 
 type RichTextEditorProps = {
   value: string;
@@ -30,9 +34,9 @@ function ToolbarButton({
   );
 }
 
-function Toolbar({ editor }: { editor: Editor }) {
+function Toolbar({ editor, onOpenImagePicker }: { editor: Editor; onOpenImagePicker: () => void }) {
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b border-white/10 bg-background p-2">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-background p-2">
       <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
         بولد
       </ToolbarButton>
@@ -82,13 +86,19 @@ function Toolbar({ editor }: { editor: Editor }) {
       >
         لینک
       </ToolbarButton>
+      <ToolbarButton onClick={onOpenImagePicker}>افزودن عکس</ToolbarButton>
+      <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()}>خط جداکننده</ToolbarButton>
+      <ToolbarButton onClick={() => editor.chain().focus().undo().run()}>واگرد</ToolbarButton>
+      <ToolbarButton onClick={() => editor.chain().focus().redo().run()}>ازنو</ToolbarButton>
     </div>
   );
 }
 
 export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
+  const [imagePickerOpen, setImagePickerOpen] = useState(false);
+
   const editor = useEditor({
-    extensions: [StarterKit.configure({ link: { openOnClick: false } })],
+    extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image],
     content: value,
     immediatelyRender: false,
     editorProps: {
@@ -103,9 +113,20 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   if (!editor) return null;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10 bg-white/5">
-      <Toolbar editor={editor} />
+    <div className="rounded-lg border border-white/10 bg-white/5">
+      <Toolbar editor={editor} onOpenImagePicker={() => setImagePickerOpen(true)} />
       <EditorContent editor={editor} dir="rtl" />
+
+      <MediaPickerModal
+        open={imagePickerOpen}
+        onClose={() => setImagePickerOpen(false)}
+        multiple
+        onConfirm={(paths) => {
+          paths.forEach((path) => {
+            editor.chain().focus().setImage({ src: getMediaUrl(path) }).run();
+          });
+        }}
+      />
     </div>
   );
 }

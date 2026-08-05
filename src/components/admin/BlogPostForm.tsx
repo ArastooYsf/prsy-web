@@ -170,7 +170,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
         />
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background/95 shadow-[0_-8px_30px_rgba(0,0,0,0.35)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/90">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background shadow-[0_-8px_30px_rgba(0,0,0,0.35)]">
         <div className="container flex flex-col gap-4 py-4 sm:flex-row sm:items-end">
           <div className="min-w-0 flex-1">
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">متن پست</label>
@@ -188,13 +188,22 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="shrink-0 rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving ? "در حال ذخیره..." : "ذخیره"}
-          </button>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={() => router.push("/admin/blog")}
+              className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium text-foreground/70 transition-colors hover:border-white/20"
+            >
+              انصراف
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? "در حال ذخیره..." : "ذخیره"}
+            </button>
+          </div>
         </div>
       </div>
     </form>

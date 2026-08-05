@@ -23,12 +23,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts         BlogPost[]
-  mediaAssets   MediaAsset[]
-  tickets       Ticket[]
-  ticketReplies TicketReply[]
-  contracts     Contract[]
-  orders        Order[]
+  posts           BlogPost[]
+  mediaAssets     MediaAsset[]
+  tickets         Ticket[]
+  ticketReplies   TicketReply[]
+  contracts       Contract[]
+  orders          Order[]
+  cannedResponses CannedResponse[]
 
   @@map("users")
 }
@@ -41,14 +42,15 @@ enum TicketStatus {
 }
 
 model Ticket {
-  id        String       @id @default(cuid())
-  userId    String
-  user      User         @relation(fields: [userId], references: [id])
-  subject   String
-  message   String       @db.Text
-  status    TicketStatus @default(OPEN)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  subject       String
+  message       String       @db.Text
+  status        TicketStatus @default(OPEN)
+  messageSeenAt DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   replies TicketReply[]
 
@@ -57,16 +59,31 @@ model Ticket {
 }
 
 model TicketReply {
-  id        String   @id @default(cuid())
-  ticketId  String
-  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  message   String   @db.Text
-  createdAt DateTime @default(now())
+  id             String    @id @default(cuid())
+  ticketId       String
+  ticket         Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id])
+  message        String    @db.Text
+  attachmentUrl  String?
+  attachmentName String?
+  seenAt         DateTime?
+  createdAt      DateTime  @default(now())
 
   @@index([ticketId])
   @@map("ticket_replies")
+}
+
+model CannedResponse {
+  id          String   @id @default(cuid())
+  title       String
+  body        String   @db.Text
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("canned_responses")
 }
 
 enum ContractStatus {

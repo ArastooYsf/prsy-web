@@ -18,13 +18,15 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   const body = await request.json().catch(() => null);
   const message = typeof body?.message === "string" ? sanitizePlainText(body.message).slice(0, 5000) : "";
+  const attachmentUrl = typeof body?.attachmentUrl === "string" ? body.attachmentUrl : null;
+  const attachmentName = typeof body?.attachmentName === "string" ? body.attachmentName.slice(0, 200) : null;
 
-  if (!message) {
+  if (!message && !attachmentUrl) {
     return NextResponse.json({ error: "متن پاسخ نمی‌تواند خالی باشد." }, { status: 400 });
   }
 
   const reply = await prisma.ticketReply.create({
-    data: { ticketId: ticket.id, authorId: session.user.id, message },
+    data: { ticketId: ticket.id, authorId: session.user.id, message, attachmentUrl, attachmentName },
   });
 
   if (ticket.status === "OPEN" || ticket.status === "IN_PROGRESS") {

@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
-import TicketThread from "@/components/TicketThread";
-import TicketReplyForm from "@/components/account/TicketReplyForm";
+import TicketChat, { type ChatMessage } from "@/components/TicketChat";
 
 export const dynamic = "force-dynamic";
 
@@ -21,20 +20,28 @@ export default async function AccountTicketDetailPage({ params }: { params: { id
     notFound();
   }
 
-  const messages = [
+  const messages: ChatMessage[] = [
     {
       id: ticket.id,
+      authorId: ticket.userId,
       authorLabel: "شما",
       isStaff: false,
       message: ticket.message,
-      createdAt: ticket.createdAt,
+      attachmentUrl: null,
+      attachmentName: null,
+      createdAt: ticket.createdAt.toISOString(),
+      seenAt: ticket.messageSeenAt ? ticket.messageSeenAt.toISOString() : null,
     },
     ...ticket.replies.map((reply) => ({
       id: reply.id,
+      authorId: reply.authorId,
       authorLabel: reply.authorId === userId ? "شما" : "تیم پشتیبانی",
       isStaff: reply.authorId !== userId,
       message: reply.message,
-      createdAt: reply.createdAt,
+      attachmentUrl: reply.attachmentUrl,
+      attachmentName: reply.attachmentName,
+      createdAt: reply.createdAt.toISOString(),
+      seenAt: reply.seenAt ? reply.seenAt.toISOString() : null,
     })),
   ];
 
@@ -49,9 +56,12 @@ export default async function AccountTicketDetailPage({ params }: { params: { id
         </span>
       </div>
 
-      <TicketThread messages={messages} />
-
-      {ticket.status !== "CLOSED" && <TicketReplyForm ticketId={ticket.id} />}
+      <TicketChat
+        ticketId={ticket.id}
+        initialMessages={messages}
+        viewerRole="customer"
+        canReply={ticket.status !== "CLOSED"}
+      />
     </div>
   );
 }

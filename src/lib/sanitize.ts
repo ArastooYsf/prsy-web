@@ -24,11 +24,17 @@ export function sanitizeRichText(html: string): string {
       "a",
       "code",
       "pre",
+      "img",
+      "hr",
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
+      img: ["src", "alt"],
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemesByTag: {
+      img: ["http", "https"],
+    },
     transformTags: {
       a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
     },

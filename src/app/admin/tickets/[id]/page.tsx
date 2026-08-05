@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import TicketThread from "@/components/TicketThread";
-import TicketReplyForm from "@/components/admin/TicketReplyForm";
+import TicketChat, { type ChatMessage } from "@/components/TicketChat";
 import TicketStatusSelect from "@/components/admin/TicketStatusSelect";
 
 export const dynamic = "force-dynamic";
@@ -21,20 +20,33 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
     notFound();
   }
 
-  const messages = [
+  const messages: ChatMessage[] = [
     {
       id: ticket.id,
+      authorId: ticket.userId,
       authorLabel: ticket.user.name || ticket.user.email,
       isStaff: false,
       message: ticket.message,
-      createdAt: ticket.createdAt,
+      attachmentUrl: null,
+      attachmentName: null,
+      createdAt: ticket.createdAt.toISOString(),
+      seenAt: ticket.messageSeenAt ? ticket.messageSeenAt.toISOString() : null,
     },
     ...ticket.replies.map((reply) => ({
       id: reply.id,
-      authorLabel: reply.authorId === viewerId ? "شما" : reply.author.name || "تیم پشتیبانی",
+      authorId: reply.authorId,
+      authorLabel:
+        reply.authorId === viewerId
+          ? "شما"
+          : reply.author.role === "ADMIN" || reply.author.role === "SUPPORT"
+            ? reply.author.name || "تیم پشتیبانی"
+            : reply.author.name || reply.author.email,
       isStaff: reply.author.role === "ADMIN" || reply.author.role === "SUPPORT",
       message: reply.message,
-      createdAt: reply.createdAt,
+      attachmentUrl: reply.attachmentUrl,
+      attachmentName: reply.attachmentName,
+      createdAt: reply.createdAt.toISOString(),
+      seenAt: reply.seenAt ? reply.seenAt.toISOString() : null,
     })),
   ];
 
@@ -48,9 +60,7 @@ export default async function AdminTicketDetailPage({ params }: { params: { id: 
         <TicketStatusSelect ticketId={ticket.id} status={ticket.status} />
       </div>
 
-      <TicketThread messages={messages} />
-
-      <TicketReplyForm ticketId={ticket.id} />
+      <TicketChat ticketId={ticket.id} initialMessages={messages} viewerRole="staff" canReply />
     </div>
   );
 }

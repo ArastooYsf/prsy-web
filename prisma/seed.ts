@@ -33,6 +33,26 @@ async function main() {
   });
 
   console.log(`کاربر ادمین آماده شد: ${admin.email}`);
+
+  const supportEmail = process.env.SUPPORT_EMAIL;
+  const supportPassword = process.env.SUPPORT_PASSWORD;
+
+  if (supportEmail && supportPassword) {
+    const supportPasswordHash = await bcrypt.hash(supportPassword, 12);
+
+    const support = await prisma.user.upsert({
+      where: { email: supportEmail },
+      update: { password: supportPasswordHash, role: Role.SUPPORT },
+      create: {
+        email: supportEmail,
+        password: supportPasswordHash,
+        role: Role.SUPPORT,
+        name: "پشتیبانی",
+      },
+    });
+
+    console.log(`کاربر پشتیبان آماده شد: ${support.email}`);
+  }
 }
 
 main()

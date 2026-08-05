@@ -1,10 +1,17 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import BlogPostForm from "@/components/admin/BlogPostForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (session!.user.role !== "ADMIN") {
+    redirect("/admin");
+  }
+
   const post = await prisma.blogPost.findUnique({ where: { id: params.id } });
 
   if (!post) notFound();

@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "@/components/admin/RichTextEditor";
-import ImageUploadField from "@/components/admin/ImageUploadField";
+import MediaPicker from "@/components/admin/MediaPicker";
 import { slugify } from "@/lib/slugify";
+import { getMediaUrl } from "@/lib/media";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -84,87 +85,118 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">عنوان</label>
-        <input
-          value={title}
-          onChange={(e) => handleTitleChange(e.target.value)}
-          className={inputClass}
-          placeholder="عنوان پست"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">نامک (slug)</label>
-        <input
-          dir="ltr"
-          value={slug}
-          onChange={(e) => {
-            setSlugTouched(true);
-            setSlug(e.target.value);
-          }}
-          className={inputClass}
-          placeholder="post-slug"
-        />
-      </div>
-
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">خلاصه</label>
-        <textarea
-          value={excerpt}
-          onChange={(e) => setExcerpt(e.target.value)}
-          rows={2}
-          className={inputClass}
-          placeholder="یک یا دو جمله معرفی کوتاه پست"
-        />
-      </div>
-
-      <ImageUploadField label="تصویر شاخص" value={coverImage} onChange={setCoverImage} />
-
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">متن پست</label>
-        <RichTextEditor value={content} onChange={setContent} />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-6 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
-        <label className="flex items-center gap-2 text-sm text-foreground/80">
+    <form onSubmit={handleSubmit} className="pb-[26rem] sm:pb-80">
+      <div className="space-y-5">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">عنوان</label>
           <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            className="h-4 w-4 rounded border-white/20 accent-accent-500"
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            className={inputClass}
+            placeholder="عنوان پست"
+            required
           />
-          منتشر شود
-        </label>
+        </div>
 
-        {published && (
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-foreground/80">تاریخ انتشار</label>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">نامک (slug)</label>
+          <input
+            dir="ltr"
+            value={slug}
+            onChange={(e) => {
+              setSlugTouched(true);
+              setSlug(e.target.value);
+            }}
+            className={inputClass}
+            placeholder="post-slug"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">خلاصه</label>
+          <textarea
+            value={excerpt}
+            onChange={(e) => setExcerpt(e.target.value)}
+            rows={2}
+            className={inputClass}
+            placeholder="یک یا دو جمله معرفی کوتاه پست"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-6 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+          <label className="flex items-center gap-2 text-sm text-foreground/80">
             <input
-              type="date"
-              value={publishedAt}
-              onChange={(e) => setPublishedAt(e.target.value)}
-              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent-500/50"
+              type="checkbox"
+              checked={published}
+              onChange={(e) => setPublished(e.target.checked)}
+              className="h-4 w-4 rounded border-white/20 accent-accent-500"
             />
-          </div>
+            منتشر شود
+          </label>
+
+          {published && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-foreground/80">تاریخ انتشار</label>
+              <input
+                type="date"
+                value={publishedAt}
+                onChange={(e) => setPublishedAt(e.target.value)}
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent-500/50"
+              />
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
+            {error}
+          </p>
         )}
       </div>
 
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
+      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-foreground/40">پیش‌نمایش زنده</p>
+        <h1 className="text-balance text-2xl font-black leading-tight sm:text-3xl">{title || "عنوان پست"}</h1>
+        {coverImage && (
+          <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+            <img src={getMediaUrl(coverImage)} alt="" className="w-full object-cover" />
+          </div>
+        )}
+        <div
+          className="prose prose-invert prose-sm mt-6 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400"
+          dangerouslySetInnerHTML={{
+            __html: content && content !== "<p></p>" ? content : '<p class="text-foreground/40">متن پست همین‌جا نمایش داده می‌شود...</p>',
+          }}
+        />
+      </div>
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {saving ? "در حال ذخیره..." : "ذخیره"}
-      </button>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background/95 shadow-[0_-8px_30px_rgba(0,0,0,0.35)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/90">
+        <div className="container flex flex-col gap-4 py-4 sm:flex-row sm:items-end">
+          <div className="min-w-0 flex-1">
+            <label className="mb-1.5 block text-sm font-medium text-foreground/80">متن پست</label>
+            <div className="max-h-[220px] overflow-y-auto rounded-lg">
+              <RichTextEditor value={content} onChange={setContent} />
+            </div>
+          </div>
+
+          <div className="w-full shrink-0 sm:w-52">
+            <MediaPicker
+              label="تصویر شاخص"
+              multiple={false}
+              value={coverImage ? [coverImage] : []}
+              onChange={(paths) => setCoverImage(paths[0] ?? "")}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="shrink-0 rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {saving ? "در حال ذخیره..." : "ذخیره"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

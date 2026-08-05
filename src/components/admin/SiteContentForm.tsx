@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ImageUploadField from "@/components/admin/ImageUploadField";
+import MediaPicker from "@/components/admin/MediaPicker";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -84,10 +84,11 @@ export default function SiteContentForm({ initialValues }: { initialValues: Reco
                     className={inputClass}
                   />
                 </div>
-                <ImageUploadField
+                <MediaPicker
                   label="تصویر"
-                  value={values[`hero.${slide.id}.image`] ?? ""}
-                  onChange={set(`hero.${slide.id}.image`)}
+                  multiple={false}
+                  value={values[`hero.${slide.id}.image`] ? [values[`hero.${slide.id}.image`]] : []}
+                  onChange={(paths) => set(`hero.${slide.id}.image`)(paths[0] ?? "")}
                 />
               </div>
             </div>
@@ -124,10 +125,11 @@ export default function SiteContentForm({ initialValues }: { initialValues: Reco
           {PRODUCT_CATEGORIES.map((category) => (
             <div key={category.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
               <p className="mb-3 text-sm font-semibold">{category.label}</p>
-              <ImageUploadField
+              <MediaPicker
                 label="تصویر"
-                value={values[`products.${category.id}.image`] ?? ""}
-                onChange={set(`products.${category.id}.image`)}
+                multiple={false}
+                value={values[`products.${category.id}.image`] ? [values[`products.${category.id}.image`]] : []}
+                onChange={(paths) => set(`products.${category.id}.image`)(paths[0] ?? "")}
               />
             </div>
           ))}

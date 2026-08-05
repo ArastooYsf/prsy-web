@@ -1,7 +1,9 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import UploadWidget from "@/components/admin/UploadWidget";
 
-async function getStats() {
+async function getAdminStats() {
   try {
     const [posts, contentEntries, media] = await Promise.all([
       prisma.blogPost.count(),
@@ -19,8 +21,39 @@ async function getStats() {
   }
 }
 
+async function getSupportStats() {
+  const [openTickets, activeContracts, activeOrders] = await Promise.all([
+    prisma.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS"] } } }),
+    prisma.contract.count({ where: { status: "ACTIVE" } }),
+    prisma.order.count({ where: { status: { in: ["PENDING", "PROCESSING", "SHIPPED"] } } }),
+  ]);
+  return { openTickets, activeContracts, activeOrders };
+}
+
 export default async function AdminDashboardPage() {
-  const stats = await getStats();
+  const session = await getServerSession(authOptions);
+
+  if (session!.user.role !== "ADMIN") {
+    const stats = await getSupportStats();
+    const cards = [
+      { label: "تیکت‌های باز", value: stats.openTickets },
+      { label: "قراردادهای فعال", value: stats.activeContracts },
+      { label: "سفارش‌های در جریان", value: stats.activeOrders },
+    ];
+
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {cards.map((card) => (
+          <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+            <p className="text-sm text-foreground/60">{card.label}</p>
+            <p className="mt-2 text-3xl font-black">{card.value}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const stats = await getAdminStats();
 
   const cards = [
     { label: "پست‌های وبلاگ", value: stats.posts },

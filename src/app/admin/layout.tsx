@@ -19,7 +19,7 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     redirect("/login?callbackUrl=/admin");
   }
 
@@ -34,7 +34,7 @@ export default async function AdminLayout({
         </div>
         <SignOutButton callbackUrl="/login" />
       </div>
-      <AdminNav />
+      <AdminNav role={session.user.role} />
       {children}
     </section>
   );

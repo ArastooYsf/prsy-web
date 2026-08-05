@@ -57,6 +57,15 @@ export function Header() {
 		};
 	}, [open]);
 
+	React.useEffect(() => {
+		if (!open) return;
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') setOpen(false);
+		};
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	}, [open]);
+
 	return (
 		<header
 			className={cn(
@@ -113,6 +122,9 @@ export function Header() {
 					size="icon"
 					variant="outline"
 					onClick={() => setOpen(!open)}
+					aria-label={open ? 'بستن منو' : 'باز کردن منو'}
+					aria-expanded={open}
+					aria-controls="mobile-nav-drawer"
 					className="transition-transform duration-300 hover:scale-105 lg:hidden"
 				>
 					<MenuToggleIcon open={open} className="size-5" duration={300} />
@@ -120,6 +132,7 @@ export function Header() {
 			</nav>
 
 			<div
+				id="mobile-nav-drawer"
 				className={cn(
 					'bg-background fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-y-auto border-y lg:hidden',
 					open ? 'block' : 'hidden',

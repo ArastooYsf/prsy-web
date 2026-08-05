@@ -1,9 +1,17 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getSiteContentMap } from "@/lib/site-content";
 import SiteContentForm from "@/components/admin/SiteContentForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminContentPage() {
+  const session = await getServerSession(authOptions);
+  if (session!.user.role !== "ADMIN") {
+    redirect("/admin");
+  }
+
   const values = await getSiteContentMap();
 
   return (

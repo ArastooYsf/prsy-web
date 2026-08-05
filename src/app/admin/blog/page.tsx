@@ -1,10 +1,18 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DeletePostButton from "@/components/admin/DeletePostButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBlogListPage() {
+  const session = await getServerSession(authOptions);
+  if (session!.user.role !== "ADMIN") {
+    redirect("/admin");
+  }
+
   const posts = await prisma.blogPost.findMany({
     orderBy: { createdAt: "desc" },
   });

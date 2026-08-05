@@ -54,7 +54,7 @@ export default function RegisterForm() {
       return;
     }
 
-    router.push("/");
+    router.push("/account");
     router.refresh();
   };
 

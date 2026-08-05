@@ -5,6 +5,7 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -54,6 +55,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+        <ScrollProgress />
         {GA_MEASUREMENT_ID && (
           <>
             <Script

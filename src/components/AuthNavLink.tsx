@@ -32,7 +32,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
     return variant === "icon" ? <div className="h-9 w-9" aria-hidden /> : null;
   }
 
-  if (status === "authenticated" && session.user.role === "ADMIN") {
+  if (status === "authenticated" && (session.user.role === "ADMIN" || session.user.role === "SUPPORT")) {
     if (variant === "icon") {
       return (
         <Button size="icon" variant="outline" className="h-9 w-9" asChild>

@@ -32,7 +32,7 @@ function ToolbarButton({
 
 function Toolbar({ editor }: { editor: Editor }) {
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-white/10 p-2">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b border-white/10 bg-background p-2">
       <ToolbarButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
         بولد
       </ToolbarButton>

@@ -3,14 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const LINKS = [
-  { href: "/admin", label: "داشبورد" },
-  { href: "/admin/blog", label: "وبلاگ" },
-  { href: "/admin/content", label: "محتوای سایت" },
+const ALL_LINKS = [
+  { href: "/admin", label: "داشبورد", roles: ["ADMIN", "SUPPORT"] },
+  { href: "/admin/tickets", label: "تیکت‌ها", roles: ["ADMIN", "SUPPORT"] },
+  { href: "/admin/contracts", label: "قراردادها", roles: ["ADMIN", "SUPPORT"] },
+  { href: "/admin/orders", label: "سفارش‌ها", roles: ["ADMIN", "SUPPORT"] },
+  { href: "/admin/blog", label: "وبلاگ", roles: ["ADMIN"] },
+  { href: "/admin/content", label: "محتوای سایت", roles: ["ADMIN"] },
 ];
 
-export default function AdminNav() {
+export default function AdminNav({ role }: { role: string }) {
   const pathname = usePathname();
+  const LINKS = ALL_LINKS.filter((link) => link.roles.includes(role));
 
   return (
     <nav className="mb-8 flex flex-wrap gap-2">

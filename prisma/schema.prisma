@@ -9,7 +9,8 @@ datasource db {
 
 enum Role {
   ADMIN
-  USER
+  SUPPORT
+  CUSTOMER
 }
 
 model User {
@@ -17,14 +18,111 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      Role     @default(USER)
+  phone     String?
+  role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts        BlogPost[]
-  mediaAssets  MediaAsset[]
+  posts         BlogPost[]
+  mediaAssets   MediaAsset[]
+  tickets       Ticket[]
+  ticketReplies TicketReply[]
+  contracts     Contract[]
+  orders        Order[]
 
   @@map("users")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  ANSWERED
+  CLOSED
+}
+
+model Ticket {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  subject   String
+  message   String       @db.Text
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  replies TicketReply[]
+
+  @@index([userId])
+  @@map("tickets")
+}
+
+model TicketReply {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@map("ticket_replies")
+}
+
+enum ContractStatus {
+  ACTIVE
+  EXPIRED
+}
+
+model Contract {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  title     String
+  type      String
+  startDate DateTime
+  endDate   DateTime
+  status    ContractStatus @default(ACTIVE)
+  fileUrl   String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([userId])
+  @@map("contracts")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  items OrderItem[]
+
+  @@index([userId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String @id @default(cuid())
+  orderId     String
+  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productName String
+  quantity    Int
+
+  @@index([orderId])
+  @@map("order_items")
 }
 
 model BlogPost {

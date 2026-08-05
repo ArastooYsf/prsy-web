@@ -1,56 +1,102 @@
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import SignOutButton from "@/components/SignOutButton";
-
-export const metadata: Metadata = {
-  title: "حساب کاربری",
-  robots: { index: false, follow: false },
-};
+import { prisma } from "@/lib/prisma";
+import { TICKET_STATUS, CONTRACT_STATUS, ORDER_STATUS } from "@/lib/status-labels";
 
 export const dynamic = "force-dynamic";
 
-export default async function AccountPage() {
+const dateFmt = (d: Date) => d.toLocaleDateString("fa-IR");
+
+export default async function AccountOverviewPage() {
   const session = await getServerSession(authOptions);
+  const userId = session!.user.id;
 
-  if (!session?.user) {
-    redirect("/login?callbackUrl=/account");
-  }
+  const [openTicketsCount, activeContractsCount, activeOrdersCount, recentTickets, recentContracts, recentOrders] =
+    await Promise.all([
+      prisma.ticket.count({ where: { userId, status: { in: ["OPEN", "IN_PROGRESS"] } } }),
+      prisma.contract.count({ where: { userId, status: "ACTIVE" } }),
+      prisma.order.count({ where: { userId, status: { in: ["PENDING", "PROCESSING", "SHIPPED"] } } }),
+      prisma.ticket.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
+      prisma.contract.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
+      prisma.order.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
+    ]);
 
-  if (session.user.role === "ADMIN") {
-    redirect("/admin");
-  }
+  const activity = [
+    ...recentTickets.map((t) => ({
+      key: `ticket-${t.id}`,
+      href: `/account/tickets/${t.id}`,
+      title: `تیکت: ${t.subject}`,
+      updatedAt: t.updatedAt,
+      badge: TICKET_STATUS[t.status],
+    })),
+    ...recentContracts.map((c) => ({
+      key: `contract-${c.id}`,
+      href: `/account/contracts`,
+      title: `قرارداد: ${c.title}`,
+      updatedAt: c.updatedAt,
+      badge: CONTRACT_STATUS[c.status],
+    })),
+    ...recentOrders.map((o) => ({
+      key: `order-${o.id}`,
+      href: `/account/orders/${o.id}`,
+      title: `سفارش: ${o.orderNumber}`,
+      updatedAt: o.updatedAt,
+      badge: ORDER_STATUS[o.status],
+    })),
+  ]
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .slice(0, 6);
+
+  const stats = [
+    { label: "تیکت‌های باز", value: openTicketsCount, href: "/account/tickets" },
+    { label: "قراردادهای فعال", value: activeContractsCount, href: "/account/contracts" },
+    { label: "سفارش‌های در جریان", value: activeOrdersCount, href: "/account/orders" },
+  ];
 
   return (
-    <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-16 lg:min-h-[calc(100vh-3rem)]">
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
-
-      <div className="container relative z-10">
-        <div className="mx-auto w-full max-w-sm">
-          <div className="text-center">
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
-              حساب کاربری
-            </span>
-            <h1 className="text-balance text-2xl font-black leading-tight sm:text-3xl">
-              خوش آمدید، <span className="text-gradient">{session.user.name || session.user.email}</span>
-            </h1>
-          </div>
-
-          <div className="mt-8 space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-            <div>
-              <p className="text-xs font-medium text-foreground/50">ایمیل</p>
-              <p dir="ltr" className="mt-1 text-left text-sm text-foreground">
-                {session.user.email}
-              </p>
-            </div>
-            <div className="pt-2">
-              <SignOutButton callbackUrl="/" />
-            </div>
-          </div>
-        </div>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {stats.map((stat) => (
+          <Link
+            key={stat.label}
+            href={stat.href}
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-accent-500/30"
+          >
+            <p className="text-sm text-foreground/60">{stat.label}</p>
+            <p className="mt-2 text-3xl font-black text-accent-400">{stat.value}</p>
+          </Link>
+        ))}
       </div>
-    </section>
+
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <h2 className="text-base font-bold">آخرین فعالیت‌ها</h2>
+        {activity.length === 0 ? (
+          <p className="mt-4 text-sm text-foreground/60">هنوز فعالیتی ثبت نشده است.</p>
+        ) : (
+          <div className="mt-4 divide-y divide-white/10">
+            {activity.map((item) => (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="flex items-center justify-between gap-4 py-3.5 text-sm transition-colors hover:text-accent-400"
+              >
+                <span>{item.title}</span>
+                <span className="flex shrink-0 items-center gap-3">
+                  <span
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${item.badge.className}`}
+                  >
+                    {item.badge.label}
+                  </span>
+                  <span dir="ltr" className="text-foreground/50">
+                    {dateFmt(item.updatedAt)}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

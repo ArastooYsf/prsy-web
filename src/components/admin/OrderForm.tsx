@@ -100,7 +100,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
       {order && (
         <div>
           <label className="mb-1.5 block text-sm font-medium text-foreground/80">شماره سفارش</label>
-          <p dir="ltr" className="text-left text-sm text-foreground/60">
+          <p dir="ltr" className="text-right text-sm text-foreground/60">
             {order.orderNumber}
           </p>
         </div>

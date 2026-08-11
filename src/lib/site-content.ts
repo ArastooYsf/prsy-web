@@ -1,7 +1,20 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { sanitizeRichText } from "@/lib/sanitize";
+import {
+  DEFAULT_HERO_SLIDES,
+  DEFAULT_PRODUCT_CATEGORIES,
+  type HeroSlideContent,
+  type ProductCategoryContent,
+} from "@/lib/site-content-defaults";
+
+export { DEFAULT_HERO_SLIDES, DEFAULT_PRODUCT_CATEGORIES };
+export type { HeroSlideContent, ProductCategoryContent };
 
 export const SITE_CONTENT_TAG = "site-content";
+
+const HERO_SLIDES_KEY = "hero.slides";
+const PRODUCT_CATEGORIES_KEY = "products.categories";
 
 async function loadSiteContentMap(): Promise<Record<string, string>> {
   try {
@@ -23,58 +36,24 @@ export const getSiteContentMap = unstable_cache(loadSiteContentMap, ["site-conte
   revalidate: 300,
 });
 
-export const HERO_SLIDE_IDS = [
-  "diesel-generators",
-  "power-engines",
-  "spare-parts",
-  "overhaul",
-] as const;
-
-export const PRODUCT_CATEGORY_IDS = [
-  "diesel-generators",
-  "power-engines",
-  "spare-parts",
-  "generator-engines",
-  "alternators",
-  "overhaul",
-] as const;
-
-export type HeroOverride = {
-  title?: string;
-  description?: string;
-  image?: string;
-};
-
-export async function getHeroOverrides(): Promise<Record<string, HeroOverride>> {
-  const map = await getSiteContentMap();
-  const overrides: Record<string, HeroOverride> = {};
-
-  for (const id of HERO_SLIDE_IDS) {
-    overrides[id] = {
-      title: map[`hero.${id}.title`],
-      description: map[`hero.${id}.description`],
-      image: map[`hero.${id}.image`],
-    };
+function parseJsonArray<T>(raw: string | undefined, fallback: T[]): T[] {
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? (parsed as T[]) : fallback;
+  } catch {
+    return fallback;
   }
-
-  return overrides;
 }
 
-export async function getAboutContent(): Promise<{ title?: string; body?: string }> {
+export async function getHeroSlides(): Promise<HeroSlideContent[]> {
   const map = await getSiteContentMap();
-  return {
-    title: map["about.title"],
-    body: map["about.body"],
-  };
+  const slides = parseJsonArray<HeroSlideContent>(map[HERO_SLIDES_KEY], DEFAULT_HERO_SLIDES);
+  return slides.map((slide) => ({ ...slide, description: sanitizeRichText(slide.description) }));
 }
 
-export async function getProductCategoryImages(): Promise<Record<string, string | undefined>> {
+export async function getProductCategories(): Promise<ProductCategoryContent[]> {
   const map = await getSiteContentMap();
-  const images: Record<string, string | undefined> = {};
-
-  for (const id of PRODUCT_CATEGORY_IDS) {
-    images[id] = map[`products.${id}.image`];
-  }
-
-  return images;
+  const categories = parseJsonArray<ProductCategoryContent>(map[PRODUCT_CATEGORIES_KEY], DEFAULT_PRODUCT_CATEGORIES);
+  return categories.map((category) => ({ ...category, description: sanitizeRichText(category.description) }));
 }

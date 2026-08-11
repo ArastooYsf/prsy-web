@@ -3,143 +3,10 @@
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { getMediaUrl } from "@/lib/media";
+import { DEFAULT_PRODUCT_CATEGORIES, type ProductCategoryContent } from "@/lib/site-content-defaults";
+import { CATEGORY_ICONS } from "@/lib/category-icons";
 
 type Condition = "new" | "used" | "service";
-
-type Category = {
-  id: string;
-  title: string;
-  description: string;
-  conditions: Condition[];
-  brands: string[];
-  icon: React.ReactNode;
-};
-
-const CATEGORIES: Category[] = [
-  {
-    id: "diesel-generators",
-    title: "دیزل ژنراتور",
-    description: "دیزل ژنراتورهای صنعتی و تجاری در ظرفیت‌های مختلف",
-    conditions: ["new", "used"],
-    brands: ["کاترپیلار", "کامینز", "پرکینز", "ولوو", "ویچای", "جی‌ام (GM)"],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="7" width="14" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-        <path
-          d="M11.5 10.5l-3 3.6h2.1l-1 2.9 3.4-3.6h-2l0.5-2.9z"
-          stroke="currentColor"
-          strokeWidth="1.3"
-          strokeLinejoin="round"
-        />
-        <path d="M19 10h2M19 14h2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    id: "power-engines",
-    title: "موتور برق",
-    description: "موتور برق‌های قابل‌حمل و ثابت برای مصارف خانگی و تجاری",
-    conditions: ["new", "used"],
-    brands: ["کواکس", "فروسکی", "هیوندا", "سایر برندها"],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M7 11h10v3a5 5 0 01-5 5 5 5 0 01-5-5v-3z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <path d="M9 7v4M15 7v4M12 19v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    id: "spare-parts",
-    title: "قطعات یدکی دیزل ژنراتور و موتور برق",
-    description: "قطعات یدکی اورجینال برای انواع دیزل ژنراتور و موتور برق",
-    conditions: ["new"],
-    brands: ["کاترپیلار", "ولوو", "کامینز", "ویچای", "پرکینز", "جی‌ام"],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.6" />
-        <path
-          d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: "generator-engines",
-    title: "موتور ژنراتور",
-    description: "موتور به‌صورت مجزا، جدای از ژنراتور کامل",
-    conditions: ["new", "used"],
-    brands: [
-      "کاترپیلار",
-      "کامینز",
-      "پرکینز",
-      "ولوو",
-      "ویچای",
-      "جی‌ام",
-      "کواکس",
-      "فروسکی",
-      "هیوندا",
-    ],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="8" y="3" width="8" height="6" rx="1" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M10.5 9v3M13.5 9v3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <rect x="6" y="12" width="12" height="8" rx="1" stroke="currentColor" strokeWidth="1.6" />
-      </svg>
-    ),
-  },
-  {
-    id: "alternators",
-    title: "دینام / آلترناتور",
-    description: "دینام و آلترناتورهای سازگار با انواع دیزل ژنراتور",
-    conditions: ["new", "used"],
-    brands: ["استمفورد", "مک‌الت", "کینز", "مارلی"],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="6.5" stroke="currentColor" strokeWidth="1.6" />
-        <path
-          d="M12 5.5v3M12 15.5v3M5.5 12h3M15.5 12h3M7.5 7.5l2 2M14.5 14.5l2 2M7.5 16.5l2-2M14.5 9.5l2-2"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: "overhaul",
-    title: "خدمات اورهال و تعمیرات",
-    description: "اورهال و تعمیرات تخصصی دیزل ژنراتور و موتور برق",
-    conditions: ["service"],
-    brands: [
-      "کاترپیلار",
-      "کامینز",
-      "پرکینز",
-      "ولوو",
-      "ویچای",
-      "جی‌ام",
-      "و سایر برندها",
-    ],
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M14.7 6.3a4 4 0 00-5.4 5.4L3.5 17.5l3 3 5.8-5.8a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
-];
 
 const CONDITION_BADGE: Record<Condition, { label: string; className: string }> = {
   new: {
@@ -157,10 +24,11 @@ const CONDITION_BADGE: Record<Condition, { label: string; className: string }> =
 };
 
 type ProductCategoriesProps = {
-  images?: Record<string, string | undefined>;
+  categories?: ProductCategoryContent[];
 };
 
-export default function ProductCategories({ images = {} }: ProductCategoriesProps) {
+export default function ProductCategories({ categories: categoriesProp }: ProductCategoriesProps) {
+  const categories = categoriesProp && categoriesProp.length > 0 ? categoriesProp : DEFAULT_PRODUCT_CATEGORIES;
   return (
     <section className="section-padding relative">
       <div className="container">
@@ -199,7 +67,7 @@ export default function ProductCategories({ images = {} }: ProductCategoriesProp
           variants={staggerContainer(0.12)}
           className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
         >
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <motion.div
               key={category.id}
               id={category.id}
@@ -208,10 +76,10 @@ export default function ProductCategories({ images = {} }: ProductCategoriesProp
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="group scroll-mt-28 flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
             >
-              {images[category.id] && (
+              {category.image && (
                 <div className="aspect-video w-full overflow-hidden">
                   <img
-                    src={getMediaUrl(images[category.id]!)}
+                    src={getMediaUrl(category.image)}
                     alt={category.title}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
@@ -220,7 +88,7 @@ export default function ProductCategories({ images = {} }: ProductCategoriesProp
               <div className="flex flex-1 flex-col p-7">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20">
-                  {category.icon}
+                  {CATEGORY_ICONS[category.iconKey]}
                 </div>
                 <div className="flex flex-wrap justify-end gap-1.5">
                   {category.conditions.map((condition) => (
@@ -235,9 +103,10 @@ export default function ProductCategories({ images = {} }: ProductCategoriesProp
               </div>
 
               <h3 className="mt-5 text-lg font-bold">{category.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-foreground/70">
-                {category.description}
-              </p>
+              <div
+                className="prose prose-invert prose-sm mt-2 max-w-none text-sm leading-6 text-foreground/70 [&_p]:m-0"
+                dangerouslySetInnerHTML={{ __html: category.description }}
+              />
 
               <div className="mt-5 flex flex-1 flex-wrap items-end gap-1.5">
                 {category.brands.map((brand) => (

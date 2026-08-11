@@ -71,7 +71,7 @@ export default async function BlogPage() {
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     {post.publishedAt && (
-                      <p dir="ltr" className="text-left text-xs text-foreground/50">
+                      <p dir="ltr" className="text-right text-xs text-foreground/50">
                         {post.publishedAt.toLocaleDateString("fa-IR")}
                       </p>
                     )}

@@ -19,14 +19,14 @@ export default async function AdminTicketsPage() {
           هنوز تیکتی ثبت نشده است.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10">
+        <div className="rounded-2xl border border-white/10">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.03] text-foreground/60">
+            <thead className="text-foreground/60">
               <tr>
-                <th className="px-4 py-3 text-right font-medium">موضوع</th>
-                <th className="px-4 py-3 text-right font-medium">مشتری</th>
-                <th className="px-4 py-3 text-right font-medium">وضعیت</th>
-                <th className="px-4 py-3 text-right font-medium">آخرین بروزرسانی</th>
+                <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">موضوع</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">مشتری</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
+                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">آخرین بروزرسانی</th>
               </tr>
             </thead>
             <tbody>
@@ -45,7 +45,7 @@ export default async function AdminTicketsPage() {
                       {TICKET_STATUS[ticket.status].label}
                     </span>
                   </td>
-                  <td dir="ltr" className="px-4 py-3 text-foreground/60">
+                  <td dir="ltr" className="px-4 py-3 text-right text-foreground/60">
                     {ticket.updatedAt.toLocaleDateString("fa-IR")}
                   </td>
                 </tr>

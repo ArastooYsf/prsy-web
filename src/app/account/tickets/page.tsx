@@ -41,7 +41,7 @@ export default async function AccountTicketsPage() {
             >
               <div>
                 <p className="font-semibold">{ticket.subject}</p>
-                <p dir="ltr" className="mt-1 text-left text-xs text-foreground/50">
+                <p dir="ltr" className="mt-1 text-right text-xs text-foreground/50">
                   {ticket.updatedAt.toLocaleDateString("fa-IR")}
                 </p>
               </div>

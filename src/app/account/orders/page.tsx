@@ -33,11 +33,11 @@ export default async function AccountOrdersPage() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-accent-500/30"
             >
               <div>
-                <p dir="ltr" className="text-left font-semibold">
+                <p dir="ltr" className="text-right font-semibold">
                   {order.orderNumber}
                 </p>
                 <p className="mt-1 text-xs text-foreground/50">{order.items.length} قلم کالا</p>
-                <p dir="ltr" className="mt-1 text-left text-xs text-foreground/50">
+                <p dir="ltr" className="mt-1 text-right text-xs text-foreground/50">
                   {order.createdAt.toLocaleDateString("fa-IR")}
                 </p>
               </div>

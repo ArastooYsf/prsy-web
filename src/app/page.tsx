@@ -1,16 +1,18 @@
 import Hero from "@/components/Hero";
+import WhyUs from "@/components/WhyUs";
 import Features from "@/components/Features";
 import SocialProof from "@/components/SocialProof";
 import FAQ from "@/components/FAQ";
 import ConsultationSection from "@/components/ConsultationSection";
-import { getHeroOverrides } from "@/lib/site-content";
+import { getHeroSlides } from "@/lib/site-content";
 
 export default async function Home() {
-  const heroOverrides = await getHeroOverrides();
+  const heroSlides = await getHeroSlides();
 
   return (
     <>
-      <Hero overrides={heroOverrides} />
+      <Hero slides={heroSlides} />
+      <WhyUs />
       <Features />
       <SocialProof />
       <FAQ />

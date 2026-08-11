@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
-import { getProductCategoryImages } from "@/lib/site-content";
+import { getProductCategories } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "محصولات",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
-  const categoryImages = await getProductCategoryImages();
+  const categories = await getProductCategories();
 
   return (
     <>
@@ -32,7 +32,7 @@ export default async function ProductsPage() {
         </div>
       </section>
 
-      <ProductCategories images={categoryImages} />
+      <ProductCategories categories={categories} />
       <AuxiliaryServices />
     </>
   );

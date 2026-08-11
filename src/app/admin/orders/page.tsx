@@ -34,21 +34,21 @@ export default async function AdminOrdersPage() {
           هنوز سفارشی ثبت نشده است.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10">
+        <div className="rounded-2xl border border-white/10">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.03] text-foreground/60">
+            <thead className="text-foreground/60">
               <tr>
-                <th className="px-4 py-3 text-right font-medium">شماره سفارش</th>
-                <th className="px-4 py-3 text-right font-medium">مشتری</th>
-                <th className="px-4 py-3 text-right font-medium">اقلام</th>
-                <th className="px-4 py-3 text-right font-medium">وضعیت</th>
-                <th className="px-4 py-3 text-right font-medium"></th>
+                <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">شماره سفارش</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">مشتری</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">اقلام</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
+                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12"></th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id} className="border-t border-white/10">
-                  <td dir="ltr" className="px-4 py-3 text-left font-medium">
+                  <td dir="ltr" className="px-4 py-3 text-right font-medium">
                     {order.orderNumber}
                   </td>
                   <td className="px-4 py-3 text-foreground/70">{order.user.name || order.user.email}</td>

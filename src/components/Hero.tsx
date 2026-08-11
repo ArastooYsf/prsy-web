@@ -4,68 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { getMediaUrl } from "@/lib/media";
-
-type Slide = {
-  id: string;
-  title: string;
-  description: string;
-  ctaLabel: string;
-  ctaHref: string;
-  image: string;
-};
-
-const SLIDES: Slide[] = [
-  {
-    id: "diesel-generators",
-    title: "دیزل ژنراتور صنعتی و تجاری",
-    description:
-      "تأمین انواع دیزل ژنراتور در ظرفیت‌های مختلف، با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم.",
-    ctaLabel: "مشاهده محصول",
-    ctaHref: "/products#diesel-generators",
-    image: "products/diesel-generators.svg",
-  },
-  {
-    id: "power-engines",
-    title: "موتور برق خانگی و تجاری",
-    description:
-      "موتور برق‌های قابل‌حمل و ثابت، مناسب مصارف خانگی و تجاری، با گارانتی و پشتیبانی کامل.",
-    ctaLabel: "مشاهده محصول",
-    ctaHref: "/products#power-engines",
-    image: "products/power-engines.svg",
-  },
-  {
-    id: "spare-parts",
-    title: "قطعات یدکی اورجینال",
-    description:
-      "تأمین قطعات یدکی اورجینال برای انواع دیزل ژنراتور و موتور برق، فقط به‌صورت نو.",
-    ctaLabel: "بیشتر بدانید",
-    ctaHref: "/products#spare-parts",
-    image: "products/spare-parts.svg",
-  },
-  {
-    id: "overhaul",
-    title: "خدمات اورهال و تعمیرات",
-    description:
-      "اورهال و تعمیرات تخصصی دیزل ژنراتور و موتور برق، توسط تیم فنی مجرب.",
-    ctaLabel: "بیشتر بدانید",
-    ctaHref: "/products#overhaul",
-    image: "products/overhaul.svg",
-  },
-];
+import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
 
 const SLIDE_DURATION = 5;
 
-type HeroOverride = {
-  title?: string;
-  description?: string;
-  image?: string;
-};
-
 type HeroProps = {
-  overrides?: Record<string, HeroOverride>;
+  slides?: HeroSlideContent[];
 };
 
-export default function Hero({ overrides = {} }: HeroProps) {
+export default function Hero({ slides: slidesProp }: HeroProps) {
   const [index, setIndex] = useState(0);
   const [imageHovered, setImageHovered] = useState(false);
   const [textHovered, setTextHovered] = useState(false);
@@ -75,15 +22,7 @@ export default function Hero({ overrides = {} }: HeroProps) {
     setCanHover(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
   }, []);
 
-  const slides = SLIDES.map((s) => {
-    const override = overrides[s.id];
-    return {
-      ...s,
-      title: override?.title || s.title,
-      description: override?.description || s.description,
-      image: override?.image || s.image,
-    };
-  });
+  const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
 
   const slide = slides[index];
   const imageFirst = index % 2 === 0;
@@ -157,9 +96,10 @@ export default function Hero({ overrides = {} }: HeroProps) {
                 <h1 className="text-balance text-3xl font-black leading-tight tracking-tight sm:text-5xl">
                   {slide.title}
                 </h1>
-                <p className="mt-4 text-balance leading-8 text-foreground/70 sm:text-lg">
-                  {slide.description}
-                </p>
+                <div
+                  className="prose prose-invert prose-sm mt-4 max-w-none text-balance leading-8 text-foreground/70 sm:text-lg [&_p]:m-0"
+                  dangerouslySetInnerHTML={{ __html: slide.description }}
+                />
                 <Link
                   href={slide.ctaHref}
                   className="group mt-7 inline-flex items-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 sm:text-base"

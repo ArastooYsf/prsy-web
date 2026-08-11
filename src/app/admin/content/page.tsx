@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getSiteContentMap } from "@/lib/site-content";
+import { getHeroSlides, getProductCategories } from "@/lib/site-content";
 import SiteContentForm from "@/components/admin/SiteContentForm";
 
 export const dynamic = "force-dynamic";
@@ -12,15 +12,15 @@ export default async function AdminContentPage() {
     redirect("/admin");
   }
 
-  const values = await getSiteContentMap();
+  const [heroSlides, categories] = await Promise.all([getHeroSlides(), getProductCategories()]);
 
   return (
     <div>
       <h2 className="mb-2 text-lg font-bold">محتوای سایت</h2>
       <p className="mb-6 text-sm text-foreground/60">
-        فقط بخش‌های زیر از پنل قابل‌ویرایش هستند؛ فیلدهای خالی همان مقدار پیش‌فرض کد را نشان می‌دهند.
+        اسلایدر صفحه اصلی و دسته‌بندی محصولات را می‌توانید ویرایش، اضافه یا حذف کنید.
       </p>
-      <SiteContentForm initialValues={values} />
+      <SiteContentForm initialHeroSlides={heroSlides} initialCategories={categories} />
     </div>
   );
 }

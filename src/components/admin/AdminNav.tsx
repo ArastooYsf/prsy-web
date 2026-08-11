@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const ALL_LINKS = [
   { href: "/admin", label: "داشبورد", roles: ["ADMIN", "SUPPORT"] },
   { href: "/admin/tickets", label: "تیکت‌ها", roles: ["ADMIN", "SUPPORT"] },
+  { href: "/admin/customers", label: "مشتریان", roles: ["ADMIN", "SUPPORT"] },
   { href: "/admin/contracts", label: "قراردادها", roles: ["ADMIN", "SUPPORT"] },
   { href: "/admin/orders", label: "سفارش‌ها", roles: ["ADMIN", "SUPPORT"] },
   { href: "/admin/blog", label: "وبلاگ", roles: ["ADMIN"] },

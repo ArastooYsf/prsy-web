@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
 
           {post.publishedAt && (
-            <p dir="ltr" className="mt-6 text-left text-xs text-foreground/50">
+            <p dir="ltr" className="mt-6 text-right text-xs text-foreground/50">
               {post.publishedAt.toLocaleDateString("fa-IR")}
             </p>
           )}

@@ -38,12 +38,12 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <OrderProgress status={order.status} />
         </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10">
+        <div className="rounded-2xl border border-white/10">
           <table className="w-full text-sm">
-            <thead className="bg-white/[0.03] text-foreground/60">
+            <thead className="text-foreground/60">
               <tr>
-                <th className="px-4 py-3 text-right font-medium">نام محصول</th>
-                <th className="px-4 py-3 text-right font-medium">تعداد</th>
+                <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام محصول</th>
+                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">تعداد</th>
               </tr>
             </thead>
             <tbody>

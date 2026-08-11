@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import WhyUs from "@/components/WhyUs";
+import Customers from "@/components/Customers";
 import Features from "@/components/Features";
 import SocialProof from "@/components/SocialProof";
 import FAQ from "@/components/FAQ";
@@ -13,6 +14,7 @@ export default async function Home() {
     <>
       <Hero slides={heroSlides} />
       <WhyUs />
+      <Customers />
       <Features />
       <SocialProof />
       <FAQ />

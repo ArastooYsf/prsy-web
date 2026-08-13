@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,16 +11,23 @@ const dateFmt = (d: Date) => d.toLocaleDateString("fa-IR");
 
 export default async function AccountOverviewPage() {
   const session = await getServerSession(authOptions);
+
+  // Personal stats (open tickets/active contracts/orders) only apply to a
+  // CUSTOMER; ADMIN/SUPPORT's real landing page is the management dashboard.
+  if (session!.user.role === "ADMIN" || session!.user.role === "SUPPORT") {
+    redirect("/account/admin");
+  }
+
   const userId = session!.user.id;
 
   const [openTicketsCount, activeContractsCount, activeOrdersCount, recentTickets, recentContracts, recentOrders] =
     await Promise.all([
-      prisma.ticket.count({ where: { userId, status: { in: ["OPEN", "IN_PROGRESS"] } } }),
-      prisma.contract.count({ where: { userId, status: "ACTIVE" } }),
-      prisma.order.count({ where: { userId, status: { in: ["PENDING", "PROCESSING", "SHIPPED"] } } }),
-      prisma.ticket.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
-      prisma.contract.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
-      prisma.order.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 5 }),
+      prisma.ticket.count({ where: { userId, status: { in: ["OPEN", "IN_PROGRESS"] }, deletedAt: null } }),
+      prisma.contract.count({ where: { userId, status: "ACTIVE", deletedAt: null } }),
+      prisma.order.count({ where: { userId, status: { in: ["PENDING", "PROCESSING", "SHIPPED"] }, deletedAt: null } }),
+      prisma.ticket.findMany({ where: { userId, deletedAt: null }, orderBy: { updatedAt: "desc" }, take: 5 }),
+      prisma.contract.findMany({ where: { userId, deletedAt: null }, orderBy: { updatedAt: "desc" }, take: 5 }),
+      prisma.order.findMany({ where: { userId, deletedAt: null }, orderBy: { updatedAt: "desc" }, take: 5 }),
     ]);
 
   const activity = [

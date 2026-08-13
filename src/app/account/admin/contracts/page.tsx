@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
+import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function AdminContractsPage() {
   const isAdmin = session!.user.role === "ADMIN";
 
   const contracts = await prisma.contract.findMany({
+    where: { deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: { user: true },
   });
@@ -58,13 +60,22 @@ export default async function AdminContractsPage() {
                       {CONTRACT_STATUS[contract.status].label}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-left">
-                    <Link
-                      href={`/account/admin/contracts/${contract.id}`}
-                      className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-                    >
-                      {isAdmin ? "ویرایش" : "مشاهده"}
-                    </Link>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/account/admin/contracts/${contract.id}`}
+                        className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                      >
+                        {isAdmin ? "ویرایش" : "مشاهده"}
+                      </Link>
+                      {isAdmin && (
+                        <DeleteEntityButton
+                          endpoint={`/api/admin/contracts/${contract.id}`}
+                          title="حذف قرارداد"
+                          message={`مطمئنید می‌خواهید قرارداد «${contract.title}» را حذف کنید؟`}
+                        />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

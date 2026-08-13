@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
@@ -8,8 +9,10 @@ import { useScroll } from '@/components/ui/use-scroll';
 import AuthNavLink from '@/components/AuthNavLink';
 
 export function Header() {
+	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
 	const scrolled = useScroll(10);
+	const isAccountArea = pathname?.startsWith('/account');
 
 	const links = [
 		{
@@ -65,6 +68,8 @@ export function Header() {
 		window.addEventListener('keydown', onKeyDown);
 		return () => window.removeEventListener('keydown', onKeyDown);
 	}, [open]);
+
+	if (isAccountArea) return null;
 
 	return (
 		<header

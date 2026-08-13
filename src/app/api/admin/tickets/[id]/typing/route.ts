@@ -10,7 +10,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const ticket = await prisma.ticket.findUnique({ where: { id: params.id } });
+  const ticket = await prisma.ticket.findFirst({ where: { id: params.id, deletedAt: null } });
   if (!ticket) {
     return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }
@@ -27,8 +27,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const ticket = await prisma.ticket.findUnique({
-    where: { id: params.id },
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: params.id, deletedAt: null },
     select: { customerTypingAt: true },
   });
   if (!ticket) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/logger";
 
 type ItemInput = { productName: string; quantity: number };
 
@@ -27,7 +28,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const existing = await prisma.order.findUnique({ where: { id: params.id } });
+  const existing = await prisma.order.findFirst({ where: { id: params.id, deletedAt: null } });
   if (!existing) {
     return NextResponse.json({ error: "سفارش یافت نشد." }, { status: 404 });
   }
@@ -55,5 +56,39 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     });
   });
 
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: existing.status !== status ? "status_change" : "update",
+    target: { type: "order", id: order.id },
+    summary:
+      existing.status !== status
+        ? `وضعیت سفارش «${order.orderNumber}» از ${existing.status} به ${status} تغییر کرد`
+        : `سفارش «${order.orderNumber}» ویرایش شد`,
+  });
+
   return NextResponse.json({ order });
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
+  }
+
+  const order = await prisma.order.findFirst({ where: { id: params.id, deletedAt: null } });
+  if (!order) {
+    return NextResponse.json({ error: "سفارش یافت نشد." }, { status: 404 });
+  }
+
+  await prisma.order.update({ where: { id: order.id }, data: { deletedAt: new Date() } });
+
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: "delete",
+    target: { type: "order", id: order.id },
+    summary: `سفارش «${order.orderNumber}» حذف شد`,
+  });
+
+  return NextResponse.json({ ok: true });
 }

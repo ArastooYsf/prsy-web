@@ -19,7 +19,7 @@ export default async function NewOrderPage() {
   }
 
   const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
+    where: { role: "CUSTOMER", deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 

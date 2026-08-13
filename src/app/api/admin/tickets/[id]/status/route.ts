@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/logger";
 
 const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"];
 
@@ -19,12 +20,19 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "وضعیت نامعتبر است." }, { status: 400 });
   }
 
-  const ticket = await prisma.ticket.findUnique({ where: { id: params.id } });
+  const ticket = await prisma.ticket.findFirst({ where: { id: params.id, deletedAt: null } });
   if (!ticket) {
     return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }
 
   await prisma.ticket.update({ where: { id: ticket.id }, data: { status: status as typeof ticket.status } });
+
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: "status_change",
+    target: { type: "ticket", id: ticket.id },
+    summary: `وضعیت تیکت «${ticket.subject}» از ${ticket.status} به ${status} تغییر کرد`,
+  });
 
   return NextResponse.json({ ok: true });
 }

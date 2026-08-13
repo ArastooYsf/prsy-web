@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import OrderProgress from "@/components/OrderProgress";
 import OrderForm from "@/components/admin/OrderForm";
+import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +13,8 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
   const session = await getServerSession(authOptions);
   const isAdmin = session!.user.role === "ADMIN";
 
-  const order = await prisma.order.findUnique({
-    where: { id: params.id },
+  const order = await prisma.order.findFirst({
+    where: { id: params.id, deletedAt: null },
     include: { user: true, items: true },
   });
 
@@ -61,13 +62,21 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
   }
 
   const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
+    where: { role: "CUSTOMER", deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 
   return (
     <div>
-      <h2 className="mb-6 text-lg font-bold">ویرایش سفارش</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold">ویرایش سفارش</h2>
+        <DeleteEntityButton
+          endpoint={`/api/admin/orders/${order.id}`}
+          title="حذف سفارش"
+          message={`مطمئنید می‌خواهید سفارش «${order.orderNumber}» را حذف کنید؟`}
+          redirectTo="/account/admin/orders"
+        />
+      </div>
       <div className="mx-auto max-w-xl">
         <OrderForm
           mode="edit"

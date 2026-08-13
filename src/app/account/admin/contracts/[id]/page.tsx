@@ -7,6 +7,7 @@ import { CONTRACT_STATUS } from "@/lib/status-labels";
 import ContractForm from "@/components/admin/ContractForm";
 import DateRangeDisplay from "@/components/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
+import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,8 @@ export default async function AdminContractDetailPage({ params }: { params: { id
   const session = await getServerSession(authOptions);
   const isAdmin = session!.user.role === "ADMIN";
 
-  const contract = await prisma.contract.findUnique({
-    where: { id: params.id },
+  const contract = await prisma.contract.findFirst({
+    where: { id: params.id, deletedAt: null },
     include: { user: true },
   });
 
@@ -57,13 +58,21 @@ export default async function AdminContractDetailPage({ params }: { params: { id
   }
 
   const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
+    where: { role: "CUSTOMER", deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 
   return (
     <div>
-      <h2 className="mb-6 text-lg font-bold">ویرایش قرارداد</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold">ویرایش قرارداد</h2>
+        <DeleteEntityButton
+          endpoint={`/api/admin/contracts/${contract.id}`}
+          title="حذف قرارداد"
+          message={`مطمئنید می‌خواهید قرارداد «${contract.title}» را حذف کنید؟`}
+          redirectTo="/account/admin/contracts"
+        />
+      </div>
       <div className="mx-auto max-w-xl">
         <ContractForm
           mode="edit"

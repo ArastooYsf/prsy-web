@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/logger";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
@@ -15,15 +16,14 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }
 
-  await Promise.all([
-    ticket.messageSeenAt
-      ? Promise.resolve()
-      : prisma.ticket.update({ where: { id: ticket.id }, data: { messageSeenAt: new Date() } }),
-    prisma.ticketReply.updateMany({
-      where: { ticketId: ticket.id, authorId: ticket.userId, seenAt: null },
-      data: { seenAt: new Date() },
-    }),
-  ]);
+  await prisma.ticket.update({ where: { id: ticket.id }, data: { deletedAt: new Date() } });
+
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: "delete",
+    target: { type: "ticket", id: ticket.id },
+    summary: `تیکت «${ticket.subject}» حذف شد`,
+  });
 
   return NextResponse.json({ ok: true });
 }

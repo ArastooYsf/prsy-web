@@ -40,3 +40,9 @@ next-env.d.ts
 
 # admin-uploaded media (lives on the host, not in version control)
 /public/media/uploads
+
+# event logs (host-local, contain user emails/ids — not version control)
+/logs
+
+# local DB backups (contain real user data)
+/backups

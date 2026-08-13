@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
-const EMOJIS = [
-  "👍", "👎", "🙏", "🙂", "😀", "😊", "😐", "😕", "😢", "😡",
-  "❤️", "🎉", "✅", "❌", "⚠️", "🔥", "💡", "📅", "⏰", "🚚",
-  "🔧", "⚙️", "💰", "📦", "🙌", "👌", "🤝", "✔️", "❓", "📌",
-];
-
+// Twemoji set (not "native") so emoji render identically across
+// Android/iOS/Windows/macOS instead of relying on each OS's own emoji font.
 export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -45,20 +43,19 @@ export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) =>
       </button>
 
       {open && (
-        <div className="absolute bottom-11 right-0 z-20 grid w-64 grid-cols-6 gap-1 rounded-2xl border border-white/10 bg-background p-3 shadow-2xl">
-          {EMOJIS.map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              onClick={() => {
-                onSelect(emoji);
-                setOpen(false);
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-lg transition-colors hover:bg-white/10"
-            >
-              {emoji}
-            </button>
-          ))}
+        <div className="absolute bottom-11 right-0 z-20">
+          <Picker
+            data={data}
+            set="twemoji"
+            theme="dark"
+            locale="fa"
+            previewPosition="none"
+            skinTonePosition="search"
+            onEmojiSelect={(emoji: { native: string }) => {
+              onSelect(emoji.native);
+              setOpen(false);
+            }}
+          />
         </div>
       )}
     </div>

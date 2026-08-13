@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -25,6 +26,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const updated = await prisma.user.update({
     where: { id: customer.id },
     data: { approvalStatus: action },
+  });
+
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: "approval_change",
+    target: { type: "customer", id: updated.id },
+    summary: `وضعیت تأیید مشتری «${updated.name || updated.email}» به ${action} تغییر کرد`,
   });
 
   return NextResponse.json({ customer: { id: updated.id, approvalStatus: updated.approvalStatus } });

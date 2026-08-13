@@ -23,17 +23,17 @@ export default async function AccountLayout({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden lg:flex-row">
       <AccountSidebar role={session.user.role} />
-      <div className="min-w-0 flex-1">
-        <section className="container py-6 sm:py-12">
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        <section className="container flex flex-1 flex-col py-6 sm:py-12">
           <div className="mb-8 border-b border-white/10 pb-6">
             <p className="text-xs font-medium text-foreground/50">حساب کاربری</p>
             <h1 className="mt-1 text-xl font-black sm:text-2xl">
               خوش آمدید، <span className="text-gradient">{session.user.name || session.user.email}</span>
             </h1>
           </div>
-          {children}
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         </section>
       </div>
     </div>

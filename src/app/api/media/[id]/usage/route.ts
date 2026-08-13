@@ -26,9 +26,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
     prisma.blogPost.findMany({ where: { content: { contains: asset.url } }, select: { id: true, title: true } }),
     prisma.siteContent.findMany({ where: { value: { contains: asset.url } }, select: { id: true, key: true } }),
     prisma.contract.findMany({ where: { fileUrl: asset.url }, select: { id: true, title: true } }),
-    prisma.ticketReply.findMany({
-      where: { attachmentUrl: asset.url },
-      select: { id: true, ticket: { select: { subject: true } } },
+    prisma.ticketAttachment.findMany({
+      where: { url: asset.url },
+      select: { id: true, reply: { select: { ticket: { select: { subject: true } } } } },
     }),
   ]);
 
@@ -47,7 +47,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     usage.push({ type: "contract", label: `قرارداد: ${c.title}` });
   }
   for (const r of repliesOf) {
-    usage.push({ type: "ticket", label: `تیکت: ${r.ticket.subject}` });
+    usage.push({ type: "ticket", label: `تیکت: ${r.reply.ticket.subject}` });
   }
 
   return NextResponse.json({ count: usage.length, usage });

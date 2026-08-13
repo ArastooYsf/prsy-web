@@ -23,6 +23,7 @@ import {
   PackageSearch,
   Newspaper,
   LayoutTemplate,
+  History,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,7 @@ const ADMIN_LINKS: { href: string; label: string; icon: LucideIcon; roles: strin
   { href: "/account/admin/orders", label: "سفارش‌ها (مدیریت)", icon: PackageSearch, roles: ["ADMIN", "SUPPORT"] },
   { href: "/account/admin/blog", label: "وبلاگ", icon: Newspaper, roles: ["ADMIN"] },
   { href: "/account/admin/content", label: "محتوای سایت", icon: LayoutTemplate, roles: ["ADMIN"] },
+  { href: "/account/admin/logs", label: "گزارش رویدادها", icon: History, roles: ["ADMIN"] },
 ];
 
 const EXACT_MATCH_HREFS = new Set(["/account", "/account/admin"]);
@@ -98,11 +100,16 @@ function SidebarContents({
   onNavigate?: () => void;
 }) {
   const adminLinks = ADMIN_LINKS.filter((link) => link.roles.includes(role));
+  // Personal account pages (tickets/contracts/orders as a customer) only make
+  // sense for CUSTOMER — an ADMIN/SUPPORT isn't a customer of their own site.
+  // Profile stays for everyone since staff also need to change their own name/password.
+  const personalLinks =
+    role === "CUSTOMER" ? PERSONAL_LINKS : PERSONAL_LINKS.filter((link) => link.href === "/account/profile");
 
   return (
     <div className="flex h-full flex-col">
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {PERSONAL_LINKS.map((link) => (
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">
+        {personalLinks.map((link) => (
           <NavItem
             key={link.href}
             href={link.href}
@@ -176,7 +183,7 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
       <motion.aside
         animate={{ width: collapsed ? 76 : 236 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 flex-col border-l border-white/10 bg-white/[0.015] lg:top-12 lg:flex lg:h-[calc(100vh-3rem)]"
+        className="hidden h-full shrink-0 flex-col border-l border-white/10 bg-white/[0.015] lg:flex"
       >
         <div className="flex items-center justify-between px-3 pt-3">
           {!collapsed && <span className="text-xs font-semibold text-foreground/40">حساب کاربری</span>}

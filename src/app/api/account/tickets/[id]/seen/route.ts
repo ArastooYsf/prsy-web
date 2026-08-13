@@ -10,7 +10,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const ticket = await prisma.ticket.findFirst({ where: { id: params.id, userId: session.user.id } });
+  const ticket = await prisma.ticket.findFirst({ where: { id: params.id, userId: session.user.id, deletedAt: null } });
   if (!ticket) {
     return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }

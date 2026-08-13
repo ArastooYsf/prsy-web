@@ -15,7 +15,7 @@ export default async function AccountContractsPage() {
   const userId = session!.user.id;
 
   const contracts = await prisma.contract.findMany({
-    where: { userId },
+    where: { userId, deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 

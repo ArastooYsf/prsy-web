@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CONTRACT_STATUSES } from "@/lib/status-labels";
+import { logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -11,7 +12,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
-  const existing = await prisma.contract.findUnique({ where: { id: params.id } });
+  const existing = await prisma.contract.findFirst({ where: { id: params.id, deletedAt: null } });
   if (!existing) {
     return NextResponse.json({ error: "قرارداد یافت نشد." }, { status: 404 });
   }
@@ -41,5 +42,39 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     data: { userId, title, type, startDate, endDate, status, fileUrl },
   });
 
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: existing.status !== status ? "status_change" : "update",
+    target: { type: "contract", id: contract.id },
+    summary:
+      existing.status !== status
+        ? `وضعیت قرارداد «${contract.title}» از ${existing.status} به ${status} تغییر کرد`
+        : `قرارداد «${contract.title}» ویرایش شد`,
+  });
+
   return NextResponse.json({ contract });
+}
+
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
+  }
+
+  const contract = await prisma.contract.findFirst({ where: { id: params.id, deletedAt: null } });
+  if (!contract) {
+    return NextResponse.json({ error: "قرارداد یافت نشد." }, { status: 404 });
+  }
+
+  await prisma.contract.update({ where: { id: contract.id }, data: { deletedAt: new Date() } });
+
+  await logEvent({
+    actor: { id: session.user.id, email: session.user.email ?? "" },
+    action: "delete",
+    target: { type: "contract", id: contract.id },
+    summary: `قرارداد «${contract.title}» حذف شد`,
+  });
+
+  return NextResponse.json({ ok: true });
 }

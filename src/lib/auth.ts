@@ -29,7 +29,7 @@ export const authOptions: AuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user) {
+        if (!user || user.deletedAt) {
           return null;
         }
 

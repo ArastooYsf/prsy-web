@@ -12,7 +12,7 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
   const userId = session!.user.id;
 
   const order = await prisma.order.findFirst({
-    where: { id: params.id, userId },
+    where: { id: params.id, userId, deletedAt: null },
     include: { items: true },
   });
 

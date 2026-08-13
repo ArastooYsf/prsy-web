@@ -1,13 +1,19 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
+import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCustomersPage() {
+  const session = await getServerSession(authOptions);
+  const isAdmin = session!.user.role === "ADMIN";
+
   const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER" },
+    where: { role: "CUSTOMER", deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 
@@ -57,7 +63,8 @@ export default async function AdminCustomersPage() {
                 <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">ایمیل</th>
                 <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">نوع</th>
                 <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
-                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ عضویت</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ عضویت</th>
+                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
               </tr>
             </thead>
             <tbody>
@@ -88,6 +95,15 @@ export default async function AdminCustomersPage() {
                   </td>
                   <td dir="ltr" className="px-4 py-3 text-right text-xs text-foreground/50">
                     {formatJalali(customer.createdAt.toISOString())}
+                  </td>
+                  <td className="px-4 py-3">
+                    {isAdmin && (
+                      <DeleteEntityButton
+                        endpoint={`/api/admin/customers/${customer.id}`}
+                        title="حذف مشتری"
+                        message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
+                      />
+                    )}
                   </td>
                 </tr>
               ))}

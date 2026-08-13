@@ -1,39 +1,61 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { LifeBuoy, User } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { LifeBuoy, User, MoreVertical } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import EmojiPicker from "@/components/EmojiPicker";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
 import MediaPickerModal from "@/components/MediaPickerModal";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
+
+export type ChatAttachment = {
+  id: string;
+  url: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+};
 
 export type ChatMessage = {
   id: string;
   authorId: string;
   authorLabel: string;
   isStaff: boolean;
+  isReply: boolean;
   message: string;
-  attachmentUrl: string | null;
-  attachmentName: string | null;
+  attachments: ChatAttachment[];
   createdAt: string;
   seenAt: string | null;
+  editedAt: string | null;
+  deletedAt: string | null;
+};
+
+// A file the viewer has picked but not sent yet — no DB id until the reply
+// that carries it is created, so a locally-generated tempId is the React key.
+type PendingAttachment = {
+  tempId: string;
+  url: string;
+  filename: string;
+  mimeType: string;
+  size: number;
 };
 
 type TicketChatProps = {
   ticketId: string;
   initialMessages: ChatMessage[];
   viewerRole: "customer" | "staff";
+  viewerId: string;
   canReply: boolean;
 };
 
-const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 // Consecutive messages from the same sender within this window are grouped
-// together (single tail + single avatar on the last one), matching Telegram.
+// together (single avatar on the last one), matching Telegram.
 const GROUP_GAP_MS = 5 * 60 * 1000;
 
 // There's no websocket/SSE server in this project, so "typing" status is
@@ -47,6 +69,24 @@ const TYPING_STALE_MS = 5000;
 // keystroke doesn't hit the API.
 const TYPING_PING_THROTTLE_MS = 2500;
 
+// Shared width ceiling for every bubble (text or image), matching Telegram's
+// shrink-to-fit behavior: short content hugs itself, long content wraps at
+// this cap. Resolved with CSS min() against a viewport unit rather than a
+// parent-relative `%`, because the bubble's immediate flex ancestor is itself
+// shrink-to-fit — a percentage max-width there has no definite containing
+// block to resolve against and silently fails (short messages were wrapping
+// as if the cap were much narrower than intended).
+const BUBBLE_MAX_WIDTH_PX = 420;
+const BUBBLE_MAX_WIDTH_VW = 85;
+const BUBBLE_MAX_WIDTH_CSS = `min(${BUBBLE_MAX_WIDTH_PX}px, ${BUBBLE_MAX_WIDTH_VW}vw)`;
+
+// Fixed display box for a single-image message — every photo renders at
+// exactly this size (object-fit: cover crops to fill it) regardless of the
+// uploaded file's actual resolution, so a 4000x3000 photo and a 100x100 icon
+// both come out identically sized instead of dictating the bubble's size.
+const IMAGE_MAX_WIDTH = 320;
+const IMAGE_MAX_HEIGHT = 400;
+
 // Physical side each role renders on. The page is dir="rtl", where CSS
 // `justify-start` renders on the visual RIGHT and `justify-end` on the
 // visual LEFT — the inverse of an LTR page. Getting this backwards is an
@@ -57,8 +97,14 @@ const JUSTIFY_CLASS: Record<"left" | "right", string> = {
   left: "justify-end",
 };
 
-function isImageUrl(url: string) {
-  return IMAGE_EXTENSIONS.some((ext) => url.toLowerCase().endsWith(ext));
+function isImageMime(mimeType: string) {
+  return mimeType.startsWith("image/");
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function SeenTicks({ seen, onGradient }: { seen: boolean; onGradient: boolean }) {
@@ -121,86 +167,26 @@ function TypingIndicator({ isStaff }: { isStaff: boolean }) {
   );
 }
 
-// Builds a single closed SVG path — the bubble's rounded rectangle fused
-// with a small pointed tail at one bottom corner — so the tail is part of
-// the same filled shape as the body (no separate element, no seam),
-// matching the "droplet clip-path" technique used by Telegram Desktop.
-function buildTailPath(w: number, h: number, side: "left" | "right"): string {
-  const T = 7; // how far the tail tip pokes out past the body edge
-  const R = Math.max(4, Math.min(16, h / 2, w / 2)); // corner radius, clamped for tiny bubbles
-
-  if (side === "right") {
-    const bodyW = w - T;
-    const rightEdgeY = Math.max(R, h - R - T);
-    return [
-      `M ${R} 0`,
-      `L ${bodyW - R} 0`,
-      `A ${R} ${R} 0 0 1 ${bodyW} ${R}`,
-      `L ${bodyW} ${rightEdgeY}`,
-      `L ${w} ${h}`,
-      `L ${bodyW - R} ${h}`,
-      `L ${R} ${h}`,
-      `A ${R} ${R} 0 0 1 0 ${h - R}`,
-      `L 0 ${R}`,
-      `A ${R} ${R} 0 0 1 ${R} 0`,
-      "Z",
-    ].join(" ");
-  }
-
-  const bodyX0 = T;
-  const leftEdgeY = Math.max(R, h - R - T);
-  return [
-    `M ${bodyX0 + R} 0`,
-    `L ${w - R} 0`,
-    `A ${R} ${R} 0 0 1 ${w} ${R}`,
-    `L ${w} ${h - R}`,
-    `A ${R} ${R} 0 0 1 ${w - R} ${h}`,
-    `L ${bodyX0 + R} ${h}`,
-    `L 0 ${h}`,
-    `L ${bodyX0} ${leftEdgeY}`,
-    `L ${bodyX0} ${R}`,
-    `A ${R} ${R} 0 0 1 ${bodyX0 + R} 0`,
-    "Z",
-  ].join(" ");
-}
-
 type BubbleProps = {
   side: "left" | "right";
   isStaff: boolean;
-  hasTail: boolean;
   children: ReactNode;
 };
 
-function Bubble({ side, isStaff, hasTail, children }: BubbleProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
-
-  useLayoutEffect(() => {
-    if (!hasTail) return;
-    const el = ref.current;
-    if (!el) return;
-    const update = () => setSize({ w: el.offsetWidth, h: el.offsetHeight });
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [hasTail]);
-
-  const clipPath = hasTail && size ? `path('${buildTailPath(size.w, size.h, side)}')` : undefined;
+function Bubble({ side, isStaff, children }: BubbleProps) {
   // Slides in from the outward direction it settles into (right-side
   // bubbles slide in from further right, left-side from further left).
   const entranceX = side === "right" ? 16 : -16;
 
   return (
     <motion.div
-      ref={ref}
-      style={clipPath ? { clipPath } : undefined}
       initial={{ opacity: 0, y: 12, scale: 0.96, x: entranceX }}
       animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
       whileHover={{ scale: 1.01, y: -1 }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      style={{ maxWidth: BUBBLE_MAX_WIDTH_CSS }}
       className={cn(
-        "w-fit max-w-[70%] rounded-2xl px-3.5 py-2",
+        "w-fit rounded-2xl px-3.5 py-2",
         isStaff
           ? "bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)]"
           : "bg-white/[0.07] text-foreground shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm",
@@ -211,18 +197,94 @@ function Bubble({ side, isStaff, hasTail, children }: BubbleProps) {
   );
 }
 
-export default function TicketChat({ ticketId, initialMessages, viewerRole, canReply }: TicketChatProps) {
+// "More options" trigger pinned to the top corner of the row (via
+// `self-start`, independent of how tall the bubble ends up being) — revealed
+// on hover on desktop, or via a long-press elsewhere in the message on touch
+// devices (see `longPressedId` in the parent). The dropdown itself is Radix's
+// Popper-positioned Content: it has built-in viewport collision detection,
+// so near the bottom of the chat it automatically flips to open upward
+// instead of spilling off-screen.
+function MessageMenu({
+  onEdit,
+  onDelete,
+  forceVisible,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+  forceVisible: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <DropdownMenu.Root open={open} onOpenChange={setOpen} dir="rtl">
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          aria-label="گزینه‌های پیام"
+          className={cn(
+            "flex h-7 w-7 shrink-0 self-start items-center justify-center rounded-full text-foreground/40 opacity-0 transition-opacity hover:bg-white/10 hover:text-foreground group-hover:opacity-100",
+            (forceVisible || open) && "opacity-100",
+          )}
+        >
+          <MoreVertical className="size-4" />
+        </button>
+      </DropdownMenu.Trigger>
+
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="start"
+          sideOffset={4}
+          collisionPadding={8}
+          className="z-50 w-32 overflow-hidden rounded-xl border border-white/10 bg-background p-1 shadow-2xl"
+        >
+          <DropdownMenu.Item
+            onSelect={onEdit}
+            className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+          >
+            ویرایش
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={onDelete}
+            className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-red-400 outline-none transition-colors data-[highlighted]:bg-red-500/10"
+          >
+            حذف
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
+export default function TicketChat({ ticketId, initialMessages, viewerRole, viewerId, canReply }: TicketChatProps) {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [pendingAttachment, setPendingAttachment] = useState<{ url: string; name: string } | null>(null);
+  const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([]);
   const [attachmentPickerOpen, setAttachmentPickerOpen] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  // Touch devices have no hover — a long-press on the message itself reveals
+  // its (otherwise hidden) options button, same idea as Telegram's mobile UI.
+  const [longPressedId, setLongPressedId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasScrolledOnce = useRef(false);
   const lastTypingPingRef = useRef(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTouchStart = (messageId: string) => {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    setLongPressedId((prev) => (prev === messageId ? prev : null));
+    longPressTimerRef.current = setTimeout(() => setLongPressedId(messageId), 450);
+  };
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+  };
 
   const seenEndpoint = viewerRole === "customer" ? `/api/account/tickets/${ticketId}/seen` : `/api/admin/tickets/${ticketId}/seen`;
   const replyEndpoint = viewerRole === "customer" ? `/api/account/tickets/${ticketId}/reply` : `/api/admin/tickets/${ticketId}/reply`;
@@ -271,11 +333,9 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
     fetch(typingEndpoint, { method: "POST" });
   };
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendMessage = async () => {
     setError("");
-
-    if (!text.trim() && !pendingAttachment) return;
+    if (!text.trim() && pendingAttachments.length === 0) return;
 
     setSending(true);
 
@@ -284,8 +344,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: text,
-        attachmentUrl: pendingAttachment?.url ?? null,
-        attachmentName: pendingAttachment?.name ?? null,
+        attachments: pendingAttachments.map((a) => ({
+          url: a.url,
+          filename: a.filename,
+          mimeType: a.mimeType,
+          size: a.size,
+        })),
       }),
     });
 
@@ -305,24 +369,91 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
         authorId: reply.authorId,
         authorLabel: "شما",
         isStaff: viewerRole === "staff",
+        isReply: true,
         message: reply.message,
-        attachmentUrl: reply.attachmentUrl,
-        attachmentName: reply.attachmentName,
+        attachments: reply.attachments ?? [],
         createdAt: reply.createdAt,
         seenAt: null,
+        editedAt: null,
+        deletedAt: null,
       },
     ]);
     setText("");
-    setPendingAttachment(null);
+    setPendingAttachments([]);
     router.refresh();
   };
 
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
+  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const startEdit = (m: ChatMessage) => {
+    setEditingId(m.id);
+    setEditingText(m.message);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingText("");
+  };
+
+  const saveEdit = async (m: ChatMessage) => {
+    if (!editingText.trim() && m.attachments.length === 0) return;
+    setSavingEdit(true);
+
+    const res = await fetch(`${replyEndpoint}/${m.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: editingText }),
+    });
+
+    setSavingEdit(false);
+
+    if (!res.ok) return;
+
+    const { reply } = await res.json();
+    setMessages((prev) =>
+      prev.map((msg) => (msg.id === m.id ? { ...msg, message: reply.message, editedAt: reply.editedAt } : msg)),
+    );
+    cancelEdit();
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
+    setDeleting(true);
+
+    const res = await fetch(`${replyEndpoint}/${deleteTargetId}`, { method: "DELETE" });
+
+    if (res.ok) {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === deleteTargetId
+            ? { ...msg, message: "", attachments: [], deletedAt: new Date().toISOString() }
+            : msg,
+        ),
+      );
+    }
+
+    setDeleting(false);
+    setDeleteTargetId(null);
+  };
+
   return (
-    <div className="flex h-[calc(100vh-16rem)] min-h-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-black/10">
+    <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-black/10">
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.map((m, i) => {
           const isMine = viewerRole === "staff" ? m.isStaff : !m.isStaff;
+          const canModify = m.isReply && !m.deletedAt && m.authorId === viewerId;
           const side = m.isStaff ? PHYSICAL_SIDE.staff : PHYSICAL_SIDE.customer;
+          const isEditing = editingId === m.id;
 
           const prev = messages[i - 1];
           const next = messages[i + 1];
@@ -332,57 +463,147 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
           const isLastInGroup = !next || next.isStaff !== m.isStaff || gapToNext > GROUP_GAP_MS;
 
           const bubbleContent = (
-            <Bubble side={side} isStaff={m.isStaff} hasTail={isLastInGroup}>
-              {m.message && <p className="whitespace-pre-wrap text-sm leading-6">{m.message}</p>}
+            <Bubble side={side} isStaff={m.isStaff}>
+              {isEditing ? (
+                <div className="flex min-w-[220px] flex-col gap-2">
+                  <textarea
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        saveEdit(m);
+                      } else if (e.key === "Escape") {
+                        cancelEdit();
+                      }
+                    }}
+                    rows={2}
+                    autoFocus
+                    className={cn(
+                      "w-full resize-none rounded-lg bg-black/10 px-2 py-1.5 text-sm outline-none",
+                      m.isStaff ? "text-white placeholder:text-white/50" : "text-foreground placeholder:text-foreground/40",
+                    )}
+                  />
+                  <div className="flex items-center justify-end gap-2 text-xs">
+                    <button type="button" onClick={cancelEdit} className="opacity-70 hover:opacity-100">
+                      انصراف
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => saveEdit(m)}
+                      disabled={savingEdit}
+                      className="rounded-full bg-black/20 px-3 py-1 font-semibold hover:bg-black/30 disabled:opacity-50"
+                    >
+                      {savingEdit ? "..." : "ذخیره"}
+                    </button>
+                  </div>
+                </div>
+              ) : m.deletedAt ? (
+                <p className={cn("text-sm italic", m.isStaff ? "text-white/70" : "text-foreground/40")}>
+                  این پیام حذف شد
+                </p>
+              ) : (
+                <>
+                  {m.message && <p className="whitespace-pre-wrap text-sm leading-6">{m.message}</p>}
 
-              {m.attachmentUrl &&
-                (isImageUrl(m.attachmentUrl) ? (
-                  <a href={getMediaUrl(m.attachmentUrl)} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={getMediaUrl(m.attachmentUrl)}
-                      alt={m.attachmentName ?? ""}
-                      className={`max-w-full rounded-lg border border-white/10 ${m.message ? "mt-2" : ""}`}
-                    />
-                  </a>
-                ) : (
-                  <a
-                    href={getMediaUrl(m.attachmentUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-2 rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs hover:border-white/30 ${m.message ? "mt-2" : ""}`}
+                  {(() => {
+                    const images = m.attachments.filter((a) => isImageMime(a.mimeType));
+                    const files = m.attachments.filter((a) => !isImageMime(a.mimeType));
+                    return (
+                      <>
+                        {images.length > 0 && (
+                          <div
+                            className={cn(
+                              "gap-1",
+                              m.message ? "mt-2" : "",
+                              images.length === 1 ? "" : "grid grid-cols-2",
+                            )}
+                          >
+                            {images.map((img) => (
+                              <a key={img.id} href={getMediaUrl(img.url)} target="_blank" rel="noopener noreferrer">
+                                <img
+                                  src={getMediaUrl(img.url)}
+                                  alt={img.filename}
+                                  style={
+                                    images.length === 1
+                                      ? { width: IMAGE_MAX_WIDTH, height: IMAGE_MAX_HEIGHT, maxWidth: "100%" }
+                                      : undefined
+                                  }
+                                  className={cn(
+                                    "rounded-lg border border-white/10 object-cover",
+                                    images.length !== 1 && "aspect-square w-full",
+                                  )}
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        )}
+
+                        {files.length > 0 && (
+                          <div className={cn("flex flex-col gap-1.5", m.message || images.length > 0 ? "mt-2" : "")}>
+                            {files.map((f) => (
+                              <a
+                                key={f.id}
+                                href={getMediaUrl(f.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs hover:border-white/30"
+                              >
+                                <FileTypeIcon kind={fileKindFromName(f.filename)} />
+                                <span className="min-w-0 flex-1 truncate">{f.filename}</span>
+                                <span className="shrink-0 opacity-60">{formatFileSize(f.size)}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+
+                  <div
+                    className={cn(
+                      "mt-1 flex items-center justify-end gap-1.5 text-[10px]",
+                      m.isStaff ? "text-white/70" : "text-foreground/40",
+                    )}
                   >
-                    <FileTypeIcon kind={fileKindFromName(m.attachmentUrl)} />
-                    <span className="truncate">{m.attachmentName ?? "فایل پیوست"}</span>
-                  </a>
-                ))}
-
-              <div
-                className={cn(
-                  "mt-1 flex items-center justify-end gap-1.5 text-[10px]",
-                  m.isStaff ? "text-white/70" : "text-foreground/40",
-                )}
-              >
-                <span dir="ltr">
-                  {new Date(m.createdAt).toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" })}
-                </span>
-                {isMine && <SeenTicks seen={!!m.seenAt} onGradient={m.isStaff} />}
-              </div>
+                    {m.editedAt && <span>ویرایش شد ·</span>}
+                    <span dir="ltr">
+                      {new Date(m.createdAt).toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    {isMine && <SeenTicks seen={!!m.seenAt} onGradient={m.isStaff} />}
+                  </div>
+                </>
+              )}
             </Bubble>
           );
+
+          const menu =
+            canModify && !isEditing ? (
+              <MessageMenu
+                onEdit={() => startEdit(m)}
+                onDelete={() => setDeleteTargetId(m.id)}
+                forceVisible={longPressedId === m.id}
+              />
+            ) : null;
 
           return (
             <div
               key={m.id}
               className={cn(
-                "flex",
+                "group flex",
                 JUSTIFY_CLASS[side],
                 isFirstInGroup ? (i === 0 ? "mt-0" : "mt-4") : "mt-1",
               )}
+              onTouchStart={canModify ? () => handleTouchStart(m.id) : undefined}
+              onTouchEnd={canModify ? cancelLongPress : undefined}
+              onTouchMove={canModify ? cancelLongPress : undefined}
             >
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-1.5">
+                {isMine && side === "left" && menu}
                 {!isMine && side === "right" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
                 {bubbleContent}
                 {!isMine && side === "left" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
+                {isMine && side === "right" && menu}
               </div>
             </div>
           );
@@ -408,21 +629,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
 
       {canReply ? (
         <form onSubmit={handleSend} className="border-t border-white/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
-          {pendingAttachment && (
-            <div className="mb-2 flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs">
-              <span className="truncate text-foreground/70">{pendingAttachment.name}</span>
-              <button
-                type="button"
-                onClick={() => setPendingAttachment(null)}
-                className="mr-auto shrink-0 text-foreground/40 hover:text-red-400"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-          )}
-
           <div className="mb-2 flex items-center gap-1">
             <EmojiPicker onSelect={(emoji) => setText((prev) => prev + emoji)} />
             {viewerRole === "staff" && <CannedResponsePicker onSelect={(body) => setText((prev) => (prev ? `${prev}\n${body}` : body))} />}
@@ -444,45 +650,95 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
             </button>
           </div>
 
-          <MediaPickerModal
-            open={attachmentPickerOpen}
-            onClose={() => setAttachmentPickerOpen(false)}
-            kind="all"
-            multiple={false}
-            onConfirm={(assets) => {
-              if (assets[0]) setPendingAttachment({ url: assets[0].url, name: assets[0].filename });
-            }}
-          />
+          <div className="flex flex-col gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-sm transition-colors focus-within:border-accent-500/50">
+            {pendingAttachments.length > 0 &&
+              (() => {
+                const images = pendingAttachments.filter((a) => isImageMime(a.mimeType));
+                const files = pendingAttachments.filter((a) => !isImageMime(a.mimeType));
+                const removeOne = (tempId: string) =>
+                  setPendingAttachments((prev) => prev.filter((a) => a.tempId !== tempId));
 
-          <div className="flex items-end gap-2 rounded-xl border border-white/10 bg-white/5 px-2 py-1.5 backdrop-blur-sm transition-colors focus-within:border-accent-500/50">
-            <textarea
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                if (e.target.value.trim()) pingTyping();
-              }}
-              rows={2}
-              placeholder="پیام خود را بنویسید..."
-              className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-foreground outline-none placeholder:text-foreground/40"
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              disabled={sending || (!text.trim() && !pendingAttachment)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-              aria-label="ارسال"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </motion.button>
+                return (
+                  <div className="flex flex-col gap-1.5 p-1">
+                    {images.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {images.map((img) => (
+                          <div
+                            key={img.tempId}
+                            className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10"
+                          >
+                            <img src={getMediaUrl(img.url)} alt={img.filename} className="h-full w-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeOne(img.tempId)}
+                              aria-label="حذف تصویر"
+                              className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-white hover:bg-red-500"
+                            >
+                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {files.length > 0 && (
+                      <div className="flex flex-col gap-1">
+                        {files.map((f) => (
+                          <div key={f.tempId} className="flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs">
+                            <FileTypeIcon kind={fileKindFromName(f.filename)} className="h-4 w-4 shrink-0" />
+                            <span className="min-w-0 flex-1 truncate text-foreground/80">{f.filename}</span>
+                            <span className="shrink-0 text-foreground/40">{formatFileSize(f.size)}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeOne(f.tempId)}
+                              aria-label="حذف پیوست"
+                              className="shrink-0 rounded-full p-1 text-foreground/40 hover:bg-white/10 hover:text-red-400"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+            <div className="flex items-end gap-2">
+              <textarea
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  if (e.target.value.trim()) pingTyping();
+                }}
+                onKeyDown={handleTextareaKeyDown}
+                rows={2}
+                placeholder="پیام خود را بنویسید..."
+                className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-foreground outline-none placeholder:text-foreground/40"
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                disabled={sending || (!text.trim() && pendingAttachments.length === 0)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="ارسال"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </motion.button>
+            </div>
           </div>
 
           {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
@@ -492,6 +748,33 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, canR
           این تیکت بسته شده است.
         </div>
       )}
+
+      <MediaPickerModal
+        open={attachmentPickerOpen}
+        onClose={() => setAttachmentPickerOpen(false)}
+        kind="all"
+        multiple
+        onConfirm={(assets) => {
+          setPendingAttachments((prev) => {
+            const existingUrls = new Set(prev.map((a) => a.url));
+            const additions = assets
+              .filter((a) => !existingUrls.has(a.url))
+              .map((a) => ({ tempId: a.id, url: a.url, filename: a.filename, mimeType: a.mimeType, size: a.size }));
+            return [...prev, ...additions];
+          });
+        }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTargetId}
+        title="حذف پیام"
+        message="مطمئنید می‌خواهید این پیام را حذف کنید؟ این پیام برای طرف مقابل «حذف شد» نمایش داده می‌شود."
+        confirmLabel="حذف کن"
+        danger
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTargetId(null)}
+      />
     </div>
   );
 }

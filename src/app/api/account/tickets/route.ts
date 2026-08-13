@@ -11,6 +11,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
+  if (session.user.role !== "CUSTOMER") {
+    return NextResponse.json({ error: "فقط مشتریان می‌توانند تیکت ثبت کنند." }, { status: 403 });
+  }
+
   const body = await request.json().catch(() => null);
   const subject = typeof body?.subject === "string" ? sanitizePlainText(body.subject).slice(0, 200) : "";
   const message = typeof body?.message === "string" ? sanitizePlainText(body.message).slice(0, 5000) : "";

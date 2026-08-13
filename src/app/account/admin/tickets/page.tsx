@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
+import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTicketsPage() {
   const tickets = await prisma.ticket.findMany({
+    where: { deletedAt: null },
     orderBy: { updatedAt: "desc" },
     include: { user: true },
   });
@@ -26,7 +28,8 @@ export default async function AdminTicketsPage() {
                 <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">موضوع</th>
                 <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">مشتری</th>
                 <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
-                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">آخرین بروزرسانی</th>
+                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">آخرین بروزرسانی</th>
+                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
               </tr>
             </thead>
             <tbody>
@@ -47,6 +50,13 @@ export default async function AdminTicketsPage() {
                   </td>
                   <td dir="ltr" className="px-4 py-3 text-right text-foreground/60">
                     {ticket.updatedAt.toLocaleDateString("fa-IR")}
+                  </td>
+                  <td className="px-4 py-3">
+                    <DeleteEntityButton
+                      endpoint={`/api/admin/tickets/${ticket.id}`}
+                      title="حذف تیکت"
+                      message={`مطمئنید می‌خواهید تیکت «${ticket.subject}» را حذف کنید؟`}
+                    />
                   </td>
                 </tr>
               ))}

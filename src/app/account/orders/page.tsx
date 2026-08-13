@@ -11,7 +11,7 @@ export default async function AccountOrdersPage() {
   const userId = session!.user.id;
 
   const orders = await prisma.order.findMany({
-    where: { userId },
+    where: { userId, deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });

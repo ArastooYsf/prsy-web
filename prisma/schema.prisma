@@ -36,6 +36,7 @@ model User {
   economicCode   String?
   approvalStatus ApprovalStatus @default(APPROVED)
   notes          String?        @db.Text
+  deletedAt      DateTime?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -67,6 +68,7 @@ model Ticket {
   messageSeenAt DateTime?
   customerTypingAt DateTime?
   staffTypingAt    DateTime?
+  deletedAt     DateTime?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
@@ -83,13 +85,28 @@ model TicketReply {
   authorId       String
   author         User      @relation(fields: [authorId], references: [id])
   message        String    @db.Text
-  attachmentUrl  String?
-  attachmentName String?
+  attachments    TicketAttachment[]
   seenAt         DateTime?
+  editedAt       DateTime?
+  deletedAt      DateTime?
   createdAt      DateTime  @default(now())
 
   @@index([ticketId])
   @@map("ticket_replies")
+}
+
+model TicketAttachment {
+  id        String      @id @default(cuid())
+  replyId   String
+  reply     TicketReply @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  url       String
+  filename  String
+  mimeType  String
+  size      Int
+  createdAt DateTime    @default(now())
+
+  @@index([replyId])
+  @@map("ticket_attachments")
 }
 
 model CannedResponse {
@@ -122,6 +139,7 @@ model Contract {
   endDate   DateTime
   status    ContractStatus @default(ACTIVE)
   fileUrl   String?
+  deletedAt DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
@@ -151,6 +169,7 @@ model Order {
   userId      String
   user        User        @relation(fields: [userId], references: [id])
   status      OrderStatus @default(PENDING)
+  deletedAt   DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

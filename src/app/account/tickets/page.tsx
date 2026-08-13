@@ -11,7 +11,7 @@ export default async function AccountTicketsPage() {
   const userId = session!.user.id;
 
   const tickets = await prisma.ticket.findMany({
-    where: { userId },
+    where: { userId, deletedAt: null },
     orderBy: { updatedAt: "desc" },
   });
 

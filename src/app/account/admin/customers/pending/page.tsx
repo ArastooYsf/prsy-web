@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PendingCustomersPage() {
   const pending = await prisma.user.findMany({
-    where: { role: "CUSTOMER", approvalStatus: "PENDING" },
+    where: { role: "CUSTOMER", approvalStatus: "PENDING", deletedAt: null },
     orderBy: { createdAt: "asc" },
   });
 

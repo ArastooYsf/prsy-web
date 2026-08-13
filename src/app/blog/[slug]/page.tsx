@@ -54,7 +54,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </Link>
             {canEdit && (
               <Link
-                href={`/admin/blog/${post.id}`}
+                href={`/account/admin/blog/${post.id}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-1.5 text-xs font-semibold text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">

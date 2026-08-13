@@ -99,7 +99,7 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
       return;
     }
 
-    router.push("/admin/contracts");
+    router.push("/account/admin/contracts");
     router.refresh();
   };
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn, getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -41,13 +41,7 @@ export default function LoginForm() {
       return;
     }
 
-    if (explicitCallbackUrl) {
-      router.push(explicitCallbackUrl);
-    } else {
-      const session = await getSession();
-      const role = session?.user?.role;
-      router.push(role === "ADMIN" || role === "SUPPORT" ? "/admin" : "/account");
-    }
+    router.push(explicitCallbackUrl || "/account");
     router.refresh();
   };
 

@@ -91,7 +91,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
       return;
     }
 
-    router.push("/admin/orders");
+    router.push("/account/admin/orders");
     router.refresh();
   };
 

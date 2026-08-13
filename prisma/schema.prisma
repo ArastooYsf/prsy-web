@@ -65,6 +65,8 @@ model Ticket {
   message       String       @db.Text
   status        TicketStatus @default(OPEN)
   messageSeenAt DateTime?
+  customerTypingAt DateTime?
+  staffTypingAt    DateTime?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 

@@ -80,7 +80,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
       return;
     }
 
-    router.push("/admin/blog");
+    router.push("/account/admin/blog");
     router.refresh();
   };
 
@@ -191,7 +191,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
           <div className="flex shrink-0 gap-2">
             <button
               type="button"
-              onClick={() => router.push("/admin/blog")}
+              onClick={() => router.push("/account/admin/blog")}
               className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium text-foreground/70 transition-colors hover:border-white/20"
             >
               انصراف

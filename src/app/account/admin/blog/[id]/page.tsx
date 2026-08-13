@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
-    redirect("/admin");
+    redirect("/account/admin");
   }
 
   const post = await prisma.blogPost.findUnique({ where: { id: params.id } });

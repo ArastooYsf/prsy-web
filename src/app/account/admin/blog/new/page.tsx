@@ -6,7 +6,7 @@ import BlogPostForm from "@/components/admin/BlogPostForm";
 export default async function NewBlogPostPage() {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
-    redirect("/admin");
+    redirect("/account/admin");
   }
 
   return (

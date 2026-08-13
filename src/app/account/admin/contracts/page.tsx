@@ -21,7 +21,7 @@ export default async function AdminContractsPage() {
         <h2 className="text-lg font-bold">قراردادها</h2>
         {isAdmin && (
           <Link
-            href="/admin/contracts/new"
+            href="/account/admin/contracts/new"
             className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
           >
             ثبت قرارداد جدید
@@ -60,7 +60,7 @@ export default async function AdminContractsPage() {
                   </td>
                   <td className="px-4 py-3 text-left">
                     <Link
-                      href={`/admin/contracts/${contract.id}`}
+                      href={`/account/admin/contracts/${contract.id}`}
                       className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                     >
                       {isAdmin ? "ویرایش" : "مشاهده"}

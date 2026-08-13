@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminContentPage() {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
-    redirect("/admin");
+    redirect("/account/admin");
   }
 
   const [heroSlides, categories] = await Promise.all([getHeroSlides(), getProductCategories()]);

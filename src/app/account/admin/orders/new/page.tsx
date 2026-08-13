@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function NewOrderPage() {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
-    redirect("/admin/orders");
+    redirect("/account/admin/orders");
   }
 
   const customers = await prisma.user.findMany({

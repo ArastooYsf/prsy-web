@@ -36,7 +36,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
     if (variant === "icon") {
       return (
         <Button size="icon" variant="outline" className="h-9 w-9" asChild>
-          <Link href="/admin" aria-label="پنل مدیریت">
+          <Link href="/account/admin" aria-label="پنل مدیریت">
             <PanelIcon />
           </Link>
         </Button>
@@ -44,7 +44,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
     }
     return (
       <Button variant="outline" className="w-full" asChild>
-        <Link href="/admin" onClick={onNavigate}>
+        <Link href="/account/admin" onClick={onNavigate}>
           پنل مدیریت
         </Link>
       </Button>

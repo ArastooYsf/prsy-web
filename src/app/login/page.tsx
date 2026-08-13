@@ -16,7 +16,7 @@ export default async function LoginPage() {
   const session = await getServerSession(authOptions);
 
   if (session?.user) {
-    redirect(session.user.role === "ADMIN" || session.user.role === "SUPPORT" ? "/admin" : "/account");
+    redirect("/account");
   }
 
   return (

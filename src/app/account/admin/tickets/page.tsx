@@ -33,7 +33,7 @@ export default async function AdminTicketsPage() {
               {tickets.map((ticket) => (
                 <tr key={ticket.id} className="border-t border-white/10">
                   <td className="px-4 py-3 font-medium">
-                    <Link href={`/admin/tickets/${ticket.id}`} className="hover:text-accent-400">
+                    <Link href={`/account/admin/tickets/${ticket.id}`} className="hover:text-accent-400">
                       {ticket.subject}
                     </Link>
                   </td>

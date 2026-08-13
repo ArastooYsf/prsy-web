@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminBlogListPage() {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
-    redirect("/admin");
+    redirect("/account/admin");
   }
 
   const posts = await prisma.blogPost.findMany({
@@ -22,7 +22,7 @@ export default async function AdminBlogListPage() {
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-lg font-bold">پست‌های وبلاگ</h2>
         <Link
-          href="/admin/blog/new"
+          href="/account/admin/blog/new"
           className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
         >
           پست جدید
@@ -65,7 +65,7 @@ export default async function AdminBlogListPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`/admin/blog/${post.id}`}
+                        href={`/account/admin/blog/${post.id}`}
                         className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                       >
                         ویرایش

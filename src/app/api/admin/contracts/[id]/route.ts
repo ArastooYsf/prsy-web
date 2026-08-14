@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { CONTRACT_STATUSES } from "@/lib/status-labels";
-import { logEvent } from "@/lib/logger";
+import { CONTRACT_STATUS, CONTRACT_STATUSES } from "@/lib/status-labels";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -43,13 +43,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: existing.status !== status ? "status_change" : "update",
-    target: { type: "contract", id: contract.id },
+    target: { type: "contract", id: contract.id, label: `قرارداد «${contract.title}»` },
     summary:
       existing.status !== status
-        ? `وضعیت قرارداد «${contract.title}» از ${existing.status} به ${status} تغییر کرد`
-        : `قرارداد «${contract.title}» ویرایش شد`,
+        ? `از «${CONTRACT_STATUS[existing.status]?.label ?? existing.status}» به «${CONTRACT_STATUS[status]?.label ?? status}»`
+        : undefined,
   });
 
   return NextResponse.json({ contract });
@@ -70,10 +70,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   await prisma.contract.update({ where: { id: contract.id }, data: { deletedAt: new Date() } });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: "delete",
-    target: { type: "contract", id: contract.id },
-    summary: `قرارداد «${contract.title}» حذف شد`,
+    target: { type: "contract", id: contract.id, label: `قرارداد «${contract.title}»` },
   });
 
   return NextResponse.json({ ok: true });

@@ -51,3 +51,29 @@ export function currentJalaliYear(): number {
   const now = new Date();
   return toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate()).jy;
 }
+
+const PERSIAN_DIGITS: Record<string, string> = {
+  "0": "۰",
+  "1": "۱",
+  "2": "۲",
+  "3": "۳",
+  "4": "۴",
+  "5": "۵",
+  "6": "۶",
+  "7": "۷",
+  "8": "۸",
+  "9": "۹",
+};
+
+export function toPersianDigits(input: string | number): string {
+  return String(input).replace(/[0-9]/g, (digit) => PERSIAN_DIGITS[digit]);
+}
+
+// "۱۴۰۴/۰۵/۲۲ ساعت ۱۴:۳۲:۰۵" — used for the human-readable event log report.
+export function formatJalaliDateTime(date: string | Date): string {
+  const d = new Date(date);
+  const { jy, jm, jd } = toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  const dateStr = `${jy}/${String(jm).padStart(2, "0")}/${String(jd).padStart(2, "0")}`;
+  const timeStr = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+  return toPersianDigits(`${dateStr} ساعت ${timeStr}`);
+}

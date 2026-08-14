@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { formatLogEntryHuman, isValidLogFilename, readLogEntries } from "@/lib/logger";
+import { formatLogFileAsText, isValidLogFilename } from "@/lib/logger";
 
-// ADMIN-only (not SUPPORT) per spec — returns one day's events already
-// converted to readable Persian lines, for inline display in the logs page.
+// Export as a clean, readable text report — never the raw JSON Lines.
 export async function GET(request: Request, { params }: { params: { filename: string } }) {
   const session = await getServerSession(authOptions);
 
@@ -17,9 +16,14 @@ export async function GET(request: Request, { params }: { params: { filename: st
   }
 
   try {
-    const entries = await readLogEntries(params.filename);
-    const lines = entries.map(formatLogEntryHuman);
-    return NextResponse.json({ lines });
+    const text = await formatLogFileAsText(params.filename);
+    const downloadName = params.filename.replace(/\.log$/, ".txt");
+    return new NextResponse(text, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${downloadName}"`,
+      },
+    });
   } catch {
     return NextResponse.json({ error: "فایل یافت نشد." }, { status: 404 });
   }

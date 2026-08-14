@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logEvent } from "@/lib/logger";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { ORDER_STATUS } from "@/lib/status-labels";
 
 type ItemInput = { productName: string; quantity: number };
 
@@ -57,13 +58,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: existing.status !== status ? "status_change" : "update",
-    target: { type: "order", id: order.id },
+    target: { type: "order", id: order.id, label: `سفارش «${order.orderNumber}»` },
     summary:
       existing.status !== status
-        ? `وضعیت سفارش «${order.orderNumber}» از ${existing.status} به ${status} تغییر کرد`
-        : `سفارش «${order.orderNumber}» ویرایش شد`,
+        ? `از «${ORDER_STATUS[existing.status]?.label ?? existing.status}» به «${ORDER_STATUS[status]?.label ?? status}»`
+        : undefined,
   });
 
   return NextResponse.json({ order });
@@ -84,10 +85,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   await prisma.order.update({ where: { id: order.id }, data: { deletedAt: new Date() } });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: "delete",
-    target: { type: "order", id: order.id },
-    summary: `سفارش «${order.orderNumber}» حذف شد`,
+    target: { type: "order", id: order.id, label: `سفارش «${order.orderNumber}»` },
   });
 
   return NextResponse.json({ ok: true });

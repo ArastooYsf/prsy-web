@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logEvent } from "@/lib/logger";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { TICKET_STATUS } from "@/lib/status-labels";
 
 const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"];
 
@@ -28,10 +29,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   await prisma.ticket.update({ where: { id: ticket.id }, data: { status: status as typeof ticket.status } });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: "status_change",
-    target: { type: "ticket", id: ticket.id },
-    summary: `وضعیت تیکت «${ticket.subject}» از ${ticket.status} به ${status} تغییر کرد`,
+    target: { type: "ticket", id: ticket.id, label: `تیکت «${ticket.subject}»` },
+    summary: `از «${TICKET_STATUS[ticket.status]?.label ?? ticket.status}» به «${TICKET_STATUS[status]?.label ?? status}»`,
   });
 
   return NextResponse.json({ ok: true });

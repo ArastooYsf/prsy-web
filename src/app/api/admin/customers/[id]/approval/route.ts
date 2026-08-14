@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logEvent } from "@/lib/logger";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { APPROVAL_STATUS } from "@/lib/status-labels";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -29,10 +30,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: "approval_change",
-    target: { type: "customer", id: updated.id },
-    summary: `وضعیت تأیید مشتری «${updated.name || updated.email}» به ${action} تغییر کرد`,
+    target: { type: "customer", id: updated.id, label: `مشتری «${updated.name || updated.email}»` },
+    summary: `به «${APPROVAL_STATUS[action]?.label ?? action}»`,
   });
 
   return NextResponse.json({ customer: { id: updated.id, approvalStatus: updated.approvalStatus } });

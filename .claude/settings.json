@@ -7,5 +7,17 @@
       "Bash(CHROME_PATH=/snap/bin/chromium npx --yes lighthouse http://localhost:3000 --output=json --output-path=/tmp/claude-1000/-home-arastooysf-Projects-prsy-website/c169048f-4722-44e6-a1d5-46eaca63fffa/scratchpad/lh-home.json '--chrome-flags=--headless=new --no-sandbox --disable-gpu' --only-categories=performance,accessibility,best-practices,seo --preset=desktop)",
       "Bash(CHROME_PATH=/snap/bin/chromium npx --yes lighthouse http://localhost:3000/products --output=json --output-path=/tmp/claude-1000/-home-arastooysf-Projects-prsy-website/c169048f-4722-44e6-a1d5-46eaca63fffa/scratchpad/lh-products.json '--chrome-flags=--headless=new --no-sandbox --disable-gpu' --only-categories=performance,accessibility,best-practices,seo --preset=desktop)"
     ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"{\\\"systemMessage\\\":\\\"یادآوری QA (CLAUDE.md): قبل از پایان تسک، ریسپانسیو بودن (375/768/1920px) و امتیاز تقریبی Lighthouse (Performance/A11y/Best Practices/SEO) را بررسی و مشکلات را با اولویت گزارش کن.\\\"}\""
+          }
+        ]
+      }
+    ]
   }
 }

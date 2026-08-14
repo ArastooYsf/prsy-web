@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logEvent } from "@/lib/logger";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -19,10 +19,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   await prisma.ticket.update({ where: { id: ticket.id }, data: { deletedAt: new Date() } });
 
   await logEvent({
-    actor: { id: session.user.id, email: session.user.email ?? "" },
+    actor: actorFromSession(session),
     action: "delete",
-    target: { type: "ticket", id: ticket.id },
-    summary: `تیکت «${ticket.subject}» حذف شد`,
+    target: { type: "ticket", id: ticket.id, label: `تیکت «${ticket.subject}»` },
   });
 
   return NextResponse.json({ ok: true });

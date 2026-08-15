@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import type { FooterContactContent } from "@/lib/site-content";
 
 const QUICK_LINKS = [
   { label: "خانه", href: "/" },
@@ -25,16 +26,11 @@ const SERVICES = [
   { label: "اورهال و تعمیرات", href: "/products#overhaul" },
 ];
 
-const CONTACT = [
-  { label: "تهران، خیابان ولیعصر، برج صنعت، طبقه ۵" },
-  { label: "۰۲۱-۹۱۰۰۰۰۰۰", href: "tel:+982191000000" },
-  { label: "info@yasharindustry.com", href: "mailto:info@yasharindustry.com" },
-];
-
-const SOCIALS = [
-  {
+// Icons stay hardcoded per platform; only the destination URL is admin-editable
+// (see FooterContactContent) — a platform with no URL set just isn't rendered.
+const SOCIAL_ICONS = {
+  instagramUrl: {
     name: "اینستاگرام",
-    href: "#",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6" />
@@ -43,9 +39,8 @@ const SOCIALS = [
       </svg>
     ),
   },
-  {
+  linkedinUrl: {
     name: "لینکدین",
-    href: "#",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.6" />
@@ -53,22 +48,31 @@ const SOCIALS = [
       </svg>
     ),
   },
-  {
+  telegramUrl: {
     name: "تلگرام",
-    href: "#",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M21 4L3 11.5l6 2m12-9.5l-3.5 16-8.5-6.5m12-9.5L9 13.5m0 0v5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
-];
+} as const;
 
-export default function Footer() {
+export default function Footer({ contact }: { contact: FooterContactContent }) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
 
   if (pathname?.startsWith("/account")) return null;
+
+  const contactItems = [
+    { label: contact.address },
+    contact.phone ? { label: contact.phone, href: contact.phoneHref || undefined } : null,
+    contact.email ? { label: contact.email, href: `mailto:${contact.email}` } : null,
+  ].filter((item): item is { label: string; href?: string } => item !== null);
+
+  const socials = (Object.keys(SOCIAL_ICONS) as (keyof typeof SOCIAL_ICONS)[])
+    .map((key) => ({ ...SOCIAL_ICONS[key], href: contact[key] }))
+    .filter((social) => social.href);
 
   return (
     <footer className="border-t border-white/10 bg-black/20">
@@ -93,18 +97,31 @@ export default function Footer() {
               معتبر جهانی؛ به‌صورت نو و دست‌دوم، با بهترین قیمت و سریع‌ترین
               تحویل.
             </p>
-            <div className="mt-6 flex items-center gap-3">
-              {SOCIALS.map((social) => (
-                <motion.a
-                  key={social.name}
-                  href={social.href}
-                  aria-label={social.name}
-                  whileHover={{ y: -3, scale: 1.05 }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
-                >
-                  {social.icon}
-                </motion.a>
-              ))}
+            {socials.length > 0 && (
+              <div className="mt-6 flex items-center gap-3">
+                {socials.map((social) => (
+                  <motion.a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    whileHover={{ y: -3, scale: 1.05 }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
+                  >
+                    {social.icon}
+                  </motion.a>
+                ))}
+              </div>
+            )}
+
+            {/* Placeholder for the Enamad trust-seal embed. Once verified on
+                enamad.ir, replace this box with the exact <a>/<script> snippet
+                they provide — see the project report for the registration steps. */}
+            <div className="mt-6 flex h-16 w-16 flex-col items-center justify-center rounded-lg border border-dashed border-white/15 text-center text-[9px] leading-4 text-foreground/40">
+              محل درج
+              <br />
+              نماد اعتماد
             </div>
           </motion.div>
 
@@ -147,7 +164,7 @@ export default function Footer() {
               ارتباط با ما
             </h3>
             <ul className="mt-5 space-y-3">
-              {CONTACT.map((item) =>
+              {contactItems.map((item) =>
                 item.href ? (
                   <li key={item.label}>
                     <a
@@ -172,7 +189,7 @@ export default function Footer() {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-foreground/50 sm:flex-row"
+          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-foreground/50 sm:flex-row-reverse"
         >
           <p>
             © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه
@@ -184,6 +201,9 @@ export default function Footer() {
             </Link>
             <Link href="/terms" className="transition-colors hover:text-white">
               قوانین و مقررات
+            </Link>
+            <Link href="/warranty" className="transition-colors hover:text-white">
+              گارانتی و پشتیبانی
             </Link>
           </div>
         </motion.div>

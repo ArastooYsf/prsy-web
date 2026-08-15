@@ -4,17 +4,20 @@ import { sanitizeRichText } from "@/lib/sanitize";
 import {
   DEFAULT_HERO_SLIDES,
   DEFAULT_PRODUCT_CATEGORIES,
+  DEFAULT_FOOTER_CONTACT,
   type HeroSlideContent,
   type ProductCategoryContent,
+  type FooterContactContent,
 } from "@/lib/site-content-defaults";
 
-export { DEFAULT_HERO_SLIDES, DEFAULT_PRODUCT_CATEGORIES };
-export type { HeroSlideContent, ProductCategoryContent };
+export { DEFAULT_HERO_SLIDES, DEFAULT_PRODUCT_CATEGORIES, DEFAULT_FOOTER_CONTACT };
+export type { HeroSlideContent, ProductCategoryContent, FooterContactContent };
 
 export const SITE_CONTENT_TAG = "site-content";
 
 const HERO_SLIDES_KEY = "hero.slides";
 const PRODUCT_CATEGORIES_KEY = "products.categories";
+export const FOOTER_CONTACT_KEY = "footer.contact";
 
 async function loadSiteContentMap(): Promise<Record<string, string>> {
   try {
@@ -56,4 +59,19 @@ export async function getProductCategories(): Promise<ProductCategoryContent[]> 
   const map = await getSiteContentMap();
   const categories = parseJsonArray<ProductCategoryContent>(map[PRODUCT_CATEGORIES_KEY], DEFAULT_PRODUCT_CATEGORIES);
   return categories.map((category) => ({ ...category, description: sanitizeRichText(category.description) }));
+}
+
+function parseJsonObject<T extends object>(raw: string | undefined, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? { ...fallback, ...parsed } : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function getFooterContact(): Promise<FooterContactContent> {
+  const map = await getSiteContentMap();
+  return parseJsonObject<FooterContactContent>(map[FOOTER_CONTACT_KEY], DEFAULT_FOOTER_CONTACT);
 }

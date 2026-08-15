@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import TurnstileWidget from "@/components/TurnstileWidget";
 
@@ -18,6 +19,7 @@ export default function RegisterForm() {
   const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">("INDIVIDUAL");
   const [companyName, setCompanyName] = useState("");
   const [economicCode, setEconomicCode] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [error, setError] = useState("");
@@ -54,6 +56,10 @@ export default function RegisterForm() {
     }
     if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
       setError("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.");
+      return;
+    }
+    if (!acceptedTerms) {
+      setError("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.");
       return;
     }
 
@@ -244,6 +250,23 @@ export default function RegisterForm() {
         </>
       )}
 
+      <label className="flex items-start gap-2.5 text-sm text-foreground/70">
+        <input
+          type="checkbox"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          className="mt-0.5 size-4 shrink-0 rounded border-white/20 bg-white/5"
+          style={{ accentColor: "#f97316" }}
+          required
+        />
+        <span>
+          <Link href="/terms" target="_blank" className="font-medium text-accent-400 transition-colors hover:text-white">
+            قوانین و مقررات
+          </Link>{" "}
+          را می‌پذیرم
+        </span>
+      </label>
+
       <TurnstileWidget
         key={turnstileKey}
         onVerify={(token) => {
@@ -262,7 +285,7 @@ export default function RegisterForm() {
 
       <button
         type="submit"
-        disabled={loading || !turnstileToken}
+        disabled={loading || !turnstileToken || !acceptedTerms}
         className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}

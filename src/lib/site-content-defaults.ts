@@ -24,6 +24,28 @@ export type ProductCategoryContent = {
   image?: string;
 };
 
+export type FooterContactContent = {
+  address: string;
+  phone: string; // display label, e.g. "۰۲۱-۹۱۰۰۰۰۰۰"
+  phoneHref: string; // e.g. "tel:+982191000000"
+  email: string;
+  // Empty string hides that platform's icon in the footer — icons themselves
+  // stay hardcoded in Footer.tsx, only the destination URL is admin-editable.
+  instagramUrl: string;
+  linkedinUrl: string;
+  telegramUrl: string;
+};
+
+export const DEFAULT_FOOTER_CONTACT: FooterContactContent = {
+  address: "تهران، خیابان ولیعصر، برج صنعت، طبقه ۵",
+  phone: "۰۲۱-۹۱۰۰۰۰۰۰",
+  phoneHref: "tel:+982191000000",
+  email: "info@yasharindustry.com",
+  instagramUrl: "",
+  linkedinUrl: "",
+  telegramUrl: "",
+};
+
 export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
   {
     id: "diesel-generators",

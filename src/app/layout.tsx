@@ -5,7 +5,9 @@ import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { getFooterContact } from "@/lib/site-content";
 import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -47,11 +49,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const footerContact = await getFooterContact();
+
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
@@ -76,8 +80,9 @@ export default function RootLayout({
           <PageLoader />
           <Header />
           <main>{children}</main>
-          <Footer />
+          <Footer contact={footerContact} />
         </SessionProviderWrapper>
+        <CookieConsentBanner />
       </body>
     </html>
   );

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import TurnstileWidget from "@/components/TurnstileWidget";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -17,14 +18,32 @@ export default function RegisterForm() {
   const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">("INDIVIDUAL");
   const [companyName, setCompanyName] = useState("");
   const [economicCode, setEconomicCode] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileKey, setTurnstileKey] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingApprovalMessage, setPendingApprovalMessage] = useState(false);
+  const freshTokenResolveRef = useRef<((token: string) => void) | null>(null);
+
+  // Turnstile tokens are single-use — the register POST already consumed
+  // the one on screen, so the follow-up auto-login needs its own. Remounting
+  // the widget triggers a new (near-instant, usually invisible) solve.
+  function getFreshTurnstileToken(): Promise<string> {
+    return new Promise((resolve) => {
+      freshTokenResolveRef.current = resolve;
+      setTurnstileToken("");
+      setTurnstileKey((k) => k + 1);
+    });
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
+    if (!turnstileToken) {
+      setError("لطفاً تأیید کنید که ربات نیستید.");
+      return;
+    }
     if (password.length < 8) {
       setError("رمز عبور باید حداقل ۸ کاراکتر باشد.");
       return;
@@ -43,13 +62,15 @@ export default function RegisterForm() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, customerType, companyName, economicCode }),
+      body: JSON.stringify({ name, email, password, customerType, companyName, economicCode, turnstileToken }),
     });
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
       setError(body?.error || "خطا در ثبت‌نام.");
       setLoading(false);
+      setTurnstileToken("");
+      setTurnstileKey((k) => k + 1);
       return;
     }
 
@@ -61,7 +82,8 @@ export default function RegisterForm() {
       return;
     }
 
-    const result = await signIn("credentials", { email, password, redirect: false });
+    const freshToken = await getFreshTurnstileToken();
+    const result = await signIn("credentials", { email, password, turnstileToken: freshToken, redirect: false });
 
     setLoading(false);
 
@@ -222,6 +244,16 @@ export default function RegisterForm() {
         </>
       )}
 
+      <TurnstileWidget
+        key={turnstileKey}
+        onVerify={(token) => {
+          setTurnstileToken(token);
+          freshTokenResolveRef.current?.(token);
+          freshTokenResolveRef.current = null;
+        }}
+        onExpire={() => setTurnstileToken("")}
+      />
+
       {error && (
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
           {error}
@@ -230,7 +262,7 @@ export default function RegisterForm() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !turnstileToken}
         className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}

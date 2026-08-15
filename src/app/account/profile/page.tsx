@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ProfileForm from "@/components/account/ProfileForm";
 import PasswordForm from "@/components/account/PasswordForm";
+import TwoFactorSetup from "@/components/account/TwoFactorSetup";
 import NotificationSettingsPreview from "@/components/account/NotificationSettingsPreview";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +70,8 @@ export default async function AccountProfilePage() {
       />
 
       <PasswordForm />
+
+      {user.role === "ADMIN" && <TwoFactorSetup initialEnabled={user.twoFactorEnabled} />}
 
       <NotificationSettingsPreview />
     </div>

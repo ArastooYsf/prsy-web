@@ -2,11 +2,17 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
+
+  const turnstileOk = await verifyTurnstileToken(body?.turnstileToken, request.headers.get("x-forwarded-for") ?? undefined);
+  if (!turnstileOk) {
+    return NextResponse.json({ error: "تأیید ربات‌نبودن ناموفق بود، دوباره تلاش کنید." }, { status: 400 });
+  }
 
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";

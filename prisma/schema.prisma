@@ -25,23 +25,27 @@ enum ApprovalStatus {
 }
 
 model User {
-  id             String         @id @default(cuid())
-  email          String         @unique
-  password       String
-  name           String?
-  phone          String?
-  alternatePhone String?
-  address        String?
-  avatarUrl      String?
-  role           Role           @default(CUSTOMER)
-  customerType   CustomerType   @default(INDIVIDUAL)
-  companyName    String?
-  economicCode   String?
-  approvalStatus ApprovalStatus @default(APPROVED)
-  notes          String?        @db.Text
-  deletedAt      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id                  String         @id @default(cuid())
+  email               String         @unique
+  password            String
+  name                String?
+  phone               String?
+  alternatePhone      String?
+  address             String?
+  avatarUrl           String?
+  role                Role           @default(CUSTOMER)
+  customerType        CustomerType   @default(INDIVIDUAL)
+  companyName         String?
+  economicCode        String?
+  approvalStatus      ApprovalStatus @default(APPROVED)
+  notes               String?        @db.Text
+  failedLoginAttempts Int            @default(0)
+  lockedUntil         DateTime?
+  twoFactorSecret     String?
+  twoFactorEnabled    Boolean        @default(false)
+  deletedAt           DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 
   posts           BlogPost[]
   mediaAssets     MediaAsset[]
@@ -62,18 +66,18 @@ enum TicketStatus {
 }
 
 model Ticket {
-  id            String       @id @default(cuid())
-  userId        String
-  user          User         @relation(fields: [userId], references: [id])
-  subject       String
-  message       String       @db.Text
-  status        TicketStatus @default(OPEN)
-  messageSeenAt DateTime?
+  id               String       @id @default(cuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id])
+  subject          String
+  message          String       @db.Text
+  status           TicketStatus @default(OPEN)
+  messageSeenAt    DateTime?
   customerTypingAt DateTime?
   staffTypingAt    DateTime?
-  deletedAt     DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  deletedAt        DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   replies TicketReply[]
 
@@ -82,17 +86,17 @@ model Ticket {
 }
 
 model TicketReply {
-  id             String    @id @default(cuid())
-  ticketId       String
-  ticket         Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  authorId       String
-  author         User      @relation(fields: [authorId], references: [id])
-  message        String    @db.Text
-  attachments    TicketAttachment[]
-  seenAt         DateTime?
-  editedAt       DateTime?
-  deletedAt      DateTime?
-  createdAt      DateTime  @default(now())
+  id          String             @id @default(cuid())
+  ticketId    String
+  ticket      Ticket             @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User               @relation(fields: [authorId], references: [id])
+  message     String             @db.Text
+  attachments TicketAttachment[]
+  seenAt      DateTime?
+  editedAt    DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime           @default(now())
 
   @@index([ticketId])
   @@map("ticket_replies")
@@ -194,18 +198,18 @@ model OrderItem {
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String    @unique
   excerpt     String?
-  content     String   @db.Text
+  content     String    @db.Text
   coverImage  String?
-  published   Boolean  @default(false)
+  published   Boolean   @default(false)
   publishedAt DateTime?
   authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  author      User      @relation(fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([authorId])
   @@map("blog_posts")

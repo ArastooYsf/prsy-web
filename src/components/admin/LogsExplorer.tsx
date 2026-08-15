@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, ChevronDown, Download, Lock, ShieldAlert, Unlock } from "lucide-react";
+import { AlertTriangle, Bell, ChevronDown, Download, Lock, ShieldAlert, Unlock } from "lucide-react";
 import { isoToJalali } from "@/lib/jalali";
 import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
 import type { LogCategory, LogFileSummary } from "@/lib/logger";
@@ -15,6 +15,7 @@ const CATEGORY_META: Record<LogCategory, { label: string; className: string; ico
   general: { label: "عادی", className: "border-white/10 bg-white/5 text-foreground/60", icon: null },
   crash: { label: "کرش", className: "border-red-500/30 bg-red-500/10 text-red-400", icon: AlertTriangle },
   security: { label: "امنیتی", className: "border-amber-500/30 bg-amber-500/10 text-amber-400", icon: ShieldAlert },
+  notification: { label: "اعلان", className: "border-brand-400/30 bg-brand-400/10 text-brand-300", icon: Bell },
 };
 
 const CATEGORY_FILTERS: { value: "all" | LogCategory; label: string }[] = [
@@ -22,6 +23,7 @@ const CATEGORY_FILTERS: { value: "all" | LogCategory; label: string }[] = [
   { value: "general", label: "عادی" },
   { value: "crash", label: "کرش" },
   { value: "security", label: "امنیتی" },
+  { value: "notification", label: "اعلان" },
 ];
 
 function formatSize(bytes: number) {

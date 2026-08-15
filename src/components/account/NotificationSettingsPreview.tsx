@@ -7,10 +7,10 @@ const NOTIFICATION_OPTIONS = [
   { label: "پیامک برای رویدادهای مهم حساب" },
 ];
 
-// Backend for notification delivery doesn't exist yet — this is a disabled
-// preview of the settings UI so the layout/expectation is visible; wiring it
-// up needs a notification-preferences table/column plus an actual email/SMS
-// sender, neither of which exist in this project yet.
+// Delivery itself (email/SMS/in-app bell) is live for all four events below —
+// see src/lib/notifications/. What's still missing is per-user opt-out: there's
+// no preferences table yet, so every customer currently receives all of them
+// and these toggles stay disabled until that's built.
 export default function NotificationSettingsPreview() {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
@@ -18,11 +18,11 @@ export default function NotificationSettingsPreview() {
         <Bell className="size-4 text-foreground/50" />
         <h3 className="text-base font-bold">تنظیمات اعلان</h3>
         <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-foreground/50">
-          به‌زودی
+          به‌زودی قابل تنظیم
         </span>
       </div>
       <p className="mt-2 text-sm text-foreground/50">
-        سیستم اعلان‌رسانی این پروژه هنوز پیاده‌سازی نشده؛ گزینه‌های زیر فقط پیش‌نمایش هستند و غیرفعال‌اند.
+        این اعلان‌ها هم‌اکنون برای همه فعال هستند؛ امکان خاموش/روشن کردن جداگانه هر مورد به‌زودی اضافه می‌شود.
       </p>
 
       <div className="mt-5 space-y-3 opacity-50">

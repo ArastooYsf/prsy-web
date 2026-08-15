@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { ORDER_STATUS } from "@/lib/status-labels";
+import { notifyOrderStatusChange } from "@/lib/notifications/events";
 
 type ItemInput = { productName: string; quantity: number };
 
@@ -66,6 +67,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         ? `از «${ORDER_STATUS[existing.status]?.label ?? existing.status}» به «${ORDER_STATUS[status]?.label ?? status}»`
         : undefined,
   });
+
+  if (existing.status !== status) {
+    void notifyOrderStatusChange({
+      order: { id: order.id, orderNumber: order.orderNumber },
+      customer: { id: customer.id, email: customer.email, phone: customer.phone, name: customer.name },
+      newStatus: status,
+    });
+  }
 
   return NextResponse.json({ order });
 }

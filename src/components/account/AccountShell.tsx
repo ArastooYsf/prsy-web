@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import AdminSearchBox from "@/components/admin/AdminSearchBox";
+import NotificationBell from "@/components/account/NotificationBell";
 
 // The blog editor (new + edit) owns its own full-screen split-panel layout
 // (see /account/admin/blog/[id] and /account/admin/blog/new) — no sidebar,
@@ -46,7 +47,10 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
                 خوش آمدید، <span className="text-gradient">{userLabel}</span>
               </h1>
             </div>
-            {isAdmin && canSearch && <AdminSearchBox />}
+            <div className="flex items-center gap-3 sm:justify-end">
+              {isAdmin && canSearch && <AdminSearchBox />}
+              <NotificationBell />
+            </div>
           </div>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         </section>

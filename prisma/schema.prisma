@@ -54,8 +54,24 @@ model User {
   contracts       Contract[]
   orders          Order[]
   cannedResponses CannedResponse[]
+  notifications   Notification[]
 
   @@map("users")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, read])
+  @@map("notifications")
 }
 
 enum TicketStatus {
@@ -137,18 +153,19 @@ enum ContractStatus {
 }
 
 model Contract {
-  id        String         @id @default(cuid())
-  userId    String
-  user      User           @relation(fields: [userId], references: [id])
-  title     String
-  type      String
-  startDate DateTime
-  endDate   DateTime
-  status    ContractStatus @default(ACTIVE)
-  fileUrl   String?
-  deletedAt DateTime?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id                   String         @id @default(cuid())
+  userId               String
+  user                 User           @relation(fields: [userId], references: [id])
+  title                String
+  type                 String
+  startDate            DateTime
+  endDate              DateTime
+  status               ContractStatus @default(ACTIVE)
+  fileUrl              String?
+  expiryReminderSentAt DateTime?
+  deletedAt            DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   @@index([userId])
   @@map("contracts")

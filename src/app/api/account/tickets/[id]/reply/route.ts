@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { parseAttachmentsInput } from "@/lib/ticket-attachments";
+import { notifyStaffNewCustomerMessage } from "@/lib/notifications/events";
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -44,6 +45,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   const nextStatus = ticket.status === "ANSWERED" ? "IN_PROGRESS" : ticket.status;
   await prisma.ticket.update({ where: { id: ticket.id }, data: { status: nextStatus } });
+
+  void notifyStaffNewCustomerMessage({
+    ticket: { id: ticket.id, subject: ticket.subject },
+    customer: { id: session.user.id, email: session.user.email ?? "", name: session.user.name },
+  });
 
   return NextResponse.json({ reply });
 }

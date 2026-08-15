@@ -17,7 +17,7 @@ const LOG_DIR = path.join(process.cwd(), "logs");
 // under the cap. Locked files are never touched, no matter how old.
 export const LOG_DIR_SIZE_CAP_BYTES = 300 * 1024 * 1024; // 300MB
 
-export type LogCategory = "general" | "crash" | "security";
+export type LogCategory = "general" | "crash" | "security" | "notification";
 
 export type LogAction =
   | "create"
@@ -28,7 +28,9 @@ export type LogAction =
   | "role_change"
   | "login_failed"
   | "unauthorized_access"
-  | "crash";
+  | "crash"
+  | "notification_sent"
+  | "notification_failed";
 
 export type LogActor = {
   id: string;
@@ -226,6 +228,8 @@ const ACTION_LABELS_FA: Record<LogAction, string> = {
   login_failed: "تلاش ورود ناموفق داشت",
   unauthorized_access: "تلاش دسترسی غیرمجاز انجام داد",
   crash: "با خطای سیستمی مواجه شد",
+  notification_sent: "اعلان ارسال کرد",
+  notification_failed: "ارسال اعلان ناموفق بود",
 };
 
 export function formatLogEntryHuman(entry: LogEntry): string {

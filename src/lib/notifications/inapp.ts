@@ -1,0 +1,15 @@
+import { prisma } from "@/lib/prisma";
+
+export async function createNotification({
+  userId,
+  title,
+  message,
+  link,
+}: {
+  userId: string;
+  title: string;
+  message: string;
+  link?: string | null;
+}): Promise<void> {
+  await prisma.notification.create({ data: { userId, title, message, link: link ?? null } });
+}

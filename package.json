@@ -13,7 +13,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:backup": "tsx scripts/backup-db.ts"
+    "db:backup": "tsx scripts/backup-db.ts",
+    "notify:contracts": "tsx scripts/notify-expiring-contracts.ts"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
@@ -44,6 +45,7 @@
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.10.1",
+    "resend": "^6.20.0",
     "sanitize-html": "^2.17.6",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7"

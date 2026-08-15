@@ -37,8 +37,8 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
         <OrderProgress status={order.status} />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-sm">
+      <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10">
+        <table className="w-full min-w-[320px] text-sm">
           <thead className="bg-white/[0.03] text-foreground/60">
             <tr>
               <th className="px-4 py-3 text-right font-medium">نام محصول</th>

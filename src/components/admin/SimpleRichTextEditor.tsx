@@ -25,7 +25,7 @@ function ToolbarButton({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
+      className={`flex h-10 w-10 items-center justify-center rounded-md transition-colors ${
         active ? "bg-accent-500 text-white" : "text-foreground/70 hover:bg-white/10 hover:text-foreground"
       }`}
     >

@@ -26,7 +26,7 @@ export default async function AdminCustomersPage() {
         <div className="flex flex-wrap gap-2">
           <Link
             href="/account/admin/customers/pending"
-            className="relative rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="relative inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             درخواست‌های تأیید مشتری حقوقی
             {pendingCount > 0 && (
@@ -37,7 +37,7 @@ export default async function AdminCustomersPage() {
           </Link>
           <Link
             href="/account/admin/customers/migrate"
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             Migrate مشتریان قدیمی
           </Link>
@@ -55,61 +55,110 @@ export default async function AdminCustomersPage() {
           هنوز مشتری‌ای ثبت نشده است.
         </p>
       ) : (
-        <div className="rounded-2xl border border-white/10">
-          <table className="w-full text-sm">
-            <thead className="text-foreground/60">
-              <tr>
-                <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام</th>
-                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">ایمیل</th>
-                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">نوع</th>
-                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
-                <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ عضویت</th>
-                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((customer) => (
-                <tr key={customer.id} className="border-t border-white/10">
-                  <td className="px-4 py-3 font-medium">
-                    {customer.name || "—"}
-                    {customer.companyName && (
-                      <span className="mr-1.5 text-xs text-foreground/40">({customer.companyName})</span>
-                    )}
-                  </td>
-                  <td dir="ltr" className="px-4 py-3 text-right text-foreground/70">
-                    {customer.email}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
-                    >
-                      {CUSTOMER_TYPE[customer.customerType].label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
-                    >
-                      {APPROVAL_STATUS[customer.approvalStatus].label}
-                    </span>
-                  </td>
-                  <td dir="ltr" className="px-4 py-3 text-right text-xs text-foreground/50">
-                    {formatJalali(customer.createdAt.toISOString())}
-                  </td>
-                  <td className="px-4 py-3">
-                    {isAdmin && (
-                      <DeleteEntityButton
-                        endpoint={`/api/admin/customers/${customer.id}`}
-                        title="حذف مشتری"
-                        message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
-                      />
-                    )}
-                  </td>
+        <>
+          {/* Mobile/tablet: card list */}
+          <div className="space-y-3 md:hidden">
+            {customers.map((customer) => (
+              <div key={customer.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">{customer.name || "—"}</p>
+                    {customer.companyName && <p className="text-xs text-foreground/40">{customer.companyName}</p>}
+                    <p dir="ltr" className="mt-0.5 truncate text-xs text-foreground/60">
+                      {customer.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
+                  >
+                    {CUSTOMER_TYPE[customer.customerType].label}
+                  </span>
+                  <span
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
+                  >
+                    {APPROVAL_STATUS[customer.approvalStatus].label}
+                  </span>
+                </div>
+                <dl className="mt-3 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <dt className="text-foreground/40">تاریخ عضویت</dt>
+                    <dd dir="ltr" className="text-foreground/70">
+                      {formatJalali(customer.createdAt.toISOString())}
+                    </dd>
+                  </div>
+                </dl>
+                {isAdmin && (
+                  <div className="mt-3 flex justify-end border-t border-white/5 pt-3">
+                    <DeleteEntityButton
+                      endpoint={`/api/admin/customers/${customer.id}`}
+                      title="حذف مشتری"
+                      message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop/tablet: table */}
+          <div className="hidden overflow-x-auto rounded-2xl border border-white/10 md:block">
+            <table className="w-full text-sm">
+              <thead className="text-foreground/60">
+                <tr>
+                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام</th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">ایمیل</th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">نوع</th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ عضویت</th>
+                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {customers.map((customer) => (
+                  <tr key={customer.id} className="border-t border-white/10">
+                    <td className="px-4 py-3 font-medium">
+                      {customer.name || "—"}
+                      {customer.companyName && (
+                        <span className="mr-1.5 text-xs text-foreground/40">({customer.companyName})</span>
+                      )}
+                    </td>
+                    <td dir="ltr" className="px-4 py-3 text-right text-foreground/70">
+                      {customer.email}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
+                      >
+                        {CUSTOMER_TYPE[customer.customerType].label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
+                      >
+                        {APPROVAL_STATUS[customer.approvalStatus].label}
+                      </span>
+                    </td>
+                    <td dir="ltr" className="px-4 py-3 text-right text-xs text-foreground/50">
+                      {formatJalali(customer.createdAt.toISOString())}
+                    </td>
+                    <td className="px-4 py-3">
+                      {isAdmin && (
+                        <DeleteEntityButton
+                          endpoint={`/api/admin/customers/${customer.id}`}
+                          title="حذف مشتری"
+                          message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

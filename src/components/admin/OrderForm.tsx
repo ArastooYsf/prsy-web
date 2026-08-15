@@ -152,7 +152,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  className="shrink-0 rounded-lg border border-white/10 px-3 py-3 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
+                  className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-white/10 px-3.5 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
                 >
                   حذف
                 </button>
@@ -163,7 +163,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
         <button
           type="button"
           onClick={addItem}
-          className="mt-3 rounded-full border border-white/10 px-4 py-2 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          className="mt-3 inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
         >
           + افزودن قلم کالا
         </button>

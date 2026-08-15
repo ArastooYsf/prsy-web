@@ -32,10 +32,10 @@ export default function ConfirmDialog({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-background p-5 shadow-2xl"
+        className="flex max-h-[85vh] w-full max-w-sm flex-col rounded-2xl border border-white/10 bg-background p-5 shadow-2xl"
       >
         <h3 className="text-base font-bold">{title}</h3>
-        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-foreground/70">{message}</p>
+        <p className="mt-2 overflow-y-auto whitespace-pre-line text-sm leading-6 text-foreground/70">{message}</p>
         <div className="mt-5 flex justify-end gap-2">
           <button
             type="button"

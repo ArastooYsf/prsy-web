@@ -102,7 +102,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
           <button
             type="button"
             onClick={() => setHeroSlides((prev) => [...prev, emptySlide()])}
-            className="rounded-full border border-accent-500/30 bg-accent-500/10 px-4 py-2 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
+            className="inline-flex min-h-11 items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
           >
             + افزودن اسلاید
           </button>
@@ -115,7 +115,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
                 <button
                   type="button"
                   onClick={() => setDeleteTarget({ type: "slide", index: i })}
-                  className="text-xs font-medium text-red-400 transition-colors hover:text-red-300"
+                  className="inline-flex min-h-11 items-center text-xs font-medium text-red-400 transition-colors hover:text-red-300"
                 >
                   حذف اسلاید
                 </button>
@@ -162,7 +162,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
           <button
             type="button"
             onClick={() => setCategories((prev) => [...prev, emptyCategory()])}
-            className="rounded-full border border-accent-500/30 bg-accent-500/10 px-4 py-2 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
+            className="inline-flex min-h-11 items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
           >
             + افزودن دسته
           </button>
@@ -175,7 +175,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
                 <button
                   type="button"
                   onClick={() => setDeleteTarget({ type: "category", index: i })}
-                  className="text-xs font-medium text-red-400 transition-colors hover:text-red-300"
+                  className="inline-flex min-h-11 items-center text-xs font-medium text-red-400 transition-colors hover:text-red-300"
                 >
                   حذف دسته
                 </button>
@@ -207,7 +207,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
                         key={opt.value}
                         type="button"
                         onClick={() => toggleCondition(i, opt.value)}
-                        className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                        className={`inline-flex min-h-11 items-center rounded-full border px-4 text-xs font-medium transition-colors ${
                           category.conditions.includes(opt.value)
                             ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
                             : "border-white/10 text-foreground/60 hover:border-white/20"

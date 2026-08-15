@@ -26,7 +26,7 @@ export default function DeletePostButton({ id, title }: { id: string; title: str
       type="button"
       onClick={handleDelete}
       disabled={deleting}
-      className="rounded-full border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
+      className="inline-flex min-h-11 items-center rounded-full border border-red-500/30 px-3.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
     >
       {deleting ? "..." : "حذف"}
     </button>

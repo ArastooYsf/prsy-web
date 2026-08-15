@@ -15,7 +15,7 @@ export default function ToggleSwitch({ checked, onChange, onLabel, offLabel, cla
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`inline-flex items-center gap-2 text-xs font-medium text-foreground/70 transition-colors hover:text-foreground ${className}`}
+      className={`inline-flex min-h-11 items-center gap-2 text-xs font-medium text-foreground/70 transition-colors hover:text-foreground ${className}`}
     >
       <span>{checked ? onLabel : offLabel}</span>
       <span

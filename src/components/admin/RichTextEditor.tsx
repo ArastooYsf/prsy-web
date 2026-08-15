@@ -32,7 +32,7 @@ function ToolbarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
         active ? "bg-accent-500 text-white" : "text-foreground/70 hover:bg-white/10 hover:text-foreground"
       }`}
     >

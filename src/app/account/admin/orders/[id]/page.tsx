@@ -39,8 +39,8 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <OrderProgress status={order.status} />
         </div>
-        <div className="rounded-2xl border border-white/10">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-white/10">
+          <table className="w-full min-w-[320px] text-sm">
             <thead className="text-foreground/60">
               <tr>
                 <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام محصول</th>

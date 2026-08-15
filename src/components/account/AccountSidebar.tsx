@@ -24,6 +24,7 @@ import {
   Newspaper,
   LayoutTemplate,
   History,
+  Home,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -143,6 +144,14 @@ function SidebarContents({
       </nav>
 
       <div className="space-y-1 border-t border-white/10 p-3">
+        <NavItem
+          href="/"
+          label="بازگشت به سایت اصلی"
+          Icon={Home}
+          active={false}
+          collapsed={collapsed}
+          onNavigate={onNavigate}
+        />
         <NavItem
           href="/account/profile"
           label="تنظیمات"

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Import } from "lucide-react";
 import CustomerForm from "@/components/admin/CustomerForm";
 import CsvImportForm from "@/components/admin/CsvImportForm";
 
@@ -12,7 +13,10 @@ export const dynamic = "force-dynamic";
 export default function MigrateCustomersPage() {
   return (
     <div>
-      <h2 className="mb-2 text-lg font-bold">Migrate مشتریان قدیمی</h2>
+      <h2 className="mb-2 flex items-center gap-2 text-lg font-bold">
+        <Import className="size-5 text-accent-400" />
+        Migrate مشتریان قدیمی
+      </h2>
       <p className="mb-6 text-sm text-foreground/60">
         اطلاعات مشتریانی که قبل از راه‌اندازی این سیستم ثبت شده بودند را اینجا وارد کنید — یک‌به‌یک یا با ایمپورت CSV.
       </p>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
+import { FileText, MessageSquare, Package, type LucideIcon } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS, CONTRACT_STATUS, ORDER_STATUS } from "@/lib/status-labels";
@@ -56,10 +57,10 @@ export default async function AccountOverviewPage() {
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
     .slice(0, 6);
 
-  const stats = [
-    { label: "تیکت‌های باز", value: openTicketsCount, href: "/account/tickets" },
-    { label: "قراردادهای فعال", value: activeContractsCount, href: "/account/contracts" },
-    { label: "سفارش‌های در جریان", value: activeOrdersCount, href: "/account/orders" },
+  const stats: { label: string; value: number; href: string; icon: LucideIcon }[] = [
+    { label: "تیکت‌های باز", value: openTicketsCount, href: "/account/tickets", icon: MessageSquare },
+    { label: "قراردادهای فعال", value: activeContractsCount, href: "/account/contracts", icon: FileText },
+    { label: "سفارش‌های در جریان", value: activeOrdersCount, href: "/account/orders", icon: Package },
   ];
 
   return (
@@ -71,7 +72,10 @@ export default async function AccountOverviewPage() {
             href={stat.href}
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-accent-500/30"
           >
-            <p className="text-sm text-foreground/60">{stat.label}</p>
+            <div className="flex items-center gap-2 text-foreground/60">
+              <stat.icon className="size-4" />
+              <p className="text-sm">{stat.label}</p>
+            </div>
             <p className="mt-2 text-3xl font-black text-accent-400">{stat.value}</p>
           </Link>
         ))}

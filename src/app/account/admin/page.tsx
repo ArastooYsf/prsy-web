@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { Headset, Image as ImageIcon, LayoutTemplate, Newspaper, PackageSearch, ScrollText, type LucideIcon } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import UploadWidget from "@/components/admin/UploadWidget";
@@ -35,17 +36,20 @@ export default async function AdminDashboardPage() {
 
   if (session!.user.role !== "ADMIN") {
     const stats = await getSupportStats();
-    const cards = [
-      { label: "تیکت‌های باز", value: stats.openTickets },
-      { label: "قراردادهای فعال", value: stats.activeContracts },
-      { label: "سفارش‌های در جریان", value: stats.activeOrders },
+    const cards: { label: string; value: number; icon: LucideIcon }[] = [
+      { label: "تیکت‌های باز", value: stats.openTickets, icon: Headset },
+      { label: "قراردادهای فعال", value: stats.activeContracts, icon: ScrollText },
+      { label: "سفارش‌های در جریان", value: stats.activeOrders, icon: PackageSearch },
     ];
 
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {cards.map((card) => (
           <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-sm text-foreground/60">{card.label}</p>
+            <div className="flex items-center gap-2 text-foreground/60">
+              <card.icon className="size-4" />
+              <p className="text-sm">{card.label}</p>
+            </div>
             <p className="mt-2 text-3xl font-black">{card.value}</p>
           </div>
         ))}
@@ -55,10 +59,10 @@ export default async function AdminDashboardPage() {
 
   const stats = await getAdminStats();
 
-  const cards = [
-    { label: "پست‌های وبلاگ", value: stats.posts },
-    { label: "محتوای سایت", value: stats.contentEntries },
-    { label: "فایل‌های آپلودشده", value: stats.media },
+  const cards: { label: string; value: number; icon: LucideIcon }[] = [
+    { label: "پست‌های وبلاگ", value: stats.posts, icon: Newspaper },
+    { label: "محتوای سایت", value: stats.contentEntries, icon: LayoutTemplate },
+    { label: "فایل‌های آپلودشده", value: stats.media, icon: ImageIcon },
   ];
 
   return (
@@ -72,7 +76,10 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {cards.map((card) => (
           <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-sm text-foreground/60">{card.label}</p>
+            <div className="flex items-center gap-2 text-foreground/60">
+              <card.icon className="size-4" />
+              <p className="text-sm">{card.label}</p>
+            </div>
             <p className="mt-2 text-3xl font-black">{card.value}</p>
           </div>
         ))}

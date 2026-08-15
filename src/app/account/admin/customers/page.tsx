@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { Import, UserCheck, UserPlus, Users } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
@@ -22,12 +23,16 @@ export default async function AdminCustomersPage() {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">مشتریان</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <Users className="size-5 text-accent-400" />
+          مشتریان
+        </h2>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/account/admin/customers/pending"
-            className="relative inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="relative inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
+            <UserCheck className="size-4" />
             درخواست‌های تأیید مشتری حقوقی
             {pendingCount > 0 && (
               <span className="mr-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -37,14 +42,16 @@ export default async function AdminCustomersPage() {
           </Link>
           <Link
             href="/account/admin/customers/migrate"
-            className="inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
+            <Import className="size-4" />
             Migrate مشتریان قدیمی
           </Link>
           <Link
             href="/account/admin/customers/new"
-            className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
           >
+            <UserPlus className="size-4" />
             افزودن مشتری
           </Link>
         </div>

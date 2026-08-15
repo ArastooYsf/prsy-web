@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 type DeleteEntityButtonProps = {
@@ -54,9 +55,10 @@ export default function DeleteEntityButton({
         onClick={() => setOpen(true)}
         className={
           className ??
-          "inline-flex min-h-11 items-center rounded-full border border-red-500/30 px-3.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
+          "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-red-500/30 px-3.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
         }
       >
+        <Trash2 className="size-3.5" />
         {label}
       </button>
       <ConfirmDialog

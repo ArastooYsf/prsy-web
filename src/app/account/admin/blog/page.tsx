@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
+import { Newspaper, Pencil, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DeletePostButton from "@/components/admin/DeletePostButton";
@@ -20,11 +21,15 @@ export default async function AdminBlogListPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold">پست‌های وبلاگ</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <Newspaper className="size-5 text-accent-400" />
+          پست‌های وبلاگ
+        </h2>
         <Link
           href="/account/admin/blog/new"
-          className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
         >
+          <Plus className="size-4" />
           پست جدید
         </Link>
       </div>
@@ -62,8 +67,9 @@ export default async function AdminBlogListPage() {
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/5 pt-3">
                   <Link
                     href={`/account/admin/blog/${post.id}`}
-                    className="inline-flex min-h-11 items-center rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                   >
+                    <Pencil className="size-3.5" />
                     ویرایش
                   </Link>
                   <DeletePostButton id={post.id} title={post.title} />
@@ -105,8 +111,9 @@ export default async function AdminBlogListPage() {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/account/admin/blog/${post.id}`}
-                          className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                         >
+                          <Pencil className="size-3.5" />
                           ویرایش
                         </Link>
                         <DeletePostButton id={post.id} title={post.title} />

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, X } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function CustomerApprovalActions({ customerId, customerLabel }: { customerId: string; customerLabel: string }) {
@@ -30,15 +31,17 @@ export default function CustomerApprovalActions({ customerId, customerLabel }: {
         <button
           type="button"
           onClick={() => setPendingAction("APPROVE")}
-          className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 text-xs font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
         >
+          <Check className="size-3.5" />
           تأیید
         </button>
         <button
           type="button"
           onClick={() => setPendingAction("REJECT")}
-          className="rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/20"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/20"
         >
+          <X className="size-3.5" />
           رد
         </button>
       </div>

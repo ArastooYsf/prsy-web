@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { UserCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatJalali } from "@/lib/jalali";
 import CustomerApprovalActions from "@/components/admin/CustomerApprovalActions";
@@ -18,7 +19,10 @@ export default async function PendingCustomersPage() {
 
   return (
     <div>
-      <h2 className="mb-2 text-lg font-bold">درخواست‌های تأیید مشتری حقوقی</h2>
+      <h2 className="mb-2 flex items-center gap-2 text-lg font-bold">
+        <UserCheck className="size-5 text-accent-400" />
+        درخواست‌های تأیید مشتری حقوقی
+      </h2>
       <p className="mb-6 text-sm text-foreground/60">
         این حساب‌ها به‌عنوان مشتری حقوقی ثبت‌نام کرده‌اند و تا زمان تأیید نمی‌توانند وارد شوند.
       </p>

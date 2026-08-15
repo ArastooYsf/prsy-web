@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Plus, Trash2 } from "lucide-react";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -152,8 +153,9 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-white/10 px-3.5 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
+                  className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-white/10 px-3.5 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
                 >
+                  <Trash2 className="size-3.5" />
                   حذف
                 </button>
               )}
@@ -163,9 +165,10 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
         <button
           type="button"
           onClick={addItem}
-          className="mt-3 inline-flex min-h-11 items-center rounded-full border border-white/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
         >
-          + افزودن قلم کالا
+          <Plus className="size-3.5" />
+          افزودن قلم کالا
         </button>
       </div>
 

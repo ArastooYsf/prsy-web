@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
 export default function DeletePostButton({ id, title }: { id: string; title: string }) {
   const router = useRouter();
@@ -26,8 +27,9 @@ export default function DeletePostButton({ id, title }: { id: string; title: str
       type="button"
       onClick={handleDelete}
       disabled={deleting}
-      className="inline-flex min-h-11 items-center rounded-full border border-red-500/30 px-3.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-red-500/30 px-3.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-60"
     >
+      <Trash2 className="size-3.5" />
       {deleting ? "..." : "حذف"}
     </button>
   );

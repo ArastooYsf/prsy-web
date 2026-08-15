@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import MediaPicker from "@/components/admin/MediaPicker";
 import SimpleRichTextEditor from "@/components/admin/SimpleRichTextEditor";
 import IconPicker from "@/components/admin/IconPicker";
@@ -102,9 +103,10 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
           <button
             type="button"
             onClick={() => setHeroSlides((prev) => [...prev, emptySlide()])}
-            className="inline-flex min-h-11 items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
           >
-            + افزودن اسلاید
+            <Plus className="size-3.5" />
+            افزودن اسلاید
           </button>
         </div>
         <div className="space-y-6">
@@ -162,9 +164,10 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
           <button
             type="button"
             onClick={() => setCategories((prev) => [...prev, emptyCategory()])}
-            className="inline-flex min-h-11 items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
           >
-            + افزودن دسته
+            <Plus className="size-3.5" />
+            افزودن دسته
           </button>
         </div>
         <div className="space-y-6">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { Eye, PackagePlus, PackageSearch, Pencil } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
@@ -20,12 +21,16 @@ export default async function AdminOrdersPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold">سفارش‌ها</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <PackageSearch className="size-5 text-accent-400" />
+          سفارش‌ها
+        </h2>
         {isAdmin && (
           <Link
             href="/account/admin/orders/new"
-            className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
           >
+            <PackagePlus className="size-4" />
             ثبت سفارش جدید
           </Link>
         )}
@@ -64,8 +69,9 @@ export default async function AdminOrdersPage() {
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/5 pt-3">
                   <Link
                     href={`/account/admin/orders/${order.id}`}
-                    className="inline-flex min-h-11 items-center rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                   >
+                    {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
                     {isAdmin ? "ویرایش" : "مشاهده"}
                   </Link>
                   {isAdmin && (
@@ -111,8 +117,9 @@ export default async function AdminOrdersPage() {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/account/admin/orders/${order.id}`}
-                          className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                         >
+                          {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
                           {isAdmin ? "ویرایش" : "مشاهده"}
                         </Link>
                         {isAdmin && (

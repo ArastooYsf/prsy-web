@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { MessageSquare, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
@@ -18,11 +19,15 @@ export default async function AccountTicketsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold">تیکت‌های پشتیبانی</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <MessageSquare className="size-5 text-accent-400" />
+          تیکت‌های پشتیبانی
+        </h2>
         <Link
           href="/account/tickets/new"
-          className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
         >
+          <Plus className="size-4" />
           ثبت تیکت جدید
         </Link>
       </div>

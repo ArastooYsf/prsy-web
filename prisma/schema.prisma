@@ -30,6 +30,9 @@ model User {
   password       String
   name           String?
   phone          String?
+  alternatePhone String?
+  address        String?
+  avatarUrl      String?
   role           Role           @default(CUSTOMER)
   customerType   CustomerType   @default(INDIVIDUAL)
   companyName    String?

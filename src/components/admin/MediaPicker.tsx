@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ImagePlus, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
 
@@ -37,9 +38,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
                 aria-label="حذف تصویر"
                 className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition-transform hover:scale-110"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
+                <X className="size-3" strokeWidth={2.5} />
               </button>
             </div>
           ))}
@@ -49,8 +48,9 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full cursor-pointer rounded-lg border border-dashed border-white/15 px-4 py-3 text-center text-sm text-foreground/60 transition-colors hover:border-accent-500/40"
+        className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-white/15 px-4 py-3 text-center text-sm text-foreground/60 transition-colors hover:border-accent-500/40"
       >
+        <ImagePlus className="size-4" />
         {value.length > 0 ? "تغییر تصویر" : "انتخاب تصویر"}
       </button>
 

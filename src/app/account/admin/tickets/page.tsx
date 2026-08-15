@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Headset } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
@@ -14,7 +15,10 @@ export default async function AdminTicketsPage() {
 
   return (
     <div>
-      <h2 className="mb-6 text-lg font-bold">تیکت‌های پشتیبانی</h2>
+      <h2 className="mb-6 flex items-center gap-2 text-lg font-bold">
+        <Headset className="size-5 text-accent-400" />
+        تیکت‌های پشتیبانی
+      </h2>
 
       {tickets.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">

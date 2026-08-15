@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { Package } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
@@ -18,7 +19,10 @@ export default async function AccountOrdersPage() {
 
   return (
     <div>
-      <h2 className="mb-6 text-lg font-bold">سفارش‌ها</h2>
+      <h2 className="mb-6 flex items-center gap-2 text-lg font-bold">
+        <Package className="size-5 text-accent-400" />
+        سفارش‌ها
+      </h2>
 
       {orders.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">

@@ -2,7 +2,9 @@ import { getServerSession } from "next-auth";
 import { Headset, Image as ImageIcon, LayoutTemplate, Newspaper, PackageSearch, ScrollText, type LucideIcon } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getTicketTrend, getOrderStatusBreakdown, getTicketOpenClosedRatio } from "@/lib/admin-stats";
 import UploadWidget from "@/components/admin/UploadWidget";
+import { TicketTrendChart, OrderStatusChart, TicketRatioChart } from "@/components/admin/DashboardCharts";
 
 async function getAdminStats() {
   try {
@@ -31,8 +33,18 @@ async function getSupportStats() {
   return { openTickets, activeContracts, activeOrders };
 }
 
+async function getChartData() {
+  const [ticketTrend, orderStatusBreakdown, ticketRatio] = await Promise.all([
+    getTicketTrend(30),
+    getOrderStatusBreakdown(),
+    getTicketOpenClosedRatio(),
+  ]);
+  return { ticketTrend, orderStatusBreakdown, ticketRatio };
+}
+
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
+  const charts = await getChartData();
 
   if (session!.user.role !== "ADMIN") {
     const stats = await getSupportStats();
@@ -43,16 +55,28 @@ export default async function AdminDashboardPage() {
     ];
 
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {cards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <div className="flex items-center gap-2 text-foreground/60">
-              <card.icon className="size-4" />
-              <p className="text-sm">{card.label}</p>
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {cards.map((card) => (
+            <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+              <div className="flex items-center gap-2 text-foreground/60">
+                <card.icon className="size-4" />
+                <p className="text-sm">{card.label}</p>
+              </div>
+              <p className="mt-2 text-3xl font-black">{card.value}</p>
             </div>
-            <p className="mt-2 text-3xl font-black">{card.value}</p>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <TicketTrendChart data={charts.ticketTrend} />
           </div>
-        ))}
+          <TicketRatioChart data={charts.ticketRatio} />
+          <div className="lg:col-span-3">
+            <OrderStatusChart data={charts.orderStatusBreakdown} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -83,6 +107,16 @@ export default async function AdminDashboardPage() {
             <p className="mt-2 text-3xl font-black">{card.value}</p>
           </div>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TicketTrendChart data={charts.ticketTrend} />
+        </div>
+        <TicketRatioChart data={charts.ticketRatio} />
+        <div className="lg:col-span-3">
+          <OrderStatusChart data={charts.orderStatusBreakdown} />
+        </div>
       </div>
 
       <UploadWidget />

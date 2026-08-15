@@ -1,24 +1,52 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { Import, UserCheck, UserPlus, Users } from "lucide-react";
+import { FileSpreadsheet, Import, UserCheck, UserPlus, Users } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
+import { filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
+import ListFilterBar from "@/components/admin/ListFilterBar";
+import SortableHeader from "@/components/admin/SortableHeader";
+import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminCustomersPage() {
+const ROLE_LABEL: Record<string, string> = { CUSTOMER: "مشتری", SUPPORT: "پشتیبان", ADMIN: "مدیر" };
+
+const SORT_FIELDS = ["name", "email", "customerType", "approvalStatus", "createdAt"] as const;
+
+function buildOrderBy(field: (typeof SORT_FIELDS)[number], dir: "asc" | "desc"): Prisma.UserOrderByWithRelationInput {
+  return { [field]: dir };
+}
+
+export default async function AdminCustomersPage({ searchParams }: { searchParams: ListSearchParams }) {
   const session = await getServerSession(authOptions);
   const isAdmin = session!.user.role === "ADMIN";
 
-  const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER", deletedAt: null },
-    orderBy: { createdAt: "desc" },
-  });
+  // Defaults to the customer-only view (this page's usual purpose); an
+  // explicit role filter can widen it to staff accounts too.
+  const roleFilter = param(searchParams, "role");
+  const customerType = param(searchParams, "customerType");
+  const approvalStatus = param(searchParams, "approvalStatus");
+  const q = param(searchParams, "q");
+  const { field, dir } = sortParams(searchParams, SORT_FIELDS, "createdAt");
+  const roleWhere = !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
 
-  const pendingCount = customers.filter((c) => c.approvalStatus === "PENDING").length;
+  const [customers, pendingCount] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        deletedAt: null,
+        role: roleWhere,
+        ...(customerType ? { customerType: customerType as never } : {}),
+        ...(approvalStatus ? { approvalStatus: approvalStatus as never } : {}),
+        ...(q ? { OR: [{ name: { contains: q } }, { email: { contains: q } }, { phone: { contains: q } }] } : {}),
+      },
+      orderBy: buildOrderBy(field, dir),
+    }),
+    prisma.user.count({ where: { role: "CUSTOMER", approvalStatus: "PENDING", deletedAt: null } }),
+  ]);
 
   return (
     <div>
@@ -28,6 +56,13 @@ export default async function AdminCustomersPage() {
           مشتریان
         </h2>
         <div className="flex flex-wrap gap-2">
+          <a
+            href={`/api/admin/customers/export${filterQueryString(searchParams)}`}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          >
+            <FileSpreadsheet className="size-4" />
+            دانلود اکسل
+          </a>
           <Link
             href="/account/admin/customers/pending"
             className="relative inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
@@ -57,9 +92,36 @@ export default async function AdminCustomersPage() {
         </div>
       </div>
 
+      <ListFilterBar
+        searchPlaceholder="جست‌وجوی نام، ایمیل یا تلفن..."
+        selects={[
+          {
+            key: "role",
+            label: "نقش",
+            allLabel: "نقش: مشتریان (پیش‌فرض)",
+            options: [
+              { value: "ALL", label: "همه نقش‌ها" },
+              { value: "CUSTOMER", label: "مشتری" },
+              { value: "SUPPORT", label: "پشتیبان" },
+              { value: "ADMIN", label: "مدیر" },
+            ],
+          },
+          {
+            key: "customerType",
+            label: "نوع",
+            options: Object.entries(CUSTOMER_TYPE).map(([value, t]) => ({ value, label: t.label })),
+          },
+          {
+            key: "approvalStatus",
+            label: "وضعیت تأیید",
+            options: Object.entries(APPROVAL_STATUS).map(([value, s]) => ({ value, label: s.label })),
+          },
+        ]}
+      />
+
       {customers.length === 0 ? (
         <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
-          هنوز مشتری‌ای ثبت نشده است.
+          مشتری‌ای با این مشخصات یافت نشد.
         </p>
       ) : (
         <>
@@ -77,6 +139,11 @@ export default async function AdminCustomersPage() {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  {customer.role !== "CUSTOMER" && (
+                    <span className="rounded-full border border-brand-400/30 bg-brand-400/10 px-2.5 py-1 text-[11px] font-semibold text-brand-300">
+                      {ROLE_LABEL[customer.role]}
+                    </span>
+                  )}
                   <span
                     className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
                   >
@@ -114,11 +181,21 @@ export default async function AdminCustomersPage() {
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">ایمیل</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">نوع</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ عضویت</th>
+                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+                    <SortableHeader field="name" label="نام" />
+                  </th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                    <SortableHeader field="email" label="ایمیل" />
+                  </th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                    <SortableHeader field="customerType" label="نوع" />
+                  </th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                    <SortableHeader field="approvalStatus" label="وضعیت" />
+                  </th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                    <SortableHeader field="createdAt" label="تاریخ عضویت" />
+                  </th>
                   <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
                 </tr>
               </thead>
@@ -127,6 +204,9 @@ export default async function AdminCustomersPage() {
                   <tr key={customer.id} className="border-t border-white/10">
                     <td className="px-4 py-3 font-medium">
                       {customer.name || "—"}
+                      {customer.role !== "CUSTOMER" && (
+                        <span className="mr-1.5 text-xs text-brand-300">[{ROLE_LABEL[customer.role]}]</span>
+                      )}
                       {customer.companyName && (
                         <span className="mr-1.5 text-xs text-foreground/40">({customer.companyName})</span>
                       )}

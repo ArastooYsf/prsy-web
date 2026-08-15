@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import AccountSidebar from "@/components/account/AccountSidebar";
+import AdminSearchBox from "@/components/admin/AdminSearchBox";
 
 // The blog editor (new + edit) owns its own full-screen split-panel layout
 // (see /account/admin/blog/[id] and /account/admin/blog/new) — no sidebar,
@@ -25,6 +26,7 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
   }
 
   const isAdmin = pathname.startsWith("/account/admin");
+  const canSearch = role === "ADMIN" || role === "SUPPORT";
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden lg:flex-row">
@@ -37,11 +39,14 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
               : "container flex flex-1 flex-col py-6 sm:py-12"
           }
         >
-          <div className="mb-8 border-b border-white/10 pb-6">
-            <p className="text-xs font-medium text-foreground/50">حساب کاربری</p>
-            <h1 className="mt-1 text-xl font-black sm:text-2xl">
-              خوش آمدید، <span className="text-gradient">{userLabel}</span>
-            </h1>
+          <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-medium text-foreground/50">حساب کاربری</p>
+              <h1 className="mt-1 text-xl font-black sm:text-2xl">
+                خوش آمدید، <span className="text-gradient">{userLabel}</span>
+              </h1>
+            </div>
+            {isAdmin && canSearch && <AdminSearchBox />}
           </div>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         </section>

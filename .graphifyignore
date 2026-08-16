@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Build/dist output (not currently produced by this project, kept for safety)
+dist/
+build/
+
+# Generated Prisma client (schema.prisma generator output = ../src/generated/prisma)
+src/generated/
+
+# graphify's own output — never re-scan the graph it produced
+graphify-out/
+
+# Misc build artifacts
+*.tsbuildinfo
+coverage/

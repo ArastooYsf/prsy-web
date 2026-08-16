@@ -14,27 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"{\\\"systemMessage\\\":\\\"\u06cc\u0627\u062f\u0622\u0648\u0631\u06cc QA (CLAUDE.md): \u0642\u0628\u0644 \u0627\u0632 \u067e\u0627\u06cc\u0627\u0646 \u062a\u0633\u06a9\u060c \u0631\u06cc\u0633\u067e\u0627\u0646\u0633\u06cc\u0648 \u0628\u0648\u062f\u0646 (375/768/1920px) \u0648 \u0627\u0645\u062a\u06cc\u0627\u0632 \u062a\u0642\u0631\u06cc\u0628\u06cc Lighthouse (Performance/A11y/Best Practices/SEO) \u0631\u0627 \u0628\u0631\u0631\u0633\u06cc \u0648 \u0645\u0634\u06a9\u0644\u0627\u062a \u0631\u0627 \u0628\u0627 \u0627\u0648\u0644\u0648\u06cc\u062a \u06af\u0632\u0627\u0631\u0634 \u06a9\u0646.\\\"}\""
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash|Grep",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/arastooysf/.local/bin/graphify hook-guard search"
-          }
-        ]
-      },
-      {
-        "matcher": "Read|Glob",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/arastooysf/.local/bin/graphify hook-guard read"
+            "command": "echo \"{\\\"systemMessage\\\":\\\"یادآوری QA (CLAUDE.md): قبل از پایان تسک، ریسپانسیو بودن (375/768/1920px) و امتیاز تقریبی Lighthouse (Performance/A11y/Best Practices/SEO) را بررسی و مشکلات را با اولویت گزارش کن.\\\"}\""
           }
         ]
       }

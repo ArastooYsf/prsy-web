@@ -40,6 +40,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [invalidIndexes, setInvalidIndexes] = useState<Set<number>>(new Set());
 
   const updateItem = (index: number, field: keyof Item, value: string) => {
     setItems((prev) =>
@@ -51,6 +52,12 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
         return { ...item, productName: value };
       }),
     );
+    setInvalidIndexes((prev) => {
+      if (!prev.has(index)) return prev;
+      const next = new Set(prev);
+      next.delete(index);
+      return next;
+    });
   };
 
   const addItem = () => setItems((prev) => [...prev, { productName: "", quantity: 1 }]);
@@ -60,19 +67,35 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
     e.preventDefault();
     setError("");
 
-    const namedItems = items.filter((item) => item.productName.trim());
-
-    if (!userId || namedItems.length === 0) {
-      setError("مشتری و حداقل یک قلم کالا الزامی است.");
+    if (!userId) {
+      setError("انتخاب مشتری الزامی است.");
       return;
     }
 
-    if (namedItems.some((item) => !(typeof item.quantity === "number" && item.quantity >= 1))) {
-      setError("تعداد هر قلم کالا باید حداقل ۱ باشد.");
+    // Every row must be fully filled in — a row with only one of the two
+    // fields set is never silently dropped, since that would submit an
+    // order missing an item the user thought they'd added.
+    const bad = new Set<number>();
+    items.forEach((item, i) => {
+      const hasName = !!item.productName.trim();
+      const hasQuantity = typeof item.quantity === "number" && item.quantity >= 1;
+      if (!hasName || !hasQuantity) bad.add(i);
+    });
+
+    if (items.length === 0 || bad.size === items.length) {
+      setInvalidIndexes(new Set(items.map((_, i) => i)));
+      setError("حداقل یک قلم کالا الزامی است.");
       return;
     }
 
-    const validItems = namedItems as { productName: string; quantity: number }[];
+    if (bad.size > 0) {
+      setInvalidIndexes(bad);
+      setError("نام و تعداد همه‌ی اقلام سفارش را تکمیل کنید یا ردیف‌های ناقص را حذف کنید.");
+      return;
+    }
+
+    setInvalidIndexes(new Set());
+    const validItems = items as { productName: string; quantity: number }[];
 
     setSaving(true);
 
@@ -134,12 +157,14 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">اقلام سفارش</label>
         <div className="space-y-3">
-          {items.map((item, index) => (
+          {items.map((item, index) => {
+            const invalid = invalidIndexes.has(index);
+            return (
             <div key={index} className="flex items-center gap-2">
               <input
                 value={item.productName}
                 onChange={(e) => updateItem(index, "productName", e.target.value)}
-                className={inputClass}
+                className={invalid && !item.productName.trim() ? `${inputClass} border-red-500/50` : inputClass}
                 placeholder="نام محصول"
               />
               <input
@@ -147,7 +172,11 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
                 min={1}
                 value={item.quantity}
                 onChange={(e) => updateItem(index, "quantity", e.target.value)}
-                className={`${inputClass} w-24`}
+                className={
+                  invalid && !(typeof item.quantity === "number" && item.quantity >= 1)
+                    ? `${inputClass} w-24 border-red-500/50`
+                    : `${inputClass} w-24`
+                }
               />
               {items.length > 1 && (
                 <button
@@ -160,7 +189,8 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
                 </button>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
         <button
           type="button"

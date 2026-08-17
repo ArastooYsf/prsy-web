@@ -60,7 +60,7 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
     dateRanges.some((d) => !!searchParams.get(d.fromKey) || !!searchParams.get(d.toKey));
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className="mb-4 flex flex-wrap items-start gap-2">
       {searchPlaceholder && (
         <div className="relative min-w-0 flex-1 basis-56">
           <Search className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-foreground/40" />
@@ -92,14 +92,16 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
       ))}
 
       {dateRanges.map((d) => (
-        <div key={d.fromKey} className="flex items-center gap-1.5">
-          <span className="text-xs text-foreground/40">{d.label}:</span>
-          <div className="w-36">
-            <JalaliDatePicker value={searchParams.get(d.fromKey) ?? ""} onChange={(v) => updateParam(d.fromKey, v || null)} />
-          </div>
-          <span className="text-xs text-foreground/40">تا</span>
-          <div className="w-36">
-            <JalaliDatePicker value={searchParams.get(d.toKey) ?? ""} onChange={(v) => updateParam(d.toKey, v || null)} />
+        <div key={d.fromKey} className="flex flex-col gap-1">
+          <span className="text-xs text-foreground/40">{d.label}</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-36">
+              <JalaliDatePicker value={searchParams.get(d.fromKey) ?? ""} onChange={(v) => updateParam(d.fromKey, v || null)} />
+            </div>
+            <span className="shrink-0 text-xs text-foreground/40">تا</span>
+            <div className="w-36">
+              <JalaliDatePicker value={searchParams.get(d.toKey) ?? ""} onChange={(v) => updateParam(d.toKey, v || null)} />
+            </div>
           </div>
         </div>
       ))}

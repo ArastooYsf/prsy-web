@@ -154,6 +154,26 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
           ))}
         </div>
       </div>
+
+      <motion.a
+        href="#why-us"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        aria-label="مشاهده‌ی ادامه‌ی محتوا"
+        className="absolute inset-x-0 bottom-3 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-foreground/40 transition-colors hover:text-foreground/70 sm:bottom-4"
+      >
+        <motion.svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </motion.svg>
+      </motion.a>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
 
 type CannedResponse = {
   id: string;
@@ -15,23 +16,10 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newBody, setNewBody] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     fetchResponses();
-    const onClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onClickOutside);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", onClickOutside);
-      window.removeEventListener("keydown", onKeyDown);
-    };
   }, [open]);
 
   const fetchResponses = async () => {
@@ -44,8 +32,7 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
     setLoading(false);
   };
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAdd = async () => {
     if (!newTitle.trim() || !newBody.trim()) return;
 
     const res = await fetch("/api/admin/canned-responses", {
@@ -69,25 +56,32 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
   };
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="پیام‌های آماده"
-        className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M4 5.5h16M4 10.5h16M4 15.5h10"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          aria-label="پیام‌های آماده"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 5.5h16M4 10.5h16M4 15.5h10"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </Popover.Trigger>
 
-      {open && (
-        <div className="absolute bottom-11 right-0 z-20 flex max-h-96 w-80 flex-col overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl">
+      <Popover.Portal>
+        <Popover.Content
+          side="top"
+          align="start"
+          sideOffset={8}
+          collisionPadding={8}
+          className="z-20 flex max-h-96 w-80 max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+        >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <p className="text-sm font-semibold">پیام‌های آماده</p>
             <button
@@ -100,7 +94,12 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
           </div>
 
           {adding && (
-            <form onSubmit={handleAdd} className="space-y-2 border-b border-white/10 p-3">
+            // A plain div, not a <form> — this picker is itself nested inside
+            // TicketChat's message-compose <form>, and a nested <form> here
+            // made this "save" button's submit behavior browser-dependent and
+            // unreliable (it never reliably fired handleAdd). A button with an
+            // explicit onClick sidesteps form nesting entirely.
+            <div className="space-y-2 border-b border-white/10 p-3">
               <input
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
@@ -115,15 +114,16 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 outline-none focus:border-accent-500/50"
               />
               <button
-                type="submit"
+                type="button"
+                onClick={handleAdd}
                 className="w-full rounded-lg bg-accent-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-600"
               >
                 ذخیره پاسخ آماده
               </button>
-            </form>
+            </div>
           )}
 
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="flex-1 overflow-y-auto overscroll-contain p-2">
             {loading ? (
               <p className="py-6 text-center text-xs text-foreground/50">در حال بارگذاری...</p>
             ) : responses.length === 0 ? (
@@ -159,8 +159,8 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
               ))
             )}
           </div>
-        </div>
-      )}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

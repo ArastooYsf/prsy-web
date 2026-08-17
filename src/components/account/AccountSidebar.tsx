@@ -219,7 +219,7 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="باز کردن منو"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
         >
           <Menu className="size-[18px]" />
         </button>
@@ -249,7 +249,7 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
                   type="button"
                   onClick={() => setMobileOpen(false)}
                   aria-label="بستن منو"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground/50 hover:bg-white/10 hover:text-foreground"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground/50 hover:bg-white/10 hover:text-foreground"
                 >
                   <X className="size-4" />
                 </button>

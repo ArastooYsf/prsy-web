@@ -69,7 +69,7 @@ export default async function AccountContractsPage() {
                       href={getMediaUrl(contract.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                     >
                       <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
                       دانلود پیوست

@@ -3,8 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { verifyTurnstileToken } from "@/lib/turnstile";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail } from "@/lib/validation";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
       ? sanitizePlainText(body.economicCode).slice(0, 50)
       : null;
 
-  if (!EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     return NextResponse.json({ error: "ایمیل معتبر نیست." }, { status: 400 });
   }
   if (password.length < 8) {

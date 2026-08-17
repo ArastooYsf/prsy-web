@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 export async function PATCH(request: Request) {
   const session = await getServerSession(authOptions);
@@ -26,8 +25,14 @@ export async function PATCH(request: Request) {
   const economicCode =
     typeof body?.economicCode === "string" ? sanitizePlainText(body.economicCode).slice(0, 50) : "";
 
-  if (!EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     return NextResponse.json({ error: "ایمیل معتبر نیست." }, { status: 400 });
+  }
+  if (phone && !isValidIranPhone(phone)) {
+    return NextResponse.json({ error: "شماره تماس معتبر نیست." }, { status: 400 });
+  }
+  if (alternatePhone && !isValidIranPhone(alternatePhone)) {
+    return NextResponse.json({ error: "شماره تماس جایگزین معتبر نیست." }, { status: 400 });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

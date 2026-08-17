@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/admin/ToastProvider";
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -36,8 +37,12 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
     e.preventDefault();
     setError("");
 
-    if (!email.trim() || password.length < 8) {
-      setError("ایمیل الزامی و رمز عبور باید حداقل ۸ کاراکتر باشد.");
+    if (!isValidEmail(email) || password.length < 8) {
+      setError("ایمیل معتبر الزامی و رمز عبور باید حداقل ۸ کاراکتر باشد.");
+      return;
+    }
+    if (phone.trim() && !isValidIranPhone(phone)) {
+      setError("شماره تلفن معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
       return;
     }
     if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -52,6 +53,20 @@ export default function ProfileForm({
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    if (!isValidEmail(email)) {
+      setError("ایمیل معتبر نیست.");
+      return;
+    }
+    if (phone && !isValidIranPhone(phone)) {
+      setError("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      return;
+    }
+    if (alternatePhone && !isValidIranPhone(alternatePhone)) {
+      setError("شماره تماس جایگزین معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      return;
+    }
+
     setSaving(true);
 
     const res = await fetch("/api/account/profile", {

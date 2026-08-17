@@ -4,8 +4,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -31,8 +30,11 @@ export async function POST(request: Request) {
       : null;
   const notes = typeof body?.notes === "string" ? sanitizePlainText(body.notes).slice(0, 4000) : null;
 
-  if (!EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     return NextResponse.json({ error: "ایمیل معتبر نیست." }, { status: 400 });
+  }
+  if (phone && !isValidIranPhone(phone)) {
+    return NextResponse.json({ error: "شماره تلفن معتبر نیست." }, { status: 400 });
   }
   if (password.length < 8) {
     return NextResponse.json({ error: "رمز عبور باید حداقل ۸ کاراکتر باشد." }, { status: 400 });

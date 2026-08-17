@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 type FormState = {
   name: string;
@@ -45,6 +46,14 @@ export default function ConsultationForm() {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       setError("لطفاً نام و شماره تماس خود را وارد کنید.");
+      return;
+    }
+    if (!isValidIranPhone(form.phone)) {
+      setError("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      return;
+    }
+    if (form.email.trim() && !isValidEmail(form.email)) {
+      setError("ایمیل معتبر نیست.");
       return;
     }
     setError("");

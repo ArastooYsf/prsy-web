@@ -5,8 +5,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 // Expected format: one header row, then "name,email,phone,notes" per line.
 // Deliberately naive (no quoted-comma support) — matches the "simple CSV" ask.
@@ -39,8 +38,12 @@ export async function POST(request: Request) {
     const [rawName, rawEmail, rawPhone, rawNotes] = cells;
     const email = (rawEmail ?? "").toLowerCase();
 
-    if (!EMAIL_RE.test(email)) {
+    if (!isValidEmail(email)) {
       skipped.push({ row: i + 2, reason: "ایمیل نامعتبر" });
+      continue;
+    }
+    if (rawPhone && !isValidIranPhone(rawPhone)) {
+      skipped.push({ row: i + 2, reason: "شماره تلفن نامعتبر" });
       continue;
     }
 

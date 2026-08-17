@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import TurnstileWidget from "@/components/TurnstileWidget";
+import { isValidEmail } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -42,6 +43,10 @@ export default function RegisterForm() {
     e.preventDefault();
     setError("");
 
+    if (!isValidEmail(email)) {
+      setError("ایمیل معتبر نیست.");
+      return;
+    }
     if (!turnstileToken) {
       setError("لطفاً تأیید کنید که ربات نیستید.");
       return;

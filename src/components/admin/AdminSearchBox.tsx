@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Loader2, Search, X } from "lucide-react";
+import { scrollFieldAboveKeyboard } from "@/lib/scroll-into-view";
 
 type SearchGroup<T> = { items: T[]; hasMore: boolean };
 
@@ -70,7 +71,10 @@ export default function AdminSearchBox() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setOpen(true)}
+            onFocus={(e) => {
+              setOpen(true);
+              scrollFieldAboveKeyboard(e.currentTarget);
+            }}
             placeholder="جست‌وجو در مشتریان، تیکت‌ها، قراردادها، سفارش‌ها..."
             className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
           />

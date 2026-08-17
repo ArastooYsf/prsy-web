@@ -2,9 +2,7 @@
 
 import { formatGregorian, formatJalali } from "@/lib/jalali";
 import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
-
-const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-3 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50";
+import GregorianDatePicker from "@/components/admin/GregorianDatePicker";
 
 type JalaliGregorianDateFieldProps = {
   label: string;
@@ -20,7 +18,7 @@ export default function JalaliGregorianDateField({ label, value, onChange, calen
     <div>
       <label className="mb-1.5 block text-sm font-medium text-foreground/80">{label}</label>
       {calendar === "gregorian" ? (
-        <input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} />
+        <GregorianDatePicker value={value} onChange={onChange} />
       ) : (
         <JalaliDatePicker value={value} onChange={onChange} />
       )}

@@ -1513,7 +1513,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core_testdomaindetection",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": "testdomaindetection"
     },
     {
@@ -1766,7 +1766,7 @@
       "label": "JalaliDatePicker()",
       "file_type": "code",
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L23",
+      "source_location": "L27",
       "_callable": true,
       "_origin": "ast",
       "id": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -3251,18 +3251,6 @@
       "norm_label": ".test_add_plugins_no_duplicates()"
     },
     {
-      "label": ".test_add_spacing()",
-      "file_type": "code",
-      "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
-      "source_location": "L137",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_testtailwindconfiggenerator_test_add_spacing",
-      "community": 16,
-      "community_name": "TestTailwindConfigGenerator",
-      "norm_label": ".test_add_spacing()"
-    },
-    {
       "label": ".test_custom_output_path()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
@@ -3321,6 +3309,18 @@
       "community": 16,
       "community_name": "TestTailwindConfigGenerator",
       "norm_label": ".test_full_configuration_typescript()"
+    },
+    {
+      "label": ".test_generate_javascript_config()",
+      "file_type": "code",
+      "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
+      "source_location": "L205",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_testtailwindconfiggenerator_test_generate_javascript_config",
+      "community": 16,
+      "community_name": "TestTailwindConfigGenerator",
+      "norm_label": ".test_generate_javascript_config()"
     },
     {
       "label": ".test_init_default_typescript()",
@@ -3513,18 +3513,6 @@
       "community": 17,
       "community_name": "design_system.py",
       "norm_label": "section_header()"
-    },
-    {
-      "label": "format_output()",
-      "file_type": "code",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
-      "source_location": "L44",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_search_format_output",
-      "community": 17,
-      "community_name": "design_system.py",
-      "norm_label": "format_output()"
     },
     {
       "label": ".test_persist_then_skip_then_force()",
@@ -4151,16 +4139,16 @@
       "norm_label": "generate_design_brief()"
     },
     {
-      "label": ".test_add_components_already_installed()",
+      "label": ".test_add_components_no_components()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L111",
+      "source_location": "L95",
       "_callable": true,
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_already_installed",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_no_components",
       "community": 213,
-      "community_name": ".test_add_components_already_installed",
-      "norm_label": ".test_add_components_already_installed()"
+      "community_name": ".test_add_components_no_components",
+      "norm_label": ".test_add_components_no_components()"
     },
     {
       "label": "generateOrderNumber()",
@@ -4293,6 +4281,18 @@
       "community": 23,
       "community_name": "search",
       "norm_label": "_suggest_terms()"
+    },
+    {
+      "label": "format_output()",
+      "file_type": "code",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+      "source_location": "L44",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "claude_skills_ui_ux_pro_max_scripts_search_format_output",
+      "community": 23,
+      "community_name": "search",
+      "norm_label": "format_output()"
     },
     {
       "label": ".test_accessibility_query_hits_ux()",
@@ -4463,16 +4463,16 @@
       "norm_label": ".validate_config()"
     },
     {
-      "label": ".test_generate_javascript_config()",
+      "label": ".test_add_spacing()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
-      "source_location": "L205",
+      "source_location": "L137",
       "_callable": true,
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_testtailwindconfiggenerator_test_generate_javascript_config",
+      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_testtailwindconfiggenerator_test_add_spacing",
       "community": 24,
       "community_name": "TailwindConfigGenerator",
-      "norm_label": ".test_generate_javascript_config()"
+      "norm_label": ".test_add_spacing()"
     },
     {
       "label": "._apply_reasoning()",
@@ -5637,6 +5637,18 @@
       "community": 36,
       "community_name": "auth.ts",
       "norm_label": "post()"
+    },
+    {
+      "label": "RegisterPage()",
+      "file_type": "code",
+      "source_file": "src/app/register/page.tsx",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_register_page_registerpage",
+      "community": 36,
+      "community_name": "auth.ts",
+      "norm_label": "registerpage()"
     },
     {
       "label": "clientIp()",
@@ -7883,16 +7895,16 @@
       "norm_label": "main()"
     },
     {
-      "label": ".test_add_components_no_components()",
+      "label": ".test_add_components_already_installed()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L95",
+      "source_location": "L111",
       "_callable": true,
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_no_components",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_already_installed",
       "community": 61,
       "community_name": "ShadcnInstaller",
-      "norm_label": ".test_add_components_no_components()"
+      "norm_label": ".test_add_components_already_installed()"
     },
     {
       "label": ".test_get_installed_components_no_config()",
@@ -8891,18 +8903,6 @@
       "norm_label": "get()"
     },
     {
-      "label": "RegisterPage()",
-      "file_type": "code",
-      "source_file": "src/app/register/page.tsx",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_app_register_page_registerpage",
-      "community": 8,
-      "community_name": "authOptions",
-      "norm_label": "registerpage()"
-    },
-    {
       "label": "backupFilename()",
       "file_type": "code",
       "source_file": "scripts/backup-db.ts",
@@ -9175,7 +9175,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_core_detect_domain",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": "detect_domain()"
     },
     {
@@ -9187,7 +9187,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core_testdomaindetection_test_accessibility_keywords_route_to_ux",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": ".test_accessibility_keywords_route_to_ux()"
     },
     {
@@ -9199,7 +9199,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core_testdomaindetection_test_ambiguous_query_returns_runner_up",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": ".test_ambiguous_query_returns_runner_up()"
     },
     {
@@ -9211,7 +9211,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core_testdomaindetection_test_empty_query_falls_back_to_style",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": ".test_empty_query_falls_back_to_style()"
     },
     {
@@ -9223,7 +9223,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core_testdomaindetection_test_style_keywords_route_to_style",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": ".test_style_keywords_route_to_style()"
     },
     {
@@ -11889,17 +11889,6 @@
       "norm_label": "test adding full color palette."
     },
     {
-      "label": "Test adding custom spacing.",
-      "file_type": "rationale",
-      "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
-      "source_location": "L138",
-      "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_rationale_138",
-      "community": 16,
-      "community_name": "TestTailwindConfigGenerator",
-      "norm_label": "test adding custom spacing."
-    },
-    {
       "label": "Test adding custom breakpoints.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
@@ -11953,6 +11942,17 @@
       "community": 16,
       "community_name": "TestTailwindConfigGenerator",
       "norm_label": "test initialization with default settings."
+    },
+    {
+      "label": "Test generating JavaScript configuration.",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
+      "source_location": "L206",
+      "_origin": "ast",
+      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_rationale_206",
+      "community": 16,
+      "community_name": "TestTailwindConfigGenerator",
+      "norm_label": "test generating javascript configuration."
     },
     {
       "label": "Test validating valid configuration.",
@@ -12332,45 +12332,45 @@
       "label": "$type",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L65",
+      "source_location": "L63",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_default_type",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_none_type",
       "community": 169,
-      "community_name": "default",
+      "community_name": "none",
       "norm_label": "$type"
     },
     {
       "label": "$value",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L65",
+      "source_location": "L63",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_default_value",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_none_value",
       "community": 169,
-      "community_name": "default",
+      "community_name": "none",
       "norm_label": "$value"
     },
     {
-      "label": "default",
+      "label": "none",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L65",
+      "source_location": "L63",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_radius_default",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_radius_none",
       "community": 169,
-      "community_name": "default",
-      "norm_label": "default"
+      "community_name": "none",
+      "norm_label": "none"
     },
     {
-      "label": "default",
+      "label": "none",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L74",
+      "source_location": "L72",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_shadow_default",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_shadow_none",
       "community": 169,
-      "community_name": "default",
-      "norm_label": "default"
+      "community_name": "none",
+      "norm_label": "none"
     },
     {
       "label": "design_system.py",
@@ -12384,15 +12384,15 @@
       "norm_label": "design_system.py"
     },
     {
-      "label": "scripts/search.py",
+      "label": "test_core.py",
       "file_type": "code",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/tests/test_core.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_search",
+      "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core",
       "community": 17,
       "community_name": "design_system.py",
-      "norm_label": "scripts/search.py"
+      "norm_label": "test_core.py"
     },
     {
       "label": "Format a page-specific override file with intelligent AI-generated content.",
@@ -12525,17 +12525,6 @@
       "community": 17,
       "community_name": "design_system.py",
       "norm_label": "format design system as master.md with hierarchical override logic."
-    },
-    {
-      "label": "Format results for Claude consumption (token-optimized)",
-      "file_type": "rationale",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
-      "source_location": "L45",
-      "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_search_rationale_45",
-      "community": 17,
-      "community_name": "design_system.py",
-      "norm_label": "format results for claude consumption (token-optimized)"
     },
     {
       "label": "react-dom",
@@ -13682,15 +13671,15 @@
       "norm_label": "generate a comprehensive logo design brief based on query"
     },
     {
-      "label": "Test adding components that are already installed.",
+      "label": "Test adding components with empty list.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L112",
+      "source_location": "L96",
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_112",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_96",
       "community": 213,
-      "community_name": ".test_add_components_already_installed",
-      "norm_label": "test adding components that are already installed."
+      "community_name": ".test_add_components_no_components",
+      "norm_label": "test adding components with empty list."
     },
     {
       "label": "$type",
@@ -14265,6 +14254,17 @@
       "norm_label": "scripts/core.py"
     },
     {
+      "label": "scripts/search.py",
+      "file_type": "code",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "claude_skills_ui_ux_pro_max_scripts_search",
+      "community": 23,
+      "community_name": "search",
+      "norm_label": "scripts/search.py"
+    },
+    {
       "label": "Load CSV and return list of dicts, with mtime-based caching.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-ux-pro-max/scripts/core.py",
@@ -14329,6 +14329,17 @@
       "community": 23,
       "community_name": "search",
       "norm_label": "search stack-specific guidelines"
+    },
+    {
+      "label": "Format results for Claude consumption (token-optimized)",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "claude_skills_ui_ux_pro_max_scripts_search_rationale_45",
+      "community": 23,
+      "community_name": "search",
+      "norm_label": "format results for claude consumption (token-optimized)"
     },
     {
       "label": "Known query -> expected top-domain sanity checks (not exact-row pinning, since\u2026",
@@ -14452,15 +14463,15 @@
       "norm_label": "add full color palette (50-950 shades) for a base color. args: name: color name..."
     },
     {
-      "label": "Test generating JavaScript configuration.",
+      "label": "Test adding custom spacing.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
-      "source_location": "L206",
+      "source_location": "L138",
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_rationale_206",
+      "id": "claude_skills_ui_styling_scripts_tests_test_tailwind_config_gen_rationale_138",
       "community": 24,
       "community_name": "TailwindConfigGenerator",
-      "norm_label": "test generating javascript configuration."
+      "norm_label": "test adding custom spacing."
     },
     {
       "label": "Generates design system recommendations from aggregated searches.",
@@ -16201,6 +16212,28 @@
       "norm_label": "setup/route.ts"
     },
     {
+      "label": "register/page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/register/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_register_page",
+      "community": 36,
+      "community_name": "auth.ts",
+      "norm_label": "register/page.tsx"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/register/page.tsx",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_app_register_page_metadata",
+      "community": 36,
+      "community_name": "auth.ts",
+      "norm_label": "metadata"
+    },
+    {
       "label": "auth.ts",
       "file_type": "code",
       "source_file": "src/lib/auth.ts",
@@ -16336,6 +16369,28 @@
       "label": "$type",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_default_type",
+      "community": 38,
+      "community_name": "radius",
+      "norm_label": "$type"
+    },
+    {
+      "label": "$value",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_default_value",
+      "community": 38,
+      "community_name": "radius",
+      "norm_label": "$value"
+    },
+    {
+      "label": "$type",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
       "source_location": "L69",
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_full_type",
@@ -16355,39 +16410,6 @@
       "norm_label": "$value"
     },
     {
-      "label": "$type",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L63",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_none_type",
-      "community": 38,
-      "community_name": "radius",
-      "norm_label": "$type"
-    },
-    {
-      "label": "$value",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L63",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_none_value",
-      "community": 38,
-      "community_name": "radius",
-      "norm_label": "$value"
-    },
-    {
-      "label": "primitive",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L3",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_primitive",
-      "community": 38,
-      "community_name": "radius",
-      "norm_label": "primitive"
-    },
-    {
       "label": "radius",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
@@ -16399,15 +16421,15 @@
       "norm_label": "radius"
     },
     {
-      "label": "shadow",
+      "label": "default",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L71",
+      "source_location": "L65",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_primitive_shadow",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_radius_default",
       "community": 38,
       "community_name": "radius",
-      "norm_label": "shadow"
+      "norm_label": "default"
     },
     {
       "label": "full",
@@ -16421,26 +16443,15 @@
       "norm_label": "full"
     },
     {
-      "label": "none",
+      "label": "default",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L63",
+      "source_location": "L74",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_radius_none",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_shadow_default",
       "community": 38,
       "community_name": "radius",
-      "norm_label": "none"
-    },
-    {
-      "label": "none",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L72",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_shadow_none",
-      "community": 38,
-      "community_name": "radius",
-      "norm_label": "none"
+      "norm_label": "default"
     },
     {
       "label": "cip/core.py",
@@ -18621,6 +18632,17 @@
       "norm_label": "tests for shadcn_add.py"
     },
     {
+      "label": "Test adding components that are already installed.",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
+      "source_location": "L112",
+      "_origin": "ast",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_112",
+      "community": 61,
+      "community_name": "ShadcnInstaller",
+      "norm_label": "test adding components that are already installed."
+    },
+    {
       "label": "Test listing installed components when they exist.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
@@ -18641,17 +18663,6 @@
       "community": 61,
       "community_name": "ShadcnInstaller",
       "norm_label": "test getting installed components without config."
-    },
-    {
-      "label": "Test adding components with empty list.",
-      "file_type": "rationale",
-      "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L96",
-      "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_96",
-      "community": 61,
-      "community_name": "ShadcnInstaller",
-      "norm_label": "test adding components with empty list."
     },
     {
       "label": "Add all available shadcn/ui components. Args: overwrite: If True, overwrite\u2026",
@@ -19728,7 +19739,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_duration_fast",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "fast"
     },
     {
@@ -19739,7 +19750,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_duration_normal",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "normal"
     },
     {
@@ -19750,7 +19761,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_duration_slow",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "slow"
     },
     {
@@ -19761,7 +19772,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_fast_type",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$type"
     },
     {
@@ -19772,7 +19783,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_fast_value",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$value"
     },
     {
@@ -19783,7 +19794,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_normal_type",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$type"
     },
     {
@@ -19794,8 +19805,19 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_normal_value",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$value"
+    },
+    {
+      "label": "primitive",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_primitive",
+      "community": 73,
+      "community_name": "primitive",
+      "norm_label": "primitive"
     },
     {
       "label": "duration",
@@ -19805,7 +19827,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_primitive_duration",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "duration"
     },
     {
@@ -19816,7 +19838,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_slow_type",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$type"
     },
     {
@@ -19827,7 +19849,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_slow_value",
       "community": 73,
-      "community_name": "duration",
+      "community_name": "primitive",
       "norm_label": "$value"
     },
     {
@@ -20282,28 +20304,6 @@
       "norm_label": "media/route.ts"
     },
     {
-      "label": "register/page.tsx",
-      "file_type": "code",
-      "source_file": "src/app/register/page.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "src_app_register_page",
-      "community": 8,
-      "community_name": "authOptions",
-      "norm_label": "register/page.tsx"
-    },
-    {
-      "label": "metadata",
-      "file_type": "code",
-      "source_file": "src/app/register/page.tsx",
-      "source_location": "L8",
-      "_origin": "ast",
-      "id": "src_app_register_page_metadata",
-      "community": 8,
-      "community_name": "authOptions",
-      "norm_label": "metadata"
-    },
-    {
       "label": "authOptions",
       "file_type": "code",
       "source_file": "src/lib/auth.ts",
@@ -20535,17 +20535,6 @@
       "norm_label": "utils.ts"
     },
     {
-      "label": "test_core.py",
-      "file_type": "code",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/tests/test_core.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_tests_test_core",
-      "community": 87,
-      "community_name": "test_core.py",
-      "norm_label": "test_core.py"
-    },
-    {
       "label": "Auto-detect the most relevant domain from query. Matches are weighted by\u2026",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-ux-pro-max/scripts/core.py",
@@ -20553,7 +20542,7 @@
       "_origin": "ast",
       "id": "claude_skills_ui_ux_pro_max_scripts_core_rationale_378",
       "community": 87,
-      "community_name": "test_core.py",
+      "community_name": "detect_domain",
       "norm_label": "auto-detect the most relevant domain from query. matches are weighted by..."
     },
     {
@@ -20982,8 +20971,19 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_fontsize_sm",
       "community": 94,
-      "community_name": "sm",
+      "community_name": "shadow",
       "norm_label": "sm"
+    },
+    {
+      "label": "shadow",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_primitive_shadow",
+      "community": 94,
+      "community_name": "shadow",
+      "norm_label": "shadow"
     },
     {
       "label": "sm",
@@ -20993,7 +20993,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_radius_sm",
       "community": 94,
-      "community_name": "sm",
+      "community_name": "shadow",
       "norm_label": "sm"
     },
     {
@@ -21004,7 +21004,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_shadow_sm",
       "community": 94,
-      "community_name": "sm",
+      "community_name": "shadow",
       "norm_label": "sm"
     },
     {
@@ -21015,7 +21015,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_sm_type",
       "community": 94,
-      "community_name": "sm",
+      "community_name": "shadow",
       "norm_label": "$type"
     },
     {
@@ -21026,7 +21026,7 @@
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_sm_value",
       "community": 94,
-      "community_name": "sm",
+      "community_name": "shadow",
       "norm_label": "$value"
     },
     {
@@ -31620,7 +31620,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L25",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -31632,7 +31632,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L26",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -31644,7 +31644,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L55",
+      "source_location": "L66",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -31655,7 +31655,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L56",
+      "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -31668,7 +31668,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L60",
+      "source_location": "L71",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -31680,7 +31680,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L71",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker_jalalidatepicker",
@@ -55168,7 +55168,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/admin/JalaliDatePicker.tsx",
-      "source_location": "L23",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_admin_jalalidatepicker",

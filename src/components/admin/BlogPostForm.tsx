@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import MediaPicker from "@/components/admin/MediaPicker";
+import GregorianDatePicker from "@/components/admin/GregorianDatePicker";
 import { slugify } from "@/lib/slugify";
 import { getMediaUrl } from "@/lib/media";
 
@@ -176,12 +177,9 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
               {published && (
                 <div className="flex items-center gap-2">
                   <label className="text-sm text-foreground/80">تاریخ انتشار</label>
-                  <input
-                    type="date"
-                    value={publishedAt}
-                    onChange={(e) => setPublishedAt(e.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent-500/50"
-                  />
+                  <div className="w-44">
+                    <GregorianDatePicker value={publishedAt} onChange={setPublishedAt} />
+                  </div>
                 </div>
               )}
             </div>

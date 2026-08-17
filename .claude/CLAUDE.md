@@ -1,3 +1,15 @@
+# قانون دائمی: اول Skill، بعد کدنویسی
+
+قبل از شروع هر کار جدید در این پروژه — نوشتن کد، ساخت فایل، تولید سند (Word/Excel/PDF)، طراحی UI، تست ریسپانسیو/بصری، یا هر فرآیند دیگه — همیشه اول بررسی کن که آیا یک Skill نصب‌شده یا در دسترس (پروژه‌ای یا سراسری، در `.claude/skills/` یا از طریق پلاگین‌های نصب‌شده) دقیقاً برای همون نوع کار طراحی شده. اگه Skill مرتبطی پیدا شد، حتماً از دستورالعمل و محدودیت‌های همون Skill پیروی کن به‌جای شروع از صفر بر اساس حدس خودت — چون Skill‌ها قواعد و محدودیت‌های خاص محیط رو از قبل می‌دونن.
+
+Skill‌های نصب‌شده‌ی مرتبط با کار این پروژه (آخرین بررسی: ۱۳۹۹/۰۵/۲۵ — 2026-08-16):
+- **carbone-skill** — تولید فایل Word/Excel/PDF از روی template (برای قرارداد، فاکتور، گزارش خروجی)
+- **playwright** (MCP) — اتوماسیون مرورگر واقعی، اسکرین‌شات، تست ریسپانسیو
+- **chrome-devtools-mcp** — بازرسی مرورگر زنده، ترِیس پرفورمنس، شبکه، کنسول
+- **frontend-design** — تولید رابط کاربری با کیفیت طراحی بالا، غیر ژنریک
+- **design / design-system / ui-styling / ui-ux-pro-max / brand / banner-design / slides** — طراحی، دیزاین‌سیستم، برندینگ، اسلاید
+- **graphify** — گراف دانش کدبیس (جزئیات کامل در بخش زیر)
+
 # graphify
 - **graphify** (`.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
 When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

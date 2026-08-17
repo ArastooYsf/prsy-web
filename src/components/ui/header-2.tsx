@@ -74,9 +74,15 @@ export function Header() {
 	return (
 		<header
 			className={cn(
-				'sticky top-0 z-50 mx-auto w-full max-w-5xl border-b border-transparent lg:max-w-6xl lg:rounded-md lg:border lg:transition-all lg:ease-out',
+				// The blurred background/shadow scroll effect below is desktop-only (lg:)
+				// on purpose: applying it at every breakpoint made the header visibly
+				// flicker on mobile, since iOS's elastic overscroll bounce can push
+				// scrollY back and forth across the threshold several times a second
+				// near the top of the page. The header itself stays visually fixed on
+				// mobile at all times instead.
+				'sticky top-0 z-50 mx-auto w-full max-w-5xl border-b border-transparent bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:max-w-6xl lg:rounded-md lg:border lg:border-transparent lg:bg-transparent lg:transition-all lg:ease-out',
 				{
-					'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10':
+					'lg:border-border lg:top-4 lg:max-w-5xl lg:bg-background/95 lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
 						scrolled && !open,
 					'bg-background/90': open,
 				},

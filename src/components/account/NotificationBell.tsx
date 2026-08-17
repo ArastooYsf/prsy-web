@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import * as Popover from "@radix-ui/react-popover";
 import { Bell, Check } from "lucide-react";
 
 const POLL_MS = 45000;
@@ -30,17 +31,6 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,23 +71,29 @@ export default function NotificationBell() {
   }
 
   return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="اعلان‌ها"
-        className="relative flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/70 transition-colors hover:border-accent-500/30 hover:text-foreground"
-      >
-        <Bell className="size-4" />
-        {unreadCount > 0 && (
-          <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-white">
-            {unreadCount > 9 ? "۹+" : unreadCount}
-          </span>
-        )}
-      </button>
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          aria-label="اعلان‌ها"
+          className="relative flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/70 transition-colors hover:border-accent-500/30 hover:text-foreground"
+        >
+          <Bell className="size-4" />
+          {unreadCount > 0 && (
+            <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-white">
+              {unreadCount > 9 ? "۹+" : unreadCount}
+            </span>
+          )}
+        </button>
+      </Popover.Trigger>
 
-      {open && (
-        <div className="absolute left-0 z-50 mt-2 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl">
+      <Popover.Portal>
+        <Popover.Content
+          align="end"
+          sideOffset={8}
+          collisionPadding={12}
+          className="z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+        >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <p className="text-sm font-bold">اعلان‌ها</p>
             {unreadCount > 0 && (
@@ -112,7 +108,7 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto overscroll-contain">
             {notifications.length === 0 ? (
               <p className="p-6 text-center text-sm text-foreground/50">اعلانی وجود ندارد.</p>
             ) : (
@@ -155,8 +151,8 @@ export default function NotificationBell() {
               </div>
             )}
           </div>
-        </div>
-      )}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

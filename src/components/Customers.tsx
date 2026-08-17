@@ -99,7 +99,7 @@ export default function Customers() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer(0.12)}
-          className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
+          className="mt-14 grid grid-cols-2 gap-3 sm:mt-16 sm:gap-6 lg:grid-cols-4"
         >
           {SEGMENTS.map((segment) => (
             <motion.div
@@ -107,13 +107,13 @@ export default function Customers() {
               variants={fadeInUp}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="group flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-7 transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
+              className="group flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-4 transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10 sm:p-7"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20 sm:h-12 sm:w-12">
                 {segment.icon}
               </div>
-              <h3 className="mt-5 text-lg font-bold">{segment.title}</h3>
-              <p className="mt-2.5 text-sm leading-6 text-foreground/70">{segment.description}</p>
+              <h3 className="mt-4 text-sm font-bold sm:mt-5 sm:text-lg">{segment.title}</h3>
+              <p className="mt-2 text-xs leading-5 text-foreground/70 sm:mt-2.5 sm:text-sm sm:leading-6">{segment.description}</p>
             </motion.div>
           ))}
         </motion.div>

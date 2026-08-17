@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { logEvent } from "@/lib/logger";
 import { formatJalali } from "@/lib/jalali";
 import { ORDER_STATUS } from "@/lib/status-labels";
+import { SITE_URL } from "@/lib/site-url";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
 import { createNotification } from "./inapp";
@@ -14,7 +15,6 @@ import { ticketReplyEmail, staffNewMessageEmail, orderStatusEmail, contractExpir
 // failure, never fail the main operation". Callers that DO need to know the
 // work finished (e.g. the contract-expiry cron script, which exits right
 // after) can still `await` the returned promise; it just never rejects.
-const SITE_URL = (process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
 
 const SYSTEM_ACTOR = { id: "system", name: "سیستم", email: "", role: "SYSTEM" };
 

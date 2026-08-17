@@ -1,7 +1,7 @@
 # Graph Report - website  (2026-08-17)
 
 ## Corpus Check
-- 332 files · ~158,783 words
+- 332 files · ~158,360 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -88,7 +88,7 @@
 - .claude/CLAUDE.md
 - logo/generate.py
 - generate-tokens.cjs
-- primitive
+- duration
 - admin/tickets/[id]/page.tsx
 - ConsultationForm.tsx
 - AccountShell.tsx
@@ -102,14 +102,14 @@
 - NotificationBell
 - FAQ.tsx
 - cn
-- detect_domain
+- test_core.py
 - _select_palette_for_mode
 - upload/route.ts
 - tickets/new/page.tsx
 - button
 - next-auth.d.ts
 - lg
-- shadow
+- sm
 - seed.ts
 - admin/blog/page.tsx
 - getMediaUrl
@@ -184,7 +184,7 @@
 - qrcode
 - @radix-ui/react-dropdown-menu
 - rate-limiter-flexible
-- none
+- default
 - react-dom
 - recharts
 - resend
@@ -225,7 +225,7 @@
 - Ticket Attachment: 3D Modeling Software Screenshot (L-shaped Panel)
 - Ticket Attachment (Empty/Invalid PNG Stub)
 - Ticket Attachment: 3D Modeling Software Screenshot (L-shaped Object, Top View)
-- .test_add_components_no_components
+- .test_add_components_already_installed
 - $type
 - radius
 - orders/route.ts
@@ -314,8 +314,8 @@ Cohesion: 0.04
 Nodes (45): dotenv, eslint, eslint-config-next, devDependencies, dotenv, eslint, eslint-config-next, postcss (+37 more)
 
 ### Community 8 - "authOptions"
-Cohesion: 0.09
-Nodes (6): dynamic, handler, authOptions, adapter, globalForPrisma, prisma
+Cohesion: 0.08
+Nodes (7): dynamic, handler, metadata, authOptions, adapter, globalForPrisma, prisma
 
 ### Community 9 - "card"
 Cohesion: 0.20
@@ -347,11 +347,11 @@ Nodes (32): AIDA Formula (Attention-Interest-Desire-Action), Before-After-Bridge
 
 ### Community 16 - "TestTailwindConfigGenerator"
 Cohesion: 0.06
-Nodes (16): Test adding colors multiple times., Test adding full color palette., Test adding custom breakpoints., Test TailwindConfigGenerator class., Test that adding same plugin twice doesn't duplicate., Test plugin recommendations for Next.js., Test initialization with default settings., Test generating JavaScript configuration. (+8 more)
+Nodes (16): Test adding colors multiple times., Test adding full color palette., Test adding custom spacing., Test adding custom breakpoints., Test TailwindConfigGenerator class., Test that adding same plugin twice doesn't duplicate., Test plugin recommendations for Next.js., Test initialization with default settings. (+8 more)
 
 ### Community 17 - "design_system.py"
-Cohesion: 0.11
-Nodes (25): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+17 more)
+Cohesion: 0.09
+Nodes (27): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+19 more)
 
 ### Community 18 - "events.ts"
 Cohesion: 0.16
@@ -374,8 +374,8 @@ Cohesion: 0.11
 Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
 
 ### Community 23 - "search"
-Cohesion: 0.12
-Nodes (18): _domain_keywords(), _get_bm25(), _load_csv(), _load_product_keywords(), Load CSV and return list of dicts, with mtime-based caching., Fitted BM25 index for this file+columns, with mtime-based caching., Core search function using BM25. Returns (results, bm25_or_none)., Nearest known vocabulary terms for a query that returned 0 hits, so the caller… (+10 more)
+Cohesion: 0.14
+Nodes (16): _domain_keywords(), _get_bm25(), _load_csv(), _load_product_keywords(), Load CSV and return list of dicts, with mtime-based caching., Fitted BM25 index for this file+columns, with mtime-based caching., Core search function using BM25. Returns (results, bm25_or_none)., Nearest known vocabulary terms for a query that returned 0 hits, so the caller… (+8 more)
 
 ### Community 24 - "TailwindConfigGenerator"
 Cohesion: 0.10
@@ -426,16 +426,16 @@ Cohesion: 0.11
 Nodes (19): docker-compose.yml (Local Dev Database), Production DB via host cPanel (local-dev-only rationale), db Service Definition, MySQL 8.4 Image, Placeholder Contract PDF (empty seed file), public/media README, NEXT_PUBLIC_MEDIA_URL (media README mention), Project README (+11 more)
 
 ### Community 36 - "auth.ts"
-Cohesion: 0.19
-Nodes (8): POST(), POST(), POST(), metadata, loginIpRateLimiter, createTwoFactorSecret(), twoFactorQrCodeDataUrl(), verifyTwoFactorCode()
+Cohesion: 0.25
+Nodes (7): POST(), POST(), POST(), loginIpRateLimiter, createTwoFactorSecret(), twoFactorQrCodeDataUrl(), verifyTwoFactorCode()
 
 ### Community 37 - "fetch-background.py"
 Cohesion: 0.17
 Nodes (17): generate_css_for_background(), get_background_image(), get_curated_images(), get_overlay_css(), get_pexels_search_url(), load_backgrounds_config(), load_brand_colors(), main() (+9 more)
 
 ### Community 38 - "radius"
-Cohesion: 0.29
-Nodes (8): $type, $value, $type, $value, radius, default, full, default
+Cohesion: 0.24
+Nodes (10): $type, $value, $type, $value, primitive, radius, shadow, full (+2 more)
 
 ### Community 39 - "Extraction Subagent Prompt Template"
 Cohesion: 0.11
@@ -527,7 +527,7 @@ Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4
 
 ### Community 61 - "ShadcnInstaller"
 Cohesion: 0.20
-Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test adding components that are already installed., Test listing installed components when they exist., Test getting installed components without config.
+Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test listing installed components when they exist., Test getting installed components without config., Test adding components with empty list.
 
 ### Community 62 - ".check_shadcn_config"
 Cohesion: 0.21
@@ -569,9 +569,9 @@ Nodes (9): enhance_prompt(), generate_batch(), generate_logo(), load_env(), main
 Cohesion: 0.36
 Nodes (9): flattenTokens(), fs, generateCSS(), generateTailwind(), main(), parseArgs(), path, resolveReference() (+1 more)
 
-### Community 73 - "primitive"
-Cohesion: 0.18
-Nodes (11): fast, normal, slow, $type, $value, $type, $value, primitive (+3 more)
+### Community 73 - "duration"
+Cohesion: 0.20
+Nodes (10): fast, normal, slow, $type, $value, $type, $value, duration (+2 more)
 
 ### Community 74 - "admin/tickets/[id]/page.tsx"
 Cohesion: 0.33
@@ -621,8 +621,8 @@ Nodes (3): metadata, FAQ(), FAQS
 Cohesion: 0.16
 Nodes (14): AccountSidebarProps, ADMIN_LINKS, EXACT_MATCH_HREFS, isLinkActive(), NavItem(), PERSONAL_LINKS, SidebarContents(), Avatar() (+6 more)
 
-### Community 87 - "detect_domain"
-Cohesion: 0.43
+### Community 87 - "test_core.py"
+Cohesion: 0.39
 Nodes (3): detect_domain(), Auto-detect the most relevant domain from query. Matches are weighted by…, TestDomainDetection
 
 ### Community 88 - "_select_palette_for_mode"
@@ -649,9 +649,9 @@ Nodes (5): JWT, next-auth, next-auth/jwt, Session, User
 Cohesion: 0.60
 Nodes (5): lg, $type, $value, lg, lg
 
-### Community 94 - "shadow"
-Cohesion: 0.47
-Nodes (6): sm, shadow, sm, sm, $type, $value
+### Community 94 - "sm"
+Cohesion: 0.60
+Nodes (5): sm, sm, sm, $type, $value
 
 ### Community 95 - "seed.ts"
 Cohesion: 0.50
@@ -721,9 +721,9 @@ Nodes (9): dependencies, next, @prisma/adapter-mariadb, react, @tiptap/extension
 Cohesion: 0.67
 Nodes (4): padding-y, padding-y, $type, $value
 
-### Community 169 - "none"
+### Community 169 - "default"
 Cohesion: 0.67
-Nodes (4): $type, $value, none, none
+Nodes (4): $type, $value, default, default
 
 ### Community 176 - "destructive"
 Cohesion: 0.67
@@ -769,7 +769,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Why does `authOptions` connect `authOptions` to `jalali.ts`, `logger.ts`, `ToastProvider.tsx`, `sanitizePlainText`, `logEvent`, `contracts/[id]/page.tsx`, `admin/page.tsx`, `site-content.ts`, `status-labels.ts`, `auth.ts`, `login/page.tsx`, `BlogPostForm.tsx`, `profile/page.tsx`, `site-content/route.ts`, `account/tickets/[id]/reply/route.ts`, `admin/tickets/[id]/page.tsx`, `AccountShell.tsx`, `orders/route.ts`, `upload/route.ts`, `tickets/new/page.tsx`, `admin/blog/page.tsx`, `getMediaUrl`, `orders/new/page.tsx`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `primitive` connect `primitive` to `gray`, `radius`, `spacing`, `fontSize`, `design-tokens-starter.json`, `shadow`?**
+- **Why does `primitive` connect `radius` to `gray`, `duration`, `spacing`, `fontSize`, `design-tokens-starter.json`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._

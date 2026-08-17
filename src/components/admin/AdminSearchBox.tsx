@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import * as Popover from "@radix-ui/react-popover";
 import { Loader2, Search, X } from "lucide-react";
 
 type SearchGroup<T> = { items: T[]; hasMore: boolean };
@@ -34,17 +35,6 @@ export default function AdminSearchBox() {
   const [results, setResults] = useState<SearchResults>(EMPTY_RESULTS);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -72,34 +62,42 @@ export default function AdminSearchBox() {
   const showDropdown = open && query.trim().length >= 2;
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-sm">
-      <div className="relative">
-        <Search className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-foreground/40" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setOpen(true)}
-          placeholder="جست‌وجو در مشتریان، تیکت‌ها، قراردادها، سفارش‌ها..."
-          className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              setResults(EMPTY_RESULTS);
-            }}
-            aria-label="پاک کردن جست‌وجو"
-            className="absolute left-2.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-foreground/40 hover:text-foreground"
-          >
-            <X className="size-3.5" />
-          </button>
-        )}
-      </div>
+    <Popover.Root open={showDropdown} onOpenChange={(v) => setOpen(v)}>
+      <Popover.Anchor asChild>
+        <div className="relative w-full max-w-sm">
+          <Search className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-foreground/40" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setOpen(true)}
+            placeholder="جست‌وجو در مشتریان، تیکت‌ها، قراردادها، سفارش‌ها..."
+            className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setResults(EMPTY_RESULTS);
+              }}
+              aria-label="پاک کردن جست‌وجو"
+              className="absolute left-2.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-foreground/40 hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+          )}
+        </div>
+      </Popover.Anchor>
 
-      {showDropdown && (
-        <div className="absolute z-50 mt-2 max-h-[70vh] w-full overflow-y-auto rounded-2xl border border-white/10 bg-background shadow-2xl">
+      <Popover.Portal>
+        <Popover.Content
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          align="start"
+          sideOffset={8}
+          collisionPadding={8}
+          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-background shadow-2xl"
+        >
           {loading ? (
             <div className="flex items-center justify-center gap-2 p-6 text-sm text-foreground/50">
               <Loader2 className="size-4 animate-spin" />
@@ -179,9 +177,9 @@ export default function AdminSearchBox() {
           ) : (
             <p className="p-6 text-center text-sm text-foreground/50">نتیجه‌ای یافت نشد.</p>
           )}
-        </div>
-      )}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 

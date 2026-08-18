@@ -223,6 +223,7 @@ model BlogPost {
   coverImage  String?
   published   Boolean   @default(false)
   publishedAt DateTime?
+  viewCount   Int       @default(0)
   authorId    String
   author      User      @relation(fields: [authorId], references: [id])
   createdAt   DateTime  @default(now())
@@ -239,6 +240,16 @@ model SiteContent {
   updatedAt DateTime @updatedAt
 
   @@map("site_content")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("page_views")
 }
 
 model MediaAsset {

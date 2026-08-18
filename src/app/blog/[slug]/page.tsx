@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizeRichText } from "@/lib/sanitize";
+import BlogViewTracker from "@/components/BlogViewTracker";
 
 export const revalidate = 60;
 
@@ -46,6 +47,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   return (
     <article className="relative pb-20 pt-14 sm:pb-28 sm:pt-20">
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+      <BlogViewTracker postId={post.id} />
       <div className="container relative">
         <div className="mx-auto max-w-2xl">
           <div className="flex items-center justify-between gap-4">

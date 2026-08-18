@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { Eye } from "lucide-react";
 import type { StatusCount, TrendPoint } from "@/lib/admin-stats";
 import { RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
 
@@ -112,6 +113,37 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
         </BarChart>
       </ResponsiveContainer>
     </ChartCard>
+  );
+}
+
+export function SiteViewsCard({ initialCount, initialRange }: { initialCount: number; initialRange: StatsRange }) {
+  const [range, setRange] = useState<StatsRange>(initialRange);
+  const [count, setCount] = useState(initialCount);
+  const [loading, setLoading] = useState(false);
+
+  const handleRangeChange = async (next: StatsRange) => {
+    if (next === range) return;
+    setRange(next);
+    setLoading(true);
+    const res = await fetch(`/api/admin/dashboard/pageviews?range=${next}`);
+    if (res.ok) {
+      const body = await res.json();
+      setCount(body.count);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-foreground/60">
+          <Eye className="size-4" />
+          <p className="text-sm">بازدیدهای کلی سایت</p>
+        </div>
+        <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />
+      </div>
+      <p className="mt-2 text-3xl font-black">{count.toLocaleString("fa-IR")}</p>
+    </div>
   );
 }
 

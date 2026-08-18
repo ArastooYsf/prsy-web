@@ -5,17 +5,17 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2221 nodes · 3710 edges · 232 communities (128 shown, 104 thin omitted)
+- 2219 nodes · 3683 edges · 237 communities (135 shown, 102 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `667e7919`
+- Built from commit: `38a633b1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- jalali.ts
+- customers/page.tsx
 - Design Skill
 - contracts/export/route.ts
 - gray
@@ -26,7 +26,7 @@
 - auth.ts
 - card
 - site-content.ts
-- AccountShell.tsx
+- account/layout.tsx
 - slide_search_core.py
 - CustomerForm.tsx
 - spacing
@@ -53,7 +53,7 @@
 - Project README
 - twofactor.ts
 - fetch-background.py
-- site-content/route.ts
+- footer-contact/route.ts
 - Extraction Subagent Prompt Template
 - app/layout.tsx
 - login/page.tsx
@@ -67,11 +67,11 @@
 - TicketChat.tsx
 - Brand Skill
 - _palette_is_dark
-- SocialProof.tsx
+- About.tsx
 - $type
 - extract-colors.cjs
 - validate-asset.cjs
-- AdminSearchBox.tsx
+- ListFilterBar.tsx
 - input
 - cn
 - validate-tokens.cjs
@@ -100,19 +100,19 @@
 - Component-Specific Accessibility Patterns
 - backup-db.ts
 - muted
-- faq/page.tsx
+- FAQ.tsx
 - header-2.tsx
 - detect_domain
 - _select_palette_for_mode
 - upload/route.ts
-- admin/orders/[id]/page.tsx
+- orders/new/page.tsx
 - button
 - next-auth.d.ts
 - lg
 - shadow
 - seed.ts
 - isValidEmail
-- admin/layout.tsx
+- MediaPickerModal.tsx
 - contact/page.tsx
 - radius
 - graphify clone command
@@ -126,8 +126,8 @@
 - main
 - primary-foreground
 - .test_add_components_no_components
-- logEvent
-- default
+- prisma
+- jalali.ts
 - /graphify add command
 - graphify hook install/uninstall/status
 - .__init__
@@ -178,12 +178,13 @@
 - next-auth
 - next.config.mjs
 - otplib
-- padding-y
+- GregorianDatePicker.tsx
+- formatJalali
 - md
 - qrcode
 - @radix-ui/react-dropdown-menu
 - rate-limiter-flexible
-- destructive
+- ProductCategories.tsx
 - react-dom
 - recharts
 - resend
@@ -215,6 +216,7 @@
 - shadcn/ui Color Customization Methods
 - Tailwind Plugins (official & custom)
 - Tailwind Container Queries (@container)
+- NotificationBell.tsx
 - Diesel Generators Product Icon
 - Overhaul Product Category Icon (SVG)
 - Power Engines Product Icon
@@ -224,17 +226,21 @@
 - Ticket Attachment (Empty/Invalid PNG Stub)
 - Ticket Attachment: 3D Modeling Software Screenshot (L-shaped Object, Top View)
 - sanitizePlainText
-- ConsultationForm.tsx
+- app/blog/page.tsx
 - radius
 - .test_get_installed_components_empty
+- [slug]/page.tsx
+- padding-x
 - @radix-ui/react-popover
 - lucide-react
 - ring
 - clsx
 - @radix-ui/react-slot
 - tailwind-merge
+- none
 - prisma
 - @prisma/client
+- primary
 - 20260805111845_contract_types_and_status/migration.sql
 
 ## God Nodes (most connected - your core abstractions)
@@ -256,10 +262,10 @@
   public/media/contracts/7927b14b-5f42-4534-a963-51a098150470.pdf → public/media/README.md
 - `Brand Guidelines Starter Template` --semantically_similar_to--> `Brand Guidelines Template`  [INFERRED] [semantically similar]
   .claude/skills/brand/templates/brand-guidelines-starter.md → .claude/skills/brand/references/brand-guideline-template.md
-- `TestTokenizer` --uses--> `BM25`  [INFERRED]
-  .claude/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
-- `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
-  .claude/skills/ui-styling/scripts/tests/test_shadcn_add.py → .claude/skills/ui-styling/scripts/shadcn_add.py
+- `TestTailwindConfigGenerator` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .claude/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestGeneratedConfigIsValidJs` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .claude/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .claude/skills/ui-styling/scripts/tailwind_config_gen.py
 
 ## Import Cycles
 - None detected.
@@ -278,19 +284,19 @@
 - **Brand Skill Reference & Template Documentation Set** — claude_skills_brand_skill_doc, claude_skills_brand_references_brand_guideline_template_doc, claude_skills_brand_templates_brand_guidelines_starter_doc [INFERRED 0.85]
 - **shadcn/ui Components Documented with Matching Accessibility Patterns** — claude_skills_ui_styling_references_shadcn_accessibility_component_specific_patterns, claude_skills_ui_styling_references_shadcn_components_dialog, claude_skills_ui_styling_references_shadcn_components_accordion, claude_skills_ui_styling_references_shadcn_components_tabs, claude_skills_ui_styling_references_shadcn_components_select [INFERRED 0.85]
 
-## Communities (232 total, 104 thin omitted)
+## Communities (237 total, 102 thin omitted)
 
-### Community 0 - "jalali.ts"
-Cohesion: 0.06
-Nodes (66): AdminContractsPage(), buildOrderBy(), dynamic, SORT_FIELDS, AdminCustomersPage(), buildOrderBy(), dynamic, ROLE_LABEL (+58 more)
+### Community 0 - "customers/page.tsx"
+Cohesion: 0.16
+Nodes (26): AdminContractsPage(), buildOrderBy(), dynamic, SORT_FIELDS, AdminCustomersPage(), buildOrderBy(), dynamic, ROLE_LABEL (+18 more)
 
 ### Community 1 - "Design Skill"
 Cohesion: 0.05
 Nodes (64): Design Routing Guide, Skill Dependency Flow (brand to design-system to ui-styling), Banner Design Skill (external), Brand Skill (external), CIP Design Skill (external), UI Styling Skill (external), Icon Design Reference, Gemini 3.1 Pro Preview Model (+56 more)
 
 ### Community 2 - "contracts/export/route.ts"
-Cohesion: 0.22
-Nodes (10): RFC-5987, columns, ContractRow, columns, GET(), columns, OrderRow, buildExcelResponse() (+2 more)
+Cohesion: 0.24
+Nodes (9): RFC-5987, columns, ContractRow, GET(), columns, GET(), OrderRow, buildExcelResponse() (+1 more)
 
 ### Community 3 - "gray"
 Cohesion: 0.05
@@ -302,7 +308,7 @@ Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and re
 
 ### Community 5 - "logger.ts"
 Cohesion: 0.08
-Nodes (38): beforeSend(), SYSTEM_ACTOR, AdminLogsPage(), dynamic, metadata, GET(), PATCH(), GET() (+30 more)
+Nodes (39): beforeSend(), SYSTEM_ACTOR, AdminLogsPage(), dynamic, metadata, GET(), PATCH(), GET() (+31 more)
 
 ### Community 6 - "UI/UX Pro Max Skill"
 Cohesion: 0.05
@@ -313,28 +319,28 @@ Cohesion: 0.04
 Nodes (45): dotenv, eslint, eslint-config-next, devDependencies, dotenv, eslint, eslint-config-next, postcss (+37 more)
 
 ### Community 8 - "auth.ts"
-Cohesion: 0.09
-Nodes (7): dynamic, handler, authOptions, loginIpRateLimiter, adapter, globalForPrisma, prisma
+Cohesion: 0.07
+Nodes (9): dynamic, dynamic, dynamic, metadata, handler, authOptions, loginIpRateLimiter, adapter (+1 more)
 
 ### Community 9 - "card"
 Cohesion: 0.20
 Nodes (12): $type, $value, bg, bg, padding, shadow, card, bg (+4 more)
 
 ### Community 10 - "site-content.ts"
-Cohesion: 0.11
-Nodes (25): AdminContentPage(), dynamic, RootLayout(), Home(), metadata, ProductsPage(), FooterContactForm(), Hero() (+17 more)
+Cohesion: 0.14
+Nodes (19): AdminContentPage(), dynamic, RootLayout(), Home(), ProductsPage(), FooterContactForm(), HeroProps, DEFAULT_FOOTER_CONTACT (+11 more)
 
-### Community 11 - "AccountShell.tsx"
-Cohesion: 0.19
-Nodes (8): dynamic, metadata, AccountShell(), AccountShellProps, isBareShellRoute(), Notification, NotificationBell(), timeAgoFa()
+### Community 11 - "account/layout.tsx"
+Cohesion: 0.32
+Nodes (5): dynamic, metadata, AccountShell(), AccountShellProps, isBareShellRoute()
 
 ### Community 12 - "slide_search_core.py"
 Cohesion: 0.08
 Nodes (36): format_context(), format_result(), main(), Format a single search result for display, Format contextual recommendations for display., BM25, calculate_pattern_break(), detect_domain() (+28 more)
 
 ### Community 13 - "CustomerForm.tsx"
-Cohesion: 0.22
-Nodes (6): dynamic, metadata, dynamic, metadata, CustomerForm(), CustomerFormProps
+Cohesion: 0.18
+Nodes (8): dynamic, metadata, dynamic, metadata, CsvImportForm(), ImportResult, CustomerForm(), CustomerFormProps
 
 ### Community 14 - "spacing"
 Cohesion: 0.06
@@ -353,8 +359,8 @@ Cohesion: 0.11
 Nodes (25): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+17 more)
 
 ### Community 18 - "events.ts"
-Cohesion: 0.12
-Nodes (28): main(), POST(), POST(), sendEmail(), logDelivery(), notifyContractExpiry(), notifyOrderStatusChange(), notifyStaffNewCustomerMessage() (+20 more)
+Cohesion: 0.16
+Nodes (23): main(), sendEmail(), logDelivery(), notifyContractExpiry(), notifyOrderStatusChange(), notifyStaffNewCustomerMessage(), notifyTicketReply(), SYSTEM_ACTOR (+15 more)
 
 ### Community 19 - "html-token-validator.py"
 Cohesion: 0.13
@@ -370,7 +376,7 @@ Nodes (19): BM25, detect_domain(), _load_csv(), Load CSV and return list of dict
 
 ### Community 22 - "color"
 Cohesion: 0.11
-Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
+Nodes (19): $type, $value, background, destructive, foreground, muted-foreground, primary-hover, secondary (+11 more)
 
 ### Community 23 - "search"
 Cohesion: 0.12
@@ -385,16 +391,16 @@ Cohesion: 0.13
 Nodes (12): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+4 more)
 
 ### Community 26 - "useToast"
-Cohesion: 0.13
-Nodes (14): dynamic, dynamic, metadata, NewTicketForm(), PasswordForm(), CsvImportForm(), ImportResult, DeletePostButton() (+6 more)
+Cohesion: 0.12
+Nodes (13): dynamic, metadata, NewTicketForm(), PasswordForm(), SetupState, TwoFactorSetup(), DeletePostButton(), ToastContext (+5 more)
 
 ### Community 27 - "admin-stats.ts"
 Cohesion: 0.11
-Nodes (26): AdminDashboardPage(), getAdminStats(), getChartData(), getSupportStats(), GET(), VALID_RANGES, ORDER_STATUS_COLORS, OrderStatusChart() (+18 more)
+Nodes (25): AdminDashboardPage(), getAdminStats(), getChartData(), getSupportStats(), GET(), VALID_RANGES, ORDER_STATUS_COLORS, OrderStatusChart() (+17 more)
 
 ### Community 28 - "staggerContainer"
-Cohesion: 0.11
-Nodes (23): metadata, AuxiliaryServices(), SERVICES, ConsultationSection(), Customers(), SEGMENTS, FAQ(), Features (+15 more)
+Cohesion: 0.09
+Nodes (29): metadata, AuxiliaryServices(), SERVICES, ConsultationSection(), Customers(), SEGMENTS, Features, Footer() (+21 more)
 
 ### Community 29 - "CIP Design Style Guide"
 Cohesion: 0.12
@@ -405,12 +411,12 @@ Cohesion: 0.15
 Nodes (19): _e(), generate_chart_slide(), generate_cta_slide(), generate_deck(), generate_metrics_slide(), generate_problem_slide(), generate_solution_slide(), generate_testimonial_slide() (+11 more)
 
 ### Community 31 - "contracts/[id]/page.tsx"
-Cohesion: 0.18
-Nodes (10): dynamic, dynamic, metadata, dynamic, ContractForm(), ContractFormProps, Customer, DateRangeDisplay() (+2 more)
+Cohesion: 0.15
+Nodes (13): dynamic, dynamic, metadata, dynamic, ContractForm(), ContractFormProps, Customer, DateRangeDisplay() (+5 more)
 
 ### Community 32 - "admin/tickets/[id]/page.tsx"
-Cohesion: 0.22
-Nodes (5): dynamic, dynamic, OPTIONS, TicketStatusSelect(), ChatMessage
+Cohesion: 0.33
+Nodes (4): dynamic, OPTIONS, TicketStatusSelect(), ChatMessage
 
 ### Community 33 - "ErrorPageShell.tsx"
 Cohesion: 0.15
@@ -432,21 +438,21 @@ Nodes (6): POST(), POST(), POST(), createTwoFactorSecret(), twoFactorQrCodeDataU
 Cohesion: 0.17
 Nodes (17): generate_css_for_background(), get_background_image(), get_curated_images(), get_overlay_css(), get_pexels_search_url(), load_backgrounds_config(), load_brand_colors(), main() (+9 more)
 
-### Community 38 - "site-content/route.ts"
-Cohesion: 0.27
-Nodes (9): cleanText(), cleanUrl(), POST(), cleanHeroSlide(), cleanProductCategory(), CONDITION_VALUES, POST(), FOOTER_CONTACT_KEY (+1 more)
+### Community 38 - "footer-contact/route.ts"
+Cohesion: 0.53
+Nodes (5): cleanText(), cleanUrl(), POST(), FOOTER_CONTACT_KEY, SITE_CONTENT_TAG
 
 ### Community 39 - "Extraction Subagent Prompt Template"
 Cohesion: 0.11
 Nodes (18): Confidence Score Rubric, DEEP_MODE flag, Hyperedge Extraction Rule, Node ID Format Rule, Semantic Similarity Extraction Rule, Extraction Subagent Prompt Template, transcribe_all() function, GRAPHIFY_WHISPER_MODEL config (+10 more)
 
 ### Community 40 - "app/layout.tsx"
-Cohesion: 0.13
-Nodes (12): metadata, vazirmatn, viewport, CookieConsentBanner(), Footer(), QUICK_LINKS, SERVICES, SOCIAL_ICONS (+4 more)
+Cohesion: 0.15
+Nodes (6): metadata, vazirmatn, viewport, CookieConsentBanner(), ToastProvider(), ScrollProgress()
 
 ### Community 41 - "login/page.tsx"
-Cohesion: 0.14
-Nodes (8): metadata, metadata, LoginForm(), RegisterForm(), loadTurnstileScript(), TurnstileWidget(), TurnstileWidgetProps, Window
+Cohesion: 0.20
+Nodes (6): metadata, LoginForm(), loadTurnstileScript(), TurnstileWidget(), TurnstileWidgetProps, Window
 
 ### Community 42 - "BM25"
 Cohesion: 0.15
@@ -457,12 +463,12 @@ Cohesion: 0.12
 Nodes (16): aliases, components, hooks, lib, ui, utils, rsc, $schema (+8 more)
 
 ### Community 44 - "profile/page.tsx"
-Cohesion: 0.20
-Nodes (5): dynamic, NOTIFICATION_OPTIONS, NotificationSettingsPreview(), SetupState, TwoFactorSetup()
+Cohesion: 0.40
+Nodes (3): dynamic, NOTIFICATION_OPTIONS, NotificationSettingsPreview()
 
 ### Community 45 - "SiteContentForm.tsx"
-Cohesion: 0.18
-Nodes (14): IconPicker(), IconPickerProps, SimpleRichTextEditor(), SimpleRichTextEditorProps, CONDITION_OPTIONS, emptyCategory(), emptySlide(), genId() (+6 more)
+Cohesion: 0.16
+Nodes (12): IconPickerProps, SimpleRichTextEditorProps, CONDITION_OPTIONS, emptyCategory(), emptySlide(), genId(), SiteContentForm(), SiteContentFormProps (+4 more)
 
 ### Community 46 - "icon/generate.py"
 Cohesion: 0.20
@@ -477,8 +483,8 @@ Cohesion: 0.12
 Nodes (9): Test adding components in dry run mode., Test ShadcnInstaller class., Test adding all components without config., Test adding all components in dry run mode., Test listing installed components without config., Test listing installed components when none exist., Test initialization with custom project root., Test checking for non-existent shadcn config. (+1 more)
 
 ### Community 49 - "TicketChat.tsx"
-Cohesion: 0.16
-Nodes (12): CannedResponse, CannedResponsePicker(), EmojiPicker(), BubbleProps, ChatAttachment, formatFileSize(), isImageMime(), JUSTIFY_CLASS (+4 more)
+Cohesion: 0.14
+Nodes (10): CannedResponse, BubbleProps, ChatAttachment, formatFileSize(), isImageMime(), JUSTIFY_CLASS, PendingAttachment, PHYSICAL_SIDE (+2 more)
 
 ### Community 50 - "Brand Skill"
 Cohesion: 0.06
@@ -488,9 +494,9 @@ Nodes (42): 22 Art Direction Styles, CTA Rules, Banner Sizes & Art Direction Sty
 Cohesion: 0.18
 Nodes (7): _palette_is_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., _relative_luminance(), The exact reproduction from issue #428., TestEndToEndCoherence, TestLuminance
 
-### Community 52 - "SocialProof.tsx"
-Cohesion: 0.18
-Nodes (9): metadata, About(), AboutProps, PRINCIPLES, Counter(), CounterProps, SECTORS, STATS (+1 more)
+### Community 52 - "About.tsx"
+Cohesion: 0.24
+Nodes (6): metadata, About(), AboutProps, PRINCIPLES, Counter(), CounterProps
 
 ### Community 53 - "$type"
 Cohesion: 0.60
@@ -504,17 +510,17 @@ Nodes (11): calculateCompliance(), colorDistance(), displayPalette(), extractHex
 Cohesion: 0.25
 Nodes (13): checkManifest(), formatBytes(), formatOutput(), fs, main(), parseFilename(), path, RULES (+5 more)
 
-### Community 56 - "AdminSearchBox.tsx"
-Cohesion: 0.29
-Nodes (7): AdminSearchBox(), EMPTY_RESULTS, hasAnyResults(), SearchGroup, SearchResults, centerField(), scrollFieldAboveKeyboard()
+### Community 56 - "ListFilterBar.tsx"
+Cohesion: 0.17
+Nodes (11): AdminSearchBox(), EMPTY_RESULTS, hasAnyResults(), SearchGroup, SearchResults, DateRangeFilter, ListFilterBar(), ListFilterBarProps (+3 more)
 
 ### Community 57 - "input"
 Cohesion: 0.29
-Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
+Nodes (8): padding-y, input, $type, $value, focus-ring, padding-y, $type, $value
 
 ### Community 58 - "cn"
-Cohesion: 0.19
-Nodes (13): AccountSidebar(), AccountSidebarProps, ADMIN_LINKS, EXACT_MATCH_HREFS, isLinkActive(), NavItem(), PERSONAL_LINKS, SidebarContents() (+5 more)
+Cohesion: 0.16
+Nodes (15): AccountSidebar(), AccountSidebarProps, ADMIN_LINKS, EXACT_MATCH_HREFS, isLinkActive(), NavItem(), PERSONAL_LINKS, SidebarContents() (+7 more)
 
 ### Community 59 - "validate-tokens.cjs"
 Cohesion: 0.24
@@ -616,9 +622,13 @@ Nodes (7): BACKUP_DIR, backupFilename(), main(), parseDatabaseUrl(), rotateBacku
 Cohesion: 0.67
 Nodes (3): muted, $type, $value
 
+### Community 85 - "FAQ.tsx"
+Cohesion: 0.32
+Nodes (3): metadata, FAQ(), FAQS
+
 ### Community 86 - "header-2.tsx"
-Cohesion: 0.21
-Nodes (9): AuthNavLink(), AuthNavLinkProps, Button, ButtonProps, buttonVariants, Header(), MenuToggleIcon(), MenuToggleProps (+1 more)
+Cohesion: 0.27
+Nodes (7): AuthNavLink(), AuthNavLinkProps, Button, ButtonProps, buttonVariants, Header(), useScroll()
 
 ### Community 87 - "detect_domain"
 Cohesion: 0.43
@@ -632,9 +642,9 @@ Nodes (3): Pick the highest-ranked palette matching the resolved mode. Only the 
 Cohesion: 0.43
 Nodes (6): ALLOWED_IMAGE_EXTENSIONS, ALLOWED_IMAGE_TYPES, isPdf(), isZipContainer(), matchesImageSignature(), POST()
 
-### Community 90 - "admin/orders/[id]/page.tsx"
-Cohesion: 0.18
-Nodes (8): dynamic, dynamic, metadata, Customer, Item, OrderForm(), OrderFormProps, STATUS_OPTIONS
+### Community 90 - "orders/new/page.tsx"
+Cohesion: 0.22
+Nodes (7): dynamic, metadata, Customer, Item, OrderForm(), OrderFormProps, STATUS_OPTIONS
 
 ### Community 91 - "button"
 Cohesion: 0.20
@@ -657,8 +667,12 @@ Cohesion: 0.50
 Nodes (4): adapter, daysFromNow(), main(), prisma
 
 ### Community 96 - "isValidEmail"
-Cohesion: 0.37
-Nodes (8): PATCH(), POST(), POST(), ProfileForm(), ProfileFormProps, isValidEmail(), isValidIranPhone(), normalizeDigits()
+Cohesion: 0.13
+Nodes (17): PATCH(), POST(), POST(), POST(), metadata, metadata, ProfileForm(), ProfileFormProps (+9 more)
+
+### Community 97 - "MediaPickerModal.tsx"
+Cohesion: 0.13
+Nodes (18): AdminContractDetailPage(), AccountContractsPage(), ContractFileUploadField(), ContractFileUploadFieldProps, FileKind, fileKindFromMime(), fileKindFromName(), IMAGE_EXTENSIONS (+10 more)
 
 ### Community 98 - "contact/page.tsx"
 Cohesion: 0.40
@@ -666,7 +680,7 @@ Nodes (3): CONTACT_ITEMS, metadata, SOCIALS
 
 ### Community 99 - "radius"
 Cohesion: 0.29
-Nodes (8): $type, $value, $type, $value, radius, full, none, none
+Nodes (8): $type, $value, $type, $value, radius, default, full, default
 
 ### Community 100 - "graphify clone command"
 Cohesion: 0.50
@@ -688,13 +702,13 @@ Nodes (3): APP_DIR, discoverRoutes(), sitemap()
 Cohesion: 0.67
 Nodes (3): primary-foreground, $type, $value
 
-### Community 111 - "logEvent"
-Cohesion: 0.20
+### Community 111 - "prisma"
+Cohesion: 0.22
 Nodes (15): DELETE(), PATCH(), PATCH(), DELETE(), DELETE(), ItemInput, parseItems(), PATCH() (+7 more)
 
-### Community 112 - "default"
-Cohesion: 0.67
-Nodes (4): $type, $value, default, default
+### Community 112 - "jalali.ts"
+Cohesion: 0.23
+Nodes (13): JalaliDatePicker(), JalaliDatePickerProps, leadingEmptyCells(), WEEKDAYS, currentJalaliYear(), daysInJalaliMonth(), gregorianFormatter, isoToJalali() (+5 more)
 
 ### Community 113 - "/graphify add command"
 Cohesion: 0.67
@@ -705,8 +719,8 @@ Cohesion: 0.67
 Nodes (3): graphify claude install/uninstall, graphify hook install/uninstall/status, SKILL.md commit hook / CLAUDE.md integration section
 
 ### Community 120 - "status-labels.ts"
-Cohesion: 0.13
-Nodes (12): dynamic, dynamic, AccountOverviewPage(), dateFmt(), dynamic, dynamic, OrderProgress(), CONTRACT_STATUSES (+4 more)
+Cohesion: 0.09
+Nodes (17): dynamic, dynamic, dynamic, AccountOverviewPage(), dateFmt(), dynamic, dynamic, dynamic (+9 more)
 
 ### Community 136 - "secondary-foreground"
 Cohesion: 0.67
@@ -716,57 +730,81 @@ Nodes (3): secondary-foreground, $type, $value
 Cohesion: 0.67
 Nodes (4): xl, xl, $type, $value
 
-### Community 164 - "padding-y"
-Cohesion: 0.67
-Nodes (4): padding-y, padding-y, $type, $value
+### Community 163 - "GregorianDatePicker.tsx"
+Cohesion: 0.26
+Nodes (11): daysInGregorianMonth(), GREGORIAN_MONTHS, GregorianDatePicker(), GregorianDatePickerProps, isoToParts(), leadingEmptyCells(), partsToIso(), WEEKDAYS (+3 more)
+
+### Community 164 - "formatJalali"
+Cohesion: 0.23
+Nodes (8): dynamic, metadata, PendingCustomersPage(), CustomerApprovalActions(), DeleteEntityButtonProps, ConfirmDialog(), ConfirmDialogProps, formatJalali()
 
 ### Community 165 - "md"
 Cohesion: 0.67
 Nodes (4): $type, $value, md, md
 
-### Community 169 - "destructive"
-Cohesion: 0.67
-Nodes (3): destructive, $type, $value
+### Community 169 - "ProductCategories.tsx"
+Cohesion: 0.33
+Nodes (5): metadata, Condition, CONDITION_BADGE, ProductCategories(), ProductCategoriesProps
 
 ### Community 176 - "getMediaUrl"
-Cohesion: 0.07
-Nodes (37): AdminContractDetailPage(), AccountContractsPage(), BlogPage(), getPosts(), metadata, revalidate, BlogPostPage(), generateMetadata() (+29 more)
+Cohesion: 0.14
+Nodes (11): AvatarUploader(), AvatarUploaderProps, BlogPostForm(), BlogPostFormProps, MediaPicker(), MediaPickerProps, RichTextEditor(), RichTextEditorProps (+3 more)
+
+### Community 203 - "NotificationBell.tsx"
+Cohesion: 0.40
+Nodes (3): Notification, NotificationBell(), timeAgoFa()
 
 ### Community 213 - "sanitizePlainText"
-Cohesion: 0.20
-Nodes (13): PATCH(), POST(), ensureUniqueSlug(), PATCH(), ensureUniqueSlug(), POST(), POST(), PATCH() (+5 more)
+Cohesion: 0.11
+Nodes (20): PATCH(), POST(), POST(), ensureUniqueSlug(), PATCH(), ensureUniqueSlug(), POST(), POST() (+12 more)
 
-### Community 214 - "ConsultationForm.tsx"
-Cohesion: 0.29
-Nodes (5): metadata, ConsultationForm(), FormState, initialState, TOPICS
+### Community 214 - "app/blog/page.tsx"
+Cohesion: 0.50
+Nodes (4): BlogPage(), getPosts(), metadata, revalidate
 
 ### Community 215 - "radius"
 Cohesion: 0.60
 Nodes (5): radius, radius, radius, $type, $value
 
+### Community 217 - "[slug]/page.tsx"
+Cohesion: 0.60
+Nodes (4): BlogPostPage(), generateMetadata(), getPost(), revalidate
+
+### Community 218 - "padding-x"
+Cohesion: 0.67
+Nodes (4): padding-x, padding-x, $type, $value
+
 ### Community 221 - "ring"
 Cohesion: 0.67
 Nodes (3): ring, $type, $value
 
+### Community 225 - "none"
+Cohesion: 0.67
+Nodes (4): $type, $value, none, none
+
+### Community 228 - "primary"
+Cohesion: 0.67
+Nodes (3): primary, $type, $value
+
 ## Knowledge Gaps
-- **632 isolated node(s):** `fs`, `path`, `fs`, `path`, `fs` (+627 more)
+- **632 isolated node(s):** `metadata`, `dynamic`, `VALID_RANGES`, `vazirmatn`, `metadata` (+627 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **104 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **102 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `prisma` connect `auth.ts` to `jalali.ts`, `contracts/export/route.ts`, `site-content.ts`, `events.ts`, `useToast`, `admin-stats.ts`, `contracts/[id]/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `site-content/route.ts`, `profile/page.tsx`, `getMediaUrl`, `orders/route.ts`, `sanitizePlainText`, `upload/route.ts`, `admin/orders/[id]/page.tsx`, `isValidEmail`, `logEvent`, `status-labels.ts`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Why does `authOptions` connect `auth.ts` to `jalali.ts`, `contracts/export/route.ts`, `logger.ts`, `site-content.ts`, `AccountShell.tsx`, `events.ts`, `useToast`, `admin-stats.ts`, `contracts/[id]/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `site-content/route.ts`, `login/page.tsx`, `profile/page.tsx`, `getMediaUrl`, `orders/route.ts`, `sanitizePlainText`, `upload/route.ts`, `admin/orders/[id]/page.tsx`, `isValidEmail`, `admin/layout.tsx`, `logEvent`, `status-labels.ts`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Why does `useToast()` connect `useToast` to `isValidEmail`, `logger.ts`, `login/page.tsx`, `profile/page.tsx`, `CustomerForm.tsx`, `SiteContentForm.tsx`, `getMediaUrl`, `TicketChat.tsx`, `ConsultationForm.tsx`, `admin/orders/[id]/page.tsx`, `contracts/[id]/page.tsx`?**
+- **Why does `prisma` connect `prisma` to `customers/page.tsx`, `contracts/export/route.ts`, `auth.ts`, `site-content.ts`, `events.ts`, `admin-stats.ts`, `contracts/[id]/page.tsx`, `admin/tickets/[id]/page.tsx`, `formatJalali`, `twofactor.ts`, `footer-contact/route.ts`, `profile/page.tsx`, `orders/route.ts`, `sanitizePlainText`, `app/blog/page.tsx`, `[slug]/page.tsx`, `upload/route.ts`, `orders/new/page.tsx`, `isValidEmail`, `status-labels.ts`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
+- **Why does `authOptions` connect `auth.ts` to `customers/page.tsx`, `contracts/export/route.ts`, `logger.ts`, `site-content.ts`, `account/layout.tsx`, `useToast`, `admin-stats.ts`, `contracts/[id]/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `footer-contact/route.ts`, `login/page.tsx`, `profile/page.tsx`, `getMediaUrl`, `orders/route.ts`, `sanitizePlainText`, `upload/route.ts`, `orders/new/page.tsx`, `[slug]/page.tsx`, `isValidEmail`, `prisma`, `status-labels.ts`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `primitive` connect `primitive` to `radius`, `gray`, `spacing`, `fontSize`, `design-tokens-starter.json`, `shadow`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `fs`, `path`, `fs` to the rest of the system?**
+- **What connects `metadata`, `dynamic`, `VALID_RANGES` to the rest of the system?**
   _632 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `jalali.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.055077452667814115 - nodes in this community are weakly interconnected._
 - **Should `Design Skill` be split into smaller, more focused modules?**
   _Cohesion score 0.053075396825396824 - nodes in this community are weakly interconnected._
+- **Should `gray` be split into smaller, more focused modules?**
+  _Cohesion score 0.05370101596516691 - nodes in this community are weakly interconnected._

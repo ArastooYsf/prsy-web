@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
+import PageViewTracker from "@/components/PageViewTracker";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -79,6 +80,7 @@ export default async function RootLayout({
         )}
         <SessionProviderWrapper>
           <ToastProvider>
+            <PageViewTracker />
             <PageLoader />
             <Header />
             <main>{children}</main>

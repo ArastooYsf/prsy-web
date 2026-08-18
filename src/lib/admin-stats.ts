@@ -80,6 +80,11 @@ export async function getContractOrderTrend(range: StatsRange): Promise<TrendPoi
   }));
 }
 
+export async function getPageViewCount(range: StatsRange): Promise<number> {
+  const buckets = buildRangeBuckets(range);
+  return prisma.pageView.count({ where: { createdAt: { gte: buckets[0].start } } });
+}
+
 export async function getOrderStatusBreakdown(): Promise<StatusCount[]> {
   const groups = await prisma.order.groupBy({
     by: ["status"],

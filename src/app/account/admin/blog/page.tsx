@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { Newspaper, Pencil, Plus } from "lucide-react";
+import { Eye, Newspaper, Pencil, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DeletePostButton from "@/components/admin/DeletePostButton";
@@ -63,6 +63,13 @@ export default async function AdminBlogListPage() {
                       {post.publishedAt ? post.publishedAt.toLocaleDateString("fa-IR") : "—"}
                     </dd>
                   </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <dt className="text-foreground/40">بازدید</dt>
+                    <dd className="flex items-center gap-1 text-foreground/70">
+                      <Eye className="size-3.5" />
+                      {post.viewCount.toLocaleString("fa-IR")}
+                    </dd>
+                  </div>
                 </dl>
                 <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/5 pt-3">
                   <Link
@@ -86,6 +93,7 @@ export default async function AdminBlogListPage() {
                   <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">عنوان</th>
                   <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
                   <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ انتشار</th>
+                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">بازدید</th>
                   <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12"></th>
                 </tr>
               </thead>
@@ -106,6 +114,12 @@ export default async function AdminBlogListPage() {
                     </td>
                     <td dir="ltr" className="px-4 py-3 text-right text-foreground/60">
                       {post.publishedAt ? post.publishedAt.toLocaleDateString("fa-IR") : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-foreground/70">
+                      <div className="flex items-center gap-1.5">
+                        <Eye className="size-3.5" />
+                        {post.viewCount.toLocaleString("fa-IR")}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">

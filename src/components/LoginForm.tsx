@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import TurnstileWidget from "@/components/TurnstileWidget";
+import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -12,6 +13,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const explicitCallbackUrl = searchParams.get("callbackUrl");
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +21,6 @@ export default function LoginForm() {
   const [step, setStep] = useState<"credentials" | "totp">("credentials");
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const freshTokenResolveRef = useRef<((token: string) => void) | null>(null);
 
@@ -55,10 +56,9 @@ export default function LoginForm() {
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!turnstileToken) {
-      setError("لطفاً تأیید کنید که ربات نیستید.");
+      showToast("لطفاً تأیید کنید که ربات نیستید.", "error");
       return;
     }
 
@@ -73,7 +73,7 @@ export default function LoginForm() {
         setTurnstileKey((k) => k + 1);
         return;
       }
-      setError(describeError(result?.error));
+      showToast(describeError(result?.error), "error");
       setTurnstileToken("");
       setTurnstileKey((k) => k + 1);
       return;
@@ -85,7 +85,6 @@ export default function LoginForm() {
 
   const handleTotpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     const freshToken = await getFreshTurnstileToken();
@@ -93,7 +92,7 @@ export default function LoginForm() {
     setLoading(false);
 
     if (!result || result.error) {
-      setError(describeError(result?.error));
+      showToast(describeError(result?.error), "error");
       setTotpCode("");
       if (result?.error === "ACCOUNT_LOCKED" || result?.error === "TOO_MANY_REQUESTS") {
         setStep("credentials");
@@ -142,10 +141,6 @@ export default function LoginForm() {
           onExpire={() => setTurnstileToken("")}
         />
 
-        {error && (
-          <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-        )}
-
         <button
           type="submit"
           disabled={loading || totpCode.length !== 6}
@@ -158,7 +153,6 @@ export default function LoginForm() {
           type="button"
           onClick={() => {
             setStep("credentials");
-            setError("");
             setTotpCode("");
           }}
           className="w-full text-center text-xs font-medium text-foreground/50 hover:text-foreground"
@@ -208,12 +202,6 @@ export default function LoginForm() {
       </div>
 
       <TurnstileWidget key={turnstileKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken("")} />
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

@@ -9,6 +9,7 @@ import MediaPicker from "@/components/admin/MediaPicker";
 import GregorianDatePicker from "@/components/admin/GregorianDatePicker";
 import { slugify } from "@/lib/slugify";
 import { getMediaUrl } from "@/lib/media";
+import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -29,6 +30,7 @@ type BlogPostFormProps = {
 
 export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
@@ -41,7 +43,6 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
     post?.publishedAt ? post.publishedAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
   );
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   const handleTitleChange = (value: string) => {
     setTitle(value);
@@ -50,10 +51,9 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!title.trim() || !content.trim() || content === "<p></p>") {
-      setError("عنوان و متن پست الزامی هستند.");
+      showToast("عنوان و متن پست الزامی هستند.", "error");
       return;
     }
 
@@ -79,10 +79,11 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ذخیره پست.");
+      showToast(body?.error || "خطا در ذخیره پست.", "error");
       return;
     }
 
+    showToast(mode === "create" ? "پست با موفقیت ثبت شد." : "تغییرات پست ذخیره شد.");
     router.push("/account/admin/blog");
     router.refresh();
   };
@@ -100,7 +101,6 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
         <h1 className="text-sm font-semibold text-foreground/60">{mode === "create" ? "پست جدید" : "ویرایش پست"}</h1>
 
         <div className="mr-auto flex items-center gap-3">
-          {error && <p className="text-xs font-medium text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={saving}

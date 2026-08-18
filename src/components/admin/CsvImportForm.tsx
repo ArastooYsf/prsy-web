@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/admin/ToastProvider";
+import { useToast } from "@/components/ToastProvider";
 
 type ImportResult = { created: number; skipped: { row: number; reason: string }[] };
 
@@ -13,7 +13,6 @@ export default function CsvImportForm() {
 
   const [csv, setCsv] = useState("");
   const [importing, setImporting] = useState(false);
-  const [error, setError] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
 
   const handleFile = async (file: File | undefined) => {
@@ -24,11 +23,10 @@ export default function CsvImportForm() {
   };
 
   const handleImport = async () => {
-    setError("");
     setResult(null);
 
     if (!csv.trim()) {
-      setError("محتوای CSV خالی است.");
+      showToast("محتوای CSV خالی است.", "error");
       return;
     }
 
@@ -42,12 +40,12 @@ export default function CsvImportForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ایمپورت.");
+      showToast(body?.error || "خطا در ایمپورت.", "error");
       return;
     }
 
     const data: ImportResult = await res.json();
-    showToast(`${data.created} مشتری با موفقیت ثبت شد.`);
+    showToast(`${data.created} مشتری با موفقیت ثبت شد.`, data.skipped.length > 0 ? "warning" : "success");
     if (data.skipped.length > 0) setResult(data);
     router.refresh();
   };
@@ -73,10 +71,6 @@ export default function CsvImportForm() {
         placeholder={"name,email,phone,notes\nعلی رضایی,ali@example.com,09120000000,مشتری قدیمی از سال 1401"}
         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 font-mono text-xs text-foreground placeholder:text-foreground/30 outline-none transition-colors focus:border-accent-500/50"
       />
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-      )}
 
       {result && result.skipped.length > 0 && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">

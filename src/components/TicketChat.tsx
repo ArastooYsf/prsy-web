@@ -9,6 +9,7 @@ import { LifeBuoy, User, MoreVertical } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import EmojiPicker from "@/components/EmojiPicker";
+import { useToast } from "@/components/ToastProvider";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
 import MediaPickerModal from "@/components/MediaPickerModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -258,10 +259,10 @@ function MessageMenu({
 
 export default function TicketChat({ ticketId, initialMessages, viewerRole, viewerId, canReply }: TicketChatProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([]);
   const [attachmentPickerOpen, setAttachmentPickerOpen] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
@@ -277,6 +278,17 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   const hasScrolledOnce = useRef(false);
   const lastTypingPingRef = useRef(0);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    // autoFocus alone leaves the caret at position 0 in some browsers when the
+    // textarea already has a value — jump it to the end instead, since editing
+    // almost always means appending, not retyping from the start.
+    if (!editingId || !editTextareaRef.current) return;
+    const el = editTextareaRef.current;
+    el.focus();
+    el.setSelectionRange(el.value.length, el.value.length);
+  }, [editingId]);
 
   const handleTouchStart = (messageId: string) => {
     if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
@@ -347,7 +359,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   };
 
   const sendMessage = async () => {
-    setError("");
     if (!text.trim() && pendingAttachments.length === 0) return;
 
     setSending(true);
@@ -370,7 +381,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ارسال پیام.");
+      showToast(body?.error || "خطا در ارسال پیام.", "error");
       return;
     }
 
@@ -430,7 +441,11 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
     setSavingEdit(false);
 
-    if (!res.ok) return;
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      showToast(body?.error || "خطا در ذخیره ویرایش پیام.", "error");
+      return;
+    }
 
     const { reply } = await res.json();
     setMessages((prev) =>
@@ -453,6 +468,8 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
             : msg,
         ),
       );
+    } else {
+      showToast("خطا در حذف پیام.", "error");
     }
 
     setDeleting(false);
@@ -480,6 +497,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
               {isEditing ? (
                 <div className="flex min-w-[220px] flex-col gap-2">
                   <textarea
+                    ref={editTextareaRef}
                     value={editingText}
                     onChange={(e) => setEditingText(e.target.value)}
                     onKeyDown={(e) => {
@@ -491,7 +509,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                       }
                     }}
                     rows={2}
-                    autoFocus
                     className={cn(
                       "w-full resize-none rounded-lg bg-black/10 px-2 py-1.5 text-sm outline-none",
                       m.isStaff ? "text-white placeholder:text-white/50" : "text-foreground placeholder:text-foreground/40",
@@ -640,8 +657,18 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       {canReply ? (
         <form onSubmit={handleSend} className="border-t border-white/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
           <div className="mb-2 flex items-center gap-1">
-            <EmojiPicker onSelect={(emoji) => setText((prev) => prev + emoji)} />
-            {viewerRole === "staff" && <CannedResponsePicker onSelect={(body) => setText((prev) => (prev ? `${prev}\n${body}` : body))} />}
+            <EmojiPicker
+              onSelect={(emoji) => (editingId ? setEditingText((prev) => prev + emoji) : setText((prev) => prev + emoji))}
+            />
+            {viewerRole === "staff" && (
+              <CannedResponsePicker
+                onSelect={(body) =>
+                  editingId
+                    ? setEditingText((prev) => (prev ? `${prev}\n${body}` : body))
+                    : setText((prev) => (prev ? `${prev}\n${body}` : body))
+                }
+              />
+            )}
             <button
               type="button"
               onClick={() => setAttachmentPickerOpen(true)}
@@ -751,7 +778,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
             </div>
           </div>
 
-          {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
         </form>
       ) : (
         <div className="border-t border-white/10 p-4 text-center text-sm text-foreground/50">

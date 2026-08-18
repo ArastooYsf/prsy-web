@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ContractFileUploadField from "@/components/admin/ContractFileUploadField";
 import JalaliGregorianDateField from "@/components/admin/JalaliGregorianDateField";
 import ToggleSwitch from "@/components/ToggleSwitch";
+import { useToast } from "@/components/ToastProvider";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 
 const inputClass =
@@ -31,6 +32,7 @@ type ContractFormProps = {
 
 export default function ContractForm({ mode, customers, contract }: ContractFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [userId, setUserId] = useState(contract?.userId ?? customers[0]?.id ?? "");
   const [title, setTitle] = useState(contract?.title ?? "");
@@ -43,7 +45,6 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
   const [status, setStatus] = useState(contract?.status ?? "ACTIVE");
   const [fileUrl, setFileUrl] = useState(contract?.fileUrl ?? "");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/contract-types")
@@ -69,12 +70,11 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     const finalType = typeOption === CUSTOM_TYPE_VALUE ? customType.trim() : typeOption;
 
     if (!userId || !title.trim() || !finalType || !startDate || !endDate) {
-      setError("همه فیلدهای الزامی را پر کنید.");
+      showToast("همه فیلدهای الزامی را پر کنید.", "error");
       return;
     }
 
@@ -95,10 +95,11 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ذخیره قرارداد.");
+      showToast(body?.error || "خطا در ذخیره قرارداد.", "error");
       return;
     }
 
+    showToast(mode === "create" ? "قرارداد با موفقیت ثبت شد." : "تغییرات قرارداد ذخیره شد.");
     router.push("/account/admin/contracts");
     router.refresh();
   };
@@ -166,12 +167,6 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
       </div>
 
       <ContractFileUploadField value={fileUrl} onChange={setFileUrl} />
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

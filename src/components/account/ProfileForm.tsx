@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
+import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
@@ -34,6 +35,7 @@ export default function ProfileForm({
   initialEconomicCode,
 }: ProfileFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState(initialEmail);
@@ -42,8 +44,6 @@ export default function ProfileForm({
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [companyName, setCompanyName] = useState(initialCompanyName);
   const [economicCode, setEconomicCode] = useState(initialEconomicCode);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const isCustomer = role === "CUSTOMER";
@@ -51,19 +51,17 @@ export default function ProfileForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
 
     if (!isValidEmail(email)) {
-      setError("ایمیل معتبر نیست.");
+      showToast("ایمیل معتبر نیست.", "error");
       return;
     }
     if (phone && !isValidIranPhone(phone)) {
-      setError("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      showToast("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
     }
     if (alternatePhone && !isValidIranPhone(alternatePhone)) {
-      setError("شماره تماس جایگزین معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      showToast("شماره تماس جایگزین معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
     }
 
@@ -79,11 +77,11 @@ export default function ProfileForm({
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در بروزرسانی اطلاعات.");
+      showToast(body?.error || "خطا در بروزرسانی اطلاعات.", "error");
       return;
     }
 
-    setSuccess(true);
+    showToast("اطلاعات با موفقیت ذخیره شد.");
     router.refresh();
   };
 
@@ -164,17 +162,6 @@ export default function ProfileForm({
             />
           </div>
         </div>
-      )}
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
-      {success && (
-        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-400">
-          اطلاعات با موفقیت ذخیره شد.
-        </p>
       )}
 
       <button

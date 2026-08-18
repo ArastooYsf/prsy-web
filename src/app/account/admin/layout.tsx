@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import ToastProvider from "@/components/admin/ToastProvider";
 
 export const metadata: Metadata = {
   title: "مدیریت سایت",
@@ -25,5 +24,5 @@ export default async function AccountAdminLayout({
     redirect("/forbidden");
   }
 
-  return <ToastProvider>{children}</ToastProvider>;
+  return <>{children}</>;
 }

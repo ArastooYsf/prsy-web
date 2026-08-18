@@ -2,23 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function NewTicketForm() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!subject.trim() || !message.trim()) {
-      setError("موضوع و متن پیام الزامی هستند.");
+      showToast("موضوع و متن پیام الزامی هستند.", "error");
       return;
     }
 
@@ -34,7 +34,7 @@ export default function NewTicketForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ثبت تیکت.");
+      showToast(body?.error || "خطا در ثبت تیکت.", "error");
       return;
     }
 
@@ -65,12 +65,6 @@ export default function NewTicketForm() {
           placeholder="توضیحات درخواست خود را بنویسید..."
         />
       </div>
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

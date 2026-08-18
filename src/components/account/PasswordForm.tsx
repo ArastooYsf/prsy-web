@@ -1,29 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function PasswordForm() {
+  const { showToast } = useToast();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
 
     if (newPassword.length < 8) {
-      setError("رمز عبور جدید باید حداقل ۸ کاراکتر باشد.");
+      showToast("رمز عبور جدید باید حداقل ۸ کاراکتر باشد.", "error");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("رمز عبور جدید و تکرار آن یکسان نیستند.");
+      showToast("رمز عبور جدید و تکرار آن یکسان نیستند.", "error");
       return;
     }
 
@@ -39,14 +37,14 @@ export default function PasswordForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در تغییر رمز عبور.");
+      showToast(body?.error || "خطا در تغییر رمز عبور.", "error");
       return;
     }
 
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setSuccess(true);
+    showToast("رمز عبور با موفقیت تغییر کرد.");
   };
 
   return (
@@ -86,17 +84,6 @@ export default function PasswordForm() {
           className={inputClass}
         />
       </div>
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
-      {success && (
-        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-400">
-          رمز عبور با موفقیت تغییر کرد.
-        </p>
-      )}
 
       <button
         type="submit"

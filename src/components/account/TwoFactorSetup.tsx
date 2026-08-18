@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, ShieldOff } from "lucide-react";
+import { useToast } from "@/components/ToastProvider";
 
 const codeInputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm tracking-[0.5em] text-foreground outline-none transition-colors focus:border-accent-500/50";
@@ -11,20 +12,19 @@ type SetupState = { secret: string; qrCodeDataUrl: string } | null;
 
 export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boolean }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [enabled, setEnabled] = useState(initialEnabled);
   const [setup, setSetup] = useState<SetupState>(null);
   const [code, setCode] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDisable, setShowDisable] = useState(false);
 
   async function startSetup() {
-    setError("");
     setLoading(true);
     const res = await fetch("/api/account/2fa/setup", { method: "POST" });
     setLoading(false);
     if (!res.ok) {
-      setError("خطا در آغاز فعال‌سازی.");
+      showToast("خطا در آغاز فعال‌سازی.", "error");
       return;
     }
     setSetup(await res.json());
@@ -33,7 +33,6 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
   async function confirmSetup(e: React.FormEvent) {
     e.preventDefault();
     if (!setup) return;
-    setError("");
     setLoading(true);
     const res = await fetch("/api/account/2fa/confirm", {
       method: "POST",
@@ -43,18 +42,18 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
     setLoading(false);
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "کد وارد شده نادرست است.");
+      showToast(body?.error || "کد وارد شده نادرست است.", "error");
       return;
     }
     setEnabled(true);
     setSetup(null);
     setCode("");
+    showToast("احراز هویت دومرحله‌ای فعال شد.");
     router.refresh();
   }
 
   async function disable(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     setLoading(true);
     const res = await fetch("/api/account/2fa/disable", {
       method: "POST",
@@ -64,12 +63,13 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
     setLoading(false);
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "کد وارد شده نادرست است.");
+      showToast(body?.error || "کد وارد شده نادرست است.", "error");
       return;
     }
     setEnabled(false);
     setShowDisable(false);
     setCode("");
+    showToast("احراز هویت دومرحله‌ای غیرفعال شد.");
     router.refresh();
   }
 
@@ -133,10 +133,6 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
             />
           </div>
 
-          {error && (
-            <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-          )}
-
           <div className="flex gap-2">
             <button
               type="submit"
@@ -150,7 +146,6 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
               onClick={() => {
                 setSetup(null);
                 setCode("");
-                setError("");
               }}
               className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
             >
@@ -188,10 +183,6 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
             />
           </div>
 
-          {error && (
-            <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-          )}
-
           <div className="flex gap-2">
             <button
               type="submit"
@@ -205,7 +196,6 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
               onClick={() => {
                 setShowDisable(false);
                 setCode("");
-                setError("");
               }}
               className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
             >

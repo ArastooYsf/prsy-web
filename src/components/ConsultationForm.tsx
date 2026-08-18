@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 type FormState = {
@@ -32,9 +33,9 @@ const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-all duration-200 focus:border-accent-500/50 focus:ring-2 focus:ring-accent-500/20";
 
 export default function ConsultationForm() {
+  const { showToast } = useToast();
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -45,18 +46,17 @@ export default function ConsultationForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
-      setError("لطفاً نام و شماره تماس خود را وارد کنید.");
+      showToast("لطفاً نام و شماره تماس خود را وارد کنید.", "error");
       return;
     }
     if (!isValidIranPhone(form.phone)) {
-      setError("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      showToast("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
     }
     if (form.email.trim() && !isValidEmail(form.email)) {
-      setError("ایمیل معتبر نیست.");
+      showToast("ایمیل معتبر نیست.", "error");
       return;
     }
-    setError("");
     setSubmitted(true);
   };
 
@@ -178,8 +178,6 @@ export default function ConsultationForm() {
           />
         </div>
       </div>
-
-      {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
 
       <button
         type="submit"

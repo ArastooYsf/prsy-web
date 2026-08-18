@@ -2,9 +2,9 @@ import { getServerSession } from "next-auth";
 import { Headset, Image as ImageIcon, LayoutTemplate, Newspaper, PackageSearch, ScrollText, type LucideIcon } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getTicketTrend, getOrderStatusBreakdown, getTicketOpenClosedRatio } from "@/lib/admin-stats";
+import { getContractOrderTrend, getOrderStatusBreakdown, getTicketStatusBreakdown } from "@/lib/admin-stats";
 import UploadWidget from "@/components/admin/UploadWidget";
-import { TicketTrendChart, OrderStatusChart, TicketRatioChart } from "@/components/admin/DashboardCharts";
+import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardCharts";
 
 async function getAdminStats() {
   try {
@@ -34,12 +34,12 @@ async function getSupportStats() {
 }
 
 async function getChartData() {
-  const [ticketTrend, orderStatusBreakdown, ticketRatio] = await Promise.all([
-    getTicketTrend(30),
+  const [trend, orderStatusBreakdown, ticketStatusBreakdown] = await Promise.all([
+    getContractOrderTrend("30d"),
     getOrderStatusBreakdown(),
-    getTicketOpenClosedRatio(),
+    getTicketStatusBreakdown(),
   ]);
-  return { ticketTrend, orderStatusBreakdown, ticketRatio };
+  return { trend, orderStatusBreakdown, ticketStatusBreakdown };
 }
 
 export default async function AdminDashboardPage() {
@@ -70,9 +70,9 @@ export default async function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <TicketTrendChart data={charts.ticketTrend} />
+            <TrendChart initialData={charts.trend} initialRange="30d" />
           </div>
-          <TicketRatioChart data={charts.ticketRatio} />
+          <TicketStatusChart data={charts.ticketStatusBreakdown} />
           <div className="lg:col-span-3">
             <OrderStatusChart data={charts.orderStatusBreakdown} />
           </div>
@@ -111,9 +111,9 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <TicketTrendChart data={charts.ticketTrend} />
+          <TrendChart initialData={charts.trend} initialRange="30d" />
         </div>
-        <TicketRatioChart data={charts.ticketRatio} />
+        <TicketStatusChart data={charts.ticketStatusBreakdown} />
         <div className="lg:col-span-3">
           <OrderStatusChart data={charts.orderStatusBreakdown} />
         </div>

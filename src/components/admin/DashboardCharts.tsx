@@ -1,9 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
   BarChart,
   Bar,
   PieChart,
@@ -15,7 +14,8 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import type { TicketTrendPoint, StatusCount } from "@/lib/admin-stats";
+import type { StatusCount, TrendPoint } from "@/lib/admin-stats";
+import { RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
   PENDING: "#f97316",
@@ -25,7 +25,17 @@ const ORDER_STATUS_COLORS: Record<string, string> = {
   CANCELLED: "#ef4444",
 };
 
-const TICKET_RATIO_COLORS = ["#f97316", "#10b981"];
+const TICKET_STATUS_COLORS: Record<string, string> = {
+  OPEN: "#f97316",
+  IN_PROGRESS: "#eab308",
+  ANSWERED: "#10b981",
+  CLOSED: "#71717a",
+};
+
+const CONTRACT_COLOR = "#f97316";
+const ORDER_COLOR = "#60a5fa";
+
+const RANGE_OPTIONS: StatsRange[] = ["today", "7d", "30d", "1y"];
 
 const tooltipStyle = {
   backgroundColor: "#18181b",
@@ -35,10 +45,13 @@ const tooltipStyle = {
   direction: "rtl" as const,
 };
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ChartCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-      <p className="mb-4 text-sm font-semibold text-foreground/80">{title}</p>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-foreground/80">{title}</p>
+        {action}
+      </div>
       <div dir="ltr" className="h-64 w-full">
         {children}
       </div>
@@ -46,23 +59,57 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-export function TicketTrendChart({ data }: { data: TicketTrendPoint[] }) {
+function RangeFilter({ value, onChange, disabled }: { value: StatsRange; onChange: (r: StatsRange) => void; disabled?: boolean }) {
   return (
-    <ChartCard title="روند تیکت‌های ثبت‌شده (۳۰ روز اخیر)">
+    <div className="flex flex-wrap items-center gap-1">
+      {RANGE_OPTIONS.map((r) => (
+        <button
+          key={r}
+          type="button"
+          disabled={disabled}
+          onClick={() => onChange(r)}
+          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            value === r
+              ? "border-accent-500/40 bg-accent-500/10 text-accent-400"
+              : "border-white/10 text-foreground/60 hover:border-white/20"
+          }`}
+        >
+          {RANGE_LABELS[r]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function TrendChart({ initialData, initialRange }: { initialData: TrendPoint[]; initialRange: StatsRange }) {
+  const [range, setRange] = useState<StatsRange>(initialRange);
+  const [data, setData] = useState<TrendPoint[]>(initialData);
+  const [loading, setLoading] = useState(false);
+
+  const handleRangeChange = async (next: StatsRange) => {
+    if (next === range) return;
+    setRange(next);
+    setLoading(true);
+    const res = await fetch(`/api/admin/dashboard/trend?range=${next}`);
+    if (res.ok) {
+      const body = await res.json();
+      setData(body.trend);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <ChartCard title="روند ثبت قراردادها و سفارش‌ها" action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <defs>
-            <linearGradient id="ticketTrendFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f97316" stopOpacity={0.35} />
-              <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} interval={4} />
+          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} interval={range === "1y" ? 0 : "preserveStartEnd"} />
           <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} />
-          <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} />
-          <Area type="monotone" dataKey="count" name="تیکت" stroke="#f97316" strokeWidth={2} fill="url(#ticketTrendFill)" />
-        </AreaChart>
+          <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
+          <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
+          <Bar dataKey="contracts" name="قراردادها" fill={CONTRACT_COLOR} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="orders" name="سفارش‌ها" fill={ORDER_COLOR} radius={[4, 4, 0, 0]} />
+        </BarChart>
       </ResponsiveContainer>
     </ChartCard>
   );
@@ -88,19 +135,28 @@ export function OrderStatusChart({ data }: { data: StatusCount[] }) {
   );
 }
 
-export function TicketRatioChart({ data }: { data: StatusCount[] }) {
+export function TicketStatusChart({ data }: { data: StatusCount[] }) {
   const total = data.reduce((sum, d) => sum + d.count, 0);
 
   return (
-    <ChartCard title="نسبت تیکت‌های باز به بسته">
+    <ChartCard title="توزیع تیکت‌ها بر اساس وضعیت">
       {total === 0 ? (
         <div className="flex h-full items-center justify-center text-sm text-foreground/40">هنوز تیکتی ثبت نشده است.</div>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="count" nameKey="label" innerRadius={55} outerRadius={85} paddingAngle={2}>
-              {data.map((entry, i) => (
-                <Cell key={entry.status} fill={TICKET_RATIO_COLORS[i % TICKET_RATIO_COLORS.length]} />
+            <Pie
+              data={data}
+              dataKey="count"
+              nameKey="label"
+              innerRadius={55}
+              outerRadius={85}
+              paddingAngle={2}
+              label={({ percent }) => `${Math.round((percent ?? 0) * 100)}%`}
+              labelLine={false}
+            >
+              {data.map((entry) => (
+                <Cell key={entry.status} fill={TICKET_STATUS_COLORS[entry.status] ?? "#71717a"} />
               ))}
             </Pie>
             <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} />

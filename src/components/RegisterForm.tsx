@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import TurnstileWidget from "@/components/TurnstileWidget";
+import { useToast } from "@/components/ToastProvider";
 import { isValidEmail } from "@/lib/validation";
 
 const inputClass =
@@ -12,6 +13,7 @@ const inputClass =
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +25,6 @@ export default function RegisterForm() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingApprovalMessage, setPendingApprovalMessage] = useState(false);
   const freshTokenResolveRef = useRef<((token: string) => void) | null>(null);
@@ -41,30 +42,29 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!isValidEmail(email)) {
-      setError("ایمیل معتبر نیست.");
+      showToast("ایمیل معتبر نیست.", "error");
       return;
     }
     if (!turnstileToken) {
-      setError("لطفاً تأیید کنید که ربات نیستید.");
+      showToast("لطفاً تأیید کنید که ربات نیستید.", "error");
       return;
     }
     if (password.length < 8) {
-      setError("رمز عبور باید حداقل ۸ کاراکتر باشد.");
+      showToast("رمز عبور باید حداقل ۸ کاراکتر باشد.", "error");
       return;
     }
     if (password !== confirmPassword) {
-      setError("رمز عبور و تکرار آن یکسان نیستند.");
+      showToast("رمز عبور و تکرار آن یکسان نیستند.", "error");
       return;
     }
     if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
-      setError("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.");
+      showToast("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.", "error");
       return;
     }
     if (!acceptedTerms) {
-      setError("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.");
+      showToast("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.", "error");
       return;
     }
 
@@ -78,7 +78,7 @@ export default function RegisterForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ثبت‌نام.");
+      showToast(body?.error || "خطا در ثبت‌نام.", "error");
       setLoading(false);
       setTurnstileToken("");
       setTurnstileKey((k) => k + 1);
@@ -281,12 +281,6 @@ export default function RegisterForm() {
         }}
         onExpire={() => setTurnstileToken("")}
       />
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

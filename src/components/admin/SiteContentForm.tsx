@@ -7,7 +7,7 @@ import MediaPicker from "@/components/admin/MediaPicker";
 import SimpleRichTextEditor from "@/components/admin/SimpleRichTextEditor";
 import IconPicker from "@/components/admin/IconPicker";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { useToast } from "@/components/admin/ToastProvider";
+import { useToast } from "@/components/ToastProvider";
 import type { HeroSlideContent, ProductCategoryContent } from "@/lib/site-content-defaults";
 import type { CategoryIconKey } from "@/lib/category-icons";
 
@@ -43,7 +43,6 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
   const [heroSlides, setHeroSlides] = useState<HeroSlideContent[]>(initialHeroSlides);
   const [categories, setCategories] = useState<ProductCategoryContent[]>(initialCategories);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ type: "slide" | "category"; index: number } | null>(null);
 
   const updateSlide = (index: number, patch: Partial<HeroSlideContent>) => {
@@ -74,7 +73,6 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setSaving(true);
 
     const res = await fetch("/api/admin/site-content", {
@@ -87,7 +85,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ذخیره تغییرات.");
+      showToast(body?.error || "خطا در ذخیره تغییرات.", "error");
       return;
     }
 
@@ -255,10 +253,6 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
           )}
         </div>
       </section>
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-      )}
 
       <button
         type="submit"

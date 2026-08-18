@@ -80,12 +80,13 @@ const BUBBLE_MAX_WIDTH_PX = 420;
 const BUBBLE_MAX_WIDTH_VW = 85;
 const BUBBLE_MAX_WIDTH_CSS = `min(${BUBBLE_MAX_WIDTH_PX}px, ${BUBBLE_MAX_WIDTH_VW}vw)`;
 
-// Fixed display box for a single-image message — every photo renders at
-// exactly this size (object-fit: cover crops to fill it) regardless of the
-// uploaded file's actual resolution, so a 4000x3000 photo and a 100x100 icon
-// both come out identically sized instead of dictating the bubble's size.
-const IMAGE_MAX_WIDTH = 320;
-const IMAGE_MAX_HEIGHT = 400;
+// Fixed display box for a single-image message (sized per breakpoint in the
+// className below) — every photo renders at exactly this size (object-fit:
+// cover crops to fill it) regardless of the uploaded file's actual
+// resolution, so a 4000x3000 photo and a 100x100 icon both come out
+// identically sized instead of dictating the bubble's size. Smaller on
+// mobile — at the old fixed 320x400 a single photo ate ~49% of a phone's
+// viewport height, crowding out the rest of the conversation and the composer.
 
 // Physical side each role renders on. The page is dir="rtl", where CSS
 // `justify-start` renders on the visual RIGHT and `justify-end` on the
@@ -297,13 +298,25 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
   useEffect(() => {
     if (!scrollRef.current) return;
-    if (!hasScrolledOnce.current) {
-      // Jump instantly to the bottom on first load — no animated scroll on open.
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      hasScrolledOnce.current = true;
-      return;
+    // The account shell's page wrapper (not this message list) ends up being
+    // the element that actually overflows on tall threads — its "flex-1"
+    // section isn't height-clipped, so it grows to fit every message instead
+    // of leaving this list to scroll internally. Walk up to whichever
+    // ancestor genuinely has overflow so the fix keeps working whether the
+    // chat itself scrolls (fits its box) or the whole page does (doesn't).
+    let container: HTMLElement | null = scrollRef.current;
+    while (
+      container &&
+      (container.scrollHeight <= container.clientHeight || getComputedStyle(container).overflowY === "visible")
+    ) {
+      container = container.parentElement;
     }
-    scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    if (!container) return;
+
+    // Jump instantly to the bottom on first load — no animated scroll on open.
+    const behavior: ScrollBehavior = hasScrolledOnce.current ? "smooth" : "auto";
+    hasScrolledOnce.current = true;
+    container.scrollTo({ top: container.scrollHeight, behavior });
   }, [messages.length, otherTyping]);
 
   useEffect(() => {
@@ -524,14 +537,11 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                                 <img
                                   src={getMediaUrl(img.url)}
                                   alt={img.filename}
-                                  style={
-                                    images.length === 1
-                                      ? { width: IMAGE_MAX_WIDTH, height: IMAGE_MAX_HEIGHT, maxWidth: "100%" }
-                                      : undefined
-                                  }
                                   className={cn(
                                     "rounded-lg border border-white/10 object-cover",
-                                    images.length !== 1 && "aspect-square w-full",
+                                    images.length === 1
+                                      ? "h-[220px] w-[176px] max-w-full sm:h-[400px] sm:w-[320px]"
+                                      : "aspect-square w-full",
                                   )}
                                 />
                               </a>

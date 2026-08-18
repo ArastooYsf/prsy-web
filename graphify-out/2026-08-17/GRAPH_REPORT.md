@@ -1,7 +1,7 @@
 # Graph Report - website  (2026-08-17)
 
 ## Corpus Check
-- 335 files · ~160,503 words
+- 335 files · ~160,604 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f0bc97e4`
+- Built from commit: `dbf4fd37`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -26,7 +26,7 @@
 - auth.ts
 - card
 - CustomerForm.tsx
-- SiteContentForm.tsx
+- ProductCategories.tsx
 - slide_search_core.py
 - AccountShell.tsx
 - spacing
@@ -41,7 +41,7 @@
 - search
 - TailwindConfigGenerator
 - DesignSystemGenerator
-- BlogPostForm.tsx
+- site-content/route.ts
 - admin/page.tsx
 - staggerContainer
 - CIP Design Style Guide
@@ -60,7 +60,7 @@
 - BM25
 - components.json
 - profile/page.tsx
-- ProductCategories.tsx
+- SiteContentForm.tsx
 - icon/generate.py
 - fontSize
 - TestShadcnInstaller
@@ -72,7 +72,7 @@
 - extract-colors.cjs
 - validate-asset.cjs
 - contracts/export/route.ts
-- motion.ts
+- input
 - GregorianDatePicker.tsx
 - validate-tokens.cjs
 - design-tokens-starter.json
@@ -127,7 +127,7 @@
 - primary-foreground
 - MediaPickerModal.tsx
 - ToastProvider.tsx
-- input
+- padding-y
 - /graphify add command
 - graphify hook install/uninstall/status
 - .__init__
@@ -174,13 +174,13 @@
 - exceljs
 - framer-motion
 - jalaali-js
-- orders/new/page.tsx
+- motion.ts
 - next-auth
 - next.config.mjs
 - otplib
 - AdminSearchBox.tsx
 - orders/route.ts
-- RichTextEditor.tsx
+- orders/new/page.tsx
 - qrcode
 - @radix-ui/react-dropdown-menu
 - rate-limiter-flexible
@@ -226,11 +226,11 @@
 - Ticket Attachment (Empty/Invalid PNG Stub)
 - Ticket Attachment: 3D Modeling Software Screenshot (L-shaped Object, Top View)
 - getMediaUrl
-- ConsultationForm.tsx
+- BlogPostForm.tsx
 - radius
 - admin/blog/page.tsx
-- Footer.tsx
-- site-content/route.ts
+- ConsultationForm.tsx
+- RichTextEditor.tsx
 - @radix-ui/react-popover
 - lucide-react
 - ring
@@ -241,16 +241,16 @@
 - prisma
 - @prisma/client
 - app/blog/page.tsx
-- padding-y
+- Footer.tsx
 - none
 - register/route.ts
 - 12
-- 8
-- destructive
 - 2
-- 20260805111845_contract_types_and_status/migration.sql
 - 4
-- .test_add_components_no_components
+- 8
+- 20260805111845_contract_types_and_status/migration.sql
+- destructive
+- .test_add_components_already_installed
 
 ## God Nodes (most connected - your core abstractions)
 1. `authOptions` - 72 edges
@@ -339,9 +339,9 @@ Nodes (12): $type, $value, bg, bg, padding, shadow, card, bg (+4 more)
 Cohesion: 0.19
 Nodes (9): dynamic, metadata, dynamic, metadata, CsvImportForm(), ImportResult, CustomerForm(), CustomerFormProps (+1 more)
 
-### Community 11 - "SiteContentForm.tsx"
-Cohesion: 0.24
-Nodes (9): IconPicker(), SimpleRichTextEditor(), SimpleRichTextEditorProps, CONDITION_OPTIONS, emptyCategory(), emptySlide(), genId(), SiteContentForm() (+1 more)
+### Community 11 - "ProductCategories.tsx"
+Cohesion: 0.17
+Nodes (12): metadata, ProductsPage(), HeroProps, Condition, CONDITION_BADGE, ProductCategories(), ProductCategoriesProps, DEFAULT_FOOTER_CONTACT (+4 more)
 
 ### Community 12 - "slide_search_core.py"
 Cohesion: 0.08
@@ -364,8 +364,8 @@ Cohesion: 0.06
 Nodes (16): Test adding colors multiple times., Test adding full color palette., Test adding custom breakpoints., Test TailwindConfigGenerator class., Test that adding same plugin twice doesn't duplicate., Test plugin recommendations for Next.js., Test initialization with default settings., Test generating JavaScript configuration. (+8 more)
 
 ### Community 17 - "design_system.py"
-Cohesion: 0.10
-Nodes (27): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+19 more)
+Cohesion: 0.11
+Nodes (25): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+17 more)
 
 ### Community 18 - "events.ts"
 Cohesion: 0.12
@@ -396,12 +396,12 @@ Cohesion: 0.10
 Nodes (12): main(), Add custom font families. Args: fonts: Dict of font_type: [font_names] e.g.,…, Add custom spacing values. Args: spacing: Dict of name: value e.g., {'18':…, Add custom breakpoints. Args: breakpoints: Dict of name: width e.g., {'3xl':…, Add plugin requirements. Args: plugins: List of plugin names e.g.,…, Get plugin recommendations based on configuration. Returns: List of recommended…, Generate Tailwind CSS configuration files., Validate configuration. Returns: Tuple of (valid, message) (+4 more)
 
 ### Community 25 - "DesignSystemGenerator"
-Cohesion: 0.14
-Nodes (10): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+2 more)
+Cohesion: 0.13
+Nodes (12): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+4 more)
 
-### Community 26 - "BlogPostForm.tsx"
-Cohesion: 0.28
-Nodes (5): BlogPostForm(), BlogPostFormProps, MediaPicker(), MediaPickerProps, RichTextEditor()
+### Community 26 - "site-content/route.ts"
+Cohesion: 0.27
+Nodes (9): cleanHeroSlide(), cleanProductCategory(), CONDITION_VALUES, POST(), IconPickerProps, CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS (+1 more)
 
 ### Community 27 - "admin/page.tsx"
 Cohesion: 0.16
@@ -475,9 +475,9 @@ Nodes (16): aliases, components, hooks, lib, ui, utils, rsc, $schema (+8 more)
 Cohesion: 0.18
 Nodes (6): dynamic, NOTIFICATION_OPTIONS, NotificationSettingsPreview(), PasswordForm(), SetupState, TwoFactorSetup()
 
-### Community 45 - "ProductCategories.tsx"
-Cohesion: 0.17
-Nodes (12): metadata, ProductsPage(), HeroProps, Condition, CONDITION_BADGE, ProductCategories(), ProductCategoriesProps, DEFAULT_FOOTER_CONTACT (+4 more)
+### Community 45 - "SiteContentForm.tsx"
+Cohesion: 0.24
+Nodes (9): IconPicker(), SimpleRichTextEditor(), SimpleRichTextEditorProps, CONDITION_OPTIONS, emptyCategory(), emptySlide(), genId(), SiteContentForm() (+1 more)
 
 ### Community 46 - "icon/generate.py"
 Cohesion: 0.20
@@ -523,9 +523,9 @@ Nodes (13): checkManifest(), formatBytes(), formatOutput(), fs, main(), parseFil
 Cohesion: 0.26
 Nodes (9): RFC-5987, columns, ContractRow, GET(), columns, GET(), buildExcelResponse(), ExcelColumn (+1 more)
 
-### Community 57 - "motion.ts"
-Cohesion: 0.22
-Nodes (6): RevealProps, PLANS, PricingArchived(), fadeIn, scaleIn, viewportOnce
+### Community 57 - "input"
+Cohesion: 0.29
+Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
 
 ### Community 58 - "GregorianDatePicker.tsx"
 Cohesion: 0.26
@@ -541,7 +541,7 @@ Nodes (12): component, $type, $value, dark, semantic, $schema, $type, $value (+4
 
 ### Community 61 - "ShadcnInstaller"
 Cohesion: 0.20
-Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test adding components that are already installed., Test listing installed components when they exist., Test getting installed components without config.
+Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test listing installed components when they exist., Test getting installed components without config., Test adding components with empty list.
 
 ### Community 62 - ".check_shadcn_config"
 Cohesion: 0.21
@@ -719,9 +719,9 @@ Nodes (11): ConfirmDialog(), ConfirmDialogProps, formatSize(), isImageMime(), KI
 Cohesion: 0.22
 Nodes (7): dynamic, metadata, ToastContext, ToastContextValue, ToastItem, ToastProvider(), ToastType
 
-### Community 112 - "input"
-Cohesion: 0.29
-Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
+### Community 112 - "padding-y"
+Cohesion: 0.67
+Nodes (4): padding-y, padding-y, $type, $value
 
 ### Community 113 - "/graphify add command"
 Cohesion: 0.67
@@ -739,9 +739,9 @@ Nodes (13): dynamic, dynamic, AccountOverviewPage(), dateFmt(), dynamic, VALID_S
 Cohesion: 0.67
 Nodes (3): secondary-foreground, $type, $value
 
-### Community 159 - "orders/new/page.tsx"
+### Community 159 - "motion.ts"
 Cohesion: 0.22
-Nodes (7): dynamic, metadata, Customer, Item, OrderForm(), OrderFormProps, STATUS_OPTIONS
+Nodes (6): RevealProps, PLANS, PricingArchived(), fadeIn, scaleIn, viewportOnce
 
 ### Community 163 - "AdminSearchBox.tsx"
 Cohesion: 0.29
@@ -750,6 +750,10 @@ Nodes (7): AdminSearchBox(), EMPTY_RESULTS, hasAnyResults(), SearchGroup, Search
 ### Community 164 - "orders/route.ts"
 Cohesion: 0.60
 Nodes (4): generateOrderNumber(), ItemInput, parseItems(), POST()
+
+### Community 165 - "orders/new/page.tsx"
+Cohesion: 0.22
+Nodes (7): dynamic, metadata, Customer, Item, OrderForm(), OrderFormProps, STATUS_OPTIONS
 
 ### Community 169 - "footer-contact/route.ts"
 Cohesion: 0.53
@@ -767,21 +771,17 @@ Nodes (3): metadata, APPROACH, Pricing()
 Cohesion: 0.24
 Nodes (10): BlogPostPage(), generateMetadata(), getPost(), revalidate, AvatarUploader(), AvatarUploaderProps, UploadedMedia, UploadWidget() (+2 more)
 
-### Community 214 - "ConsultationForm.tsx"
-Cohesion: 0.29
-Nodes (5): metadata, ConsultationForm(), FormState, initialState, TOPICS
+### Community 214 - "BlogPostForm.tsx"
+Cohesion: 0.28
+Nodes (5): BlogPostForm(), BlogPostFormProps, MediaPicker(), MediaPickerProps, RichTextEditor()
 
 ### Community 215 - "radius"
 Cohesion: 0.60
 Nodes (5): radius, radius, radius, $type, $value
 
-### Community 217 - "Footer.tsx"
-Cohesion: 0.40
-Nodes (4): Footer(), QUICK_LINKS, SERVICES, SOCIAL_ICONS
-
-### Community 218 - "site-content/route.ts"
-Cohesion: 0.27
-Nodes (9): cleanHeroSlide(), cleanProductCategory(), CONDITION_VALUES, POST(), IconPickerProps, CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS (+1 more)
+### Community 217 - "ConsultationForm.tsx"
+Cohesion: 0.29
+Nodes (5): metadata, ConsultationForm(), FormState, initialState, TOPICS
 
 ### Community 221 - "ring"
 Cohesion: 0.67
@@ -791,9 +791,9 @@ Nodes (3): ring, $type, $value
 Cohesion: 0.50
 Nodes (4): BlogPage(), getPosts(), metadata, revalidate
 
-### Community 229 - "padding-y"
-Cohesion: 0.67
-Nodes (4): padding-y, padding-y, $type, $value
+### Community 229 - "Footer.tsx"
+Cohesion: 0.40
+Nodes (4): Footer(), QUICK_LINKS, SERVICES, SOCIAL_ICONS
 
 ### Community 230 - "none"
 Cohesion: 0.67
@@ -803,21 +803,21 @@ Nodes (4): $type, $value, none, none
 Cohesion: 0.67
 Nodes (3): $type, $value, 12
 
-### Community 233 - "8"
-Cohesion: 0.67
-Nodes (3): $type, $value, 8
-
-### Community 234 - "destructive"
-Cohesion: 0.67
-Nodes (3): destructive, $type, $value
-
-### Community 235 - "2"
+### Community 233 - "2"
 Cohesion: 0.67
 Nodes (3): $type, $value, 2
 
-### Community 245 - "4"
+### Community 234 - "4"
 Cohesion: 0.67
 Nodes (3): $type, $value, 4
+
+### Community 235 - "8"
+Cohesion: 0.67
+Nodes (3): $type, $value, 8
+
+### Community 237 - "destructive"
+Cohesion: 0.67
+Nodes (3): destructive, $type, $value
 
 ## Knowledge Gaps
 - **629 isolated node(s):** `fs`, `path`, `fs`, `path`, `fs` (+624 more)
@@ -827,9 +827,9 @@ Nodes (3): $type, $value, 4
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `prisma` connect `auth.ts` to `jalali.ts`, `contracts/[id]/page.tsx`, `logger.ts`, `events.ts`, `admin/page.tsx`, `orders/new/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `orders/route.ts`, `footer-contact/route.ts`, `profile/page.tsx`, `site-content.ts`, `contracts/export/route.ts`, `isValidEmail`, `getMediaUrl`, `admin/blog/page.tsx`, `upload/route.ts`, `site-content/route.ts`, `sanitizePlainText`, `app/blog/page.tsx`, `register/route.ts`, `status-labels.ts`?**
+- **Why does `prisma` connect `auth.ts` to `jalali.ts`, `contracts/[id]/page.tsx`, `logger.ts`, `events.ts`, `site-content/route.ts`, `admin/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `orders/new/page.tsx`, `orders/route.ts`, `footer-contact/route.ts`, `profile/page.tsx`, `site-content.ts`, `contracts/export/route.ts`, `isValidEmail`, `getMediaUrl`, `admin/blog/page.tsx`, `upload/route.ts`, `sanitizePlainText`, `app/blog/page.tsx`, `register/route.ts`, `status-labels.ts`?**
   _High betweenness centrality (0.019) - this node is a cross-community bridge._
-- **Why does `authOptions` connect `auth.ts` to `jalali.ts`, `contracts/[id]/page.tsx`, `logger.ts`, `AccountShell.tsx`, `events.ts`, `BlogPostForm.tsx`, `admin/page.tsx`, `orders/new/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `orders/route.ts`, `footer-contact/route.ts`, `login/page.tsx`, `profile/page.tsx`, `site-content.ts`, `contracts/export/route.ts`, `isValidEmail`, `getMediaUrl`, `admin/blog/page.tsx`, `upload/route.ts`, `tickets/new/page.tsx`, `site-content/route.ts`, `sanitizePlainText`, `ToastProvider.tsx`, `status-labels.ts`?**
+- **Why does `authOptions` connect `auth.ts` to `jalali.ts`, `contracts/[id]/page.tsx`, `logger.ts`, `AccountShell.tsx`, `events.ts`, `site-content/route.ts`, `admin/page.tsx`, `admin/tickets/[id]/page.tsx`, `twofactor.ts`, `orders/new/page.tsx`, `orders/route.ts`, `footer-contact/route.ts`, `login/page.tsx`, `profile/page.tsx`, `site-content.ts`, `contracts/export/route.ts`, `isValidEmail`, `getMediaUrl`, `BlogPostForm.tsx`, `admin/blog/page.tsx`, `upload/route.ts`, `tickets/new/page.tsx`, `sanitizePlainText`, `ToastProvider.tsx`, `status-labels.ts`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `primitive` connect `radius` to `gray`, `duration`, `spacing`, `fontSize`, `design-tokens-starter.json`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._

@@ -308,30 +308,69 @@
       "norm_label": "customerformprops"
     },
     {
-      "label": "SimpleRichTextEditorProps",
+      "label": "HeroProps",
       "file_type": "code",
-      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
-      "source_location": "L6",
+      "source_file": "src/components/Hero.tsx",
+      "source_location": "L11",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_simplerichtexteditor_simplerichtexteditorprops",
+      "id": "src_components_hero_heroprops",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "simplerichtexteditorprops"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "heroprops"
     },
     {
-      "label": "SiteContentFormProps",
+      "label": "Condition",
       "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L35",
+      "source_file": "src/components/ProductCategories.tsx",
+      "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_sitecontentformprops",
+      "id": "src_components_productcategories_condition",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "sitecontentformprops"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "condition"
+    },
+    {
+      "label": "ProductCategoriesProps",
+      "file_type": "code",
+      "source_file": "src/components/ProductCategories.tsx",
+      "source_location": "L26",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_components_productcategories_productcategoriesprops",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "productcategoriesprops"
+    },
+    {
+      "label": "HeroSlideContent",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults_heroslidecontent",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "heroslidecontent"
+    },
+    {
+      "label": "ProductCategoryContent",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L17",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults_productcategorycontent",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "productcategorycontent"
     },
     {
       "label": "ConfirmDialogProps",
@@ -464,43 +503,17 @@
       "norm_label": "notification"
     },
     {
-      "label": "Customer",
+      "label": "RevealProps",
       "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
-      "source_location": "L10",
+      "source_file": "src/components/motion/Reveal.tsx",
+      "source_location": "L7",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_orderform_customer",
+      "id": "src_components_motion_reveal_revealprops",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "customer"
-    },
-    {
-      "label": "Item",
-      "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
-      "source_location": "L11",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_components_admin_orderform_item",
-      "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "item"
-    },
-    {
-      "label": "OrderFormProps",
-      "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
-      "source_location": "L13",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_components_admin_orderform_orderformprops",
-      "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "orderformprops"
+      "community_name": "motion.ts",
+      "norm_label": "revealprops"
     },
     {
       "label": "TestTailwindConfigGenerator",
@@ -555,17 +568,43 @@
       "norm_label": "iteminput"
     },
     {
-      "label": "RichTextEditorProps",
+      "label": "Customer",
       "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_file": "src/components/admin/OrderForm.tsx",
       "source_location": "L10",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_richtexteditorprops",
+      "id": "src_components_admin_orderform_customer",
       "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "richtexteditorprops"
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "customer"
+    },
+    {
+      "label": "Item",
+      "file_type": "code",
+      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_location": "L11",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_components_admin_orderform_item",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "item"
+    },
+    {
+      "label": "OrderFormProps",
+      "file_type": "code",
+      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_location": "L13",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_components_admin_orderform_orderformprops",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "orderformprops"
     },
     {
       "label": "TestPersistence",
@@ -750,6 +789,32 @@
       "norm_label": "uploadedmedia"
     },
     {
+      "label": "BlogPostFormProps",
+      "file_type": "code",
+      "source_file": "src/components/admin/BlogPostForm.tsx",
+      "source_location": "L16",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_components_admin_blogpostform_blogpostformprops",
+      "community": 214,
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "blogpostformprops"
+    },
+    {
+      "label": "MediaPickerProps",
+      "file_type": "code",
+      "source_file": "src/components/admin/MediaPicker.tsx",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_components_admin_mediapicker_mediapickerprops",
+      "community": 214,
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "mediapickerprops"
+    },
+    {
       "label": "FormState",
       "file_type": "code",
       "source_file": "src/components/ConsultationForm.tsx",
@@ -758,35 +823,22 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_components_consultationform_formstate",
-      "community": 214,
+      "community": 217,
       "community_name": "ConsultationForm.tsx",
       "norm_label": "formstate"
     },
     {
-      "label": "IconPickerProps",
+      "label": "RichTextEditorProps",
       "file_type": "code",
-      "source_file": "src/components/admin/IconPicker.tsx",
-      "source_location": "L5",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L10",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_iconpicker_iconpickerprops",
+      "id": "src_components_admin_richtexteditor_richtexteditorprops",
       "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "iconpickerprops"
-    },
-    {
-      "label": "CategoryIconKey",
-      "file_type": "code",
-      "source_file": "src/lib/category-icons.tsx",
-      "source_location": "L14",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_lib_category_icons_categoryiconkey",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "categoryiconkey"
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "richtexteditorprops"
     },
     {
       "label": "TestSearchDomains",
@@ -841,30 +893,30 @@
       "norm_label": "testreasoningmatch"
     },
     {
-      "label": "BlogPostFormProps",
+      "label": "IconPickerProps",
       "file_type": "code",
-      "source_file": "src/components/admin/BlogPostForm.tsx",
-      "source_location": "L16",
+      "source_file": "src/components/admin/IconPicker.tsx",
+      "source_location": "L5",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_blogpostform_blogpostformprops",
+      "id": "src_components_admin_iconpicker_iconpickerprops",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "blogpostformprops"
+      "community_name": "site-content/route.ts",
+      "norm_label": "iconpickerprops"
     },
     {
-      "label": "MediaPickerProps",
+      "label": "CategoryIconKey",
       "file_type": "code",
-      "source_file": "src/components/admin/MediaPicker.tsx",
-      "source_location": "L8",
+      "source_file": "src/lib/category-icons.tsx",
+      "source_location": "L14",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_admin_mediapicker_mediapickerprops",
+      "id": "src_lib_category_icons_categoryiconkey",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "mediapickerprops"
+      "community_name": "site-content/route.ts",
+      "norm_label": "categoryiconkey"
     },
     {
       "label": "StatusCount",
@@ -1049,69 +1101,30 @@
       "norm_label": "setupstate"
     },
     {
-      "label": "HeroProps",
+      "label": "SimpleRichTextEditorProps",
       "file_type": "code",
-      "source_file": "src/components/Hero.tsx",
-      "source_location": "L11",
+      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
+      "source_location": "L6",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_hero_heroprops",
+      "id": "src_components_admin_simplerichtexteditor_simplerichtexteditorprops",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "heroprops"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "simplerichtexteditorprops"
     },
     {
-      "label": "Condition",
+      "label": "SiteContentFormProps",
       "file_type": "code",
-      "source_file": "src/components/ProductCategories.tsx",
-      "source_location": "L9",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L35",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "src_components_productcategories_condition",
+      "id": "src_components_admin_sitecontentform_sitecontentformprops",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "condition"
-    },
-    {
-      "label": "ProductCategoriesProps",
-      "file_type": "code",
-      "source_file": "src/components/ProductCategories.tsx",
-      "source_location": "L26",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_components_productcategories_productcategoriesprops",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "productcategoriesprops"
-    },
-    {
-      "label": "HeroSlideContent",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L8",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults_heroslidecontent",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "heroslidecontent"
-    },
-    {
-      "label": "ProductCategoryContent",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L17",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults_productcategorycontent",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "productcategorycontent"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "sitecontentformprops"
     },
     {
       "label": "TestShadcnInstaller",
@@ -1398,19 +1411,6 @@
       "community": 56,
       "community_name": "contracts/export/route.ts",
       "norm_label": "excelcolumn"
-    },
-    {
-      "label": "RevealProps",
-      "file_type": "code",
-      "source_file": "src/components/motion/Reveal.tsx",
-      "source_location": "L7",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_components_motion_reveal_revealprops",
-      "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "revealprops"
     },
     {
       "label": "GregorianDatePickerProps",
@@ -2028,88 +2028,28 @@
       "norm_label": "main()"
     },
     {
-      "label": "IconPicker()",
+      "label": "ProductsPage()",
       "file_type": "code",
-      "source_file": "src/components/admin/IconPicker.tsx",
-      "source_location": "L10",
+      "source_file": "src/app/products/page.tsx",
+      "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_iconpicker_iconpicker",
+      "id": "src_app_products_page_productspage",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "iconpicker()"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "productspage()"
     },
     {
-      "label": "SimpleRichTextEditor()",
+      "label": "ProductCategories()",
       "file_type": "code",
-      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
-      "source_location": "L37",
+      "source_file": "src/components/ProductCategories.tsx",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_simplerichtexteditor_simplerichtexteditor",
+      "id": "src_components_productcategories_productcategories",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "simplerichtexteditor()"
-    },
-    {
-      "label": "ToolbarButton()",
-      "file_type": "code",
-      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
-      "source_location": "L11",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_simplerichtexteditor_toolbarbutton",
-      "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "toolbarbutton()"
-    },
-    {
-      "label": "emptyCategory()",
-      "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L31",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_emptycategory",
-      "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "emptycategory()"
-    },
-    {
-      "label": "emptySlide()",
-      "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_emptyslide",
-      "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "emptyslide()"
-    },
-    {
-      "label": "genId()",
-      "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L23",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_genid",
-      "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "genid()"
-    },
-    {
-      "label": "SiteContentForm()",
-      "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L40",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_sitecontentform",
-      "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "sitecontentform()"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "productcategories()"
     },
     {
       "label": "ConfirmDialog()",
@@ -2892,28 +2832,40 @@
       "norm_label": ".test_add_colors()"
     },
     {
-      "label": "NewOrderPage()",
+      "label": "Reveal()",
       "file_type": "code",
-      "source_file": "src/app/account/admin/orders/new/page.tsx",
-      "source_location": "L15",
+      "source_file": "src/components/motion/Reveal.tsx",
+      "source_location": "L14",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_account_admin_orders_new_page_neworderpage",
+      "id": "src_components_motion_reveal_reveal",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "neworderpage()"
+      "community_name": "motion.ts",
+      "norm_label": "reveal()"
     },
     {
-      "label": "OrderForm()",
+      "label": "CheckIcon()",
       "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
-      "source_location": "L33",
+      "source_file": "src/components/Pricing.archived.tsx",
+      "source_location": "L65",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_orderform_orderform",
+      "id": "src_components_pricing_archived_checkicon",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "orderform()"
+      "community_name": "motion.ts",
+      "norm_label": "checkicon()"
+    },
+    {
+      "label": "PricingArchived()",
+      "file_type": "code",
+      "source_file": "src/components/Pricing.archived.tsx",
+      "source_location": "L85",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_pricing_archived_pricingarchived",
+      "community": 159,
+      "community_name": "motion.ts",
+      "norm_label": "pricingarchived()"
     },
     {
       "label": ".test_add_breakpoints()",
@@ -3192,52 +3144,28 @@
       "norm_label": "post()"
     },
     {
-      "label": "Icon()",
+      "label": "NewOrderPage()",
       "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
-      "source_location": "L48",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_icon",
-      "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "icon()"
-    },
-    {
-      "label": "Toolbar()",
-      "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
-      "source_location": "L56",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_toolbar",
-      "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "toolbar()"
-    },
-    {
-      "label": "ToolbarButton()",
-      "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_file": "src/app/account/admin/orders/new/page.tsx",
       "source_location": "L15",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_toolbarbutton",
+      "id": "src_app_account_admin_orders_new_page_neworderpage",
       "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "toolbarbutton()"
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "neworderpage()"
     },
     {
-      "label": "ToolbarDivider()",
+      "label": "OrderForm()",
       "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
-      "source_location": "L44",
+      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_location": "L33",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_toolbardivider",
+      "id": "src_components_admin_orderform_orderform",
       "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "toolbardivider()"
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "orderform()"
     },
     {
       "label": "cleanText()",
@@ -3394,18 +3322,6 @@
       "community": 17,
       "community_name": "design_system.py",
       "norm_label": "persist_design_system()"
-    },
-    {
-      "label": "_resolve_dial()",
-      "file_type": "code",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
-      "source_location": "L69",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_design_system_resolve_dial",
-      "community": 17,
-      "community_name": "design_system.py",
-      "norm_label": "_resolve_dial()"
     },
     {
       "label": "safe_slug()",
@@ -4332,28 +4248,52 @@
       "norm_label": "getmediaurl()"
     },
     {
-      "label": "ConsultationPage()",
+      "label": "NewBlogPostPage()",
       "file_type": "code",
-      "source_file": "src/app/consultation/page.tsx",
-      "source_location": "L10",
+      "source_file": "src/app/account/admin/blog/new/page.tsx",
+      "source_location": "L6",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_consultation_page_consultationpage",
+      "id": "src_app_account_admin_blog_new_page_newblogpostpage",
       "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "consultationpage()"
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "newblogpostpage()"
     },
     {
-      "label": "ConsultationForm()",
+      "label": "BlogPostForm()",
       "file_type": "code",
-      "source_file": "src/components/ConsultationForm.tsx",
-      "source_location": "L34",
+      "source_file": "src/components/admin/BlogPostForm.tsx",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_consultationform_consultationform",
+      "id": "src_components_admin_blogpostform_blogpostform",
       "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "consultationform()"
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "blogpostform()"
+    },
+    {
+      "label": "MediaPicker()",
+      "file_type": "code",
+      "source_file": "src/components/admin/MediaPicker.tsx",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_mediapicker_mediapicker",
+      "community": 214,
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "mediapicker()"
+    },
+    {
+      "label": "RichTextEditor()",
+      "file_type": "code",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L175",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_richtexteditor_richtexteditor",
+      "community": 214,
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "richtexteditor()"
     },
     {
       "label": "AdminBlogListPage()",
@@ -4380,52 +4320,76 @@
       "norm_label": "deletepostbutton()"
     },
     {
-      "label": "Footer()",
+      "label": "ConsultationPage()",
       "file_type": "code",
-      "source_file": "src/components/Footer.tsx",
-      "source_location": "L61",
+      "source_file": "src/app/consultation/page.tsx",
+      "source_location": "L10",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_footer_footer",
+      "id": "src_app_consultation_page_consultationpage",
       "community": 217,
-      "community_name": "Footer.tsx",
-      "norm_label": "footer()"
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "consultationpage()"
     },
     {
-      "label": "cleanHeroSlide()",
+      "label": "ConsultationForm()",
       "file_type": "code",
-      "source_file": "src/app/api/admin/site-content/route.ts",
-      "source_location": "L14",
+      "source_file": "src/components/ConsultationForm.tsx",
+      "source_location": "L34",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_api_admin_site_content_route_cleanheroslide",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "cleanheroslide()"
+      "id": "src_components_consultationform_consultationform",
+      "community": 217,
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "consultationform()"
     },
     {
-      "label": "cleanProductCategory()",
+      "label": "Icon()",
       "file_type": "code",
-      "source_file": "src/app/api/admin/site-content/route.ts",
-      "source_location": "L29",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L48",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_api_admin_site_content_route_cleanproductcategory",
+      "id": "src_components_admin_richtexteditor_icon",
       "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "cleanproductcategory()"
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "icon()"
     },
     {
-      "label": "POST()",
+      "label": "Toolbar()",
       "file_type": "code",
-      "source_file": "src/app/api/admin/site-content/route.ts",
-      "source_location": "L57",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L56",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_api_admin_site_content_route_post",
+      "id": "src_components_admin_richtexteditor_toolbar",
       "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "post()"
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "toolbar()"
+    },
+    {
+      "label": "ToolbarButton()",
+      "file_type": "code",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_richtexteditor_toolbarbutton",
+      "community": 218,
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "toolbarbutton()"
+    },
+    {
+      "label": "ToolbarDivider()",
+      "file_type": "code",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_location": "L44",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_richtexteditor_toolbardivider",
+      "community": 218,
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "toolbardivider()"
     },
     {
       "label": "BlogPage()",
@@ -4450,6 +4414,18 @@
       "community": 228,
       "community_name": "app/blog/page.tsx",
       "norm_label": "getposts()"
+    },
+    {
+      "label": "Footer()",
+      "file_type": "code",
+      "source_file": "src/components/Footer.tsx",
+      "source_location": "L61",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_footer_footer",
+      "community": 229,
+      "community_name": "Footer.tsx",
+      "norm_label": "footer()"
     },
     {
       "label": "_domain_keywords()",
@@ -4764,16 +4740,16 @@
       "norm_label": ".test_add_spacing()"
     },
     {
-      "label": ".test_add_components_no_components()",
+      "label": ".test_add_components_already_installed()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L95",
+      "source_location": "L111",
       "_callable": true,
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_no_components",
-      "community": 246,
-      "community_name": ".test_add_components_no_components",
-      "norm_label": ".test_add_components_no_components()"
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_already_installed",
+      "community": 245,
+      "community_name": ".test_add_components_already_installed",
+      "norm_label": ".test_add_components_already_installed()"
     },
     {
       "label": "._apply_reasoning()",
@@ -4872,6 +4848,18 @@
       "norm_label": "._select_best_match()"
     },
     {
+      "label": "_resolve_dial()",
+      "file_type": "code",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
+      "source_location": "L69",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "claude_skills_ui_ux_pro_max_scripts_design_system_resolve_dial",
+      "community": 25,
+      "community_name": "DesignSystemGenerator",
+      "norm_label": "_resolve_dial()"
+    },
+    {
       "label": ".test_known_category_matches_exactly()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-ux-pro-max/scripts/tests/test_core.py",
@@ -4896,52 +4884,40 @@
       "norm_label": ".test_unknown_category_falls_back_gracefully()"
     },
     {
-      "label": "NewBlogPostPage()",
+      "label": "cleanHeroSlide()",
       "file_type": "code",
-      "source_file": "src/app/account/admin/blog/new/page.tsx",
-      "source_location": "L6",
+      "source_file": "src/app/api/admin/site-content/route.ts",
+      "source_location": "L14",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_account_admin_blog_new_page_newblogpostpage",
+      "id": "src_app_api_admin_site_content_route_cleanheroslide",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "newblogpostpage()"
+      "community_name": "site-content/route.ts",
+      "norm_label": "cleanheroslide()"
     },
     {
-      "label": "BlogPostForm()",
+      "label": "cleanProductCategory()",
       "file_type": "code",
-      "source_file": "src/components/admin/BlogPostForm.tsx",
-      "source_location": "L30",
+      "source_file": "src/app/api/admin/site-content/route.ts",
+      "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_blogpostform_blogpostform",
+      "id": "src_app_api_admin_site_content_route_cleanproductcategory",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "blogpostform()"
+      "community_name": "site-content/route.ts",
+      "norm_label": "cleanproductcategory()"
     },
     {
-      "label": "MediaPicker()",
+      "label": "POST()",
       "file_type": "code",
-      "source_file": "src/components/admin/MediaPicker.tsx",
-      "source_location": "L15",
+      "source_file": "src/app/api/admin/site-content/route.ts",
+      "source_location": "L57",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_admin_mediapicker_mediapicker",
+      "id": "src_app_api_admin_site_content_route_post",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "mediapicker()"
-    },
-    {
-      "label": "RichTextEditor()",
-      "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
-      "source_location": "L175",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_admin_richtexteditor_richtexteditor",
-      "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "richtexteditor()"
+      "community_name": "site-content/route.ts",
+      "norm_label": "post()"
     },
     {
       "label": "AdminDashboardPage()",
@@ -6552,28 +6528,88 @@
       "norm_label": "startsetup()"
     },
     {
-      "label": "ProductsPage()",
+      "label": "IconPicker()",
       "file_type": "code",
-      "source_file": "src/app/products/page.tsx",
-      "source_location": "L12",
+      "source_file": "src/components/admin/IconPicker.tsx",
+      "source_location": "L10",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_app_products_page_productspage",
+      "id": "src_components_admin_iconpicker_iconpicker",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "productspage()"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "iconpicker()"
     },
     {
-      "label": "ProductCategories()",
+      "label": "SimpleRichTextEditor()",
       "file_type": "code",
-      "source_file": "src/components/ProductCategories.tsx",
-      "source_location": "L30",
+      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
+      "source_location": "L37",
       "_callable": true,
       "_origin": "ast",
-      "id": "src_components_productcategories_productcategories",
+      "id": "src_components_admin_simplerichtexteditor_simplerichtexteditor",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "productcategories()"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "simplerichtexteditor()"
+    },
+    {
+      "label": "ToolbarButton()",
+      "file_type": "code",
+      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_simplerichtexteditor_toolbarbutton",
+      "community": 45,
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "toolbarbutton()"
+    },
+    {
+      "label": "emptyCategory()",
+      "file_type": "code",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L31",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_sitecontentform_emptycategory",
+      "community": 45,
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "emptycategory()"
+    },
+    {
+      "label": "emptySlide()",
+      "file_type": "code",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L27",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_sitecontentform_emptyslide",
+      "community": 45,
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "emptyslide()"
+    },
+    {
+      "label": "genId()",
+      "file_type": "code",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_sitecontentform_genid",
+      "community": 45,
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "genid()"
+    },
+    {
+      "label": "SiteContentForm()",
+      "file_type": "code",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L40",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_components_admin_sitecontentform_sitecontentform",
+      "community": 45,
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "sitecontentform()"
     },
     {
       "label": "apply_color()",
@@ -7764,42 +7800,6 @@
       "norm_label": "buildexcelresponse()"
     },
     {
-      "label": "Reveal()",
-      "file_type": "code",
-      "source_file": "src/components/motion/Reveal.tsx",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_motion_reveal_reveal",
-      "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "reveal()"
-    },
-    {
-      "label": "CheckIcon()",
-      "file_type": "code",
-      "source_file": "src/components/Pricing.archived.tsx",
-      "source_location": "L65",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_pricing_archived_checkicon",
-      "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "checkicon()"
-    },
-    {
-      "label": "PricingArchived()",
-      "file_type": "code",
-      "source_file": "src/components/Pricing.archived.tsx",
-      "source_location": "L85",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_components_pricing_archived_pricingarchived",
-      "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "pricingarchived()"
-    },
-    {
       "label": "daysInGregorianMonth()",
       "file_type": "code",
       "source_file": "src/components/admin/GregorianDatePicker.tsx",
@@ -7968,16 +7968,16 @@
       "norm_label": "main()"
     },
     {
-      "label": ".test_add_components_already_installed()",
+      "label": ".test_add_components_no_components()",
       "file_type": "code",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L111",
+      "source_location": "L95",
       "_callable": true,
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_already_installed",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_testshadcninstaller_test_add_components_no_components",
       "community": 61,
       "community_name": "ShadcnInstaller",
-      "norm_label": ".test_add_components_already_installed()"
+      "norm_label": ".test_add_components_no_components()"
     },
     {
       "label": ".test_get_installed_components_no_config()",
@@ -10251,37 +10251,103 @@
       "norm_label": "$value"
     },
     {
-      "label": "SimpleRichTextEditor.tsx",
+      "label": "products/page.tsx",
       "file_type": "code",
-      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
+      "source_file": "src/app/products/page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_simplerichtexteditor",
+      "id": "src_app_products_page",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "simplerichtexteditor.tsx"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "products/page.tsx"
     },
     {
-      "label": "SiteContentForm.tsx",
+      "label": "metadata",
       "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_file": "src/app/products/page.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_app_products_page_metadata",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "metadata"
+    },
+    {
+      "label": "Hero.tsx",
+      "file_type": "code",
+      "source_file": "src/components/Hero.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_sitecontentform",
+      "id": "src_components_hero",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "sitecontentform.tsx"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "hero.tsx"
     },
     {
-      "label": "CONDITION_OPTIONS",
+      "label": "ProductCategories.tsx",
       "file_type": "code",
-      "source_file": "src/components/admin/SiteContentForm.tsx",
-      "source_location": "L17",
+      "source_file": "src/components/ProductCategories.tsx",
+      "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_sitecontentform_condition_options",
+      "id": "src_components_productcategories",
       "community": 11,
-      "community_name": "SiteContentForm.tsx",
-      "norm_label": "condition_options"
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "productcategories.tsx"
+    },
+    {
+      "label": "CONDITION_BADGE",
+      "file_type": "code",
+      "source_file": "src/components/ProductCategories.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "src_components_productcategories_condition_badge",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "condition_badge"
+    },
+    {
+      "label": "site-content-defaults.ts",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "site-content-defaults.ts"
+    },
+    {
+      "label": "DEFAULT_FOOTER_CONTACT",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults_default_footer_contact",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "default_footer_contact"
+    },
+    {
+      "label": "DEFAULT_HERO_SLIDES",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults_default_hero_slides",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "default_hero_slides"
+    },
+    {
+      "label": "DEFAULT_PRODUCT_CATEGORIES",
+      "file_type": "code",
+      "source_file": "src/lib/site-content-defaults.ts",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "src_lib_site_content_defaults_default_product_categories",
+      "community": 11,
+      "community_name": "ProductCategories.tsx",
+      "norm_label": "default_product_categories"
     },
     {
       "label": "CustomerApprovalActions.tsx",
@@ -10405,91 +10471,47 @@
       "norm_label": "toastcontext"
     },
     {
-      "label": "padding-x",
+      "label": "padding-y",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L110",
+      "source_location": "L111",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_button_padding_x",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_button_padding_y",
       "community": 112,
-      "community_name": "input",
-      "norm_label": "padding-x"
+      "community_name": "padding-y",
+      "norm_label": "padding-y"
     },
     {
-      "label": "input",
+      "label": "padding-y",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L115",
+      "source_location": "L120",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_component_input",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_input_padding_y",
       "community": 112,
-      "community_name": "input",
-      "norm_label": "input"
+      "community_name": "padding-y",
+      "norm_label": "padding-y"
     },
     {
       "label": "$type",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L118",
+      "source_location": "L111",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_focus_ring_type",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_y_type",
       "community": 112,
-      "community_name": "input",
+      "community_name": "padding-y",
       "norm_label": "$type"
     },
     {
       "label": "$value",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L118",
+      "source_location": "L111",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_focus_ring_value",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_y_value",
       "community": 112,
-      "community_name": "input",
-      "norm_label": "$value"
-    },
-    {
-      "label": "focus-ring",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L118",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_input_focus_ring",
-      "community": 112,
-      "community_name": "input",
-      "norm_label": "focus-ring"
-    },
-    {
-      "label": "padding-x",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L119",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_input_padding_x",
-      "community": 112,
-      "community_name": "input",
-      "norm_label": "padding-x"
-    },
-    {
-      "label": "$type",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_x_type",
-      "community": 112,
-      "community_name": "input",
-      "norm_label": "$type"
-    },
-    {
-      "label": "$value",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_x_value",
-      "community": 112,
-      "community_name": "input",
+      "community_name": "padding-y",
       "norm_label": "$value"
     },
     {
@@ -11736,59 +11758,81 @@
       "norm_label": "jalaali-js"
     },
     {
-      "label": "orders/new/page.tsx",
+      "label": "Reveal.tsx",
       "file_type": "code",
-      "source_file": "src/app/account/admin/orders/new/page.tsx",
+      "source_file": "src/components/motion/Reveal.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_app_account_admin_orders_new_page",
+      "id": "src_components_motion_reveal",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "orders/new/page.tsx"
+      "community_name": "motion.ts",
+      "norm_label": "reveal.tsx"
     },
     {
-      "label": "dynamic",
+      "label": "Pricing.archived.tsx",
       "file_type": "code",
-      "source_file": "src/app/account/admin/orders/new/page.tsx",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "src_app_account_admin_orders_new_page_dynamic",
-      "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "dynamic"
-    },
-    {
-      "label": "metadata",
-      "file_type": "code",
-      "source_file": "src/app/account/admin/orders/new/page.tsx",
-      "source_location": "L8",
-      "_origin": "ast",
-      "id": "src_app_account_admin_orders_new_page_metadata",
-      "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "metadata"
-    },
-    {
-      "label": "OrderForm.tsx",
-      "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_file": "src/components/Pricing.archived.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_orderform",
+      "id": "src_components_pricing_archived",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "orderform.tsx"
+      "community_name": "motion.ts",
+      "norm_label": "pricing.archived.tsx"
     },
     {
-      "label": "STATUS_OPTIONS",
+      "label": "PLANS",
       "file_type": "code",
-      "source_file": "src/components/admin/OrderForm.tsx",
-      "source_location": "L25",
+      "source_file": "src/components/Pricing.archived.tsx",
+      "source_location": "L16",
       "_origin": "ast",
-      "id": "src_components_admin_orderform_status_options",
+      "id": "src_components_pricing_archived_plans",
       "community": 159,
-      "community_name": "orders/new/page.tsx",
-      "norm_label": "status_options"
+      "community_name": "motion.ts",
+      "norm_label": "plans"
+    },
+    {
+      "label": "motion.ts",
+      "file_type": "code",
+      "source_file": "src/lib/motion.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_motion",
+      "community": 159,
+      "community_name": "motion.ts",
+      "norm_label": "motion.ts"
+    },
+    {
+      "label": "fadeIn",
+      "file_type": "code",
+      "source_file": "src/lib/motion.ts",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "src_lib_motion_fadein",
+      "community": 159,
+      "community_name": "motion.ts",
+      "norm_label": "fadein"
+    },
+    {
+      "label": "scaleIn",
+      "file_type": "code",
+      "source_file": "src/lib/motion.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_lib_motion_scalein",
+      "community": 159,
+      "community_name": "motion.ts",
+      "norm_label": "scalein"
+    },
+    {
+      "label": "viewportOnce",
+      "file_type": "code",
+      "source_file": "src/lib/motion.ts",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "src_lib_motion_viewportonce",
+      "community": 159,
+      "community_name": "motion.ts",
+      "norm_label": "viewportonce"
     },
     {
       "label": "Test adding colors multiple times.",
@@ -12066,15 +12110,59 @@
       "norm_label": "orders/route.ts"
     },
     {
-      "label": "RichTextEditor.tsx",
+      "label": "orders/new/page.tsx",
       "file_type": "code",
-      "source_file": "src/components/admin/RichTextEditor.tsx",
+      "source_file": "src/app/account/admin/orders/new/page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_richtexteditor",
+      "id": "src_app_account_admin_orders_new_page",
       "community": 165,
-      "community_name": "RichTextEditor.tsx",
-      "norm_label": "richtexteditor.tsx"
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "orders/new/page.tsx"
+    },
+    {
+      "label": "dynamic",
+      "file_type": "code",
+      "source_file": "src/app/account/admin/orders/new/page.tsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "src_app_account_admin_orders_new_page_dynamic",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "dynamic"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/account/admin/orders/new/page.tsx",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_app_account_admin_orders_new_page_metadata",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "metadata"
+    },
+    {
+      "label": "OrderForm.tsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_components_admin_orderform",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "orderform.tsx"
+    },
+    {
+      "label": "STATUS_OPTIONS",
+      "file_type": "code",
+      "source_file": "src/components/admin/OrderForm.tsx",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "src_components_admin_orderform_status_options",
+      "community": 165,
+      "community_name": "orders/new/page.tsx",
+      "norm_label": "status_options"
     },
     {
       "label": "qrcode",
@@ -12284,17 +12372,6 @@
       "community": 17,
       "community_name": "design_system.py",
       "norm_label": "format design system as markdown."
-    },
-    {
-      "label": "Bucket a 1-10 dial value into its tier config. Returns None if value is None.",
-      "file_type": "rationale",
-      "source_file": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
-      "source_location": "L70",
-      "_origin": "ast",
-      "id": "claude_skills_ui_ux_pro_max_scripts_design_system_rationale_70",
-      "community": 17,
-      "community_name": "design_system.py",
-      "norm_label": "bucket a 1-10 dial value into its tier config. returns none if value is none."
     },
     {
       "label": "Main entry point for design system generation. Args: query: Search query (e.g.,\u2026",
@@ -13606,59 +13683,37 @@
       "norm_label": "media.ts"
     },
     {
-      "label": "consultation/page.tsx",
+      "label": "blog/new/page.tsx",
       "file_type": "code",
-      "source_file": "src/app/consultation/page.tsx",
+      "source_file": "src/app/account/admin/blog/new/page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_app_consultation_page",
+      "id": "src_app_account_admin_blog_new_page",
       "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "consultation/page.tsx"
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "blog/new/page.tsx"
     },
     {
-      "label": "metadata",
+      "label": "BlogPostForm.tsx",
       "file_type": "code",
-      "source_file": "src/app/consultation/page.tsx",
-      "source_location": "L4",
-      "_origin": "ast",
-      "id": "src_app_consultation_page_metadata",
-      "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "metadata"
-    },
-    {
-      "label": "ConsultationForm.tsx",
-      "file_type": "code",
-      "source_file": "src/components/ConsultationForm.tsx",
+      "source_file": "src/components/admin/BlogPostForm.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_consultationform",
+      "id": "src_components_admin_blogpostform",
       "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "consultationform.tsx"
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "blogpostform.tsx"
     },
     {
-      "label": "initialState",
+      "label": "MediaPicker.tsx",
       "file_type": "code",
-      "source_file": "src/components/ConsultationForm.tsx",
-      "source_location": "L23",
+      "source_file": "src/components/admin/MediaPicker.tsx",
+      "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_consultationform_initialstate",
+      "id": "src_components_admin_mediapicker",
       "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "initialstate"
-    },
-    {
-      "label": "TOPICS",
-      "file_type": "code",
-      "source_file": "src/components/ConsultationForm.tsx",
-      "source_location": "L15",
-      "_origin": "ast",
-      "id": "src_components_consultationform_topics",
-      "community": 214,
-      "community_name": "ConsultationForm.tsx",
-      "norm_label": "topics"
+      "community_name": "BlogPostForm.tsx",
+      "norm_label": "mediapicker.tsx"
     },
     {
       "label": "radius",
@@ -13749,125 +13804,70 @@
       "norm_label": "deletepostbutton.tsx"
     },
     {
-      "label": "Footer.tsx",
+      "label": "consultation/page.tsx",
       "file_type": "code",
-      "source_file": "src/components/Footer.tsx",
+      "source_file": "src/app/consultation/page.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_footer",
+      "id": "src_app_consultation_page",
       "community": 217,
-      "community_name": "Footer.tsx",
-      "norm_label": "footer.tsx"
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "consultation/page.tsx"
     },
     {
-      "label": "QUICK_LINKS",
+      "label": "metadata",
       "file_type": "code",
-      "source_file": "src/components/Footer.tsx",
-      "source_location": "L9",
+      "source_file": "src/app/consultation/page.tsx",
+      "source_location": "L4",
       "_origin": "ast",
-      "id": "src_components_footer_quick_links",
+      "id": "src_app_consultation_page_metadata",
       "community": 217,
-      "community_name": "Footer.tsx",
-      "norm_label": "quick_links"
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "metadata"
     },
     {
-      "label": "SERVICES",
+      "label": "ConsultationForm.tsx",
       "file_type": "code",
-      "source_file": "src/components/Footer.tsx",
-      "source_location": "L21",
-      "_origin": "ast",
-      "id": "src_components_footer_services",
-      "community": 217,
-      "community_name": "Footer.tsx",
-      "norm_label": "services"
-    },
-    {
-      "label": "SOCIAL_ICONS",
-      "file_type": "code",
-      "source_file": "src/components/Footer.tsx",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "src_components_footer_social_icons",
-      "community": 217,
-      "community_name": "Footer.tsx",
-      "norm_label": "social_icons"
-    },
-    {
-      "label": "site-content/route.ts",
-      "file_type": "code",
-      "source_file": "src/app/api/admin/site-content/route.ts",
+      "source_file": "src/components/ConsultationForm.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_app_api_admin_site_content_route",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "site-content/route.ts"
+      "id": "src_components_consultationform",
+      "community": 217,
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "consultationform.tsx"
     },
     {
-      "label": "CONDITION_VALUES",
+      "label": "initialState",
       "file_type": "code",
-      "source_file": "src/app/api/admin/site-content/route.ts",
-      "source_location": "L12",
+      "source_file": "src/components/ConsultationForm.tsx",
+      "source_location": "L23",
       "_origin": "ast",
-      "id": "src_app_api_admin_site_content_route_condition_values",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "condition_values"
+      "id": "src_components_consultationform_initialstate",
+      "community": 217,
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "initialstate"
     },
     {
-      "label": "IconPicker.tsx",
+      "label": "TOPICS",
       "file_type": "code",
-      "source_file": "src/components/admin/IconPicker.tsx",
+      "source_file": "src/components/ConsultationForm.tsx",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "src_components_consultationform_topics",
+      "community": 217,
+      "community_name": "ConsultationForm.tsx",
+      "norm_label": "topics"
+    },
+    {
+      "label": "RichTextEditor.tsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/RichTextEditor.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_iconpicker",
+      "id": "src_components_admin_richtexteditor",
       "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "iconpicker.tsx"
-    },
-    {
-      "label": "category-icons.tsx",
-      "file_type": "code",
-      "source_file": "src/lib/category-icons.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "src_lib_category_icons",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "category-icons.tsx"
-    },
-    {
-      "label": "CATEGORY_ICON_KEYS",
-      "file_type": "code",
-      "source_file": "src/lib/category-icons.tsx",
-      "source_location": "L3",
-      "_origin": "ast",
-      "id": "src_lib_category_icons_category_icon_keys",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "category_icon_keys"
-    },
-    {
-      "label": "CATEGORY_ICON_LABELS",
-      "file_type": "code",
-      "source_file": "src/lib/category-icons.tsx",
-      "source_location": "L16",
-      "_origin": "ast",
-      "id": "src_lib_category_icons_category_icon_labels",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "category_icon_labels"
-    },
-    {
-      "label": "CATEGORY_ICONS",
-      "file_type": "code",
-      "source_file": "src/lib/category-icons.tsx",
-      "source_location": "L27",
-      "_origin": "ast",
-      "id": "src_lib_category_icons_category_icons",
-      "community": 218,
-      "community_name": "site-content/route.ts",
-      "norm_label": "category_icons"
+      "community_name": "RichTextEditor.tsx",
+      "norm_label": "richtexteditor.tsx"
     },
     {
       "label": "@radix-ui/react-popover",
@@ -14321,48 +14321,48 @@
       "norm_label": "revalidate"
     },
     {
-      "label": "padding-y",
+      "label": "Footer.tsx",
       "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L111",
+      "source_file": "src/components/Footer.tsx",
+      "source_location": "L1",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_button_padding_y",
+      "id": "src_components_footer",
       "community": 229,
-      "community_name": "padding-y",
-      "norm_label": "padding-y"
+      "community_name": "Footer.tsx",
+      "norm_label": "footer.tsx"
     },
     {
-      "label": "padding-y",
+      "label": "QUICK_LINKS",
       "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L120",
+      "source_file": "src/components/Footer.tsx",
+      "source_location": "L9",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_input_padding_y",
+      "id": "src_components_footer_quick_links",
       "community": 229,
-      "community_name": "padding-y",
-      "norm_label": "padding-y"
+      "community_name": "Footer.tsx",
+      "norm_label": "quick_links"
     },
     {
-      "label": "$type",
+      "label": "SERVICES",
       "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L111",
+      "source_file": "src/components/Footer.tsx",
+      "source_location": "L21",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_y_type",
+      "id": "src_components_footer_services",
       "community": 229,
-      "community_name": "padding-y",
-      "norm_label": "$type"
+      "community_name": "Footer.tsx",
+      "norm_label": "services"
     },
     {
-      "label": "$value",
+      "label": "SOCIAL_ICONS",
       "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L111",
+      "source_file": "src/components/Footer.tsx",
+      "source_location": "L31",
       "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_y_value",
+      "id": "src_components_footer_social_icons",
       "community": 229,
-      "community_name": "padding-y",
-      "norm_label": "$value"
+      "community_name": "Footer.tsx",
+      "norm_label": "social_icons"
     },
     {
       "label": "scripts/core.py",
@@ -14577,76 +14577,10 @@
       "label": "$type",
       "file_type": "code",
       "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L47",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_8_type",
-      "community": 233,
-      "community_name": "8",
-      "norm_label": "$type"
-    },
-    {
-      "label": "$value",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L47",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_8_value",
-      "community": 233,
-      "community_name": "8",
-      "norm_label": "$value"
-    },
-    {
-      "label": "8",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L47",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_spacing_8",
-      "community": 233,
-      "community_name": "8",
-      "norm_label": "8"
-    },
-    {
-      "label": "destructive",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L95",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_color_destructive",
-      "community": 234,
-      "community_name": "destructive",
-      "norm_label": "destructive"
-    },
-    {
-      "label": "$type",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L95",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_destructive_type",
-      "community": 234,
-      "community_name": "destructive",
-      "norm_label": "$type"
-    },
-    {
-      "label": "$value",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L95",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_destructive_value",
-      "community": 234,
-      "community_name": "destructive",
-      "norm_label": "$value"
-    },
-    {
-      "label": "$type",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
       "source_location": "L42",
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_2_type",
-      "community": 235,
+      "community": 233,
       "community_name": "2",
       "norm_label": "$type"
     },
@@ -14657,7 +14591,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_2_value",
-      "community": 235,
+      "community": 233,
       "community_name": "2",
       "norm_label": "$value"
     },
@@ -14668,9 +14602,75 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "claude_skills_design_system_templates_design_tokens_starter_spacing_2",
-      "community": 235,
+      "community": 233,
       "community_name": "2",
       "norm_label": "2"
+    },
+    {
+      "label": "$type",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_4_type",
+      "community": 234,
+      "community_name": "4",
+      "norm_label": "$type"
+    },
+    {
+      "label": "$value",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_4_value",
+      "community": 234,
+      "community_name": "4",
+      "norm_label": "$value"
+    },
+    {
+      "label": "4",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_spacing_4",
+      "community": 234,
+      "community_name": "4",
+      "norm_label": "4"
+    },
+    {
+      "label": "$type",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_8_type",
+      "community": 235,
+      "community_name": "8",
+      "norm_label": "$type"
+    },
+    {
+      "label": "$value",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_8_value",
+      "community": 235,
+      "community_name": "8",
+      "norm_label": "$value"
+    },
+    {
+      "label": "8",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_spacing_8",
+      "community": 235,
+      "community_name": "8",
+      "norm_label": "8"
     },
     {
       "label": "20260805111845_contract_types_and_status/migration.sql",
@@ -14695,15 +14695,37 @@
       "norm_label": "`contract_types`"
     },
     {
-      "label": "next",
+      "label": "destructive",
       "file_type": "code",
-      "source_file": "next",
-      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L95",
       "_origin": "ast",
-      "id": "next_next",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_color_destructive",
       "community": 237,
-      "community_name": "next",
-      "norm_label": "next"
+      "community_name": "destructive",
+      "norm_label": "destructive"
+    },
+    {
+      "label": "$type",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L95",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_destructive_type",
+      "community": 237,
+      "community_name": "destructive",
+      "norm_label": "$type"
+    },
+    {
+      "label": "$value",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L95",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_destructive_value",
+      "community": 237,
+      "community_name": "destructive",
+      "norm_label": "$value"
     },
     {
       "label": "20260805120433_customer_type_and_approval/migration.sql",
@@ -14904,48 +14926,26 @@
       "norm_label": "20260815084523_add_login_security_and_2fa_fields/migration.sql"
     },
     {
-      "label": "$type",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L44",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_4_type",
-      "community": 245,
-      "community_name": "4",
-      "norm_label": "$type"
-    },
-    {
-      "label": "$value",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L44",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_4_value",
-      "community": 245,
-      "community_name": "4",
-      "norm_label": "$value"
-    },
-    {
-      "label": "4",
-      "file_type": "code",
-      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
-      "source_location": "L44",
-      "_origin": "ast",
-      "id": "claude_skills_design_system_templates_design_tokens_starter_spacing_4",
-      "community": 245,
-      "community_name": "4",
-      "norm_label": "4"
-    },
-    {
-      "label": "Test adding components with empty list.",
+      "label": "Test adding components that are already installed.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L96",
+      "source_location": "L112",
       "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_96",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_112",
+      "community": 245,
+      "community_name": ".test_add_components_already_installed",
+      "norm_label": "test adding components that are already installed."
+    },
+    {
+      "label": "next",
+      "file_type": "code",
+      "source_file": "next",
+      "confidence": "EXTRACTED",
+      "_origin": "ast",
+      "id": "next_next",
       "community": 246,
-      "community_name": ".test_add_components_no_components",
-      "norm_label": "test adding components with empty list."
+      "community_name": "next",
+      "norm_label": "next"
     },
     {
       "label": "Generates design system recommendations from aggregated searches.",
@@ -15036,37 +15036,92 @@
       "norm_label": "generate complete design system recommendation. variance/motion/density are..."
     },
     {
-      "label": "blog/new/page.tsx",
-      "file_type": "code",
-      "source_file": "src/app/account/admin/blog/new/page.tsx",
-      "source_location": "L1",
+      "label": "Bucket a 1-10 dial value into its tier config. Returns None if value is None.",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
+      "source_location": "L70",
       "_origin": "ast",
-      "id": "src_app_account_admin_blog_new_page",
-      "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "blog/new/page.tsx"
+      "id": "claude_skills_ui_ux_pro_max_scripts_design_system_rationale_70",
+      "community": 25,
+      "community_name": "DesignSystemGenerator",
+      "norm_label": "bucket a 1-10 dial value into its tier config. returns none if value is none."
     },
     {
-      "label": "BlogPostForm.tsx",
+      "label": "site-content/route.ts",
       "file_type": "code",
-      "source_file": "src/components/admin/BlogPostForm.tsx",
+      "source_file": "src/app/api/admin/site-content/route.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_blogpostform",
+      "id": "src_app_api_admin_site_content_route",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "blogpostform.tsx"
+      "community_name": "site-content/route.ts",
+      "norm_label": "site-content/route.ts"
     },
     {
-      "label": "MediaPicker.tsx",
+      "label": "CONDITION_VALUES",
       "file_type": "code",
-      "source_file": "src/components/admin/MediaPicker.tsx",
+      "source_file": "src/app/api/admin/site-content/route.ts",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "src_app_api_admin_site_content_route_condition_values",
+      "community": 26,
+      "community_name": "site-content/route.ts",
+      "norm_label": "condition_values"
+    },
+    {
+      "label": "IconPicker.tsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/IconPicker.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_admin_mediapicker",
+      "id": "src_components_admin_iconpicker",
       "community": 26,
-      "community_name": "BlogPostForm.tsx",
-      "norm_label": "mediapicker.tsx"
+      "community_name": "site-content/route.ts",
+      "norm_label": "iconpicker.tsx"
+    },
+    {
+      "label": "category-icons.tsx",
+      "file_type": "code",
+      "source_file": "src/lib/category-icons.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_category_icons",
+      "community": 26,
+      "community_name": "site-content/route.ts",
+      "norm_label": "category-icons.tsx"
+    },
+    {
+      "label": "CATEGORY_ICON_KEYS",
+      "file_type": "code",
+      "source_file": "src/lib/category-icons.tsx",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_lib_category_icons_category_icon_keys",
+      "community": 26,
+      "community_name": "site-content/route.ts",
+      "norm_label": "category_icon_keys"
+    },
+    {
+      "label": "CATEGORY_ICON_LABELS",
+      "file_type": "code",
+      "source_file": "src/lib/category-icons.tsx",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_lib_category_icons_category_icon_labels",
+      "community": 26,
+      "community_name": "site-content/route.ts",
+      "norm_label": "category_icon_labels"
+    },
+    {
+      "label": "CATEGORY_ICONS",
+      "file_type": "code",
+      "source_file": "src/lib/category-icons.tsx",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "src_lib_category_icons_category_icons",
+      "community": 26,
+      "community_name": "site-content/route.ts",
+      "norm_label": "category_icons"
     },
     {
       "label": "admin/page.tsx",
@@ -17269,103 +17324,37 @@
       "norm_label": "twofactorsetup.tsx"
     },
     {
-      "label": "products/page.tsx",
+      "label": "SimpleRichTextEditor.tsx",
       "file_type": "code",
-      "source_file": "src/app/products/page.tsx",
+      "source_file": "src/components/admin/SimpleRichTextEditor.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_app_products_page",
+      "id": "src_components_admin_simplerichtexteditor",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "products/page.tsx"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "simplerichtexteditor.tsx"
     },
     {
-      "label": "metadata",
+      "label": "SiteContentForm.tsx",
       "file_type": "code",
-      "source_file": "src/app/products/page.tsx",
-      "source_location": "L6",
-      "_origin": "ast",
-      "id": "src_app_products_page_metadata",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "metadata"
-    },
-    {
-      "label": "Hero.tsx",
-      "file_type": "code",
-      "source_file": "src/components/Hero.tsx",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "src_components_hero",
+      "id": "src_components_admin_sitecontentform",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "hero.tsx"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "sitecontentform.tsx"
     },
     {
-      "label": "ProductCategories.tsx",
+      "label": "CONDITION_OPTIONS",
       "file_type": "code",
-      "source_file": "src/components/ProductCategories.tsx",
-      "source_location": "L1",
+      "source_file": "src/components/admin/SiteContentForm.tsx",
+      "source_location": "L17",
       "_origin": "ast",
-      "id": "src_components_productcategories",
+      "id": "src_components_admin_sitecontentform_condition_options",
       "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "productcategories.tsx"
-    },
-    {
-      "label": "CONDITION_BADGE",
-      "file_type": "code",
-      "source_file": "src/components/ProductCategories.tsx",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "src_components_productcategories_condition_badge",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "condition_badge"
-    },
-    {
-      "label": "site-content-defaults.ts",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "site-content-defaults.ts"
-    },
-    {
-      "label": "DEFAULT_FOOTER_CONTACT",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L39",
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults_default_footer_contact",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "default_footer_contact"
-    },
-    {
-      "label": "DEFAULT_HERO_SLIDES",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L49",
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults_default_hero_slides",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "default_hero_slides"
-    },
-    {
-      "label": "DEFAULT_PRODUCT_CATEGORIES",
-      "file_type": "code",
-      "source_file": "src/lib/site-content-defaults.ts",
-      "source_location": "L86",
-      "_origin": "ast",
-      "id": "src_lib_site_content_defaults_default_product_categories",
-      "community": 45,
-      "community_name": "ProductCategories.tsx",
-      "norm_label": "default_product_categories"
+      "community_name": "SiteContentForm.tsx",
+      "norm_label": "condition_options"
     },
     {
       "label": "icon/generate.py",
@@ -18391,81 +18380,92 @@
       "norm_label": "rfc-5987"
     },
     {
-      "label": "Reveal.tsx",
+      "label": "padding-x",
       "file_type": "code",
-      "source_file": "src/components/motion/Reveal.tsx",
-      "source_location": "L1",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L110",
       "_origin": "ast",
-      "id": "src_components_motion_reveal",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_button_padding_x",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "reveal.tsx"
+      "community_name": "input",
+      "norm_label": "padding-x"
     },
     {
-      "label": "Pricing.archived.tsx",
+      "label": "input",
       "file_type": "code",
-      "source_file": "src/components/Pricing.archived.tsx",
-      "source_location": "L1",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L115",
       "_origin": "ast",
-      "id": "src_components_pricing_archived",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_component_input",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "pricing.archived.tsx"
+      "community_name": "input",
+      "norm_label": "input"
     },
     {
-      "label": "PLANS",
+      "label": "$type",
       "file_type": "code",
-      "source_file": "src/components/Pricing.archived.tsx",
-      "source_location": "L16",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L118",
       "_origin": "ast",
-      "id": "src_components_pricing_archived_plans",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_focus_ring_type",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "plans"
+      "community_name": "input",
+      "norm_label": "$type"
     },
     {
-      "label": "motion.ts",
+      "label": "$value",
       "file_type": "code",
-      "source_file": "src/lib/motion.ts",
-      "source_location": "L1",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L118",
       "_origin": "ast",
-      "id": "src_lib_motion",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_focus_ring_value",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "motion.ts"
+      "community_name": "input",
+      "norm_label": "$value"
     },
     {
-      "label": "fadeIn",
+      "label": "focus-ring",
       "file_type": "code",
-      "source_file": "src/lib/motion.ts",
-      "source_location": "L12",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L118",
       "_origin": "ast",
-      "id": "src_lib_motion_fadein",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_input_focus_ring",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "fadein"
+      "community_name": "input",
+      "norm_label": "focus-ring"
     },
     {
-      "label": "scaleIn",
+      "label": "padding-x",
       "file_type": "code",
-      "source_file": "src/lib/motion.ts",
-      "source_location": "L17",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L119",
       "_origin": "ast",
-      "id": "src_lib_motion_scalein",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_input_padding_x",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "scalein"
+      "community_name": "input",
+      "norm_label": "padding-x"
     },
     {
-      "label": "viewportOnce",
+      "label": "$type",
       "file_type": "code",
-      "source_file": "src/lib/motion.ts",
-      "source_location": "L39",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L110",
       "_origin": "ast",
-      "id": "src_lib_motion_viewportonce",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_x_type",
       "community": 57,
-      "community_name": "motion.ts",
-      "norm_label": "viewportonce"
+      "community_name": "input",
+      "norm_label": "$type"
+    },
+    {
+      "label": "$value",
+      "file_type": "code",
+      "source_file": ".claude/skills/design-system/templates/design-tokens-starter.json",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "claude_skills_design_system_templates_design_tokens_starter_padding_x_value",
+      "community": 57,
+      "community_name": "input",
+      "norm_label": "$value"
     },
     {
       "label": "GregorianDatePicker.tsx",
@@ -18765,17 +18765,6 @@
       "norm_label": "tests for shadcn_add.py"
     },
     {
-      "label": "Test adding components that are already installed.",
-      "file_type": "rationale",
-      "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
-      "source_location": "L112",
-      "_origin": "ast",
-      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_112",
-      "community": 61,
-      "community_name": "ShadcnInstaller",
-      "norm_label": "test adding components that are already installed."
-    },
-    {
       "label": "Test listing installed components when they exist.",
       "file_type": "rationale",
       "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
@@ -18796,6 +18785,17 @@
       "community": 61,
       "community_name": "ShadcnInstaller",
       "norm_label": "test getting installed components without config."
+    },
+    {
+      "label": "Test adding components with empty list.",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/ui-styling/scripts/tests/test_shadcn_add.py",
+      "source_location": "L96",
+      "_origin": "ast",
+      "id": "claude_skills_ui_styling_scripts_tests_test_shadcn_add_rationale_96",
+      "community": 61,
+      "community_name": "ShadcnInstaller",
+      "norm_label": "test adding components with empty list."
     },
     {
       "label": "Add all available shadcn/ui components. Args: overwrite: If True, overwrite\u2026",
@@ -32838,7 +32838,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/TicketChat.tsx",
-      "source_location": "L482",
+      "source_location": "L494",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_ticketchat_ticketchat",
@@ -32849,7 +32849,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/TicketChat.tsx",
-      "source_location": "L510",
+      "source_location": "L522",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_ticketchat_ticketchat",
@@ -32862,7 +32862,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/TicketChat.tsx",
-      "source_location": "L523",
+      "source_location": "L535",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_ticketchat_ticketchat",
@@ -32874,7 +32874,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/TicketChat.tsx",
-      "source_location": "L552",
+      "source_location": "L564",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_ticketchat_ticketchat",
@@ -32885,7 +32885,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/TicketChat.tsx",
-      "source_location": "L554",
+      "source_location": "L566",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_ticketchat_ticketchat",
@@ -68568,5 +68568,5 @@
       "source_file": ".claude/skills/ui-styling/references/shadcn-accessibility.md"
     }
   ],
-  "built_at_commit": "f0bc97e4375959d4066338401f88e6f321a9284d"
+  "built_at_commit": "dbf4fd379f00b686d5889c5ac63991a9c1269006"
 }

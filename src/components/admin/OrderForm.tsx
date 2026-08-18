@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
   "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -32,6 +33,7 @@ const STATUS_OPTIONS = [
 
 export default function OrderForm({ mode, customers, order }: OrderFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [userId, setUserId] = useState(order?.userId ?? customers[0]?.id ?? "");
   const [status, setStatus] = useState(order?.status ?? "PENDING");
@@ -39,7 +41,6 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
     order?.items && order.items.length > 0 ? order.items : [{ productName: "", quantity: 1 }],
   );
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [invalidIndexes, setInvalidIndexes] = useState<Set<number>>(new Set());
 
   const updateItem = (index: number, field: keyof Item, value: string) => {
@@ -65,10 +66,9 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!userId) {
-      setError("انتخاب مشتری الزامی است.");
+      showToast("انتخاب مشتری الزامی است.", "error");
       return;
     }
 
@@ -84,13 +84,13 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
     if (items.length === 0 || bad.size === items.length) {
       setInvalidIndexes(new Set(items.map((_, i) => i)));
-      setError("حداقل یک قلم کالا الزامی است.");
+      showToast("حداقل یک قلم کالا الزامی است.", "error");
       return;
     }
 
     if (bad.size > 0) {
       setInvalidIndexes(bad);
-      setError("نام و تعداد همه‌ی اقلام سفارش را تکمیل کنید یا ردیف‌های ناقص را حذف کنید.");
+      showToast("نام و تعداد همه‌ی اقلام سفارش را تکمیل کنید یا ردیف‌های ناقص را حذف کنید.", "error");
       return;
     }
 
@@ -111,10 +111,11 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ذخیره سفارش.");
+      showToast(body?.error || "خطا در ذخیره سفارش.", "error");
       return;
     }
 
+    showToast(mode === "create" ? "سفارش با موفقیت ثبت شد." : "تغییرات سفارش ذخیره شد.");
     router.push("/account/admin/orders");
     router.refresh();
   };
@@ -201,12 +202,6 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
           افزودن قلم کالا
         </button>
       </div>
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       <button
         type="submit"

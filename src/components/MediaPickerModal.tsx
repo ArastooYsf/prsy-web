@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/media";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
+import { useToast } from "@/components/ToastProvider";
 
 export type MediaAsset = {
   id: string;
@@ -62,12 +63,12 @@ export default function MediaPickerModal({
   multiple = true,
   initialSelected = [],
 }: MediaPickerModalProps) {
+  const { showToast } = useToast();
   const [tab, setTab] = useState<"gallery" | "upload">("gallery");
   const [gallery, setGallery] = useState<MediaAsset[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
   const [draftSelected, setDraftSelected] = useState<string[]>(initialSelected);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [deleteTarget, setDeleteTarget] = useState<MediaAsset | null>(null);
@@ -79,7 +80,6 @@ export default function MediaPickerModal({
     if (!open) return;
     setDraftSelected(initialSelected);
     setTab("gallery");
-    setError("");
     fetchGallery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, kind]);
@@ -114,7 +114,6 @@ export default function MediaPickerModal({
   const handleUpload = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     setUploading(true);
-    setError("");
 
     const newPaths: string[] = [];
 
@@ -126,7 +125,7 @@ export default function MediaPickerModal({
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error || "خطا در آپلود یک یا چند فایل.");
+        showToast(body?.error || "خطا در آپلود یک یا چند فایل.", "error");
         continue;
       }
 
@@ -315,7 +314,6 @@ export default function MediaPickerModal({
             </label>
           )}
 
-          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         </div>
 
         <div className="flex items-center justify-between border-t border-white/10 px-5 py-4">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/admin/ToastProvider";
+import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
@@ -27,7 +27,6 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
   const [economicCode, setEconomicCode] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   const generatePassword = () => {
     setPassword(Math.random().toString(36).slice(-10));
@@ -35,18 +34,17 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (!isValidEmail(email) || password.length < 8) {
-      setError("ایمیل معتبر الزامی و رمز عبور باید حداقل ۸ کاراکتر باشد.");
+      showToast("ایمیل معتبر الزامی و رمز عبور باید حداقل ۸ کاراکتر باشد.", "error");
       return;
     }
     if (phone.trim() && !isValidIranPhone(phone)) {
-      setError("شماره تلفن معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹");
+      showToast("شماره تلفن معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
     }
     if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
-      setError("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.");
+      showToast("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.", "error");
       return;
     }
 
@@ -62,7 +60,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      setError(body?.error || "خطا در ثبت مشتری.");
+      showToast(body?.error || "خطا در ثبت مشتری.", "error");
       return;
     }
 
@@ -167,10 +165,6 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
           className={inputClass}
         />
       </div>
-
-      {error && (
-        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
-      )}
 
       <button
         type="submit"

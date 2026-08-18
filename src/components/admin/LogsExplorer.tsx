@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Bell, ChevronDown, Download, Lock, ShieldAlert, Unlock } from "lucide-react";
 import { isoToJalali } from "@/lib/jalali";
 import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
+import { useToast } from "@/components/ToastProvider";
 import type { LogCategory, LogFileSummary } from "@/lib/logger";
 
 type LogsExplorerProps = {
@@ -44,6 +45,7 @@ function jalaliKeyFromIso(iso: string): string | null {
 
 export default function LogsExplorer({ files }: LogsExplorerProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [categoryFilter, setCategoryFilter] = useState<"all" | LogCategory>("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -51,7 +53,6 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
   const [entriesCache, setEntriesCache] = useState<Record<string, string[]>>({});
   const [loadingFile, setLoadingFile] = useState<string | null>(null);
   const [togglingLock, setTogglingLock] = useState<string | null>(null);
-  const [error, setError] = useState("");
 
   const filtered = useMemo(() => {
     const fromKey = fromDate ? jalaliKeyFromIso(fromDate) : null;
@@ -72,7 +73,6 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
       return;
     }
     setExpanded(filename);
-    setError("");
 
     if (entriesCache[filename]) return;
 
@@ -81,7 +81,7 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
     setLoadingFile(null);
 
     if (!res.ok) {
-      setError("خطا در بارگذاری محتوای این روز.");
+      showToast("خطا در بارگذاری محتوای این روز.", "error");
       return;
     }
 
@@ -91,7 +91,6 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
 
   const toggleLock = async (filename: string, currentlyLocked: boolean) => {
     setTogglingLock(filename);
-    setError("");
 
     const res = await fetch(`/api/admin/logs/${filename}/lock`, {
       method: "PATCH",
@@ -102,10 +101,11 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
     setTogglingLock(null);
 
     if (!res.ok) {
-      setError("خطا در تغییر وضعیت قفل.");
+      showToast("خطا در تغییر وضعیت قفل.", "error");
       return;
     }
 
+    showToast(currentlyLocked ? "قفل فایل باز شد." : "فایل قفل شد.");
     router.refresh();
   };
 
@@ -151,10 +151,6 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
           )}
         </div>
       </div>
-
-      {error && (
-        <p className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>
-      )}
 
       {filtered.length === 0 ? (
         <p className="rounded-xl border border-white/10 bg-white/[0.02] p-6 text-center text-sm text-foreground/50">

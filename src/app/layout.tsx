@@ -7,6 +7,7 @@ import PageLoader from "@/components/PageLoader";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import ToastProvider from "@/components/ToastProvider";
 import { getFooterContact } from "@/lib/site-content";
 import "./globals.css";
 
@@ -77,10 +78,12 @@ export default async function RootLayout({
           </>
         )}
         <SessionProviderWrapper>
-          <PageLoader />
-          <Header />
-          <main>{children}</main>
-          <Footer contact={footerContact} />
+          <ToastProvider>
+            <PageLoader />
+            <Header />
+            <main>{children}</main>
+            <Footer contact={footerContact} />
+          </ToastProvider>
         </SessionProviderWrapper>
         <CookieConsentBanner />
       </body>

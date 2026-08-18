@@ -36,8 +36,8 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
         <section
           className={
             isAdmin
-              ? "mx-auto flex w-full max-w-[1680px] flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12 lg:px-10"
-              : "container flex flex-1 flex-col py-6 sm:py-12"
+              ? "mx-auto flex min-h-0 w-full max-w-[1680px] flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12 lg:px-10"
+              : "container flex min-h-0 flex-1 flex-col py-6 sm:py-12"
           }
         >
           <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">

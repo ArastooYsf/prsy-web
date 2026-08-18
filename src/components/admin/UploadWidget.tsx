@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/media";
+import { useToast } from "@/components/ToastProvider";
 
 type UploadedMedia = {
   id: string;
@@ -11,16 +12,16 @@ type UploadedMedia = {
 };
 
 export default function UploadWidget() {
+  const { showToast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
   const [uploaded, setUploaded] = useState<UploadedMedia[]>([]);
 
   const handleFiles = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     setUploading(true);
-    setError("");
 
+    let successCount = 0;
     for (const file of Array.from(fileList)) {
       const formData = new FormData();
       formData.append("file", file);
@@ -32,16 +33,18 @@ export default function UploadWidget() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error || "خطا در آپلود فایل.");
+        showToast(body?.error || "خطا در آپلود فایل.", "error");
         continue;
       }
 
       const { media } = await res.json();
       setUploaded((prev) => [media, ...prev]);
+      successCount++;
     }
 
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
+    if (successCount > 0) showToast(`${successCount} فایل با موفقیت آپلود شد.`);
   };
 
   return (
@@ -66,12 +69,6 @@ export default function UploadWidget() {
         </span>
         <span className="text-xs text-foreground/50">تصویر (PNG/JPG/WEBP) یا PDF — به مخزن سایت اضافه می‌شود</span>
       </label>
-
-      {error && (
-        <p className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-400">
-          {error}
-        </p>
-      )}
 
       {uploaded.length > 0 && (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">

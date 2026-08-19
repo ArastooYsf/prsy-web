@@ -5,6 +5,7 @@ import { Eye, Newspaper, Pencil, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DeletePostButton from "@/components/admin/DeletePostButton";
+import { formatNumber } from "@/lib/format-number";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +68,7 @@ export default async function AdminBlogListPage() {
                     <dt className="text-foreground/40">بازدید</dt>
                     <dd className="flex items-center gap-1 text-foreground/70">
                       <Eye className="size-3.5" />
-                      {post.viewCount.toLocaleString("fa-IR")}
+                      {formatNumber(post.viewCount)}
                     </dd>
                   </div>
                 </dl>
@@ -118,7 +119,7 @@ export default async function AdminBlogListPage() {
                     <td className="px-4 py-3 text-foreground/70">
                       <div className="flex items-center gap-1.5">
                         <Eye className="size-3.5" />
-                        {post.viewCount.toLocaleString("fa-IR")}
+                        {formatNumber(post.viewCount)}
                       </div>
                     </td>
                     <td className="px-4 py-3">

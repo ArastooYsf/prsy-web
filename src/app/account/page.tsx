@@ -5,6 +5,7 @@ import { FileText, MessageSquare, Package, type LucideIcon } from "lucide-react"
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS, CONTRACT_STATUS, ORDER_STATUS } from "@/lib/status-labels";
+import { formatNumber } from "@/lib/format-number";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,7 @@ export default async function AccountOverviewPage() {
               <stat.icon className="size-4" />
               <p className="text-sm">{stat.label}</p>
             </div>
-            <p className="mt-2 text-3xl font-black text-accent-400">{stat.value}</p>
+            <p className="mt-2 text-3xl font-black text-accent-400">{formatNumber(stat.value)}</p>
           </Link>
         ))}
       </div>

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
+import { formatNumber } from "@/lib/format-number";
 
 type ImportResult = { created: number; skipped: { row: number; reason: string }[] };
 
@@ -45,7 +46,7 @@ export default function CsvImportForm() {
     }
 
     const data: ImportResult = await res.json();
-    showToast(`${data.created} مشتری با موفقیت ثبت شد.`, data.skipped.length > 0 ? "warning" : "success");
+    showToast(`${formatNumber(data.created)} مشتری با موفقیت ثبت شد.`, data.skipped.length > 0 ? "warning" : "success");
     if (data.skipped.length > 0) setResult(data);
     router.refresh();
   };
@@ -74,11 +75,11 @@ export default function CsvImportForm() {
 
       {result && result.skipped.length > 0 && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
-          <p>{result.skipped.length} ردیف رد شد:</p>
+          <p>{formatNumber(result.skipped.length)} ردیف رد شد:</p>
           <ul className="mt-1 space-y-0.5 text-xs text-foreground/60">
             {result.skipped.map((s, i) => (
               <li key={i}>
-                ردیف <span dir="ltr">{s.row}</span>: {s.reason}
+                ردیف <span dir="ltr">{formatNumber(s.row)}</span>: {s.reason}
               </li>
             ))}
           </ul>

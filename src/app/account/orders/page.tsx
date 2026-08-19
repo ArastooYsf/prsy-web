@@ -4,6 +4,7 @@ import { Package } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
+import { formatNumber } from "@/lib/format-number";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export default async function AccountOrdersPage() {
                 <p dir="ltr" className="text-right font-semibold">
                   {order.orderNumber}
                 </p>
-                <p className="mt-1 text-xs text-foreground/50">{order.items.length} قلم کالا</p>
+                <p className="mt-1 text-xs text-foreground/50">{formatNumber(order.items.length)} قلم کالا</p>
                 <p dir="ltr" className="mt-1 text-right text-xs text-foreground/50">
                   {order.createdAt.toLocaleDateString("fa-IR")}
                 </p>

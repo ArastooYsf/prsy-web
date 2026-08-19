@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getContractOrderTrend, type StatsRange } from "@/lib/admin-stats";
 
-const VALID_RANGES: StatsRange[] = ["today", "7d", "30d", "1y"];
+const VALID_RANGES: StatsRange[] = ["today", "7d", "30d", "1y", "all"];
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);

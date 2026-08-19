@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/media";
+import { toPersianDigits } from "@/lib/format-number";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
 import { useToast } from "@/components/ToastProvider";
@@ -51,8 +52,8 @@ function isImageMime(mimeType: string) {
 }
 
 function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} کیلوبایت`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} مگابایت`;
+  if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} کیلوبایت`);
+  return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} مگابایت`);
 }
 
 export default function MediaPickerModal({

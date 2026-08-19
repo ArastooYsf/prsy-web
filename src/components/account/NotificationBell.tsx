@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Bell, Check } from "lucide-react";
+import { formatNumber, toPersianDigits } from "@/lib/format-number";
 
 const POLL_MS = 45000;
 
@@ -20,11 +21,11 @@ function timeAgoFa(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.floor(diffMs / 60000);
   if (minutes < 1) return "همین الان";
-  if (minutes < 60) return `${minutes} دقیقه پیش`;
+  if (minutes < 60) return toPersianDigits(`${minutes} دقیقه پیش`);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ساعت پیش`;
+  if (hours < 24) return toPersianDigits(`${hours} ساعت پیش`);
   const days = Math.floor(hours / 24);
-  return `${days} روز پیش`;
+  return toPersianDigits(`${days} روز پیش`);
 }
 
 export default function NotificationBell() {
@@ -81,7 +82,7 @@ export default function NotificationBell() {
           <Bell className="size-4" />
           {unreadCount > 0 && (
             <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-white">
-              {unreadCount > 9 ? "۹+" : unreadCount}
+              {unreadCount > 9 ? "۹+" : formatNumber(unreadCount)}
             </span>
           )}
         </button>

@@ -2,6 +2,7 @@
 
 import { animate, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { formatNumber } from "@/lib/format-number";
 
 type CounterProps = {
   value: number;
@@ -30,7 +31,7 @@ export default function Counter({
 
   return (
     <span ref={ref}>
-      {display.toLocaleString("fa-IR")}
+      {formatNumber(display)}
       {suffix}
     </span>
   );

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
+import { formatNumber } from "@/lib/format-number";
 import DateRangeDisplay from "@/components/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 
@@ -56,7 +57,7 @@ export default async function AccountContractsPage() {
                 <div className="flex items-center gap-2">
                   {expiringSoon && (
                     <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-400">
-                      رو به پایان ({daysLeft} روز)
+                      رو به پایان ({formatNumber(daysLeft)} روز)
                     </span>
                   )}
                   <span

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { Headset, Image as ImageIcon, LayoutTemplate, Newspaper, PackageSearch, ScrollText, type LucideIcon } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { formatNumber } from "@/lib/format-number";
 import { getContractOrderTrend, getOrderStatusBreakdown, getTicketStatusBreakdown, getPageViewCount } from "@/lib/admin-stats";
 import UploadWidget from "@/components/admin/UploadWidget";
 import { TrendChart, OrderStatusChart, TicketStatusChart, SiteViewsCard } from "@/components/admin/DashboardCharts";
@@ -64,7 +65,7 @@ export default async function AdminDashboardPage() {
                 <card.icon className="size-4" />
                 <p className="text-sm">{card.label}</p>
               </div>
-              <p className="mt-2 text-3xl font-black">{card.value}</p>
+              <p className="mt-2 text-3xl font-black">{formatNumber(card.value)}</p>
             </div>
           ))}
           <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />
@@ -87,7 +88,7 @@ export default async function AdminDashboardPage() {
 
   const cards: { label: string; value: number; icon: LucideIcon }[] = [
     { label: "پست‌های وبلاگ", value: stats.posts, icon: Newspaper },
-    { label: "محتوای سایت", value: stats.contentEntries, icon: LayoutTemplate },
+    { label: "محصولات سایت", value: stats.contentEntries, icon: LayoutTemplate },
     { label: "فایل‌های آپلودشده", value: stats.media, icon: ImageIcon },
   ];
 

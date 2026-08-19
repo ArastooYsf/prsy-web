@@ -17,6 +17,7 @@ import {
 import { Eye } from "lucide-react";
 import type { StatusCount, TrendPoint } from "@/lib/admin-stats";
 import { RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
+import { formatNumber, toPersianDigits } from "@/lib/format-number";
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
   PENDING: "#f97316",
@@ -36,7 +37,7 @@ const TICKET_STATUS_COLORS: Record<string, string> = {
 const CONTRACT_COLOR = "#f97316";
 const ORDER_COLOR = "#60a5fa";
 
-const RANGE_OPTIONS: StatsRange[] = ["today", "7d", "30d", "1y"];
+const RANGE_OPTIONS: StatsRange[] = ["today", "7d", "30d", "1y", "all"];
 
 const tooltipStyle = {
   backgroundColor: "#18181b",
@@ -104,9 +105,14 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} interval={range === "1y" ? 0 : "preserveStartEnd"} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} />
-          <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
+          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} interval={range === "1y" || range === "all" ? 0 : "preserveStartEnd"} />
+          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <Tooltip
+            contentStyle={tooltipStyle}
+            labelStyle={{ color: "#fff" }}
+            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            formatter={(value) => toPersianDigits(String(value ?? ""))}
+          />
           <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
           <Bar dataKey="contracts" name="قراردادها" fill={CONTRACT_COLOR} radius={[4, 4, 0, 0]} />
           <Bar dataKey="orders" name="سفارش‌ها" fill={ORDER_COLOR} radius={[4, 4, 0, 0]} />
@@ -142,7 +148,7 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
         </div>
         <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />
       </div>
-      <p className="mt-2 text-3xl font-black">{count.toLocaleString("fa-IR")}</p>
+      <p className="mt-2 text-3xl font-black">{formatNumber(count)}</p>
     </div>
   );
 }
@@ -154,8 +160,13 @@ export function OrderStatusChart({ data }: { data: StatusCount[] }) {
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
           <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} />
-          <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} cursor={{ fill: "rgba(255,255,255,0.05)" }} />
+          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <Tooltip
+            contentStyle={tooltipStyle}
+            labelStyle={{ color: "#fff" }}
+            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            formatter={(value) => toPersianDigits(String(value ?? ""))}
+          />
           <Bar dataKey="count" name="تعداد" radius={[6, 6, 0, 0]}>
             {data.map((entry) => (
               <Cell key={entry.status} fill={ORDER_STATUS_COLORS[entry.status] ?? "#71717a"} />
@@ -184,14 +195,18 @@ export function TicketStatusChart({ data }: { data: StatusCount[] }) {
               innerRadius={55}
               outerRadius={85}
               paddingAngle={2}
-              label={({ percent }) => `${Math.round((percent ?? 0) * 100)}%`}
+              label={({ percent }) => toPersianDigits(`${Math.round((percent ?? 0) * 100)}%`)}
               labelLine={false}
             >
               {data.map((entry) => (
                 <Cell key={entry.status} fill={TICKET_STATUS_COLORS[entry.status] ?? "#71717a"} />
               ))}
             </Pie>
-            <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#fff" }} />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              labelStyle={{ color: "#fff" }}
+              formatter={(value) => toPersianDigits(String(value ?? ""))}
+            />
             <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
           </PieChart>
         </ResponsiveContainer>

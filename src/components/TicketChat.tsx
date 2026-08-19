@@ -8,6 +8,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { LifeBuoy, User, MoreVertical } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
+import { toPersianDigits } from "@/lib/format-number";
 import EmojiPicker from "@/components/EmojiPicker";
 import { useToast } from "@/components/ToastProvider";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
@@ -104,9 +105,9 @@ function isImageMime(mimeType: string) {
 }
 
 function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024) return toPersianDigits(`${bytes} B`);
+  if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} KB`);
+  return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} MB`);
 }
 
 function SeenTicks({ seen, onGradient }: { seen: boolean; onGradient: boolean }) {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import type { FooterContactContent } from "@/lib/site-content";
+import { toPersianDigits } from "@/lib/format-number";
 
 const QUICK_LINKS = [
   { label: "خانه", href: "/" },
@@ -66,7 +67,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
 
   const contactItems = [
     { label: contact.address },
-    contact.phone ? { label: contact.phone, href: contact.phoneHref || undefined } : null,
+    contact.phone ? { label: toPersianDigits(contact.phone), href: contact.phoneHref || undefined } : null,
     contact.email ? { label: contact.email, href: `mailto:${contact.email}` } : null,
   ].filter((item): item is { label: string; href?: string } => item !== null);
 

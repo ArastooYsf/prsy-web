@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
+import { formatNumber } from "@/lib/format-number";
 import { dateRangeWhere, filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import ListFilterBar from "@/components/admin/ListFilterBar";
@@ -115,7 +116,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <dt className="text-foreground/40">اقلام</dt>
-                    <dd className="text-foreground/70">{order.items.length} قلم</dd>
+                    <dd className="text-foreground/70">{formatNumber(order.items.length)} قلم</dd>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <dt className="text-foreground/40">تاریخ ثبت</dt>
@@ -174,7 +175,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
                       {order.orderNumber}
                     </td>
                     <td className="px-4 py-3 text-foreground/70">{order.user.name || order.user.email}</td>
-                    <td className="px-4 py-3 text-foreground/70">{order.items.length} قلم</td>
+                    <td className="px-4 py-3 text-foreground/70">{formatNumber(order.items.length)} قلم</td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}

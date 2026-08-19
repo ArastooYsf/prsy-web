@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
+import { formatNumber } from "@/lib/format-number";
 import OrderProgress from "@/components/OrderProgress";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +50,7 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
             {order.items.map((item) => (
               <tr key={item.id} className="border-t border-white/10">
                 <td className="px-4 py-3 font-medium">{item.productName}</td>
-                <td className="px-4 py-3 text-foreground/70">{item.quantity}</td>
+                <td className="px-4 py-3 text-foreground/70">{formatNumber(item.quantity)}</td>
               </tr>
             ))}
           </tbody>

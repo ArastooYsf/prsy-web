@@ -1,4 +1,7 @@
 import { toJalaali, toGregorian, jalaaliMonthLength } from "jalaali-js";
+import { toPersianDigits } from "@/lib/format-number";
+
+export { toPersianDigits } from "@/lib/format-number";
 
 const jalaliFormatter = new Intl.DateTimeFormat("fa-IR", { year: "numeric", month: "2-digit", day: "2-digit" });
 const gregorianFormatter = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit" });
@@ -50,23 +53,6 @@ export function daysInJalaliMonth(jy: number, jm: number): number {
 export function currentJalaliYear(): number {
   const now = new Date();
   return toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate()).jy;
-}
-
-const PERSIAN_DIGITS: Record<string, string> = {
-  "0": "۰",
-  "1": "۱",
-  "2": "۲",
-  "3": "۳",
-  "4": "۴",
-  "5": "۵",
-  "6": "۶",
-  "7": "۷",
-  "8": "۸",
-  "9": "۹",
-};
-
-export function toPersianDigits(input: string | number): string {
-  return String(input).replace(/[0-9]/g, (digit) => PERSIAN_DIGITS[digit]);
 }
 
 // "۱۴۰۴/۰۵/۲۲ ساعت ۱۴:۳۲:۰۵" — used for the human-readable event log report.

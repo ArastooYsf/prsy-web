@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Bell, ChevronDown, Download, Lock, ShieldAlert, Unlock } from "lucide-react";
 import { isoToJalali } from "@/lib/jalali";
+import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
 import { useToast } from "@/components/ToastProvider";
 import type { LogCategory, LogFileSummary } from "@/lib/logger";
@@ -28,9 +29,9 @@ const CATEGORY_FILTERS: { value: "all" | LogCategory; label: string }[] = [
 ];
 
 function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} بایت`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} کیلوبایت`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} مگابایت`;
+  if (bytes < 1024) return toPersianDigits(`${bytes} بایت`);
+  if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} کیلوبایت`);
+  return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} مگابایت`);
 }
 
 function jalaliKeyFromFilename(filename: string): string {
@@ -197,7 +198,7 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
                     })}
                   </div>
 
-                  <span className="text-xs text-foreground/50">{f.entryCount.toLocaleString("fa-IR")} رویداد</span>
+                  <span className="text-xs text-foreground/50">{formatNumber(f.entryCount)} رویداد</span>
                   <span className="text-xs text-foreground/40">{formatSize(f.size)}</span>
 
                   {f.locked && (

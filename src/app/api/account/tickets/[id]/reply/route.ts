@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { parseAttachmentsInput } from "@/lib/ticket-attachments";
+import { findRecentDuplicateReply } from "@/lib/ticket-reply-dedup";
 import { notifyStaffNewCustomerMessage } from "@/lib/notifications/events";
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
@@ -31,6 +32,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   if (!message && attachments.length === 0) {
     return NextResponse.json({ error: "متن پاسخ نمی‌تواند خالی باشد." }, { status: 400 });
+  }
+
+  const duplicate = await findRecentDuplicateReply(ticket.id, session.user.id, message);
+  if (duplicate) {
+    return NextResponse.json({ reply: duplicate });
   }
 
   const reply = await prisma.ticketReply.create({

@@ -26,14 +26,15 @@ export async function GET(request: Request) {
         ? { mimeType: { not: { startsWith: "image/" } } }
         : {};
 
-  // Staff gets the shared bucket for that scope (e.g. every SITE_CONTENT upload,
-  // regardless of which admin/support user uploaded it) — but never another
-  // scope's files (customer ticket attachments, avatars, contract PDFs).
-  // Non-staff only ever sees their own uploads within the requested scope.
+  // Every ADMIN/SUPPORT user shares one gallery per scope — any file any staff
+  // member uploaded, regardless of who — but it must never include a
+  // CUSTOMER's files (e.g. their ticket attachments), so the filter is by the
+  // uploader's role, not merely "no filter". A CUSTOMER only ever sees their
+  // own uploads.
   const assets = await prisma.mediaAsset.findMany({
     where: {
       scope,
-      ...(isStaff ? {} : { uploadedById: session.user.id }),
+      ...(isStaff ? { uploadedBy: { role: { in: ["ADMIN", "SUPPORT"] } } } : { uploadedById: session.user.id }),
       ...mimeFilter,
     },
     include: { uploadedBy: { select: { id: true, role: true } } },
@@ -47,10 +48,7 @@ export async function GET(request: Request) {
     filename: asset.filename,
     mimeType: asset.mimeType,
     size: asset.size,
-    canDelete:
-      session.user.role === "ADMIN" ||
-      asset.uploadedById === session.user.id ||
-      (session.user.role === "SUPPORT" && (asset.uploadedBy?.role === "CUSTOMER" || asset.uploadedById === null)),
+    canDelete: session.user.role === "ADMIN" || asset.uploadedById === session.user.id,
   }));
 
   return NextResponse.json({ media });

@@ -91,11 +91,13 @@ const BUBBLE_MAX_WIDTH_CSS = `min(${BUBBLE_MAX_WIDTH_PX}px, ${BUBBLE_MAX_WIDTH_V
 // mobile — at the old fixed 320x400 a single photo ate ~49% of a phone's
 // viewport height, crowding out the rest of the conversation and the composer.
 
-// Physical side each role renders on. The page is dir="rtl", where CSS
-// `justify-start` renders on the visual RIGHT and `justify-end` on the
-// visual LEFT — the inverse of an LTR page. Getting this backwards is an
-// easy, silent mistake, so the mapping lives in one place.
-const PHYSICAL_SIDE = { staff: "right", customer: "left" } as const;
+// Side is relative to the viewer, not to role: the viewer's own messages
+// always render on the right (accent color), everyone else's on the left
+// (dark) — the same ticket looks different depending on who's looking at it.
+// The page is dir="rtl", where CSS `justify-start` renders on the visual
+// RIGHT and `justify-end` on the visual LEFT — the inverse of an LTR page.
+// Getting this backwards is an easy, silent mistake, so the mapping lives in
+// one place.
 const JUSTIFY_CLASS: Record<"left" | "right", string> = {
   right: "justify-start",
   left: "justify-end",
@@ -143,26 +145,23 @@ function Avatar({ isStaff, visible }: { isStaff: boolean; visible: boolean }) {
   );
 }
 
-// Three bouncing dots shown while the other party is composing a reply,
-// styled to match whichever side/color their bubbles use.
-function TypingIndicator({ isStaff }: { isStaff: boolean }) {
+// Three bouncing dots shown while the other party is composing a reply. Only
+// ever shown for the other party (never the viewer's own typing), so it
+// always uses the "other" dark styling — never the accent/gradient "mine"
+// look.
+function TypingIndicator() {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className={cn(
-        "inline-flex items-center gap-1 rounded-2xl px-4 py-3",
-        isStaff
-          ? "bg-gradient-to-br from-accent-500 to-accent-600 shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)]"
-          : "bg-white/[0.07] backdrop-blur-sm",
-      )}
+      className="inline-flex items-center gap-1 rounded-2xl bg-white/[0.07] px-4 py-3 backdrop-blur-sm"
     >
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className={cn("h-2 w-2 rounded-full", isStaff ? "bg-white/80" : "bg-foreground/50")}
+          className="h-2 w-2 rounded-full bg-foreground/50"
           animate={{ opacity: [0.4, 1, 0.4], y: [0, -4, 0] }}
           transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
         />
@@ -173,11 +172,11 @@ function TypingIndicator({ isStaff }: { isStaff: boolean }) {
 
 type BubbleProps = {
   side: "left" | "right";
-  isStaff: boolean;
+  mine: boolean;
   children: ReactNode;
 };
 
-function Bubble({ side, isStaff, children }: BubbleProps) {
+function Bubble({ side, mine, children }: BubbleProps) {
   // Slides in from the outward direction it settles into (right-side
   // bubbles slide in from further right, left-side from further left).
   const entranceX = side === "right" ? 16 : -16;
@@ -191,7 +190,7 @@ function Bubble({ side, isStaff, children }: BubbleProps) {
       style={{ maxWidth: BUBBLE_MAX_WIDTH_CSS }}
       className={cn(
         "w-fit rounded-2xl px-3.5 py-2",
-        isStaff
+        mine
           ? "bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)]"
           : "bg-white/[0.07] text-foreground shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm",
       )}
@@ -392,6 +391,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
   const sendMessage = async () => {
     if (!text.trim() && pendingAttachments.length === 0) return;
+    // Guards the Enter-key path too, not just the submit button's `disabled`
+    // attribute: without this, a slow in-flight request (e.g. the first
+    // request in a while — see SEND_COOLDOWN_MS comment) left the textarea's
+    // Enter handler free to fire a genuine duplicate send once the 400ms
+    // cooldown alone had elapsed but the request was still pending.
+    if (sending) return;
 
     const now = Date.now();
     if (now - lastSendAtRef.current < SEND_COOLDOWN_MS) return;
@@ -649,9 +654,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.map((m, i) => {
-          const isMine = viewerRole === "staff" ? m.isStaff : !m.isStaff;
+          // "Mine" is the viewer's actual identity, not their role — two
+          // different SUPPORT agents on the same ticket must each see only
+          // their own messages on the right, not every staff message.
+          const isMine = m.authorId === viewerId;
           const canModify = m.isReply && !m.deletedAt && m.authorId === viewerId;
-          const side = m.isStaff ? PHYSICAL_SIDE.staff : PHYSICAL_SIDE.customer;
+          const side: "left" | "right" = isMine ? "right" : "left";
           const isEditing = editingId === m.id;
 
           const prev = messages[i - 1];
@@ -662,7 +670,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
           const isLastInGroup = !next || next.isStaff !== m.isStaff || gapToNext > GROUP_GAP_MS;
 
           const bubbleContent = (
-            <Bubble side={side} isStaff={m.isStaff}>
+            <Bubble side={side} mine={isMine}>
               {isEditing ? (
                 <div className="flex min-w-[220px] flex-col gap-2">
                   <textarea
@@ -680,7 +688,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                     rows={2}
                     className={cn(
                       "w-full resize-none rounded-lg bg-black/10 px-2 py-1.5 text-sm outline-none",
-                      m.isStaff ? "text-white placeholder:text-white/50" : "text-foreground placeholder:text-foreground/40",
+                      isMine ? "text-white placeholder:text-white/50" : "text-foreground placeholder:text-foreground/40",
                     )}
                   />
                   <div className="flex items-center justify-end gap-2 text-xs">
@@ -698,7 +706,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                   </div>
                 </div>
               ) : m.deletedAt ? (
-                <p className={cn("text-sm italic", m.isStaff ? "text-white/70" : "text-foreground/40")}>
+                <p className={cn("text-sm italic", isMine ? "text-white/70" : "text-foreground/40")}>
                   این پیام حذف شد
                 </p>
               ) : (
@@ -759,14 +767,14 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                   <div
                     className={cn(
                       "mt-1 flex items-center justify-end gap-1.5 text-[10px]",
-                      m.isStaff ? "text-white/70" : "text-foreground/40",
+                      isMine ? "text-white/70" : "text-foreground/40",
                     )}
                   >
                     {m.editedAt && <span>ویرایش شد ·</span>}
                     <span dir="ltr">
                       {new Date(m.createdAt).toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" })}
                     </span>
-                    {isMine && <SeenTicks seen={!!m.seenAt} onGradient={m.isStaff} />}
+                    {isMine && <SeenTicks seen={!!m.seenAt} onGradient={isMine} />}
                   </div>
                 </>
               )}
@@ -815,10 +823,11 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
               onTouchMove={canModify && !selectMode ? cancelLongPress : undefined}
             >
               <div className="flex items-end gap-1.5">
+                {/* Avatar is only ever shown for the other party's messages,
+                    which now always render on the left. */}
                 {side === "left" && menu}
-                {!isMine && side === "right" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
                 {bubbleContent}
-                {!isMine && side === "left" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
+                {!isMine && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
                 {side === "right" && menu}
               </div>
             </div>
@@ -828,14 +837,14 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
         <AnimatePresence>
           {otherTyping &&
             (() => {
+              // The typing indicator is always the OTHER party's, so it
+              // always renders on the left, same as their message bubbles.
               const otherIsStaff = viewerRole === "customer";
-              const side = otherIsStaff ? PHYSICAL_SIDE.staff : PHYSICAL_SIDE.customer;
               return (
-                <div className={cn("flex mt-4", JUSTIFY_CLASS[side])}>
+                <div className={cn("flex mt-4", JUSTIFY_CLASS.left)}>
                   <div className="flex items-end gap-2">
-                    {side === "right" && <Avatar isStaff={otherIsStaff} visible />}
-                    <TypingIndicator isStaff={otherIsStaff} />
-                    {side === "left" && <Avatar isStaff={otherIsStaff} visible />}
+                    <TypingIndicator />
+                    <Avatar isStaff={otherIsStaff} visible />
                   </div>
                 </div>
               );
@@ -954,15 +963,22 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="ارسال"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                {sending ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" strokeOpacity="0.3" />
+                    <path d="M21 12a9 9 0 00-9-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
               </motion.button>
             </div>
           </div>

@@ -15,6 +15,15 @@ const UPLOAD_SUBDIR = "uploads";
 const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"] as const;
 type MediaScope = (typeof VALID_SCOPES)[number];
 
+// SITE_CONTENT and CONTRACT_FILE are only ever populated through admin-only UI
+// (the site-content/blog editor's image picker, the contract form's file
+// field) — without this gate any authenticated user, including a CUSTOMER,
+// could tag an upload with either scope directly via the API and have it
+// show up in the shared admin gallery. TICKET_ATTACHMENT and PROFILE_AVATAR
+// are legitimately uploaded by every role (a customer attaching a file to
+// their own ticket, anyone setting their own avatar).
+const ADMIN_ONLY_SCOPES: readonly MediaScope[] = ["SITE_CONTENT", "CONTRACT_FILE"];
+
 // Verify actual file bytes, not just the client-supplied name/Content-Type,
 // which are trivial to spoof (e.g. a renamed .php file claiming image/jpeg).
 function matchesImageSignature(bytes: Buffer, mimeType: string): boolean {
@@ -53,6 +62,10 @@ export async function POST(request: Request) {
   const file = formData.get("file");
   const scopeInput = formData.get("scope");
   const scope: MediaScope = VALID_SCOPES.includes(scopeInput as MediaScope) ? (scopeInput as MediaScope) : "SITE_CONTENT";
+
+  if (ADMIN_ONLY_SCOPES.includes(scope) && session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
+  }
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "فایلی ارسال نشده است." }, { status: 400 });

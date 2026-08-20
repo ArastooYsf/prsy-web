@@ -38,6 +38,7 @@ export default function ContractFileUploadField({ value, onChange }: ContractFil
         open={open}
         onClose={() => setOpen(false)}
         kind="all"
+        scope="CONTRACT_FILE"
         multiple={false}
         initialSelected={value ? [value] : []}
         onConfirm={(assets) => {

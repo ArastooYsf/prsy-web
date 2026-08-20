@@ -199,6 +199,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         open={imagePickerOpen}
         onClose={() => setImagePickerOpen(false)}
         kind="image"
+        scope="SITE_CONTENT"
         multiple
         onConfirm={(assets) => {
           assets.forEach((asset) => {

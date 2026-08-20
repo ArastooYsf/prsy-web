@@ -59,6 +59,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
         onClose={() => setOpen(false)}
         onConfirm={(assets) => onChange(assets.map((a) => a.url))}
         kind="image"
+        scope="SITE_CONTENT"
         multiple={multiple}
         initialSelected={value}
       />

@@ -43,8 +43,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
     include: { attachments: true },
   });
 
-  const nextStatus = ticket.status === "ANSWERED" ? "IN_PROGRESS" : ticket.status;
-  await prisma.ticket.update({ where: { id: ticket.id }, data: { status: nextStatus } });
+  // A new customer message always reactivates the ticket into "waiting for
+  // support reply" — regardless of whatever status it was in before (unless
+  // CLOSED, which is blocked above and never reaches this point).
+  await prisma.ticket.update({ where: { id: ticket.id }, data: { status: "WAITING_REPLY" } });
 
   void notifyStaffNewCustomerMessage({
     ticket: { id: ticket.id, subject: ticket.subject },

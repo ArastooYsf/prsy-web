@@ -30,6 +30,7 @@ const ORDER_STATUS_COLORS: Record<string, string> = {
 const TICKET_STATUS_COLORS: Record<string, string> = {
   OPEN: "#f97316",
   IN_PROGRESS: "#eab308",
+  WAITING_REPLY: "#ef4444",
   ANSWERED: "#10b981",
   CLOSED: "#71717a",
 };

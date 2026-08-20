@@ -1,6 +1,7 @@
 export const TICKET_STATUS: Record<string, { label: string; className: string }> = {
   OPEN: { label: "باز", className: "border-accent-500/30 bg-accent-500/10 text-accent-400" },
   IN_PROGRESS: { label: "در حال بررسی", className: "border-brand-400/30 bg-brand-400/10 text-brand-300" },
+  WAITING_REPLY: { label: "در انتظار پاسخ", className: "border-red-500/30 bg-red-500/10 text-red-400" },
   ANSWERED: { label: "پاسخ داده‌شده", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" },
   CLOSED: { label: "بسته‌شده", className: "border-white/10 bg-white/5 text-foreground/60" },
 };

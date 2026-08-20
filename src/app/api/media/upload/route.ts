@@ -12,6 +12,8 @@ const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordproces
 const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024; // 15MB (PDF and DOCX)
 const UPLOAD_SUBDIR = "uploads";
+const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"] as const;
+type MediaScope = (typeof VALID_SCOPES)[number];
 
 // Verify actual file bytes, not just the client-supplied name/Content-Type,
 // which are trivial to spoof (e.g. a renamed .php file claiming image/jpeg).
@@ -49,6 +51,8 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+  const scopeInput = formData.get("scope");
+  const scope: MediaScope = VALID_SCOPES.includes(scopeInput as MediaScope) ? (scopeInput as MediaScope) : "SITE_CONTENT";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "فایلی ارسال نشده است." }, { status: 400 });
@@ -93,6 +97,7 @@ export async function POST(request: Request) {
       url: relativePath,
       mimeType: file.type,
       size: file.size,
+      scope,
       uploadedById: session.user.id,
     },
   });

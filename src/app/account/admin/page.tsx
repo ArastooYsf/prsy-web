@@ -27,7 +27,7 @@ async function getAdminStats() {
 
 async function getSupportStats() {
   const [openTickets, activeContracts, activeOrders] = await Promise.all([
-    prisma.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS"] }, deletedAt: null } }),
+    prisma.ticket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_REPLY"] }, deletedAt: null } }),
     prisma.contract.count({ where: { status: "ACTIVE", deletedAt: null } }),
     prisma.order.count({ where: { status: { in: ["PENDING", "PROCESSING", "SHIPPED"] }, deletedAt: null } }),
   ]);

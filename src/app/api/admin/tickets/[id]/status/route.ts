@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { TICKET_STATUS } from "@/lib/status-labels";
 
-const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "ANSWERED", "CLOSED"];
+const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "WAITING_REPLY", "ANSWERED", "CLOSED"];
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);

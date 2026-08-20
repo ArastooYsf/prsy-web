@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"] as const;
+type MediaScope = (typeof VALID_SCOPES)[number];
+
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
@@ -12,6 +15,8 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const type = searchParams.get("type") ?? "all";
+  const scopeParam = searchParams.get("scope");
+  const scope: MediaScope = VALID_SCOPES.includes(scopeParam as MediaScope) ? (scopeParam as MediaScope) : "SITE_CONTENT";
   const isStaff = session.user.role === "ADMIN" || session.user.role === "SUPPORT";
 
   const mimeFilter =
@@ -21,8 +26,13 @@ export async function GET(request: Request) {
         ? { mimeType: { not: { startsWith: "image/" } } }
         : {};
 
+  // Staff gets the shared bucket for that scope (e.g. every SITE_CONTENT upload,
+  // regardless of which admin/support user uploaded it) — but never another
+  // scope's files (customer ticket attachments, avatars, contract PDFs).
+  // Non-staff only ever sees their own uploads within the requested scope.
   const assets = await prisma.mediaAsset.findMany({
     where: {
+      scope,
       ...(isStaff ? {} : { uploadedById: session.user.id }),
       ...mimeFilter,
     },

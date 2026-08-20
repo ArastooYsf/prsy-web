@@ -40,6 +40,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
         onClose={() => setOpen(false)}
         onConfirm={(assets) => onChange(assets[0]?.url ?? "")}
         kind="image"
+        scope="PROFILE_AVATAR"
         multiple={false}
         initialSelected={value ? [value] : []}
       />

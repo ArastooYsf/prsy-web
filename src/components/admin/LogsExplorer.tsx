@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Bell, ChevronDown, Download, Lock, ShieldAlert, Unlock } from "lucide-react";
 import { isoToJalali } from "@/lib/jalali";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
-import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
+import DateInput, { type Calendar } from "@/components/admin/DateInput";
+import ToggleSwitch from "@/components/ToggleSwitch";
 import { useToast } from "@/components/ToastProvider";
 import type { LogCategory, LogFileSummary } from "@/lib/logger";
 
@@ -50,6 +51,7 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
   const [categoryFilter, setCategoryFilter] = useState<"all" | LogCategory>("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [calendar, setCalendar] = useState<Calendar>("jalali");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [entriesCache, setEntriesCache] = useState<Record<string, string[]>>({});
   const [loadingFile, setLoadingFile] = useState<string | null>(null);
@@ -130,26 +132,36 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
           ))}
         </div>
 
-        <div className="mr-auto flex flex-wrap items-center gap-2">
-          <div className="w-36">
-            <JalaliDatePicker value={fromDate} onChange={setFromDate} />
+        <div className="mr-auto flex flex-col gap-1.5">
+          <div className="flex justify-end">
+            <ToggleSwitch
+              checked={calendar === "jalali"}
+              onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
+              onLabel="شمسی"
+              offLabel="میلادی"
+              className="min-h-0"
+            />
           </div>
-          <span className="text-xs text-foreground/40">تا</span>
-          <div className="w-36">
-            <JalaliDatePicker value={toDate} onChange={setToDate} />
+          <div className="flex flex-wrap items-start gap-2">
+            <div className="w-36">
+              <DateInput label="از" value={fromDate} onChange={setFromDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
+            </div>
+            <div className="w-36">
+              <DateInput label="تا" value={toDate} onChange={setToDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
+            </div>
+            {(fromDate || toDate) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFromDate("");
+                  setToDate("");
+                }}
+                className="self-center text-xs text-foreground/50 underline decoration-dotted hover:text-foreground/80"
+              >
+                پاک کردن بازه
+              </button>
+            )}
           </div>
-          {(fromDate || toDate) && (
-            <button
-              type="button"
-              onClick={() => {
-                setFromDate("");
-                setToDate("");
-              }}
-              className="text-xs text-foreground/50 underline decoration-dotted hover:text-foreground/80"
-            >
-              پاک کردن بازه
-            </button>
-          )}
         </div>
       </div>
 

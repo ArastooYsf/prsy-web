@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContractFileUploadField from "@/components/admin/ContractFileUploadField";
-import JalaliGregorianDateField from "@/components/admin/JalaliGregorianDateField";
+import DateInput, { type Calendar } from "@/components/admin/DateInput";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import { useToast } from "@/components/ToastProvider";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
@@ -41,7 +41,7 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
   const [customType, setCustomType] = useState("");
   const [startDate, setStartDate] = useState(contract?.startDate.slice(0, 10) ?? "");
   const [endDate, setEndDate] = useState(contract?.endDate.slice(0, 10) ?? "");
-  const [calendar, setCalendar] = useState<"jalali" | "gregorian">("jalali");
+  const [calendar, setCalendar] = useState<Calendar>("jalali");
   const [status, setStatus] = useState(contract?.status ?? "ACTIVE");
   const [fileUrl, setFileUrl] = useState(contract?.fileUrl ?? "");
   const [saving, setSaving] = useState(false);
@@ -149,9 +149,9 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
           <p className="text-sm font-medium text-foreground/80">بازه قرارداد</p>
           <ToggleSwitch checked={calendar === "jalali"} onChange={(v) => setCalendar(v ? "jalali" : "gregorian")} onLabel="شمسی" offLabel="میلادی" />
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <JalaliGregorianDateField label="تاریخ شروع" value={startDate} onChange={setStartDate} calendar={calendar} />
-          <JalaliGregorianDateField label="تاریخ پایان" value={endDate} onChange={setEndDate} calendar={calendar} />
+        <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2">
+          <DateInput label="تاریخ شروع" value={startDate} onChange={setStartDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
+          <DateInput label="تاریخ پایان" value={endDate} onChange={setEndDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
         </div>
       </div>
 

@@ -91,8 +91,8 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
           },
         ]}
         dateRanges={[
-          { fromKey: "startFrom", toKey: "startTo", label: "تاریخ شروع" },
-          { fromKey: "endFrom", toKey: "endTo", label: "تاریخ پایان" },
+          { fromKey: "startFrom", toKey: "startTo", label: "بازه‌ی تاریخ شروع" },
+          { fromKey: "endFrom", toKey: "endTo", label: "بازه‌ی تاریخ پایان" },
         ]}
       />
 

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
-import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
+import DateInput, { type Calendar } from "@/components/admin/DateInput";
+import ToggleSwitch from "@/components/ToggleSwitch";
 import { scrollFieldAboveKeyboard } from "@/lib/scroll-into-view";
 
 const selectClass =
@@ -29,6 +30,7 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
   const searchParams = useSearchParams();
 
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const [calendar, setCalendar] = useState<Calendar>("jalali");
   const isFirstRender = useRef(true);
 
   useEffect(() => {
@@ -91,20 +93,48 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
         </select>
       ))}
 
-      {dateRanges.map((d) => (
-        <div key={d.fromKey} className="flex flex-col gap-1">
-          <span className="text-xs text-foreground/40">{d.label}</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-36">
-              <JalaliDatePicker value={searchParams.get(d.fromKey) ?? ""} onChange={(v) => updateParam(d.fromKey, v || null)} />
-            </div>
-            <span className="shrink-0 text-xs text-foreground/40">تا</span>
-            <div className="w-36">
-              <JalaliDatePicker value={searchParams.get(d.toKey) ?? ""} onChange={(v) => updateParam(d.toKey, v || null)} />
-            </div>
+      {dateRanges.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-end">
+            <ToggleSwitch
+              checked={calendar === "jalali"}
+              onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
+              onLabel="شمسی"
+              offLabel="میلادی"
+              className="min-h-0"
+            />
+          </div>
+          <div className="flex flex-wrap items-start gap-3">
+            {dateRanges.map((d) => (
+              <div key={d.fromKey} className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium text-foreground/50">{d.label}</span>
+                <div className="flex items-start gap-2">
+                  <div className="w-36">
+                    <DateInput
+                      label="از"
+                      value={searchParams.get(d.fromKey) ?? ""}
+                      onChange={(v) => updateParam(d.fromKey, v || null)}
+                      calendar={calendar}
+                      onCalendarChange={setCalendar}
+                      hideToggle
+                    />
+                  </div>
+                  <div className="w-36">
+                    <DateInput
+                      label="تا"
+                      value={searchParams.get(d.toKey) ?? ""}
+                      onChange={(v) => updateParam(d.toKey, v || null)}
+                      calendar={calendar}
+                      onCalendarChange={setCalendar}
+                      hideToggle
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      )}
 
       {hasActiveFilters && (
         <button

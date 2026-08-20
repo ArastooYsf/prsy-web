@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import MediaPicker from "@/components/admin/MediaPicker";
-import GregorianDatePicker from "@/components/admin/GregorianDatePicker";
+import DateInput from "@/components/admin/DateInput";
 import { slugify } from "@/lib/slugify";
 import { getMediaUrl } from "@/lib/media";
 import { useToast } from "@/components/ToastProvider";
@@ -163,7 +163,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
               <RichTextEditor value={content} onChange={setContent} />
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
               <label className="flex items-center gap-2 text-sm text-foreground/80">
                 <input
                   type="checkbox"
@@ -175,11 +175,8 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
               </label>
 
               {published && (
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-foreground/80">تاریخ انتشار</label>
-                  <div className="w-44">
-                    <GregorianDatePicker value={publishedAt} onChange={setPublishedAt} />
-                  </div>
+                <div className="mt-3 max-w-xs">
+                  <DateInput label="تاریخ انتشار" value={publishedAt} onChange={setPublishedAt} />
                 </div>
               )}
             </div>

@@ -2,13 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TICKET_STATUS } from "@/lib/status-labels";
 
-const OPTIONS = [
-  { value: "OPEN", label: "باز" },
-  { value: "IN_PROGRESS", label: "در حال بررسی" },
-  { value: "ANSWERED", label: "پاسخ داده‌شده" },
-  { value: "CLOSED", label: "بسته‌شده" },
-];
+const OPTIONS = Object.entries(TICKET_STATUS).map(([value, s]) => ({ value, label: s.label }));
 
 export default function TicketStatusSelect({ ticketId, status }: { ticketId: string; status: string }) {
   const router = useRouter();

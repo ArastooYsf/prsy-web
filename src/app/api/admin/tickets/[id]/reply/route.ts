@@ -39,7 +39,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     include: { attachments: true },
   });
 
-  if (ticket.status === "OPEN" || ticket.status === "IN_PROGRESS") {
+  if (ticket.status === "OPEN" || ticket.status === "IN_PROGRESS" || ticket.status === "WAITING_REPLY") {
     await prisma.ticket.update({ where: { id: ticket.id }, data: { status: "ANSWERED" } });
   }
 

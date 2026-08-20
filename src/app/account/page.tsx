@@ -24,7 +24,7 @@ export default async function AccountOverviewPage() {
 
   const [openTicketsCount, activeContractsCount, activeOrdersCount, recentTickets, recentContracts, recentOrders] =
     await Promise.all([
-      prisma.ticket.count({ where: { userId, status: { in: ["OPEN", "IN_PROGRESS"] }, deletedAt: null } }),
+      prisma.ticket.count({ where: { userId, status: { in: ["OPEN", "IN_PROGRESS", "WAITING_REPLY"] }, deletedAt: null } }),
       prisma.contract.count({ where: { userId, status: "ACTIVE", deletedAt: null } }),
       prisma.order.count({ where: { userId, status: { in: ["PENDING", "PROCESSING", "SHIPPED"] }, deletedAt: null } }),
       prisma.ticket.findMany({ where: { userId, deletedAt: null }, orderBy: { updatedAt: "desc" }, take: 5 }),

@@ -18,11 +18,16 @@ export type MediaAsset = {
 
 type MediaKind = "image" | "file" | "all";
 
+// Which bucket this picker instance reads/writes — keeps the admin site-content
+// gallery from being polluted by customer ticket attachments (and vice versa).
+export type MediaScope = "SITE_CONTENT" | "TICKET_ATTACHMENT" | "PROFILE_AVATAR" | "CONTRACT_FILE";
+
 type MediaPickerModalProps = {
   open: boolean;
   onClose: () => void;
   onConfirm: (assets: MediaAsset[]) => void;
   kind?: MediaKind;
+  scope?: MediaScope;
   multiple?: boolean;
   initialSelected?: string[];
 };
@@ -61,6 +66,7 @@ export default function MediaPickerModal({
   onClose,
   onConfirm,
   kind = "image",
+  scope = "SITE_CONTENT",
   multiple = true,
   initialSelected = [],
 }: MediaPickerModalProps) {
@@ -83,7 +89,7 @@ export default function MediaPickerModal({
     setTab("gallery");
     fetchGallery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, kind]);
+  }, [open, kind, scope]);
 
   useEffect(() => {
     if (!open) return;
@@ -96,7 +102,7 @@ export default function MediaPickerModal({
 
   const fetchGallery = async () => {
     setLoadingGallery(true);
-    const res = await fetch(`/api/media?type=${kind}`);
+    const res = await fetch(`/api/media?type=${kind}&scope=${scope}`);
     if (res.ok) {
       const { media } = await res.json();
       setGallery(media);
@@ -121,6 +127,7 @@ export default function MediaPickerModal({
     for (const file of Array.from(fileList)) {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("scope", scope);
 
       const res = await fetch("/api/media/upload", { method: "POST", body: formData });
 

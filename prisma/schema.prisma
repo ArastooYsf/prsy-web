@@ -77,6 +77,7 @@ model Notification {
 enum TicketStatus {
   OPEN
   IN_PROGRESS
+  WAITING_REPLY
   ANSWERED
   CLOSED
 }
@@ -252,16 +253,25 @@ model PageView {
   @@map("page_views")
 }
 
+enum MediaScope {
+  SITE_CONTENT
+  TICKET_ATTACHMENT
+  PROFILE_AVATAR
+  CONTRACT_FILE
+}
+
 model MediaAsset {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   filename     String
   url          String
   mimeType     String
   size         Int
+  scope        MediaScope @default(SITE_CONTENT)
   uploadedById String?
-  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
-  createdAt    DateTime @default(now())
+  uploadedBy   User?      @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime   @default(now())
 
   @@index([uploadedById])
+  @@index([scope])
   @@map("media_assets")
 }

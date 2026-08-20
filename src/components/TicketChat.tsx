@@ -5,10 +5,10 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { LifeBuoy, User, MoreVertical } from "lucide-react";
+import { LifeBuoy, User, MoreVertical, ListChecks, Trash2, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
-import { toPersianDigits } from "@/lib/format-number";
+import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import EmojiPicker from "@/components/EmojiPicker";
 import { useToast } from "@/components/ToastProvider";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
@@ -70,6 +70,7 @@ const TYPING_STALE_MS = 5000;
 // Minimum gap between "I'm typing" pings sent while the user types, so every
 // keystroke doesn't hit the API.
 const TYPING_PING_THROTTLE_MS = 2500;
+const SEND_COOLDOWN_MS = 400;
 
 // Shared width ceiling for every bubble (text or image), matching Telegram's
 // shrink-to-fit behavior: short content hugs itself, long content wraps at
@@ -210,10 +211,14 @@ function Bubble({ side, isStaff, children }: BubbleProps) {
 function MessageMenu({
   onEdit,
   onDelete,
+  onDownload,
+  onSave,
   forceVisible,
 }: {
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onDownload?: () => void;
+  onSave?: () => void;
   forceVisible: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -238,20 +243,40 @@ function MessageMenu({
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-32 overflow-hidden rounded-xl border border-white/10 bg-background p-1 shadow-2xl"
+          className="z-50 w-36 overflow-hidden rounded-xl border border-white/10 bg-background p-1 shadow-2xl"
         >
-          <DropdownMenu.Item
-            onSelect={onEdit}
-            className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
-          >
-            ویرایش
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={onDelete}
-            className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-red-400 outline-none transition-colors data-[highlighted]:bg-red-500/10"
-          >
-            حذف
-          </DropdownMenu.Item>
+          {onDownload && (
+            <DropdownMenu.Item
+              onSelect={onDownload}
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+            >
+              دانلود
+            </DropdownMenu.Item>
+          )}
+          {onSave && (
+            <DropdownMenu.Item
+              onSelect={onSave}
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+            >
+              ذخیره در گالری من
+            </DropdownMenu.Item>
+          )}
+          {onEdit && (
+            <DropdownMenu.Item
+              onSelect={onEdit}
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+            >
+              ویرایش
+            </DropdownMenu.Item>
+          )}
+          {onDelete && (
+            <DropdownMenu.Item
+              onSelect={onDelete}
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-red-400 outline-none transition-colors data-[highlighted]:bg-red-500/10"
+            >
+              حذف
+            </DropdownMenu.Item>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
@@ -264,6 +289,8 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [throttled, setThrottled] = useState(false);
+  const lastSendAtRef = useRef(0);
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([]);
   const [attachmentPickerOpen, setAttachmentPickerOpen] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
@@ -272,6 +299,10 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   // Touch devices have no hover — a long-press on the message itself reveals
   // its (otherwise hidden) options button, same idea as Telegram's mobile UI.
   const [longPressedId, setLongPressedId] = useState<string | null>(null);
@@ -361,6 +392,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
   const sendMessage = async () => {
     if (!text.trim() && pendingAttachments.length === 0) return;
+
+    const now = Date.now();
+    if (now - lastSendAtRef.current < SEND_COOLDOWN_MS) return;
+    lastSendAtRef.current = now;
+    setThrottled(true);
+    window.setTimeout(() => setThrottled(false), SEND_COOLDOWN_MS);
 
     setSending(true);
 
@@ -477,8 +514,139 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
     setDeleteTargetId(null);
   };
 
+  const toggleSelectMode = () => {
+    setSelectMode((v) => !v);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const bulkDeleteEndpoint =
+    viewerRole === "customer" ? `/api/account/tickets/${ticketId}/reply/bulk-delete` : `/api/admin/tickets/${ticketId}/reply/bulk-delete`;
+
+  const confirmBulkDelete = async () => {
+    setBulkDeleting(true);
+
+    const res = await fetch(bulkDeleteEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ replyIds: Array.from(selectedIds) }),
+    });
+
+    setBulkDeleting(false);
+    setBulkConfirmOpen(false);
+
+    if (!res.ok) {
+      showToast("خطا در حذف پیام‌ها.", "error");
+      return;
+    }
+
+    const { deletedIds, skippedIds } = await res.json();
+    setMessages((prev) =>
+      prev.map((msg) =>
+        deletedIds.includes(msg.id)
+          ? { ...msg, message: "", attachments: [], deletedAt: new Date().toISOString() }
+          : msg,
+      ),
+    );
+
+    if (skippedIds.length > 0) {
+      showToast(`${formatNumber(deletedIds.length)} پیام حذف شد، ${formatNumber(skippedIds.length)} مورد رد شد.`, "warning");
+    } else {
+      showToast(`${formatNumber(deletedIds.length)} پیام حذف شد.`, "success");
+    }
+
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const hasOwnMessages = messages.some((m) => m.isReply && !m.deletedAt && m.authorId === viewerId);
+
+  const attachmentsEndpointBase =
+    viewerRole === "customer" ? `/api/account/tickets/${ticketId}/attachments` : `/api/admin/tickets/${ticketId}/attachments`;
+
+  const downloadAttachments = async (m: ChatMessage) => {
+    for (const a of m.attachments) {
+      try {
+        const res = await fetch(getMediaUrl(a.url));
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = a.filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch {
+        showToast("خطا در دانلود فایل.", "error");
+      }
+    }
+  };
+
+  const saveAttachmentsToGallery = async (m: ChatMessage) => {
+    let savedCount = 0;
+    for (const a of m.attachments) {
+      const res = await fetch(`${attachmentsEndpointBase}/${a.id}/save`, { method: "POST" });
+      if (res.ok) savedCount++;
+    }
+
+    if (savedCount === 0) {
+      showToast("خطا در ذخیره‌سازی فایل.", "error");
+    } else {
+      showToast(`${formatNumber(savedCount)} فایل در گالری شما ذخیره شد.`, "success");
+    }
+  };
+
   return (
     <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-black/10">
+      {hasOwnMessages && (
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2 sm:px-6">
+          {selectMode ? (
+            <>
+              <span className="text-xs font-medium text-foreground/60">
+                {selectedIds.size > 0 ? `${formatNumber(selectedIds.size)} پیام انتخاب شده` : "پیامی انتخاب نشده"}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setBulkConfirmOpen(true)}
+                  disabled={selectedIds.size === 0}
+                  className="flex items-center gap-1.5 rounded-full border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Trash2 className="size-3.5" />
+                  حذف انتخاب‌شده‌ها
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleSelectMode}
+                  className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/60 transition-colors hover:bg-white/10"
+                >
+                  <X className="size-3.5" />
+                  لغو انتخاب
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={toggleSelectMode}
+              className="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium text-foreground/50 transition-colors hover:bg-white/10 hover:text-foreground"
+            >
+              <ListChecks className="size-3.5" />
+              انتخاب پیام‌ها
+            </button>
+          )}
+        </div>
+      )}
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.map((m, i) => {
           const isMine = viewerRole === "staff" ? m.isStaff : !m.isStaff;
@@ -605,13 +773,33 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
             </Bubble>
           );
 
+          const hasAttachments = !m.deletedAt && m.attachments.length > 0;
+
           const menu =
-            canModify && !isEditing ? (
+            (canModify || hasAttachments) && !isEditing && !selectMode ? (
               <MessageMenu
-                onEdit={() => startEdit(m)}
-                onDelete={() => setDeleteTargetId(m.id)}
+                onEdit={canModify ? () => startEdit(m) : undefined}
+                onDelete={canModify ? () => setDeleteTargetId(m.id) : undefined}
+                onDownload={hasAttachments ? () => downloadAttachments(m) : undefined}
+                onSave={hasAttachments ? () => saveAttachmentsToGallery(m) : undefined}
                 forceVisible={longPressedId === m.id}
               />
+            ) : canModify && selectMode ? (
+              <button
+                type="button"
+                onClick={() => toggleSelected(m.id)}
+                aria-label={selectedIds.has(m.id) ? "لغو انتخاب پیام" : "انتخاب پیام"}
+                className={cn(
+                  "flex h-7 w-7 shrink-0 self-start items-center justify-center rounded-full border transition-colors",
+                  selectedIds.has(m.id)
+                    ? "border-accent-500 bg-accent-500 text-white"
+                    : "border-white/20 bg-transparent text-transparent hover:border-white/40",
+                )}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
             ) : null;
 
           return (
@@ -622,16 +810,16 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 JUSTIFY_CLASS[side],
                 isFirstInGroup ? (i === 0 ? "mt-0" : "mt-4") : "mt-1",
               )}
-              onTouchStart={canModify ? () => handleTouchStart(m.id) : undefined}
-              onTouchEnd={canModify ? cancelLongPress : undefined}
-              onTouchMove={canModify ? cancelLongPress : undefined}
+              onTouchStart={canModify && !selectMode ? () => handleTouchStart(m.id) : undefined}
+              onTouchEnd={canModify && !selectMode ? cancelLongPress : undefined}
+              onTouchMove={canModify && !selectMode ? cancelLongPress : undefined}
             >
               <div className="flex items-end gap-1.5">
-                {isMine && side === "left" && menu}
+                {side === "left" && menu}
                 {!isMine && side === "right" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
                 {bubbleContent}
                 {!isMine && side === "left" && <Avatar isStaff={m.isStaff} visible={isLastInGroup} />}
-                {isMine && side === "right" && menu}
+                {side === "right" && menu}
               </div>
             </div>
           );
@@ -762,7 +950,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                disabled={sending || (!text.trim() && pendingAttachments.length === 0)}
+                disabled={sending || throttled || (!text.trim() && pendingAttachments.length === 0)}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="ارسال"
               >
@@ -790,6 +978,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
         open={attachmentPickerOpen}
         onClose={() => setAttachmentPickerOpen(false)}
         kind="all"
+        scope="TICKET_ATTACHMENT"
         multiple
         onConfirm={(assets) => {
           setPendingAttachments((prev) => {
@@ -811,6 +1000,17 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
         loading={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTargetId(null)}
+      />
+
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="حذف پیام‌های انتخاب‌شده"
+        message={`مطمئنید می‌خواهید ${formatNumber(selectedIds.size)} پیام انتخاب‌شده را حذف کنید؟ این پیام‌ها برای طرف مقابل «حذف شد» نمایش داده می‌شوند.`}
+        confirmLabel="حذف کن"
+        danger
+        loading={bulkDeleting}
+        onConfirm={confirmBulkDelete}
+        onCancel={() => setBulkConfirmOpen(false)}
       />
     </div>
   );

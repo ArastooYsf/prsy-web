@@ -54,11 +54,8 @@ body {
     text-wrap: balance;
   }
 
-  .text-gradient {
-    background: linear-gradient(90deg, #fb923c 0%, #ea580c 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .text-accent-soft {
+    color: #fb923c;
   }
 
   .section-padding {

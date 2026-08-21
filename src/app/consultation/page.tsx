@@ -17,8 +17,8 @@ export default function ConsultationPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
             درخواست مشاوره
           </span>
-          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-black leading-tight sm:text-5xl">
-            مشاوره رایگان <span className="text-gradient">برای پروژه شما</span>
+          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-5xl">
+            مشاوره رایگان <span className="text-accent-soft">برای پروژه شما</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance leading-7 text-foreground/70">
             فرم زیر را پر کنید؛ کارشناسان ما ظرف ۴۸ ساعت کاری با شما تماس

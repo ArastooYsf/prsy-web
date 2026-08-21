@@ -149,7 +149,7 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
         </div>
         <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />
       </div>
-      <p className="mt-2 text-3xl font-black">{formatNumber(count)}</p>
+      <p className="mt-2 text-3xl font-bold">{formatNumber(count)}</p>
     </div>
   );
 }

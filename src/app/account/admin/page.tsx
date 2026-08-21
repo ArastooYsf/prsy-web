@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
                 <card.icon className="size-4" />
                 <p className="text-sm">{card.label}</p>
               </div>
-              <p className="mt-2 text-3xl font-black">{formatNumber(card.value)}</p>
+              <p className="mt-2 text-3xl font-bold">{formatNumber(card.value)}</p>
             </div>
           ))}
           <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />
@@ -108,7 +108,7 @@ export default async function AdminDashboardPage() {
               <card.icon className="size-4" />
               <p className="text-sm">{card.label}</p>
             </div>
-            <p className="mt-2 text-3xl font-black">{card.value}</p>
+            <p className="mt-2 text-3xl font-bold">{card.value}</p>
           </div>
         ))}
         <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />

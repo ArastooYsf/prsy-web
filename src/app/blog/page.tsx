@@ -34,8 +34,8 @@ export default async function BlogPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
             وبلاگ
           </span>
-          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-black leading-tight sm:text-5xl">
-            آخرین <span className="text-gradient">مقالات و اخبار</span>
+          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-5xl">
+            آخرین <span className="text-accent-soft">مقالات و اخبار</span>
           </h1>
         </div>
       </section>

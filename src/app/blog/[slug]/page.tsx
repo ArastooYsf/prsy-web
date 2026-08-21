@@ -78,7 +78,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               {post.publishedAt.toLocaleDateString("fa-IR")}
             </p>
           )}
-          <h1 className="mt-2 text-balance text-3xl font-black leading-tight sm:text-4xl">{post.title}</h1>
+          <h1 className="mt-2 text-balance text-3xl font-bold leading-tight sm:text-4xl">{post.title}</h1>
 
           {post.coverImage && (
             <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl border border-white/10">

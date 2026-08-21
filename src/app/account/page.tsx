@@ -77,7 +77,7 @@ export default async function AccountOverviewPage() {
               <stat.icon className="size-4" />
               <p className="text-sm">{stat.label}</p>
             </div>
-            <p className="mt-2 text-3xl font-black text-accent-400">{formatNumber(stat.value)}</p>
+            <p className="mt-2 text-3xl font-bold text-accent-400">{formatNumber(stat.value)}</p>
           </Link>
         ))}
       </div>

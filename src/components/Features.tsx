@@ -94,7 +94,7 @@ export default function Features() {
           </motion.span>
           <motion.h2
             variants={fadeInUp}
-            className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+            className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
             هر آنچه یک پروژه صنعتی برای موفقیت نیاز دارد
           </motion.h2>
@@ -122,7 +122,7 @@ export default function Features() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="group relative overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] p-8 transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
             >
-              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-black text-white/[0.06] transition-colors duration-300 group-hover:text-accent-500/10">
+              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-bold text-white/[0.06] transition-colors duration-300 group-hover:text-accent-500/10">
                 {feature.index}
               </span>
 

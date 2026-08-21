@@ -24,7 +24,7 @@ export default async function LoginPage() {
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/15 blur-[110px]"
+        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/8 blur-[110px]"
       />
 
       <div className="container relative z-10">
@@ -34,8 +34,8 @@ export default async function LoginPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
               حساب کاربری
             </span>
-            <h1 className="text-balance text-2xl font-black leading-tight sm:text-3xl">
-              ورود به <span className="text-gradient">حساب کاربری</span>
+            <h1 className="text-balance text-2xl font-bold leading-tight sm:text-3xl">
+              ورود به <span className="text-accent-soft">حساب کاربری</span>
             </h1>
           </div>
 

@@ -58,7 +58,7 @@ export default function SocialProof() {
               variants={fadeInUp}
               className="text-center"
             >
-              <div className="text-4xl font-black text-gradient sm:text-5xl">
+              <div className="text-4xl font-bold text-accent-soft sm:text-5xl">
                 <Counter value={stat.value} suffix={stat.suffix} />
               </div>
               <p className="mt-2 text-sm text-foreground/70 sm:text-base">

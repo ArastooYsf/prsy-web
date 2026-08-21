@@ -51,7 +51,7 @@ export default function FAQ({ full = false }: { full?: boolean }) {
           </motion.span>
           <motion.h2
             variants={fadeInUp}
-            className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+            className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
             پاسخ به پرسش‌های رایج شما
           </motion.h2>

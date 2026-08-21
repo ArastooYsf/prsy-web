@@ -67,7 +67,7 @@ export default function PrivacyPage() {
           <span className="text-sm font-semibold text-accent-400">
             حریم خصوصی
           </span>
-          <h1 className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl">
+          <h1 className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl">
             سیاست حریم خصوصی
           </h1>
           <p className="mt-4 leading-7 text-foreground/70">

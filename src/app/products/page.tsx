@@ -21,9 +21,9 @@ export default async function ProductsPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
             محصولات و خدمات
           </span>
-          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-black leading-tight sm:text-5xl">
+          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-5xl">
             دیزل ژنراتور، موتور برق و قطعات یدکی
-            <span className="text-gradient"> با بهترین کیفیت و قیمت</span>
+            <span className="text-accent-soft"> با بهترین کیفیت و قیمت</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance leading-7 text-foreground/70">
             تأمین انواع دیزل ژنراتور، موتور برق، قطعات یدکی، موتور ژنراتور و

@@ -72,7 +72,7 @@ export default function WhyUs() {
           </motion.span>
           <motion.h2
             variants={fadeInUp}
-            className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+            className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
             مزیت رقابتی ما در یک نگاه
           </motion.h2>

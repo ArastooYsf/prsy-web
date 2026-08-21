@@ -203,7 +203,23 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         multiple
         onConfirm={(assets) => {
           assets.forEach((asset) => {
-            editor.chain().focus().setImage({ src: getMediaUrl(asset.url) }).run();
+            const src = getMediaUrl(asset.url);
+            // Read the real pixel dimensions before inserting so the saved
+            // HTML carries width/height — without them the browser can't
+            // reserve space for the image before it loads, causing layout
+            // shift as the post's text jumps once each image arrives.
+            const probe = new window.Image();
+            probe.onload = () => {
+              editor
+                .chain()
+                .focus()
+                .setImage({ src, alt: asset.filename, width: probe.naturalWidth, height: probe.naturalHeight })
+                .run();
+            };
+            probe.onerror = () => {
+              editor.chain().focus().setImage({ src, alt: asset.filename }).run();
+            };
+            probe.src = src;
           });
         }}
       />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { getMediaUrl } from "@/lib/media";
 import { useToast } from "@/components/ToastProvider";
 
@@ -75,11 +76,9 @@ export default function UploadWidget() {
           {uploaded.map((item) => (
             <div key={item.id} className="overflow-hidden rounded-lg border border-white/10">
               {item.mimeType.startsWith("image/") ? (
-                <img
-                  src={getMediaUrl(item.url)}
-                  alt={item.filename}
-                  className="aspect-square w-full object-cover"
-                />
+                <div className="relative aspect-square w-full">
+                  <Image src={getMediaUrl(item.url)} alt={item.filename} fill sizes="200px" className="object-cover" />
+                </div>
               ) : (
                 <div className="flex aspect-square w-full items-center justify-center bg-white/[0.04] p-2">
                   <span className="line-clamp-3 break-words text-center text-[11px] text-foreground/60">

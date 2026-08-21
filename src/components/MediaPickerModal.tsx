@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { getMediaUrl } from "@/lib/media";
 import { toPersianDigits } from "@/lib/format-number";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -254,7 +255,7 @@ export default function MediaPickerModal({
                         }`}
                       >
                         {isImage ? (
-                          <img src={getMediaUrl(item.url)} alt={item.filename} className="h-full w-full object-cover" />
+                          <Image src={getMediaUrl(item.url)} alt={item.filename} fill sizes="200px" className="object-cover" />
                         ) : (
                           <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-white/[0.04] p-2">
                             <FileTypeIcon kind={fileKindFromMime(item.mimeType)} className="h-6 w-6" />

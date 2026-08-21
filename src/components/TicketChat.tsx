@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -727,16 +728,24 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                             )}
                           >
                             {images.map((img) => (
-                              <a key={img.id} href={getMediaUrl(img.url)} target="_blank" rel="noopener noreferrer">
-                                <img
+                              <a
+                                key={img.id}
+                                href={getMediaUrl(img.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={cn(
+                                  "relative block overflow-hidden rounded-lg border border-white/10",
+                                  images.length === 1
+                                    ? "h-[220px] w-[176px] max-w-full sm:h-[400px] sm:w-[320px]"
+                                    : "aspect-square w-full",
+                                )}
+                              >
+                                <Image
                                   src={getMediaUrl(img.url)}
                                   alt={img.filename}
-                                  className={cn(
-                                    "rounded-lg border border-white/10 object-cover",
-                                    images.length === 1
-                                      ? "h-[220px] w-[176px] max-w-full sm:h-[400px] sm:w-[320px]"
-                                      : "aspect-square w-full",
-                                  )}
+                                  fill
+                                  sizes="(min-width: 640px) 320px, 220px"
+                                  className="object-cover"
                                 />
                               </a>
                             ))}
@@ -902,7 +911,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                             key={img.tempId}
                             className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10"
                           >
-                            <img src={getMediaUrl(img.url)} alt={img.filename} className="h-full w-full object-cover" />
+                            <Image src={getMediaUrl(img.url)} alt={img.filename} fill sizes="56px" className="object-cover" />
                             <button
                               type="button"
                               onClick={() => removeOne(img.tempId)}

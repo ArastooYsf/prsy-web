@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Camera, User } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
@@ -17,10 +18,9 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative">
-        <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5">
+        <div className="relative flex size-24 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5">
           {value ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={getMediaUrl(value)} alt={nameForAlt} className="size-full object-cover" />
+            <Image src={getMediaUrl(value)} alt={nameForAlt} fill sizes="96px" className="object-cover" />
           ) : (
             <User className="size-10 text-foreground/30" />
           )}

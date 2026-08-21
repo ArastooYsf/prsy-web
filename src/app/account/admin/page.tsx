@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { formatNumber } from "@/lib/format-number";
 import { getContractOrderTrend, getOrderStatusBreakdown, getTicketStatusBreakdown, getPageViewCount } from "@/lib/admin-stats";
 import UploadWidget from "@/components/admin/UploadWidget";
-import { TrendChart, OrderStatusChart, TicketStatusChart, SiteViewsCard } from "@/components/admin/DashboardCharts";
+import { SiteViewsCard } from "@/components/admin/DashboardCharts";
+import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardChartsLazy";
 
 async function getAdminStats() {
   try {

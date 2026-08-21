@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
@@ -53,12 +54,14 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-colors hover:border-accent-500/40"
                 >
-                  <div className="aspect-video w-full overflow-hidden bg-white/5">
+                  <div className="relative aspect-video w-full overflow-hidden bg-white/5">
                     {post.coverImage ? (
-                      <img
+                      <Image
                         src={getMediaUrl(post.coverImage)}
                         alt={post.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-foreground/20">

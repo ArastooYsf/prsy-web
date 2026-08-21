@@ -76,7 +76,7 @@ export default function About({ title, body }: AboutProps) {
             </motion.span>
             <motion.h2
               variants={fadeInUp}
-              className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+              className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
             >
               {title || DEFAULT_TITLE}
             </motion.h2>
@@ -120,7 +120,7 @@ export default function About({ title, body }: AboutProps) {
           >
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
-                <div className="text-4xl font-black text-gradient sm:text-5xl">
+                <div className="text-4xl font-bold text-accent-soft sm:text-5xl">
                   <Counter value={9} suffix="+" />
                 </div>
                 <p className="mt-2 text-sm text-foreground/70">
@@ -128,7 +128,7 @@ export default function About({ title, body }: AboutProps) {
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black sm:text-5xl">۴۷۶۰۶</div>
+                <div className="text-4xl font-bold sm:text-5xl">۴۷۶۰۶</div>
                 <p className="mt-2 text-sm text-foreground/70">
                   شماره ثبت رسمی
                 </p>

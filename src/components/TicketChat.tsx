@@ -137,7 +137,7 @@ function Avatar({ isStaff, visible }: { isStaff: boolean; visible: boolean }) {
     <div
       className={cn(
         "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-        isStaff ? "bg-gradient-to-br from-accent-500 to-accent-600" : "bg-white/10",
+        isStaff ? "bg-accent-500" : "bg-white/10",
         !visible && "invisible",
       )}
     >
@@ -192,7 +192,7 @@ function Bubble({ side, mine, children }: BubbleProps) {
       className={cn(
         "w-fit rounded-2xl px-3.5 py-2",
         mine
-          ? "bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-[0_8px_20px_-6px_rgba(249,115,22,0.5)]"
+          ? "bg-accent-500 text-white shadow-[0_4px_12px_-4px_rgba(249,115,22,0.3)]"
           : "bg-white/[0.07] text-foreground shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm",
       )}
     >
@@ -969,7 +969,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={sending || throttled || (!text.trim() && pendingAttachments.length === 0)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-500 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="ارسال"
               >
                 {sending ? (

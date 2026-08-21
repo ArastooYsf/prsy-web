@@ -101,7 +101,7 @@ export default function PricingArchived() {
           </motion.span>
           <motion.h2
             variants={fadeInUp}
-            className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+            className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
             بسته‌ای متناسب با نیاز پروژه شما
           </motion.h2>
@@ -145,7 +145,7 @@ export default function PricingArchived() {
 
               <div className="mt-6 flex items-baseline gap-2">
                 <span
-                  className={`font-black ${
+                  className={`font-bold ${
                     plan.price.length > 4 ? "text-2xl" : "text-4xl"
                   }`}
                 >

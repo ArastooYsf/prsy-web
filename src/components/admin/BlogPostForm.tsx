@@ -188,7 +188,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
         <div className="bg-white/[0.02] p-4 sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
           <div className="mx-auto max-w-2xl">
             <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-foreground/40">پیش‌نمایش زنده</p>
-            <h1 className="text-balance text-2xl font-black leading-tight sm:text-3xl">{title || "عنوان پست"}</h1>
+            <h1 className="text-balance text-2xl font-bold leading-tight sm:text-3xl">{title || "عنوان پست"}</h1>
             {coverImage && (
               <div className="relative mt-6 aspect-video w-full overflow-hidden rounded-2xl border border-white/10">
                 <Image src={getMediaUrl(coverImage)} alt="" fill sizes="(min-width: 1024px) 42rem, 100vw" className="object-cover" />

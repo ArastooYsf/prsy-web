@@ -84,7 +84,7 @@ export default function Customers() {
           </motion.span>
           <motion.h2
             variants={fadeInUp}
-            className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
+            className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
             چه کسانی به ما اعتماد کرده‌اند؟
           </motion.h2>

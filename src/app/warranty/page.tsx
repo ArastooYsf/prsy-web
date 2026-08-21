@@ -52,7 +52,7 @@ export default function WarrantyPage() {
       <div className="container">
         <div className="mx-auto max-w-3xl text-center">
           <span className="text-sm font-semibold text-accent-400">گارانتی و پشتیبانی</span>
-          <h1 className="mt-3 text-balance text-3xl font-black leading-tight sm:text-4xl">شرایط گارانتی و خدمات پس از فروش</h1>
+          <h1 className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl">شرایط گارانتی و خدمات پس از فروش</h1>
           <p className="mt-4 leading-7 text-foreground/70">آخرین به‌روزرسانی: مرداد ۱۴۰۵</p>
         </div>
 

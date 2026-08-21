@@ -45,11 +45,11 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/15 blur-[110px] sm:h-[560px] sm:w-[560px]"
+        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/8 blur-[110px] sm:h-[560px] sm:w-[560px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[380px] w-[380px] rounded-full bg-brand-500/15 blur-[110px] sm:h-[500px] sm:w-[500px]"
+        className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[380px] w-[380px] rounded-full bg-brand-500/8 blur-[110px] sm:h-[500px] sm:w-[500px]"
       />
 
       <div className="container relative z-10">
@@ -97,7 +97,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   imageFirst ? "lg:order-1" : "lg:order-2"
                 }`}
               >
-                <h1 className="text-balance text-3xl font-black leading-tight tracking-tight sm:text-5xl">
+                <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
                   {slide.title}
                 </h1>
                 <div
@@ -141,7 +141,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10"
             >
               {i < index && (
-                <span className="absolute inset-0 bg-accent-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
+                <span className="absolute inset-0 bg-accent-500" />
               )}
               {i === index && (
                 <motion.span

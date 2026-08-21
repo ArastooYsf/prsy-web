@@ -50,7 +50,7 @@ export default async function AccountProfilePage() {
                 <stat.icon className="size-4" />
                 <p className="text-sm">{stat.label}</p>
               </div>
-              <p className="mt-2 text-2xl font-black text-accent-400">{stat.value}</p>
+              <p className="mt-2 text-2xl font-bold text-accent-400">{stat.value}</p>
             </Link>
           ))}
         </div>

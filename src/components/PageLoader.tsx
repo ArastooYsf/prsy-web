@@ -54,7 +54,7 @@ export default function PageLoader() {
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
         >
-          <p className="text-xl font-black tracking-wide sm:text-2xl">
+          <p className="text-xl font-bold tracking-wide sm:text-2xl">
             پویش راه صنعت
             <span className="text-accent-400"> یاشار</span>
           </p>

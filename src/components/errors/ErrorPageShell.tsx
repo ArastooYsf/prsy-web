@@ -44,7 +44,7 @@ export default function ErrorPageShell({
           </motion.span>
           <motion.h1
             variants={fadeInUp}
-            className="mt-3 text-balance text-2xl font-black leading-tight sm:text-3xl"
+            className="mt-3 text-balance text-2xl font-bold leading-tight sm:text-3xl"
           >
             {title}
           </motion.h1>

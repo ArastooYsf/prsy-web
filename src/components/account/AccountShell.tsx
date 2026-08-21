@@ -43,8 +43,8 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
           <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-medium text-foreground/50">حساب کاربری</p>
-              <h1 className="mt-1 text-xl font-black sm:text-2xl">
-                خوش آمدید، <span className="text-gradient">{userLabel}</span>
+              <h1 className="mt-1 text-xl font-bold sm:text-2xl">
+                خوش آمدید، <span className="text-accent-soft">{userLabel}</span>
               </h1>
             </div>
             <div className="flex items-center gap-3 sm:justify-end">

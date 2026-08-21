@@ -29,7 +29,7 @@ export function sanitizeRichText(html: string): string {
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      img: ["src", "alt"],
+      img: ["src", "alt", "loading", "decoding", "width", "height"],
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
     allowedSchemesByTag: {
@@ -37,6 +37,11 @@ export function sanitizeRichText(html: string): string {
     },
     transformTags: {
       a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
+      // These <img> tags come from the rich-text editor and are rendered via
+      // dangerouslySetInnerHTML, so next/image isn't an option — this is the
+      // closest equivalent for a plain <img>: lazy-load, and never block text
+      // rendering on image decode.
+      img: sanitizeHtml.simpleTransform("img", { loading: "lazy", decoding: "async" }),
     },
   });
 }

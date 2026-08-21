@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { getMediaUrl } from "@/lib/media";
@@ -74,10 +75,13 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   imageFirst ? "lg:order-2" : "lg:order-1"
                 }`}
               >
-                <img
+                <Image
                   src={getMediaUrl(slide.image)}
                   alt={slide.title}
-                  className="h-full w-full object-contain p-10 sm:p-14"
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  priority={index === 0}
+                  className="object-contain p-10 sm:p-14"
                 />
               </motion.div>
 

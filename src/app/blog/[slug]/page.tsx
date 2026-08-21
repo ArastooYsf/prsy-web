@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
@@ -80,8 +81,15 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           <h1 className="mt-2 text-balance text-3xl font-black leading-tight sm:text-4xl">{post.title}</h1>
 
           {post.coverImage && (
-            <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
-              <img src={getMediaUrl(post.coverImage)} alt={post.title} className="w-full object-cover" />
+            <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl border border-white/10">
+              <Image
+                src={getMediaUrl(post.coverImage)}
+                alt={post.title}
+                fill
+                priority
+                sizes="(min-width: 1024px) 42rem, 100vw"
+                className="object-cover"
+              />
             </div>
           )}
 

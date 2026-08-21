@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImagePlus, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
@@ -27,10 +28,12 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
         <div className="mb-3 flex flex-wrap gap-3">
           {value.map((path) => (
             <div key={path} className="relative h-20 w-20 shrink-0">
-              <img
+              <Image
                 src={getMediaUrl(path)}
                 alt=""
-                className="h-full w-full rounded-lg border border-white/10 object-cover"
+                fill
+                sizes="80px"
+                className="rounded-lg border border-white/10 object-cover"
               />
               <button
                 type="button"

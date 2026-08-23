@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,42 +15,22 @@ type HeroProps = {
 
 export default function Hero({ slides: slidesProp }: HeroProps) {
   const [index, setIndex] = useState(0);
-  const [imageHovered, setImageHovered] = useState(false);
-  const [textHovered, setTextHovered] = useState(false);
-  const [canHover, setCanHover] = useState(false);
-
-  useEffect(() => {
-    setCanHover(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
-  }, []);
 
   const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
 
   const slide = slides[index];
-  const imageFirst = index % 2 === 0;
 
   const goNext = () => {
     setIndex((i) => (i + 1) % slides.length);
-    setImageHovered(false);
-    setTextHovered(false);
   };
 
   const goTo = (i: number) => {
     setIndex(i);
-    setImageHovered(false);
-    setTextHovered(false);
   };
 
   return (
     <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 right-[-10%] h-[420px] w-[420px] rounded-full bg-accent-500/8 blur-[110px] sm:h-[560px] sm:w-[560px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[380px] w-[380px] rounded-full bg-brand-500/8 blur-[110px] sm:h-[500px] sm:w-[500px]"
-      />
 
       <div className="container relative z-10">
         <div className="relative">
@@ -63,18 +43,11 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16"
             >
-              <motion.div
-                onHoverStart={() => canHover && setImageHovered(true)}
-                onHoverEnd={() => canHover && setImageHovered(false)}
-                animate={{
-                  scale: imageHovered ? 1.06 : 1,
-                  opacity: textHovered ? 0.7 : 1,
-                }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className={`relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] shadow-2xl shadow-black/20 ring-1 ring-white/5 sm:aspect-[16/10] lg:aspect-square ${
-                  imageFirst ? "lg:order-2" : "lg:order-1"
-                }`}
-              >
+              <div className="relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] sm:aspect-[16/10] lg:order-1 lg:aspect-square">
+                <span aria-hidden className="absolute right-3 top-3 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-white/20" />
+                <span aria-hidden className="absolute left-3 top-3 h-5 w-5 rounded-tl-md border-l-2 border-t-2 border-white/20" />
+                <span aria-hidden className="absolute bottom-3 right-3 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-white/20" />
+                <span aria-hidden className="absolute bottom-3 left-3 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-white/20" />
                 {slide.image && (
                   <Image
                     src={getMediaUrl(slide.image)}
@@ -85,20 +58,9 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                     className="object-contain p-10 sm:p-14"
                   />
                 )}
-              </motion.div>
+              </div>
 
-              <motion.div
-                onHoverStart={() => canHover && setTextHovered(true)}
-                onHoverEnd={() => canHover && setTextHovered(false)}
-                animate={{
-                  opacity: imageHovered ? 0.5 : 1,
-                  filter: textHovered ? "brightness(1.1)" : "brightness(1)",
-                }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
-                className={`order-2 text-center lg:text-right ${
-                  imageFirst ? "lg:order-1" : "lg:order-2"
-                }`}
-              >
+              <div className="order-2 text-center lg:order-2 lg:text-right">
                 <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
                   {slide.title}
                 </h1>
@@ -108,7 +70,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                 />
                 <Link
                   href={slide.ctaHref}
-                  className="group mt-7 inline-flex items-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 sm:text-base"
+                  className="group mt-7 inline-flex items-center gap-2 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-brand-950 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-lg hover:shadow-accent-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-base"
                 >
                   {slide.ctaLabel}
                   <svg
@@ -127,7 +89,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                     />
                   </svg>
                 </Link>
-              </motion.div>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -140,7 +102,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               onClick={() => goTo(i)}
               aria-label={`رفتن به اسلاید ${s.title}`}
               aria-current={i === index}
-              className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10"
+              className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {i < index && (
                 <span className="absolute inset-0 bg-accent-500" />
@@ -153,7 +115,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   transition={{ duration: SLIDE_DURATION, ease: "linear" }}
                   onAnimationComplete={goNext}
                   style={{ transformOrigin: "right" }}
-                  className="absolute inset-0 bg-accent-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"
+                  className="absolute inset-0 bg-accent-500"
                 />
               )}
             </button>

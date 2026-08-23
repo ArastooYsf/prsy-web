@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/components/Hero.tsx"
+        ],
+        "createdAt": "2026-08-23T18:16:30.741Z",
+        "reason": "corner-bracket viewfinder motif: neutral border-white/20, 20px L-shaped corner marks (not a full-edge accent border), deliberate signature chosen via /frontend-design grounded in DESIGN.md Control Room identity"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/components/Hero.tsx"
+        ],
+        "createdAt": "2026-08-23T18:16:30.834Z",
+        "reason": "same corner-bracket motif: brackets use their own small rounded-md corner, not the card's rounded-2xl, so there's no radius clash — heuristic can't see the two radii are on different elements"
+      }
+    ]
+  }
+}

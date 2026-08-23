@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T18:00:00.000Z",
+  "title": "Design System: پویش راه صنعت یاشار",
+  "extensions": {
+    "colorMeta": {
+      "background": { "role": "neutral", "displayName": "زمینه‌ی اتاق کنترل", "canonical": "oklch(0.16 0.03 265)", "tonalRamp": ["#02030a", "#04050f", "#060a17", "#0a1020", "#0f172a", "#1e293b", "#334155", "#475569"] },
+      "signal-orange": { "role": "primary", "displayName": "نارنجی سیگنال", "canonical": "oklch(0.7 0.19 42)", "tonalRamp": ["#7c2d12", "#9a3412", "#c2410c", "#ea580c", "#f97316", "#fb923c", "#fdba74", "#fed7aa"] },
+      "identification-blue": { "role": "secondary", "displayName": "آبی شناسایی", "canonical": "oklch(0.62 0.19 260)", "tonalRamp": ["#172554", "#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe"] },
+      "destructive": { "role": "error", "displayName": "قرمز هشدار", "canonical": "oklch(0.63 0.21 25)", "tonalRamp": ["#450a0a", "#7f1d1d", "#991b1b", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fecaca"] },
+      "muted-foreground": { "role": "neutral", "displayName": "خاکستری خاموش", "canonical": "oklch(0.72 0.02 260)", "tonalRamp": ["#334155", "#475569", "#64748b", "#94a3b8", "#a8b4c4", "#c1cad6", "#dbe1e8", "#eef1f4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "تیتر هیرو، یک‌بار در هر صفحه." },
+      "headline": { "displayName": "Headline", "purpose": "تیتر بخش‌ها." },
+      "body": { "displayName": "Body", "purpose": "متن توضیحی، فرم، محتوای کارت." },
+      "label": { "displayName": "Label", "purpose": "برچسب گروه، بج نقش/وضعیت." }
+    },
+    "shadows": [
+      { "name": "hover-lift", "value": "0 10px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.2)", "purpose": "فقط روی hover کارت و دکمه‌ی CTA اصلی؛ هرگز حالت پیش‌فرض." },
+      { "name": "floating", "value": "0 25px 50px -12px rgba(0,0,0,0.5)", "purpose": "پاپ‌اور/دراپ‌داون/منوی موبایل که باید از پشت‌زمینه جدا دیده بشه." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "ترنزیشن‌های عمومی state (hover، رنگ، حاشیه)." },
+      { "name": "duration-standard", "value": "300ms", "purpose": "مدت پیش‌فرض ترنزیشن‌های دسکتاپ (هدر، کارت)." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "دکمه‌ی اصلی (Primary Button)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "تنها دکمه‌ی نارنجی صفحه؛ برای یک اقدام اصلی مثل «درخواست مشاوره».",
+      "html": "<button class=\"ds-btn-primary\">درخواست مشاوره</button>",
+      "css": ".ds-btn-primary { background: #f97316; color: #060a17; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; border: none; transition: background 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: rgba(249,115,22,0.9); } .ds-btn-primary:focus-visible { outline: 2px solid #f97316; outline-offset: 2px; }"
+    },
+    {
+      "name": "دکمه‌ی ثانویه (Outline Button)",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "اقدام ثانویه بدون رقابت با نارنجی سیگنال.",
+      "html": "<button class=\"ds-btn-outline\">تماس با ما</button>",
+      "css": ".ds-btn-outline { background: transparent; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.1); transition: background 0.15s cubic-bezier(0.4,0,0.2,1); } .ds-btn-outline:hover { background: rgba(30,41,59,1); } .ds-btn-outline:focus-visible { outline: 2px solid #f97316; outline-offset: 2px; }"
+    },
+    {
+      "name": "کارت (Card)",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "سطح اصلی محتوا؛ مسطح در حالت استراحت، سایه فقط روی hover.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-title\">دیزل ژنراتور صنعتی</p><p class=\"ds-card-body\">تأمین انواع دیزل ژنراتور در ظرفیت‌های مختلف.</p></div>",
+      "css": ".ds-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; transition: box-shadow 0.2s cubic-bezier(0.4,0,0.2,1), border-color 0.2s; } .ds-card:hover { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.2); border-color: rgba(249,115,22,0.4); } .ds-card-title { color: #ffffff; font-weight: 700; font-size: 1rem; } .ds-card-body { color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem; }"
+    },
+    {
+      "name": "ورودی متن (Text Input)",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "فیلد فرم استاندارد با فوکوس نارنجی کم‌رنگ.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"شماره تماس\" />",
+      "css": ".ds-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.875rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; } .ds-input::placeholder { color: rgba(255,255,255,0.4); } .ds-input:focus { border-color: rgba(249,115,22,0.5); box-shadow: 0 0 0 2px rgba(249,115,22,0.2); }"
+    },
+    {
+      "name": "بج/تگ (Badge)",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "برچسب اطلاعاتی غیرتعاملی؛ آبی شناسایی برای نقش/نوع، نارنجی برای وضعیت فعال.",
+      "html": "<span class=\"ds-badge\">مشتری</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; border-radius: 9999px; border: 1px solid rgba(59,130,246,0.3); background: rgba(59,130,246,0.1); color: #93c5fd; font-size: 0.6875rem; font-weight: 600; padding: 0.25rem 0.625rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "اتاق کنترل",
+    "overview": "سایت باید حس یک اتاق کنترل تجهیزات صنعتی رو بده: تیره، بی‌سروصدا، خوانا، و کاملاً کاربردی. هیچ سطحی برای خودش جلب توجه نمی‌کنه — پس‌زمینه‌ی نزدیک به مشکی و کارت‌های بی‌رنگ فقط بومی هستن که اطلاعات روشون قرار می‌گیره. تنها رنگی که اجازه‌ی جلب توجه داره نارنجی سیگنال است: دقیقاً مثل چراغ هشدار یا دکمه‌ی توقف اضطراری روی یک تابلوی برق — همیشه در حداقل مساحت ممکن، همیشه برای یک اقدام مشخص (CTA اصلی، وضعیت فعال، تمرکز روی فیلد). مخاطب این سایت مسن‌تر، کم‌حوصله، و صنعتی‌ست — نه کاربر اپ موبایل که دنبال شگفتی بصریه. این یعنی خلاقیت باید در دقت و اعتمادسازی نشون داده بشه، نه در تجربه‌های غیرمنتظره.",
+    "keyCharacteristics": [
+      "تیره‌ی مطلق با یک لکه‌ی نارنجی، نه طیف رنگی",
+      "بدون سایه در حالت استراحت؛ عمق فقط با لایه‌های سفید بسیار کم‌رنگ",
+      "گوشه‌های نرم و پیوسته (rounded-lg تا rounded-2xl) روی زمینه‌ی کاملاً تیره",
+      "تایپوگرافی تک‌خانواده (Vazirmatn) با تکیه بر وزن فونت برای سلسله‌مراتب، نه تغییر فونت"
+    ],
+    "rules": [
+      { "name": "The One Signal Rule", "body": "نارنجی سیگنال در هر صفحه فقط روی اقدام‌های واقعی (CTA، فوکوس، وضعیت فعال) ظاهر می‌شه؛ هرگز به‌عنوان رنگ تزئینی. اگه یک صفحه بیش از یک المان نارنجی هم‌زمان روی صفحه داره که رقابتی برای توجه ایجاد کنه، این قانون نقض شده.", "section": "colors" },
+      { "name": "The Weight-Only Rule", "body": "برای بالابردن اهمیت یک متن، وزن فونت رو زیاد کن یا اندازه رو بزرگ‌تر کن — هرگز فونت جدید اضافه نکن. یک خانواده‌ی فونت یعنی یک صدا.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "سطوح در حالت عادی صاف‌اند؛ سایه فقط واکنش به state است (hover، فوکوس)، هرگز حالت پیش‌فرض یک المان.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do نارنجی سیگنال رو فقط برای اقدام واقعی به‌کار ببر (CTA، فوکوس، وضعیت فعال) — طبق The One Signal Rule.",
+      "Do روی هر پس‌زمینه‌ی نارنجی از متن تیره (#060a17) استفاده کن، نه سفید.",
+      "Do برای جداسازی/عمق از border-white/10 + bg-white/[0.03] استفاده کن؛ سایه فقط روی تعامل.",
+      "Do سلسله‌مراتب تایپوگرافی رو با وزن فونت و اندازه بساز، نه فونت جدید.",
+      "Do برای مخاطب مسن‌تر/صنعتی، اقدام‌ها و برچسب‌ها رو همیشه با متن واضح همراه کن، نه فقط آیکون."
+    ],
+    "donts": [
+      "Don't رنگ آبی شناسایی رو به‌عنوان دکمه یا CTA استفاده نکن — نقشش فقط بج/برچسب است.",
+      "Don't سایه‌ی پیش‌فرض (بدون hover) به کارت‌ها اضافه نکن — این سیستم مسطح است، لایه‌ای نیست.",
+      "Don't از گلس‌مورفیسم پررنگ، گرادیانت تزئینی سنگین، یا انیمیشن پیچیده/اسکرول غیراستاندارد استفاده نکن.",
+      "Don't فونت دوم اضافه نکن؛ Vazirmatn تنها خانواده‌ی فونت سایت است."
+    ]
+  }
+}

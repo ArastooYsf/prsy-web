@@ -75,14 +75,16 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   imageFirst ? "lg:order-2" : "lg:order-1"
                 }`}
               >
-                <Image
-                  src={getMediaUrl(slide.image)}
-                  alt={slide.title}
-                  fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  priority={index === 0}
-                  className="object-contain p-10 sm:p-14"
-                />
+                {slide.image && (
+                  <Image
+                    src={getMediaUrl(slide.image)}
+                    alt={slide.title}
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    priority={index === 0}
+                    className="object-contain p-10 sm:p-14"
+                  />
+                )}
               </motion.div>
 
               <motion.div

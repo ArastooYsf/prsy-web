@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { Eye, Newspaper, Pencil, Plus } from "lucide-react";
+import { Newspaper, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import DeletePostButton from "@/components/admin/DeletePostButton";
-import { formatNumber } from "@/lib/format-number";
+import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
 
 export const dynamic = "force-dynamic";
 
@@ -44,45 +43,7 @@ export default async function AdminBlogListPage() {
           {/* Mobile/tablet: card list */}
           <div className="space-y-3 md:hidden">
             {posts.map((post) => (
-              <div key={post.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="font-medium">{post.title}</p>
-                  <span
-                    className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                      post.published
-                        ? "border-accent-500/30 bg-accent-500/10 text-accent-400"
-                        : "border-white/10 bg-white/5 text-foreground/60"
-                    }`}
-                  >
-                    {post.published ? "منتشرشده" : "پیش‌نویس"}
-                  </span>
-                </div>
-                <dl className="mt-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <dt className="text-foreground/40">تاریخ انتشار</dt>
-                    <dd dir="ltr" className="text-foreground/70">
-                      {post.publishedAt ? post.publishedAt.toLocaleDateString("fa-IR") : "—"}
-                    </dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <dt className="text-foreground/40">بازدید</dt>
-                    <dd className="flex items-center gap-1 text-foreground/70">
-                      <Eye className="size-3.5" />
-                      {formatNumber(post.viewCount)}
-                    </dd>
-                  </div>
-                </dl>
-                <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/5 pt-3">
-                  <Link
-                    href={`/account/admin/blog/${post.id}`}
-                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-                  >
-                    <Pencil className="size-3.5" />
-                    ویرایش
-                  </Link>
-                  <DeletePostButton id={post.id} title={post.title} />
-                </div>
-              </div>
+              <BlogCardMobile key={post.id} post={post} />
             ))}
           </div>
 
@@ -100,41 +61,7 @@ export default async function AdminBlogListPage() {
               </thead>
               <tbody>
                 {posts.map((post) => (
-                  <tr key={post.id} className="border-t border-white/10">
-                    <td className="px-4 py-3 font-medium">{post.title}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                          post.published
-                            ? "border-accent-500/30 bg-accent-500/10 text-accent-400"
-                            : "border-white/10 bg-white/5 text-foreground/60"
-                        }`}
-                      >
-                        {post.published ? "منتشرشده" : "پیش‌نویس"}
-                      </span>
-                    </td>
-                    <td dir="ltr" className="px-4 py-3 text-right text-foreground/60">
-                      {post.publishedAt ? post.publishedAt.toLocaleDateString("fa-IR") : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-foreground/70">
-                      <div className="flex items-center gap-1.5">
-                        <Eye className="size-3.5" />
-                        {formatNumber(post.viewCount)}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/account/admin/blog/${post.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-                        >
-                          <Pencil className="size-3.5" />
-                          ویرایش
-                        </Link>
-                        <DeletePostButton id={post.id} title={post.title} />
-                      </div>
-                    </td>
-                  </tr>
+                  <BlogRowDesktop key={post.id} post={post} />
                 ))}
               </tbody>
             </table>

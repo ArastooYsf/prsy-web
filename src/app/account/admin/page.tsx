@@ -7,6 +7,7 @@ import { getContractOrderTrend, getOrderStatusBreakdown, getTicketStatusBreakdow
 import UploadWidget from "@/components/admin/UploadWidget";
 import { SiteViewsCard } from "@/components/admin/DashboardCharts";
 import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardChartsLazy";
+import { StatCard } from "./StatCard";
 
 async function getAdminStats() {
   try {
@@ -61,13 +62,7 @@ export default async function AdminDashboardPage() {
       <div className="space-y-8">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((card) => (
-            <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <div className="flex items-center gap-2 text-foreground/60">
-                <card.icon className="size-4" />
-                <p className="text-sm">{card.label}</p>
-              </div>
-              <p className="mt-2 text-3xl font-bold">{formatNumber(card.value)}</p>
-            </div>
+            <StatCard key={card.label} label={card.label} value={formatNumber(card.value)} icon={card.icon} />
           ))}
           <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />
         </div>
@@ -103,13 +98,7 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <div className="flex items-center gap-2 text-foreground/60">
-              <card.icon className="size-4" />
-              <p className="text-sm">{card.label}</p>
-            </div>
-            <p className="mt-2 text-3xl font-bold">{card.value}</p>
-          </div>
+          <StatCard key={card.label} label={card.label} value={card.value} icon={card.icon} />
         ))}
         <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />
       </div>

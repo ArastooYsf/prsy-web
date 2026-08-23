@@ -6,6 +6,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { useScroll } from '@/components/ui/use-scroll';
+import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import AuthNavLink from '@/components/AuthNavLink';
 
 export function Header() {
@@ -74,23 +75,37 @@ export function Header() {
 	return (
 		<header
 			className={cn(
-				// The blurred background/shadow scroll effect below is desktop-only (lg:)
+				// Rounded corners, the border and the side inset are constant (not tied
+				// to `scrolled`) — even resting flush at the top of the page this should
+				// read as a soft rounded card, never an edge-to-edge sharp rectangle, so
+				// its corners echo the search bar's own rounded shape above it.
+				//
+				// The blurred background/shadow "lift" effect below is desktop-only (lg:)
 				// on purpose: applying it at every breakpoint made the header visibly
 				// flicker on mobile, since iOS's elastic overscroll bounce can push
 				// scrollY back and forth across the threshold several times a second
-				// near the top of the page. The header itself stays visually fixed on
-				// mobile at all times instead.
-				'sticky top-0 z-50 mx-auto w-full max-w-5xl border-b border-transparent bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:max-w-6xl lg:rounded-md lg:border lg:border-transparent lg:bg-transparent lg:transition-all lg:ease-out',
+				// near the top of the page. Nothing here is scroll-conditional, so it's
+				// safe at every breakpoint without that risk.
+				'sticky top-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl rounded-3xl border border-white/10 bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:max-w-6xl lg:transition-all lg:duration-300 lg:ease-in-out',
 				{
-					'lg:border-border lg:top-4 lg:max-w-5xl lg:bg-background/95 lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
+					'lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
 						scrolled && !open,
 					'bg-background/90': open,
 				},
 			)}
 		>
+			<div
+				className={cn(
+					'w-full border-b border-white/5 px-4 transition-all lg:border-white/10 lg:duration-300 lg:ease-in-out',
+					scrolled ? 'py-1.5 lg:py-1' : 'py-2.5 lg:py-2',
+				)}
+			>
+				<HeaderSearch compact={scrolled} />
+			</div>
+
 			<nav
 				className={cn(
-					'flex h-14 w-full items-center justify-between px-4 lg:h-12 lg:transition-all lg:ease-out',
+					'flex h-14 w-full items-center justify-between px-4 lg:h-12 lg:transition-all lg:duration-300 lg:ease-in-out',
 					{
 						'lg:px-2': scrolled,
 					},

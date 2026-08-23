@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Bell, Check } from "lucide-react";
+import Skeleton from "react-loading-skeleton";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 
 const POLL_MS = 45000;
@@ -28,8 +29,60 @@ function timeAgoFa(iso: string): string {
   return toPersianDigits(`${days} روز پیش`);
 }
 
+// notification=null (still polling for the first time) falls back to a
+// Skeleton per field, so the placeholder row is always this row's real shape.
+function NotificationRow({
+  notification,
+  onRead,
+  onNavigate,
+}: {
+  notification: Notification | null;
+  onRead: (id: string) => void;
+  onNavigate: () => void;
+}) {
+  const content = (
+    <>
+      <div className="flex items-start justify-between gap-2">
+        <p className={`text-sm ${notification?.read ? "text-foreground/70" : "font-bold text-foreground"}`}>
+          {notification?.title || <Skeleton width="70%" />}
+        </p>
+        {notification && !notification.read && <span className="mt-1 size-2 shrink-0 rounded-full bg-accent-500" />}
+      </div>
+      <p className="mt-1 line-clamp-2 text-xs text-foreground/50">{notification?.message || <Skeleton width="90%" />}</p>
+      <p className="mt-1.5 text-[11px] text-foreground/35">
+        {notification ? timeAgoFa(notification.createdAt) : <Skeleton width={64} />}
+      </p>
+    </>
+  );
+
+  if (!notification) {
+    return <div className="px-4 py-3">{content}</div>;
+  }
+
+  return notification.link ? (
+    <Link
+      href={notification.link}
+      onClick={() => {
+        if (!notification.read) onRead(notification.id);
+        onNavigate();
+      }}
+      className="block px-4 py-3 hover:bg-white/5"
+    >
+      {content}
+    </Link>
+  ) : (
+    <button
+      type="button"
+      onClick={() => !notification.read && onRead(notification.id)}
+      className="block w-full px-4 py-3 text-right hover:bg-white/5"
+    >
+      {content}
+    </button>
+  );
+}
+
 export default function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[] | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -52,7 +105,7 @@ export default function NotificationBell() {
   }, []);
 
   async function markRead(id: string) {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    setNotifications((prev) => prev && prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
     setUnreadCount((prev) => Math.max(0, prev - 1));
     await fetch("/api/account/notifications", {
       method: "PATCH",
@@ -62,7 +115,7 @@ export default function NotificationBell() {
   }
 
   async function markAllRead() {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotifications((prev) => prev && prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
     await fetch("/api/account/notifications", {
       method: "PATCH",
@@ -70,6 +123,8 @@ export default function NotificationBell() {
       body: JSON.stringify({ all: true }),
     }).catch(() => {});
   }
+
+  const rows = notifications ?? Array.from({ length: 3 }, () => null);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -110,45 +165,13 @@ export default function NotificationBell() {
           </div>
 
           <div className="max-h-96 overflow-y-auto overscroll-contain">
-            {notifications.length === 0 ? (
+            {notifications?.length === 0 ? (
               <p className="p-6 text-center text-sm text-foreground/50">اعلانی وجود ندارد.</p>
             ) : (
               <div className="divide-y divide-white/5">
-                {notifications.map((n) => {
-                  const content = (
-                    <>
-                      <div className="flex items-start justify-between gap-2">
-                        <p className={`text-sm ${n.read ? "text-foreground/70" : "font-bold text-foreground"}`}>{n.title}</p>
-                        {!n.read && <span className="mt-1 size-2 shrink-0 rounded-full bg-accent-500" />}
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-xs text-foreground/50">{n.message}</p>
-                      <p className="mt-1.5 text-[11px] text-foreground/35">{timeAgoFa(n.createdAt)}</p>
-                    </>
-                  );
-
-                  return n.link ? (
-                    <Link
-                      key={n.id}
-                      href={n.link}
-                      onClick={() => {
-                        if (!n.read) markRead(n.id);
-                        setOpen(false);
-                      }}
-                      className="block px-4 py-3 hover:bg-white/5"
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <button
-                      key={n.id}
-                      type="button"
-                      onClick={() => !n.read && markRead(n.id)}
-                      className="block w-full px-4 py-3 text-right hover:bg-white/5"
-                    >
-                      {content}
-                    </button>
-                  );
-                })}
+                {rows.map((n, i) => (
+                  <NotificationRow key={n?.id ?? i} notification={n} onRead={markRead} onNavigate={() => setOpen(false)} />
+                ))}
               </div>
             )}
           </div>

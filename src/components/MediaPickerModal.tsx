@@ -7,6 +7,7 @@ import { toPersianDigits } from "@/lib/format-number";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
 import { useToast } from "@/components/ToastProvider";
+import Skeleton from "react-loading-skeleton";
 
 export type MediaAsset = {
   id: string;
@@ -237,7 +238,11 @@ export default function MediaPickerModal({
         <div className="flex-1 overflow-y-auto p-5">
           {tab === "gallery" ? (
             loadingGallery ? (
-              <p className="py-10 text-center text-sm text-foreground/50">در حال بارگذاری...</p>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="aspect-square w-full" />
+                ))}
+              </div>
             ) : gallery.length === 0 ? (
               <p className="py-10 text-center text-sm text-foreground/50">هنوز فایلی آپلود نشده است.</p>
             ) : (

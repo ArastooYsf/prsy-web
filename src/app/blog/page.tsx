@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getMediaUrl } from "@/lib/media";
+import { BlogPostCard } from "./BlogPostCard";
 
 export const metadata: Metadata = {
   title: "وبلاگ",
@@ -49,42 +47,7 @@ export default async function BlogPage() {
           ) : (
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-colors hover:border-accent-500/40"
-                >
-                  <div className="relative aspect-video w-full overflow-hidden bg-white/5">
-                    {post.coverImage ? (
-                      <Image
-                        src={getMediaUrl(post.coverImage)}
-                        alt={post.title}
-                        fill
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-foreground/20">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.6" />
-                          <path d="M3 16l5-5 4 4 4-4 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    {post.publishedAt && (
-                      <p dir="ltr" className="text-right text-xs text-foreground/50">
-                        {post.publishedAt.toLocaleDateString("fa-IR")}
-                      </p>
-                    )}
-                    <h2 className="mt-2 text-lg font-bold leading-7">{post.title}</h2>
-                    {post.excerpt && (
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-foreground/70">{post.excerpt}</p>
-                    )}
-                    <span className="mt-4 text-sm font-semibold text-accent-400">ادامه مطلب ←</span>
-                  </div>
-                </Link>
+                <BlogPostCard key={post.id} post={post} />
               ))}
             </div>
           )}

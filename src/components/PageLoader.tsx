@@ -5,7 +5,15 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const MIN_VISIBLE_MS = 350;
 const SAFETY_TIMEOUT_MS = 6000;
+const SESSION_FLAG = "yashar:pageLoaderShown";
 
+// Whether this splash paints at all for a repeat hard navigation/refresh is
+// decided before hydration, by the beforeInteractive script in layout.tsx
+// (adds `pl-skip` to <html>, which a CSS rule turns into `display: none` on
+// [data-page-loader]) — not by React state here. Deciding it here instead
+// would need an effect to read sessionStorage, and the gap before that effect
+// runs let the route's own loading.tsx skeleton flash visible and then get
+// covered by the splash. This component only owns the fade-out once ready.
 export default function PageLoader() {
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +38,13 @@ export default function PageLoader() {
     const safetyNet = new Promise<void>((resolve) => setTimeout(resolve, SAFETY_TIMEOUT_MS));
 
     Promise.race([ready, safetyNet]).then(() => {
-      if (!cancelled) setLoading(false);
+      if (cancelled) return;
+      try {
+        sessionStorage.setItem(SESSION_FLAG, "1");
+      } catch {
+        // ignore — worst case the splash shows again next navigation
+      }
+      setLoading(false);
     });
 
     return () => {
@@ -49,6 +63,7 @@ export default function PageLoader() {
     <AnimatePresence>
       {loading && (
         <motion.div
+          data-page-loader
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}

@@ -4,16 +4,13 @@ import { FileSpreadsheet, Import, UserCheck, UserPlus, Users } from "lucide-reac
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
-import { formatJalali } from "@/lib/jalali";
 import { filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
-import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { CustomerCardMobile, CustomerRowDesktop } from "./CustomerRow";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
-
-const ROLE_LABEL: Record<string, string> = { CUSTOMER: "مشتری", SUPPORT: "پشتیبان", ADMIN: "مدیر" };
 
 const SORT_FIELDS = ["name", "email", "customerType", "approvalStatus", "createdAt"] as const;
 
@@ -128,51 +125,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
           {/* Mobile/tablet: card list */}
           <div className="space-y-3 md:hidden">
             {customers.map((customer) => (
-              <div key={customer.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-medium">{customer.name || "—"}</p>
-                    {customer.companyName && <p className="text-xs text-foreground/40">{customer.companyName}</p>}
-                    <p dir="ltr" className="mt-0.5 truncate text-xs text-foreground/60">
-                      {customer.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                  {customer.role !== "CUSTOMER" && (
-                    <span className="rounded-full border border-brand-400/30 bg-brand-400/10 px-2.5 py-1 text-[11px] font-semibold text-brand-300">
-                      {ROLE_LABEL[customer.role]}
-                    </span>
-                  )}
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
-                  >
-                    {CUSTOMER_TYPE[customer.customerType].label}
-                  </span>
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
-                  >
-                    {APPROVAL_STATUS[customer.approvalStatus].label}
-                  </span>
-                </div>
-                <dl className="mt-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <dt className="text-foreground/40">تاریخ عضویت</dt>
-                    <dd dir="ltr" className="text-foreground/70">
-                      {formatJalali(customer.createdAt.toISOString())}
-                    </dd>
-                  </div>
-                </dl>
-                {isAdmin && (
-                  <div className="mt-3 flex justify-end border-t border-white/5 pt-3">
-                    <DeleteEntityButton
-                      endpoint={`/api/admin/customers/${customer.id}`}
-                      title="حذف مشتری"
-                      message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
-                    />
-                  </div>
-                )}
-              </div>
+              <CustomerCardMobile key={customer.id} customer={customer} isAdmin={isAdmin} />
             ))}
           </div>
 
@@ -201,46 +154,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
               </thead>
               <tbody>
                 {customers.map((customer) => (
-                  <tr key={customer.id} className="border-t border-white/10">
-                    <td className="px-4 py-3 font-medium">
-                      {customer.name || "—"}
-                      {customer.role !== "CUSTOMER" && (
-                        <span className="mr-1.5 text-xs text-brand-300">[{ROLE_LABEL[customer.role]}]</span>
-                      )}
-                      {customer.companyName && (
-                        <span className="mr-1.5 text-xs text-foreground/40">({customer.companyName})</span>
-                      )}
-                    </td>
-                    <td dir="ltr" className="px-4 py-3 text-right text-foreground/70">
-                      {customer.email}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
-                      >
-                        {CUSTOMER_TYPE[customer.customerType].label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
-                      >
-                        {APPROVAL_STATUS[customer.approvalStatus].label}
-                      </span>
-                    </td>
-                    <td dir="ltr" className="px-4 py-3 text-right text-xs text-foreground/50">
-                      {formatJalali(customer.createdAt.toISOString())}
-                    </td>
-                    <td className="px-4 py-3">
-                      {isAdmin && (
-                        <DeleteEntityButton
-                          endpoint={`/api/admin/customers/${customer.id}`}
-                          title="حذف مشتری"
-                          message={`مطمئنید می‌خواهید مشتری «${customer.name || customer.email}» را حذف کنید؟ ورود این حساب دیگر امکان‌پذیر نخواهد بود.`}
-                        />
-                      )}
-                    </td>
-                  </tr>
+                  <CustomerRowDesktop key={customer.id} customer={customer} isAdmin={isAdmin} />
                 ))}
               </tbody>
             </table>

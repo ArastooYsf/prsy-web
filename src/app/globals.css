@@ -14,13 +14,13 @@
   --ring: 249 115 22; /* accent-500 */
 
   --primary: 249 115 22; /* accent-500 */
-  --primary-foreground: 255 255 255;
+  --primary-foreground: 6 10 23; /* same as --background: white on accent-500 measures 2.8:1, fails WCAG AA (4.5:1) */
 
   --secondary: 30 41 59;
   --secondary-foreground: 255 255 255;
 
   --destructive: 239 68 68;
-  --destructive-foreground: 255 255 255;
+  --destructive-foreground: 6 10 23; /* same as --background: white on this red measures 3.76:1, fails WCAG AA */
 
   --muted: 30 41 59;
   --muted-foreground: 148 163 184;
@@ -56,6 +56,13 @@ body {
 
   .text-accent-soft {
     color: #fb923c;
+  }
+
+  /* Set by the beforeInteractive script in layout.tsx before hydration —
+     suppresses the splash instantly (no flash) once it's already shown once
+     in this tab's session. */
+  html.pl-skip [data-page-loader] {
+    display: none !important;
   }
 
   .section-padding {

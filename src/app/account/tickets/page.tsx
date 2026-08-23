@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { MessageSquare, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TICKET_STATUS } from "@/lib/status-labels";
+import { TicketListItem } from "./TicketListItem";
 
 export const dynamic = "force-dynamic";
 
@@ -39,23 +39,7 @@ export default async function AccountTicketsPage() {
       ) : (
         <div className="space-y-3">
           {tickets.map((ticket) => (
-            <Link
-              key={ticket.id}
-              href={`/account/tickets/${ticket.id}`}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-accent-500/30"
-            >
-              <div>
-                <p className="font-semibold">{ticket.subject}</p>
-                <p dir="ltr" className="mt-1 text-right text-xs text-foreground/50">
-                  {ticket.updatedAt.toLocaleDateString("fa-IR")}
-                </p>
-              </div>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${TICKET_STATUS[ticket.status].className}`}
-              >
-                {TICKET_STATUS[ticket.status].label}
-              </span>
-            </Link>
+            <TicketListItem key={ticket.id} ticket={ticket} />
           ))}
         </div>
       )}

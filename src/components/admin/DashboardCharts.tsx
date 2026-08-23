@@ -15,6 +15,7 @@ import {
   Legend,
 } from "recharts";
 import { Eye } from "lucide-react";
+import Skeleton from "react-loading-skeleton";
 import type { StatusCount, TrendPoint } from "@/lib/admin-stats";
 import { RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
@@ -123,7 +124,10 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
   );
 }
 
-export function SiteViewsCard({ initialCount, initialRange }: { initialCount: number; initialRange: StatsRange }) {
+// initialCount=null (dashboard's loading.tsx) falls back to a Skeleton in
+// place of the number — the label and range toggle are static UI, never
+// async, so they always render for real.
+export function SiteViewsCard({ initialCount, initialRange }: { initialCount: number | null; initialRange: StatsRange }) {
   const [range, setRange] = useState<StatsRange>(initialRange);
   const [count, setCount] = useState(initialCount);
   const [loading, setLoading] = useState(false);
@@ -149,7 +153,7 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
         </div>
         <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />
       </div>
-      <p className="mt-2 text-3xl font-bold">{formatNumber(count)}</p>
+      <p className="mt-2 text-3xl font-bold">{count !== null ? formatNumber(count) : <Skeleton width={64} height={30} />}</p>
     </div>
   );
 }

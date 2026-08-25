@@ -6,6 +6,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
+import { useLandingTheme } from "@/components/RouteThemeScope";
+import { cn } from "@/lib/utils";
 
 const SLIDE_DURATION = 5;
 
@@ -15,6 +17,12 @@ type HeroProps = {
 
 export default function Hero({ slides: slidesProp }: HeroProps) {
   const [index, setIndex] = useState(0);
+  // Hero only ever renders on "/", but that route's own palette is now
+  // toggleable (see RouteThemeScope) rather than permanently light, so the
+  // two things Tailwind classes alone can't theme-switch — the typography
+  // plugin's prose/prose-invert and the grid background's line color — need
+  // to read the live theme instead of assuming light.
+  const isDark = useLandingTheme()?.theme === "dark";
 
   const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
 
@@ -30,7 +38,12 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
 
   return (
     <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]",
+          isDark ? "bg-grid-pattern" : "bg-grid-pattern-dark",
+        )}
+      />
 
       <div className="container relative z-10">
         <div className="relative">
@@ -43,11 +56,11 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16"
             >
-              <div className="relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] sm:aspect-[16/10] lg:order-1 lg:aspect-square">
-                <span aria-hidden className="absolute right-3 top-3 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-white/20" />
-                <span aria-hidden className="absolute left-3 top-3 h-5 w-5 rounded-tl-md border-l-2 border-t-2 border-white/20" />
-                <span aria-hidden className="absolute bottom-3 right-3 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-white/20" />
-                <span aria-hidden className="absolute bottom-3 left-3 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-white/20" />
+              <div className="relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] sm:aspect-[16/10] lg:order-1 lg:aspect-square">
+                <span aria-hidden className="absolute right-3 top-3 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-foreground/20" />
+                <span aria-hidden className="absolute left-3 top-3 h-5 w-5 rounded-tl-md border-l-2 border-t-2 border-foreground/20" />
+                <span aria-hidden className="absolute bottom-3 right-3 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-foreground/20" />
+                <span aria-hidden className="absolute bottom-3 left-3 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-foreground/20" />
                 {slide.image && (
                   <Image
                     src={getMediaUrl(slide.image)}
@@ -65,7 +78,10 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   {slide.title}
                 </h1>
                 <div
-                  className="prose prose-invert prose-sm mt-4 max-w-none text-balance leading-8 text-foreground/70 sm:text-lg [&_p]:m-0"
+                  className={cn(
+                    "prose prose-sm mt-4 max-w-none text-balance leading-8 text-foreground/70 sm:text-lg [&_p]:m-0",
+                    isDark && "prose-invert",
+                  )}
                   dangerouslySetInnerHTML={{ __html: slide.description }}
                 />
                 <Link
@@ -102,7 +118,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               onClick={() => goTo(i)}
               aria-label={`رفتن به اسلاید ${s.title}`}
               aria-current={i === index}
-              className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="relative h-1 flex-1 overflow-hidden rounded-full bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {i < index && (
                 <span className="absolute inset-0 bg-accent-500" />

@@ -30,7 +30,7 @@ const initialState: FormState = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-all duration-200 focus:border-accent-500/50 focus:ring-2 focus:ring-accent-500/20";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-all duration-200 focus:border-accent-500/50 focus:ring-2 focus:ring-accent-500/20";
 
 export default function ConsultationForm() {
   const { showToast } = useToast();
@@ -89,7 +89,7 @@ export default function ConsultationForm() {
             setForm(initialState);
             setSubmitted(false);
           }}
-          className="mt-6 rounded-full border border-white/15 px-6 py-2.5 text-sm font-semibold transition-colors duration-300 hover:bg-white/5"
+          className="mt-6 rounded-full border border-foreground/15 px-6 py-2.5 text-sm font-semibold transition-colors duration-300 hover:bg-foreground/5"
         >
           ارسال درخواست جدید
         </button>
@@ -100,7 +100,7 @@ export default function ConsultationForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+      className="mx-auto max-w-xl rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8"
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>

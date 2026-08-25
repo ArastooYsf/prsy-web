@@ -75,7 +75,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
     .filter((social) => social.href);
 
   return (
-    <footer className="border-t border-white/10 bg-black/20">
+    <footer className="border-t border-foreground/10 bg-black/20">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -107,7 +107,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
                     rel="noopener noreferrer"
                     aria-label={social.name}
                     whileHover={{ y: -3, scale: 1.05 }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
                   >
                     {social.icon}
                   </motion.a>
@@ -118,7 +118,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
             {/* Placeholder for the Enamad trust-seal embed. Once verified on
                 enamad.ir, replace this box with the exact <a>/<script> snippet
                 they provide — see the project report for the registration steps. */}
-            <div className="mt-6 flex h-16 w-16 flex-col items-center justify-center rounded-lg border border-dashed border-white/15 text-center text-[9px] leading-4 text-foreground/40">
+            <div className="mt-6 flex h-16 w-16 flex-col items-center justify-center rounded-lg border border-dashed border-foreground/15 text-center text-[9px] leading-4 text-foreground/40">
               محل درج
               <br />
               نماد اعتماد
@@ -189,20 +189,20 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-foreground/50 sm:flex-row-reverse"
+          className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-foreground/10 pt-8 text-sm text-foreground/50 sm:flex-row-reverse"
         >
           <p>
             © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه
             صنعت یاشار. تمامی حقوق محفوظ است.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="transition-colors hover:text-white">
+            <Link href="/privacy" className="transition-colors hover:text-foreground">
               حریم خصوصی
             </Link>
-            <Link href="/terms" className="transition-colors hover:text-white">
+            <Link href="/terms" className="transition-colors hover:text-foreground">
               قوانین و مقررات
             </Link>
-            <Link href="/warranty" className="transition-colors hover:text-white">
+            <Link href="/warranty" className="transition-colors hover:text-foreground">
               گارانتی و پشتیبانی
             </Link>
           </div>

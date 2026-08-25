@@ -43,7 +43,7 @@ const TESTIMONIALS = [
 
 export default function SocialProof() {
   return (
-    <section id="clients" className="section-padding relative border-t border-white/10">
+    <section id="clients" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -79,7 +79,7 @@ export default function SocialProof() {
             <motion.span
               key={sector}
               variants={fadeInUp}
-              className="rounded-full border border-transparent bg-white/[0.03] px-4 py-2 text-xs font-medium text-foreground/70 sm:text-sm"
+              className="rounded-full border border-transparent bg-foreground/[0.03] px-4 py-2 text-xs font-medium text-foreground/70 sm:text-sm"
             >
               {sector}
             </motion.span>
@@ -97,7 +97,7 @@ export default function SocialProof() {
             <motion.div
               key={testimonial.name}
               variants={fadeInUp}
-              className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-7"
+              className="flex flex-col rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-7"
             >
               <svg
                 width="28"
@@ -114,7 +114,7 @@ export default function SocialProof() {
               <p className="flex-1 leading-7 text-foreground/70">
                 {testimonial.quote}
               </p>
-              <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+              <div className="mt-6 flex items-center gap-3 border-t border-foreground/10 pt-5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                   {testimonial.name.charAt(0)}
                 </div>

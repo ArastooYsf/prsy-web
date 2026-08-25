@@ -25,11 +25,11 @@ export default function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="رضایت کوکی"
-      className="fixed inset-x-4 bottom-4 z-50 flex flex-col gap-3 rounded-2xl border border-white/10 bg-background/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center"
+      className="fixed inset-x-4 bottom-4 z-50 flex flex-col gap-3 rounded-2xl border border-foreground/10 bg-background/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center"
     >
       <p className="flex-1 text-xs leading-6 text-foreground/70">
         این سایت برای بهبود تجربه‌ی کاربری از کوکی استفاده می‌کند. با ادامه استفاده از سایت، با{" "}
-        <Link href="/privacy" className="font-medium text-accent-400 transition-colors hover:text-white">
+        <Link href="/privacy" className="font-medium text-accent-400 transition-colors hover:text-foreground">
           سیاست حریم خصوصی
         </Link>{" "}
         موافقت می‌کنید.

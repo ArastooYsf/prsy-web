@@ -16,13 +16,20 @@ import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
+import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
 import AuthNavLink from '@/components/AuthNavLink';
+import { useLandingTheme } from '@/components/RouteThemeScope';
 import type { ProductCategoryContent } from '@/lib/site-content-defaults';
 
 // How far (in px) the user needs to scroll before the header's ambient glow
 // reaches full intensity. Matches GLOW_MAX_SHADOW below.
 const GLOW_DISTANCE = 300;
 const GLOW_MAX_SHADOW = '0 8px 40px -4px rgba(249, 115, 22, 0.25)';
+// This is a hardcoded rgba string driven straight through framer-motion's
+// style prop, not a Tailwind class, so it can't pick up the CSS-variable
+// override .theme-white-blue uses elsewhere — it needs its own blue variant,
+// picked at render time by route (see isLandingPage below).
+const GLOW_MAX_SHADOW_BLUE = '0 8px 40px -4px rgba(37, 99, 235, 0.25)';
 
 // The hover "speed bump" indicator: a full-nav-height silhouette — a rounded
 // cap tapering out of the hairline border, flowing straight down to the
@@ -59,6 +66,9 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
 	const isAccountArea = pathname?.startsWith('/account');
+	const isLandingPage = pathname === '/';
+	const landingTheme = useLandingTheme();
+	const isLightTheme = isLandingPage && landingTheme?.theme !== 'dark';
 
 	// The mobile drawer is `position:fixed`, so its `top` offset has to match
 	// the header's actual rendered height in px — not a hardcoded Tailwind
@@ -97,7 +107,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 		damping: 40,
 	});
 	const glowShadow = useTransform(glowProgress, (p) =>
-		p <= 0.01 ? 'none' : GLOW_MAX_SHADOW.replace('0.25', (p * 0.25).toFixed(3)),
+		p <= 0.01 ? 'none' : (isLightTheme ? GLOW_MAX_SHADOW_BLUE : GLOW_MAX_SHADOW).replace('0.25', (p * 0.25).toFixed(3)),
 	);
 
 	// Nav hover "speed bump" indicator — see buildBumpPath above.
@@ -261,7 +271,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 				// flicker on mobile, since iOS's elastic overscroll bounce can push
 				// scrollY back and forth across the threshold several times a second
 				// near the top of the page.
-				'sticky top-0 z-50 mx-auto w-full border border-white/10 bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:w-[calc(100%-2rem)] lg:max-w-6xl lg:rounded-b-2xl lg:transition-all lg:duration-300 lg:ease-in-out',
+				'sticky top-0 z-50 mx-auto w-full border border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:w-[calc(100%-2rem)] lg:max-w-6xl lg:rounded-b-2xl lg:transition-all lg:duration-300 lg:ease-in-out',
 				{
 					'lg:rounded-t-2xl lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
 						scrolled && !open,
@@ -278,7 +288,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 				conditional here. */}
 			<motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit]" style={{ boxShadow: glowShadow }} />
 
-			<div className="w-full border-b border-white/5 px-4 py-2.5 lg:border-white/10 lg:py-2">
+			<div className="w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
 				<HeaderSearch />
 			</div>
 
@@ -306,7 +316,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 					aria-hidden
 					className="pointer-events-none absolute inset-x-0 top-0 hidden h-12 w-full overflow-visible lg:block"
 				>
-					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-white/[0.06]" />
+					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-foreground/[0.06]" />
 				</svg>
 
 				<Link
@@ -365,6 +375,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						</Button>
 						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
 						<AuthNavLink variant="icon" />
+						{isLandingPage && <ThemeToggleButton />}
 					</div>
 				</div>
 				<Button
@@ -440,6 +451,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 							onNavigate={() => setOpen(false)}
 						/>
 						<AuthNavLink variant="block" onNavigate={() => setOpen(false)} />
+						{isLandingPage && <ThemeToggleButton fullWidth />}
 					</div>
 				</div>
 			</div>

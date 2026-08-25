@@ -10,6 +10,7 @@ import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
 import { getFooterContact, getProductCategories } from "@/lib/site-content";
+import RouteThemeScope from "@/components/RouteThemeScope";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "./globals.css";
@@ -88,41 +89,43 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <ScrollProgress />
-        {GA_MEASUREMENT_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="ga4-init" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}');
-              `}
-            </Script>
-          </>
-        )}
-        <SessionProviderWrapper>
-          <ToastProvider>
-            <SkeletonTheme
-              baseColor="rgba(255,255,255,0.06)"
-              highlightColor="rgba(249,146,63,0.12)"
-              borderRadius="0.5rem"
-              direction="rtl"
-              inline
-            >
-              <PageViewTracker />
-              <PageLoader />
-              <Header productCategories={productCategories} />
-              <main>{children}</main>
-              <Footer contact={footerContact} />
-            </SkeletonTheme>
-          </ToastProvider>
-        </SessionProviderWrapper>
-        <CookieConsentBanner />
+        <RouteThemeScope>
+          <ScrollProgress />
+          {GA_MEASUREMENT_ID && (
+            <>
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="ga4-init" strategy="afterInteractive">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_MEASUREMENT_ID}');
+                `}
+              </Script>
+            </>
+          )}
+          <SessionProviderWrapper>
+            <ToastProvider>
+              <SkeletonTheme
+                baseColor="rgba(255,255,255,0.06)"
+                highlightColor="rgba(249,146,63,0.12)"
+                borderRadius="0.5rem"
+                direction="rtl"
+                inline
+              >
+                <PageViewTracker />
+                <PageLoader />
+                <Header productCategories={productCategories} />
+                <main>{children}</main>
+                <Footer contact={footerContact} />
+              </SkeletonTheme>
+            </ToastProvider>
+          </SessionProviderWrapper>
+          <CookieConsentBanner />
+        </RouteThemeScope>
       </body>
     </html>
   );

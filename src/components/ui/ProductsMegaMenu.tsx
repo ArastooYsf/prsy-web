@@ -2,12 +2,14 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { ProductCategoryContent } from "@/lib/site-content-defaults";
 import { cn } from "@/lib/utils";
+import { useLandingTheme } from "@/components/RouteThemeScope";
 
 // Close is delayed (not instant on mouseleave) so moving the cursor from the
 // trigger toward the panel — which briefly leaves both — doesn't flicker the
@@ -21,6 +23,14 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(categories[0]?.id ?? null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Tailwind Typography's prose-invert (light text) vs prose (dark text)
+  // isn't a CSS-variable-driven choice like the rest of the .theme-white-blue
+  // override, so it needs its own check — this component is shared by every
+  // page via the header, and the landing page's own palette is now
+  // toggleable rather than permanently light (see RouteThemeScope).
+  const isLandingPage = usePathname() === "/";
+  const landingTheme = useLandingTheme();
+  const isLightTheme = isLandingPage && landingTheme?.theme !== "dark";
 
   if (categories.length === 0) {
     return (
@@ -82,9 +92,9 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0, transition: OPEN_TRANSITION }}
             exit={{ opacity: 0, y: -6, transition: CLOSE_TRANSITION }}
-            className="absolute right-0 top-full z-50 mt-2 flex w-[36rem] overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+            className="absolute right-0 top-full z-50 mt-2 flex w-[36rem] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
           >
-            <div className="w-48 shrink-0 border-l border-white/10 py-2">
+            <div className="w-48 shrink-0 border-l border-foreground/10 py-2">
               {categories.map((category) => (
                 <button
                   key={category.id}
@@ -93,8 +103,8 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
                   className={cn(
                     "flex w-full items-center gap-2.5 px-4 py-2.5 text-right text-sm transition-colors",
                     category.id === active.id
-                      ? "bg-white/5 text-accent-400"
-                      : "text-foreground/70 hover:bg-white/[0.03] hover:text-foreground",
+                      ? "bg-foreground/5 text-accent-400"
+                      : "text-foreground/70 hover:bg-foreground/[0.03] hover:text-foreground",
                   )}
                 >
                   <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 [&_svg]:size-4">
@@ -108,7 +118,10 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
             <div className="flex-1 p-5">
               <p className="text-sm font-bold text-foreground">{active.title}</p>
               <p
-                className="prose prose-invert prose-sm mt-1 max-w-none text-xs leading-6 text-foreground/60 [&_p]:m-0"
+                className={cn(
+                  "prose prose-sm mt-1 max-w-none text-xs leading-6 text-foreground/60 [&_p]:m-0",
+                  !isLightTheme && "prose-invert",
+                )}
                 dangerouslySetInnerHTML={{ __html: active.description }}
               />
 
@@ -117,7 +130,7 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
                   {active.brands.map((brand) => (
                     <span
                       key={brand}
-                      className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-foreground/70"
+                      className="rounded-full border border-foreground/10 bg-foreground/5 px-2.5 py-1 text-[11px] text-foreground/70"
                     >
                       {brand}
                     </span>

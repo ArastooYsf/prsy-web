@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
-import { Search, TrendingUp } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Search, TrendingUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchDropdownBanner from "@/components/ui/SearchDropdownBanner";
 
@@ -18,7 +19,16 @@ const POPULAR_SEARCHES = [
   "موتور ژنراتور",
 ];
 
-export function HeaderSearch({ compact }: { compact: boolean }) {
+// Timing reverse-engineered from Digikala's production search dropdown (its
+// own CSS module, not copied assets): opening is slower with a soft
+// overshoot-settle curve so the panel feels considered; closing is faster
+// and linear so dismissing never feels like it's dragging. Toned down for
+// this audience: their backdrop dims the page 30%, ours dims 20% — same
+// "you're in search mode" cue, less assertive.
+const OPEN_TRANSITION = { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const };
+const CLOSE_TRANSITION = { duration: 0.2, ease: "easeIn" as const };
+
+export function HeaderSearch() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -28,13 +38,8 @@ export function HeaderSearch({ compact }: { compact: boolean }) {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Anchor asChild>
-        <div className="relative mx-auto w-full max-w-[15rem] sm:max-w-xs lg:max-w-sm">
-          <Search
-            className={cn(
-              "pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-foreground/40 transition-all lg:duration-300 lg:ease-in-out",
-              compact && "lg:size-3.5 lg:right-2.5",
-            )}
-          />
+        <div className="relative z-50 mx-auto w-full max-w-[17rem] sm:max-w-sm lg:max-w-md">
+          <Search className="pointer-events-none absolute right-3.5 top-1/2 size-[18px] -translate-y-1/2 text-foreground/40" />
           <input
             type="text"
             value={query}
@@ -42,13 +47,45 @@ export function HeaderSearch({ compact }: { compact: boolean }) {
             onFocus={() => setOpen(true)}
             aria-label="جست‌وجوی محصولات"
             placeholder="جست‌وجوی محصولات، دسته‌بندی‌ها..."
-            className={cn(
-              "h-9 w-full rounded-full border border-white/10 bg-white/5 pr-9 pl-3 text-sm text-foreground outline-none transition-all placeholder:text-foreground/40 focus:border-accent-500/50 lg:h-9 lg:duration-300 lg:ease-in-out",
-              compact && "lg:h-7 lg:pr-8 lg:text-xs",
-            )}
+            className="h-11 w-full rounded-full border border-white/10 bg-white/5 pr-10 pl-9 text-base text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
           />
+          {query && (
+            // The visible icon stays small (size-4) to match the input's own
+            // scale, but the tappable button itself is a full 44px hit target
+            // (h-11 w-11, centered on the input) — extends slightly into the
+            // row's own padding above/below, not clipped by anything there.
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="پاک کردن جست‌وجو"
+              className="absolute left-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-foreground/40 transition-colors hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
       </Popover.Anchor>
+
+      {/* Backdrop — same "you're in search mode now" cue Digikala uses
+          (they dim toward white on a light page; a plain black dim would be
+          nearly invisible on our already near-black background, so this
+          softens/blurs the page behind instead, which reads on any theme).
+          Kept outside Popover.Portal since it just needs fixed positioning,
+          not anchor-relative placement. AnimatePresence (not Radix's own
+          data-state classes) drives it because it isn't a Radix-managed
+          element, so it needs its own exit-animation lifecycle. */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: OPEN_TRANSITION }}
+            exit={{ opacity: 0, transition: CLOSE_TRANSITION }}
+            onClick={() => setOpen(false)}
+            aria-hidden
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
 
       <Popover.Portal>
         <Popover.Content
@@ -56,30 +93,30 @@ export function HeaderSearch({ compact }: { compact: boolean }) {
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-b-2xl rounded-t-none border border-white/10 bg-background shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] origin-top overflow-y-auto overscroll-contain rounded-b-2xl rounded-t-none border border-white/10 bg-background shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-2 data-[state=open]:duration-300 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-top-2 data-[state=closed]:duration-200 data-[state=closed]:ease-in"
         >
           {!trimmed && (
-            <p className="flex items-center gap-1.5 px-4 pt-3 pb-1.5 text-[11px] font-semibold text-foreground/40">
-              <TrendingUp className="size-3.5" />
+            <p className="flex items-center gap-1.5 px-5 pt-4 pb-2 text-xs font-semibold text-foreground/40">
+              <TrendingUp className="size-4" />
               جست‌وجوهای پرطرفدار
             </p>
           )}
 
           {filtered.length > 0 ? (
-            <div className={cn("flex flex-wrap gap-2 px-4 pb-3", !trimmed && "pt-1")}>
+            <div className={cn("flex flex-wrap gap-2.5 px-5 pb-4", !trimmed && "pt-1")}>
               {filtered.map((term) => (
                 <Link
                   key={term}
                   href={`/products?q=${encodeURIComponent(term)}`}
                   onClick={() => setOpen(false)}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                  className="rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-foreground/80 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                 >
                   {term}
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="px-4 py-6 text-center text-sm text-foreground/50">نتیجه‌ای یافت نشد.</p>
+            <p className="px-5 py-7 text-center text-sm text-foreground/50">نتیجه‌ای یافت نشد.</p>
           )}
 
           {!trimmed && (

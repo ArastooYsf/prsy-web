@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-08-23T18:16:30.834Z",
         "reason": "same corner-bracket motif: brackets use their own small rounded-md corner, not the card's rounded-2xl, so there's no radius clash — heuristic can't see the two radii are on different elements"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "9px",
+        "files": [
+          "src/components/Footer.tsx"
+        ],
+        "createdAt": "2026-08-23T19:17:58.386Z",
+        "reason": "pre-existing Enamad trust-seal placeholder caption inside a fixed 64x64px box, not part of today's task — micro size is a deliberate fit-to-box exception, not a drifted default"
       }
     ]
   }

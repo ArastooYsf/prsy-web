@@ -13,7 +13,6 @@ const QUICK_LINKS = [
   { label: "ویژگی‌ها", href: "/#features" },
   { label: "درباره ما", href: "/about" },
   { label: "مشتریان", href: "/#clients" },
-  { label: "قیمت‌گذاری", href: "/pricing" },
   { label: "سوالات متداول", href: "/faq" },
   { label: "درخواست مشاوره", href: "/consultation" },
   { label: "تماس با ما", href: "/contact" },

@@ -9,7 +9,7 @@ import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
-import { getFooterContact } from "@/lib/site-content";
+import { getFooterContact, getProductCategories } from "@/lib/site-content";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "./globals.css";
@@ -58,7 +58,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const footerContact = await getFooterContact();
+  const [footerContact, productCategories] = await Promise.all([getFooterContact(), getProductCategories()]);
 
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable} suppressHydrationWarning>
@@ -116,7 +116,7 @@ export default async function RootLayout({
             >
               <PageViewTracker />
               <PageLoader />
-              <Header />
+              <Header productCategories={productCategories} />
               <main>{children}</main>
               <Footer contact={footerContact} />
             </SkeletonTheme>

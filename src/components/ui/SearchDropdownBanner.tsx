@@ -24,7 +24,7 @@ export default function SearchDropdownBanner({
   return (
     <Link
       href={href}
-      className="group m-3 flex items-center gap-4 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-l from-accent-500/15 via-accent-500/5 to-transparent p-4 transition-colors hover:border-accent-500/30"
+      className="group m-3 flex items-center gap-4 overflow-hidden rounded-xl border border-foreground/10 bg-gradient-to-l from-accent-500/15 via-accent-500/5 to-transparent p-4 transition-colors hover:border-accent-500/30"
     >
       <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 shadow-md shadow-accent-500/20">
         {imageSrc ? (

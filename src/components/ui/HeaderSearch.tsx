@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, TrendingUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchDropdownBanner from "@/components/ui/SearchDropdownBanner";
+import { useLandingTheme } from "@/components/RouteThemeScope";
 
 // Real category names already used across the site (src/lib/site-content-defaults.ts) —
 // stand-ins for actual search-ranking results, which land later.
@@ -31,6 +33,14 @@ const CLOSE_TRANSITION = { duration: 0.2, ease: "easeIn" as const };
 export function HeaderSearch() {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  // Radix's Popover.Portal renders into document.body by default, outside
+  // RouteThemeScope's wrapper div in the actual DOM — CSS custom properties
+  // only inherit through real DOM ancestry, not React's tree, so the
+  // portaled content misses the scoped .theme-white-blue override entirely
+  // unless it's applied again directly here.
+  const isLandingPage = usePathname() === "/";
+  const landingTheme = useLandingTheme();
+  const isLightTheme = isLandingPage && landingTheme?.theme !== "dark";
 
   const trimmed = query.trim();
   const filtered = trimmed ? POPULAR_SEARCHES.filter((s) => s.includes(trimmed)) : POPULAR_SEARCHES;
@@ -47,7 +57,7 @@ export function HeaderSearch() {
             onFocus={() => setOpen(true)}
             aria-label="جست‌وجوی محصولات"
             placeholder="جست‌وجوی محصولات، دسته‌بندی‌ها..."
-            className="h-11 w-full rounded-full border border-white/10 bg-white/5 pr-10 pl-9 text-base text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
+            className="h-11 w-full rounded-full border border-foreground/10 bg-foreground/5 pr-10 pl-9 text-base text-foreground outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
           />
           {query && (
             // The visible icon stays small (size-4) to match the input's own
@@ -93,7 +103,10 @@ export function HeaderSearch() {
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] origin-top overflow-y-auto overscroll-contain rounded-b-2xl rounded-t-none border border-white/10 bg-background shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-2 data-[state=open]:duration-300 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-top-2 data-[state=closed]:duration-200 data-[state=closed]:ease-in"
+          className={cn(
+            "z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] origin-top overflow-y-auto overscroll-contain rounded-b-2xl rounded-t-none border border-foreground/10 bg-background shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-top-2 data-[state=open]:duration-300 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-top-2 data-[state=closed]:duration-200 data-[state=closed]:ease-in",
+            isLightTheme && "theme-white-blue",
+          )}
         >
           {!trimmed && (
             <p className="flex items-center gap-1.5 px-5 pt-4 pb-2 text-xs font-semibold text-foreground/40">
@@ -109,7 +122,7 @@ export function HeaderSearch() {
                   key={term}
                   href={`/products?q=${encodeURIComponent(term)}`}
                   onClick={() => setOpen(false)}
-                  className="rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-foreground/80 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                  className="rounded-full border border-foreground/10 bg-foreground/5 px-3.5 py-2 text-sm text-foreground/80 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                 >
                   {term}
                 </Link>
@@ -120,7 +133,7 @@ export function HeaderSearch() {
           )}
 
           {!trimmed && (
-            <div className="border-t border-white/5">
+            <div className="border-t border-foreground/5">
               <SearchDropdownBanner
                 title="مشاوره رایگان تخصصی"
                 description="برای انتخاب دیزل ژنراتور یا موتور برق مناسب با کارشناسان ما مشورت کنید"

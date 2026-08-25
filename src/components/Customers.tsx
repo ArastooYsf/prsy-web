@@ -70,7 +70,7 @@ const SEGMENTS = [
 
 export default function Customers() {
   return (
-    <section id="customers" className="section-padding relative border-t border-white/10">
+    <section id="customers" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -105,7 +105,7 @@ export default function Customers() {
             <motion.div
               key={segment.title}
               variants={fadeInUp}
-              className="group flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30 sm:p-7"
+              className="group flex flex-col rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30 sm:p-7"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 transition-colors duration-300 group-hover:bg-accent-500/20 sm:h-12 sm:w-12">
                 {segment.icon}

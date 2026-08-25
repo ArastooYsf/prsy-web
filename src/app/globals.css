@@ -33,6 +33,21 @@
 
   --card: 15 23 42;
   --card-foreground: 255 255 255;
+
+  /* The accent brand-signal scale (see tailwind.config.ts) — values match
+     the scale's original static hex exactly, so this is a no-op everywhere
+     until .theme-white-blue below overrides it for a scoped route. */
+  --accent-50: 255 247 237;
+  --accent-100: 255 237 213;
+  --accent-200: 254 215 170;
+  --accent-300: 253 186 116;
+  --accent-400: 251 146 60;
+  --accent-500: 249 115 22;
+  --accent-600: 234 88 12;
+  --accent-700: 194 65 12;
+  --accent-800: 154 52 18;
+  --accent-900: 124 45 18;
+  --accent-soft: 251 146 60; /* .text-accent-soft below */
 }
 
 html {
@@ -55,7 +70,7 @@ body {
   }
 
   .text-accent-soft {
-    color: #fb923c;
+    color: rgb(var(--accent-soft));
   }
 
   /* Set by the beforeInteractive script in layout.tsx before hydration —
@@ -68,4 +83,77 @@ body {
   .section-padding {
     @apply py-20 sm:py-28;
   }
+}
+
+/* White + blue palette preview, scoped to the landing page only (applied via
+   RouteThemeScope when pathname === "/"). Deliberately unlayered (outside
+   @tailwind's utilities layer) so it beats Tailwind's generated utility
+   rules regardless of selector specificity — CSS Cascade Layers give
+   unlayered styles priority over any layered ones. Chosen with ui-ux-pro-max
+   (--domain color, "industrial B2B trust" profile): navy text on white/slate
+   surfaces, a single restrained blue (Tailwind's blue-600, not the brighter
+   500) as the one signal color, matching this site's existing "One Signal
+   Rule" — just swapping which hue plays that role. */
+.theme-white-blue {
+  --background: 248 250 252; /* slate-50 */
+  --foreground: 15 23 42; /* slate-900 */
+
+  --border: 226 232 240; /* slate-200 */
+  --input: 226 232 240;
+  --ring: 37 99 235; /* blue-600 */
+
+  --primary: 37 99 235; /* blue-600 */
+  --primary-foreground: 255 255 255;
+
+  --secondary: 241 245 249; /* slate-100 */
+  --secondary-foreground: 15 23 42;
+
+  --destructive: 220 38 38; /* red-600 */
+  --destructive-foreground: 255 255 255;
+
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139; /* slate-500 */
+
+  --accent: 241 245 249; /* ghost/outline hover wash */
+  --accent-foreground: 15 23 42;
+
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+
+  /* Brand-signal scale reuses this project's existing blue (the `brand-*`
+     Tailwind scale already used for badges) rather than inventing new hex.
+     400/500 are both pinned to blue-600 (not blue-500) because several call
+     sites use them for small/normal-size text (nav links, eyebrow labels),
+     which needs the ~4.5:1 contrast blue-600 clears on white — blue-500
+     only clears the lower 3:1 bar for large/bold text. */
+  --accent-50: 239 246 255;
+  --accent-100: 219 234 254;
+  --accent-200: 191 219 254;
+  --accent-300: 147 197 253;
+  --accent-400: 37 99 235; /* blue-600 */
+  --accent-500: 37 99 235; /* blue-600 */
+  --accent-600: 29 78 216; /* blue-700 */
+  --accent-700: 30 64 175; /* blue-800 */
+  --accent-800: 30 58 138; /* blue-900 */
+  --accent-900: 23 37 84; /* blue-950 */
+  --accent-soft: 59 130 246; /* blue-500 — only used at large/bold sizes, so the lighter, brighter step is safe here */
+}
+
+/* Applied for ~450ms (RouteThemeScope's TRANSITION_MS) right when the
+   light/dark toggle fires, so the whole page cross-fades between palettes
+   instead of snapping. Scoped to this window (not left on permanently)
+   because leaving it on would slow down every ordinary hover/focus color
+   change site-wide to match this duration, which isn't what any single
+   element's own `transition-colors duration-*` asked for. */
+.theme-transitioning,
+.theme-transitioning * {
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease,
+    fill 0.45s ease,
+    box-shadow 0.45s ease;
 }

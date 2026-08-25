@@ -73,7 +73,7 @@ export default function PageLoader() {
             پویش راه صنعت
             <span className="text-accent-400"> یاشار</span>
           </p>
-          <div className="mt-6 h-[3px] w-40 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-6 h-[3px] w-40 overflow-hidden rounded-full bg-foreground/10">
             <motion.div
               className="h-full w-1/3 rounded-full bg-accent-500"
               animate={{ x: ["-100%", "220%"] }}

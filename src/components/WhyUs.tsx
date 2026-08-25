@@ -58,7 +58,7 @@ const PARTNERS = ["شرکت ملی حفاری ایران", "صنعت نفت"];
 
 export default function WhyUs() {
   return (
-    <section id="why-us" className="section-padding relative border-t border-white/10">
+    <section id="why-us" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -86,13 +86,13 @@ export default function WhyUs() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer(0.1)}
-          className="mt-14 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] sm:mt-16"
+          className="mt-14 divide-y divide-foreground/10 overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] sm:mt-16"
         >
           {ADVANTAGES.map((advantage) => (
             <motion.div
               key={advantage.title}
               variants={fadeInUp}
-              className="group flex flex-col items-start gap-5 p-6 transition-colors duration-300 hover:bg-white/[0.02] sm:flex-row sm:p-8"
+              className="group flex flex-col items-start gap-5 p-6 transition-colors duration-300 hover:bg-foreground/[0.02] sm:flex-row sm:p-8"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 transition-colors duration-300 group-hover:bg-accent-500/20">
                 {advantage.icon}

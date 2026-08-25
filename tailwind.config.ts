@@ -38,19 +38,26 @@ const config: Config = {
           DEFAULT: "rgb(var(--card) / <alpha-value>)",
           foreground: "rgb(var(--card-foreground) / <alpha-value>)",
         },
+        // The 50-900 steps are CSS-variable-driven (not static hex) so a
+        // scoped override (see .theme-white-blue in globals.css) can swap
+        // the whole brand-signal scale from orange to blue for a single
+        // route without touching every component that reaches for
+        // `accent-400`/`bg-accent-500`/etc. Values at :root match the
+        // original static hex exactly, so nothing changes anywhere unless
+        // that scope class is applied.
         accent: {
           DEFAULT: "rgb(var(--accent) / <alpha-value>)",
           foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
-          50: "#fff7ed",
-          100: "#ffedd5",
-          200: "#fed7aa",
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
-          800: "#9a3412",
-          900: "#7c2d12",
+          50: "rgb(var(--accent-50) / <alpha-value>)",
+          100: "rgb(var(--accent-100) / <alpha-value>)",
+          200: "rgb(var(--accent-200) / <alpha-value>)",
+          300: "rgb(var(--accent-300) / <alpha-value>)",
+          400: "rgb(var(--accent-400) / <alpha-value>)",
+          500: "rgb(var(--accent-500) / <alpha-value>)",
+          600: "rgb(var(--accent-600) / <alpha-value>)",
+          700: "rgb(var(--accent-700) / <alpha-value>)",
+          800: "rgb(var(--accent-800) / <alpha-value>)",
+          900: "rgb(var(--accent-900) / <alpha-value>)",
         },
 
         brand: {
@@ -81,6 +88,12 @@ const config: Config = {
       backgroundImage: {
         "grid-pattern":
           "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
+        // Same grid texture, dark lines for light backgrounds — a
+        // background-image value can't pick up a CSS-variable override the
+        // way a color utility can, so this needs its own explicit variant
+        // rather than swapping via .theme-white-blue.
+        "grid-pattern-dark":
+          "linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px)",
       },
     },
   },

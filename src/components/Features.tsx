@@ -118,9 +118,9 @@ export default function Features() {
             <motion.div
               key={feature.title}
               variants={fadeInUp}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-8 transition-colors duration-300 hover:border-accent-500/30"
+              className="group relative overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 transition-colors duration-300 hover:border-accent-500/30"
             >
-              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-bold text-white/[0.06] transition-colors duration-300 group-hover:text-accent-500/10">
+              <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-bold text-foreground/[0.06] transition-colors duration-300 group-hover:text-accent-500/10">
                 {feature.index}
               </span>
 

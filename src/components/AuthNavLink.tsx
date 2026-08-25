@@ -1,12 +1,9 @@
 "use client";
 
-import type { MouseEvent, ReactNode } from "react";
-import { useTransition } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { isPlainLeftClick } from "@/lib/is-plain-left-click";
 
 const UserIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -24,28 +21,11 @@ const PanelIcon = () => (
   </svg>
 );
 
-// Icon-only nav buttons feel unresponsive on a click that just sits there
-// until the destination route renders — so the icon itself spins in place
-// from click until the transition commits. useTransition's isPending is the
-// standard App Router signal for "navigation in flight" (not a manual
-// pathname-watch), and the click handler only intercepts a plain left-click
-// so Cmd/Ctrl/middle-click still open a new tab exactly like a normal <Link>.
 function IconNavButton({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!isPlainLeftClick(e)) return;
-    e.preventDefault();
-    startTransition(() => router.push(href));
-  };
-
   return (
     <Button size="icon" variant="outline" className="h-9 w-9" asChild>
-      <Link href={href} aria-label={label} onClick={handleClick}>
-        <span className={isPending ? "inline-flex animate-spin motion-reduce:animate-none" : "inline-flex"}>
-          {icon}
-        </span>
+      <Link href={href} aria-label={label}>
+        {icon}
       </Link>
     </Button>
   );

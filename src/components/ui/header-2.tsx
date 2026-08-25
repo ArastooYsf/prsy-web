@@ -111,25 +111,49 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	const bumpOpacity = useSpring(bumpTargetOpacity, BUMP_OPACITY_SPRING);
 	const bumpPath = useTransform([bumpX, bumpHalfW], ([cx, hw]) => buildBumpPath(cx as number, hw as number));
 
+	// `onMouseOver` bubbles, so sweeping the cursor across a row of inline
+	// elements can fire it several times per item (text nodes, icon glyphs)
+	// well within a single frame. Each firing wants two getBoundingClientRect()
+	// reads, which force a synchronous layout — batching to one measurement
+	// per animation frame (using only the latest event's target) means a fast
+	// sweep still costs at most one forced layout per frame instead of one per
+	// bubbled event, with no visible difference since nothing needs to react
+	// faster than a frame anyway.
+	const hoverRafRef = React.useRef<number | null>(null);
+	const pendingHoverTargetRef = React.useRef<HTMLElement | null>(null);
+
+	React.useEffect(() => {
+		return () => {
+			if (hoverRafRef.current !== null) cancelAnimationFrame(hoverRafRef.current);
+		};
+	}, []);
+
 	const handleNavItemHover = (e: React.MouseEvent<HTMLDivElement>) => {
-		const container = navRowRef.current;
 		const target = (e.target as HTMLElement).closest<HTMLElement>('[data-nav-bump]');
-		if (!container || !target) return;
-		const containerRect = container.getBoundingClientRect();
-		const itemRect = target.getBoundingClientRect();
-		const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
-		const halfW = itemRect.width / 2 + BUMP_PAD;
-		bumpTargetX.set(centerX);
-		bumpTargetHalfW.set(halfW);
-		if (!hasPositionedBump.current) {
-			// First hover this session: jump the spring outputs straight to
-			// position instead of animating in from x=0 — only the fade-in
-			// should be visible, not a sweep across the whole nav row.
-			bumpX.jump(centerX);
-			bumpHalfW.jump(halfW);
-			hasPositionedBump.current = true;
-		}
-		bumpTargetOpacity.set(1);
+		if (!target) return;
+		pendingHoverTargetRef.current = target;
+		if (hoverRafRef.current !== null) return;
+		hoverRafRef.current = requestAnimationFrame(() => {
+			hoverRafRef.current = null;
+			const container = navRowRef.current;
+			const item = pendingHoverTargetRef.current;
+			if (!container || !item) return;
+			const containerRect = container.getBoundingClientRect();
+			const itemRect = item.getBoundingClientRect();
+			const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
+			const halfW = itemRect.width / 2 + BUMP_PAD;
+			bumpTargetX.set(centerX);
+			bumpTargetHalfW.set(halfW);
+			if (!hasPositionedBump.current) {
+				// First hover this session: jump the spring outputs straight to
+				// position instead of animating in from x=0 — only the fade-in
+				// should be visible, not a sweep across the whole nav row.
+				bumpX.jump(centerX);
+				bumpHalfW.jump(halfW);
+				hasPositionedBump.current = true;
+			}
+			bumpTargetOpacity.set(1);
+		});
 	};
 
 	const handleNavRowLeave = () => {
@@ -219,21 +243,25 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 		<motion.header
 			ref={headerRef}
 			className={cn(
-				// The side inset and the border/background are constant (not tied to
-				// `scrolled`) — the search bar living inside needs a persistent
-				// container at every scroll position. The bottom corners stay rounded
-				// at every scroll position (lg:rounded-b-2xl below, unconditional);
-				// only the TOP corners and the desktop "lift" (shadow/blur/floating
-				// inset) are scroll-conditional: flush with the top of the page the
-				// header reads as sharp-topped, and the top corners round off (plus
-				// the header floats/lifts) only once the user actually scrolls.
+				// The side inset (the "floating card" look) is desktop-only: on
+				// mobile the header runs full-width, edge to edge — there's no
+				// spare horizontal space to spend on a margin there, and the
+				// search bar/nav should use the full screen width. lg: and up
+				// keeps the constant inset regardless of scroll — the search bar
+				// living inside needs a persistent container at every scroll
+				// position. The bottom corners stay rounded at every scroll
+				// position (lg:rounded-b-2xl below, unconditional); only the TOP
+				// corners and the desktop "lift" (shadow/blur/floating inset) are
+				// scroll-conditional: flush with the top of the page the header
+				// reads as sharp-topped, and the top corners round off (plus the
+				// header floats/lifts) only once the user actually scrolls.
 				//
 				// The blurred background/shadow "lift" effect below is desktop-only (lg:)
 				// on purpose: applying it at every breakpoint made the header visibly
 				// flicker on mobile, since iOS's elastic overscroll bounce can push
 				// scrollY back and forth across the threshold several times a second
 				// near the top of the page.
-				'sticky top-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-5xl border border-white/10 bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:max-w-6xl lg:rounded-b-2xl lg:transition-all lg:duration-300 lg:ease-in-out',
+				'sticky top-0 z-50 mx-auto w-full border border-white/10 bg-background/95 supports-[backdrop-filter]:bg-background/50 lg:w-[calc(100%-2rem)] lg:max-w-6xl lg:rounded-b-2xl lg:transition-all lg:duration-300 lg:ease-in-out',
 				{
 					'lg:rounded-t-2xl lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
 						scrolled && !open,
@@ -326,11 +354,18 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 							</Link>
 						</div>
 					))}
-					<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
-						<Link href="/contact">تماس با ما</Link>
-					</Button>
-					<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
-					<AuthNavLink variant="icon" />
+					{/* This trio isn't part of the hover-bump system above, so unlike
+						those wrappers it doesn't need to sit edge-to-edge with its
+						neighbors — it needs its own breathing room instead. Grouped in
+						one wrapper with a real gap, plus a margin off the last nav
+						link, so they don't touch. */}
+					<div className="mr-1 flex items-center gap-2">
+						<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
+							<Link href="/contact">تماس با ما</Link>
+						</Button>
+						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
+						<AuthNavLink variant="icon" />
+					</div>
 				</div>
 				<Button
 					ref={toggleButtonRef}

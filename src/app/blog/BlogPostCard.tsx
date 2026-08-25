@@ -11,7 +11,7 @@ export type BlogPost = Prisma.BlogPostGetPayload<object>;
 export function BlogPostCard({ post }: { post: BlogPost | null }) {
   const body = (
     <>
-      <div className="relative aspect-video w-full overflow-hidden bg-white/5">
+      <div className="relative aspect-video w-full overflow-hidden bg-foreground/5">
         {post ? (
           post.coverImage ? (
             <Image
@@ -47,13 +47,13 @@ export function BlogPostCard({ post }: { post: BlogPost | null }) {
   );
 
   if (!post) {
-    return <div className="flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03]">{body}</div>;
+    return <div className="flex flex-col overflow-hidden rounded-2xl border border-transparent bg-foreground/[0.03]">{body}</div>;
   }
 
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-colors hover:border-accent-500/40"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-transparent bg-foreground/[0.03] transition-colors hover:border-accent-500/40"
     >
       {body}
     </Link>

@@ -76,7 +76,7 @@ export default function AdminSearchBox() {
               scrollFieldAboveKeyboard(e.currentTarget);
             }}
             placeholder="جست‌وجو در مشتریان، تیکت‌ها، قراردادها، سفارش‌ها..."
-            className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
+            className="w-full rounded-full border border-foreground/10 bg-foreground/5 py-2 pl-9 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
           />
           {query && (
             <button
@@ -100,7 +100,7 @@ export default function AdminSearchBox() {
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-background shadow-2xl"
+          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-background shadow-2xl"
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2 p-6 text-sm text-foreground/50">
@@ -108,7 +108,7 @@ export default function AdminSearchBox() {
               در حال جست‌وجو...
             </div>
           ) : hasAnyResults(results) ? (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-foreground/5">
               <ResultGroup
                 title="مشتریان"
                 group={results.customers}
@@ -119,7 +119,7 @@ export default function AdminSearchBox() {
                     key={c.id}
                     href={`/account/admin/customers?q=${encodeURIComponent(c.email)}`}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-white/5"
+                    className="block px-4 py-2.5 text-sm hover:bg-foreground/5"
                   >
                     <p className="font-medium">{c.name || "—"}</p>
                     <p dir="ltr" className="text-right text-xs text-foreground/50">
@@ -138,7 +138,7 @@ export default function AdminSearchBox() {
                     key={t.id}
                     href={`/account/admin/tickets/${t.id}`}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-white/5"
+                    className="block px-4 py-2.5 text-sm hover:bg-foreground/5"
                   >
                     {t.subject}
                   </Link>
@@ -154,7 +154,7 @@ export default function AdminSearchBox() {
                     key={c.id}
                     href={`/account/admin/contracts/${c.id}`}
                     onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm hover:bg-white/5"
+                    className="block px-4 py-2.5 text-sm hover:bg-foreground/5"
                   >
                     {c.title}
                   </Link>
@@ -171,7 +171,7 @@ export default function AdminSearchBox() {
                     href={`/account/admin/orders/${o.id}`}
                     onClick={() => setOpen(false)}
                     dir="ltr"
-                    className="block px-4 py-2.5 text-right text-sm hover:bg-white/5"
+                    className="block px-4 py-2.5 text-right text-sm hover:bg-foreground/5"
                   >
                     {o.orderNumber}
                   </Link>

@@ -59,7 +59,7 @@ type AboutProps = {
 
 export default function About({ title, body }: AboutProps) {
   return (
-    <section id="about" className="section-padding relative border-t border-white/10">
+    <section id="about" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
           <motion.div
@@ -97,7 +97,7 @@ export default function About({ title, body }: AboutProps) {
                   variants={fadeInUp}
                   whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="rounded-xl border border-transparent bg-white/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30"
+                  className="rounded-xl border border-transparent bg-foreground/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10">
                     {principle.icon}
@@ -116,7 +116,7 @@ export default function About({ title, body }: AboutProps) {
             whileInView="visible"
             viewport={viewportOnce}
             variants={fadeInUp}
-            className="rounded-2xl border border-transparent bg-white/[0.03] p-8 shadow-xl shadow-black/10"
+            className="rounded-2xl border border-transparent bg-foreground/[0.03] p-8 shadow-xl shadow-black/10"
           >
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">

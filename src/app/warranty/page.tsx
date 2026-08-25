@@ -67,7 +67,7 @@ export default function WarrantyPage() {
 
         <p className="mx-auto mt-14 max-w-3xl text-center leading-7 text-foreground/70">
           برای ثبت درخواست گارانتی یا پشتیبانی، از طریق{" "}
-          <Link href="/contact" className="font-semibold text-accent-400 transition-colors hover:text-white">
+          <Link href="/contact" className="font-semibold text-accent-400 transition-colors hover:text-foreground">
             صفحه تماس با ما
           </Link>{" "}
           یا تیکت پشتیبانی در حساب کاربری خود اقدام کنید.

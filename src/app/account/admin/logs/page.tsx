@@ -28,12 +28,13 @@ export default async function AdminLogsPage() {
         گزارش رویدادها
       </h2>
       <p className="mb-6 text-sm text-foreground/50">
-        هر عملیات مهم (ایجاد، ویرایش، حذف، تغییر وضعیت) در یک فایل روزانه (بر اساس تاریخ شمسی) ثبت می‌شود. فایل‌های
-        امنیتی/کرش به‌صورت خودکار قفل می‌شوند و هیچ فایل قفل‌شده‌ای حذف نمی‌شود.
+        رویدادهای عمومی، مهم، دسترسی و اعلان هرکدام در یک فایل روزانه جداگانه (بر اساس تاریخ شمسی) ثبت می‌شوند. فایل‌های
+        امنیتی و کرش زمان‌بندی روزانه ندارند — فقط وقتی رویدادی واقعاً رخ بدهد ساخته می‌شوند، از همان لحظه قفل هستند و
+        هیچ فایل قفل‌شده‌ای — نه دستی و نه خودکار — حذف نمی‌شود.
       </p>
 
       {files.length === 0 ? (
-        <p className="rounded-xl border border-white/10 bg-white/[0.02] p-6 text-center text-sm text-foreground/50">
+        <p className="rounded-xl border border-foreground/10 bg-foreground/[0.02] p-6 text-center text-sm text-foreground/50">
           هنوز هیچ رویدادی ثبت نشده است.
         </p>
       ) : (

@@ -49,13 +49,13 @@ export default function UploadWidget() {
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
       <h2 className="text-lg font-bold">آپلود سریع به مخزن سایت</h2>
       <p className="mt-1 text-sm text-foreground/60">
         فایل‌ها به مخزن مشترک سایت اضافه می‌شوند و همه‌جا (وبلاگ، محتوای سایت، قرارداد، تیکت) قابل انتخاب هستند.
       </p>
 
-      <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-6 py-8 text-center transition-colors hover:border-accent-500/40">
+      <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-foreground/15 px-6 py-8 text-center transition-colors hover:border-accent-500/40">
         <input
           ref={inputRef}
           type="file"
@@ -74,13 +74,13 @@ export default function UploadWidget() {
       {uploaded.length > 0 && (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {uploaded.map((item) => (
-            <div key={item.id} className="overflow-hidden rounded-lg border border-white/10">
+            <div key={item.id} className="overflow-hidden rounded-lg border border-foreground/10">
               {item.mimeType.startsWith("image/") ? (
                 <div className="relative aspect-square w-full">
                   <Image src={getMediaUrl(item.url)} alt={item.filename} fill sizes="200px" className="object-cover" />
                 </div>
               ) : (
-                <div className="flex aspect-square w-full items-center justify-center bg-white/[0.04] p-2">
+                <div className="flex aspect-square w-full items-center justify-center bg-foreground/[0.04] p-2">
                   <span className="line-clamp-3 break-words text-center text-[11px] text-foreground/60">
                     {item.filename}
                   </span>

@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, TrendingUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SearchDropdownBanner from "@/components/ui/SearchDropdownBanner";
-import { useLandingTheme } from "@/components/RouteThemeScope";
+import { useSiteTheme } from "@/components/RouteThemeScope";
 
 // Real category names already used across the site (src/lib/site-content-defaults.ts) —
 // stand-ins for actual search-ranking results, which land later.
@@ -38,9 +37,8 @@ export function HeaderSearch() {
   // only inherit through real DOM ancestry, not React's tree, so the
   // portaled content misses the scoped .theme-white-blue override entirely
   // unless it's applied again directly here.
-  const isLandingPage = usePathname() === "/";
-  const landingTheme = useLandingTheme();
-  const isLightTheme = isLandingPage && landingTheme?.theme !== "dark";
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   const trimmed = query.trim();
   const filtered = trimmed ? POPULAR_SEARCHES.filter((s) => s.includes(trimmed)) : POPULAR_SEARCHES;

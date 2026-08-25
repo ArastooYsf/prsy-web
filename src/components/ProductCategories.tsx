@@ -6,6 +6,8 @@ import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_PRODUCT_CATEGORIES, type ProductCategoryContent } from "@/lib/site-content-defaults";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { cn } from "@/lib/utils";
 
 type Condition = "new" | "used" | "service";
 
@@ -16,7 +18,7 @@ const CONDITION_BADGE: Record<Condition, { label: string; className: string }> =
   },
   used: {
     label: "دست‌دوم",
-    className: "border-white/10 bg-white/5 text-foreground/60",
+    className: "border-foreground/10 bg-foreground/5 text-foreground/60",
   },
   service: {
     label: "خدمات",
@@ -30,6 +32,7 @@ type ProductCategoriesProps = {
 
 export default function ProductCategories({ categories: categoriesProp }: ProductCategoriesProps) {
   const categories = categoriesProp && categoriesProp.length > 0 ? categoriesProp : DEFAULT_PRODUCT_CATEGORIES;
+  const isDark = useSiteTheme()?.theme === "dark";
   return (
     <section className="section-padding relative">
       <div className="container">
@@ -75,7 +78,7 @@ export default function ProductCategories({ categories: categoriesProp }: Produc
               variants={fadeInUp}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="group scroll-mt-28 flex flex-col overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
+              className="group scroll-mt-28 flex flex-col overflow-hidden rounded-2xl border border-transparent bg-foreground/[0.03] transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
             >
               {category.image && (
                 <div className="relative aspect-video w-full overflow-hidden">
@@ -107,7 +110,10 @@ export default function ProductCategories({ categories: categoriesProp }: Produc
 
               <h3 className="mt-5 text-lg font-bold">{category.title}</h3>
               <div
-                className="prose prose-invert prose-sm mt-2 max-w-none text-sm leading-6 text-foreground/70 [&_p]:m-0"
+                className={cn(
+                  "prose prose-sm mt-2 max-w-none text-sm leading-6 text-foreground/70 [&_p]:m-0",
+                  isDark && "prose-invert",
+                )}
                 dangerouslySetInnerHTML={{ __html: category.description }}
               />
 
@@ -115,7 +121,7 @@ export default function ProductCategories({ categories: categoriesProp }: Produc
                 {category.brands.map((brand) => (
                   <span
                     key={brand}
-                    className="rounded-md bg-white/5 px-2 py-1 text-xs text-foreground/60"
+                    className="rounded-md bg-foreground/5 px-2 py-1 text-xs text-foreground/60"
                   >
                     {brand}
                   </span>

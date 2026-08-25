@@ -2,14 +2,13 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { ProductCategoryContent } from "@/lib/site-content-defaults";
 import { cn } from "@/lib/utils";
-import { useLandingTheme } from "@/components/RouteThemeScope";
+import { useSiteTheme } from "@/components/RouteThemeScope";
 
 // Close is delayed (not instant on mouseleave) so moving the cursor from the
 // trigger toward the panel — which briefly leaves both — doesn't flicker the
@@ -26,11 +25,9 @@ export function ProductsMegaMenu({ categories }: { categories: ProductCategoryCo
   // Tailwind Typography's prose-invert (light text) vs prose (dark text)
   // isn't a CSS-variable-driven choice like the rest of the .theme-white-blue
   // override, so it needs its own check — this component is shared by every
-  // page via the header, and the landing page's own palette is now
-  // toggleable rather than permanently light (see RouteThemeScope).
-  const isLandingPage = usePathname() === "/";
-  const landingTheme = useLandingTheme();
-  const isLightTheme = isLandingPage && landingTheme?.theme !== "dark";
+  // page via the header.
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   if (categories.length === 0) {
     return (

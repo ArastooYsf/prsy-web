@@ -37,10 +37,10 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
           </span>
         </div>
         <p className="text-sm text-foreground/70">مشتری: {order.user.name || order.user.email}</p>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
           <OrderProgress status={order.status} />
         </div>
-        <div className="overflow-x-auto rounded-2xl border border-white/10">
+        <div className="overflow-x-auto rounded-2xl border border-foreground/10">
           <table className="w-full min-w-[320px] text-sm">
             <thead className="text-foreground/60">
               <tr>
@@ -50,7 +50,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             </thead>
             <tbody>
               {order.items.map((item) => (
-                <tr key={item.id} className="border-t border-white/10">
+                <tr key={item.id} className="border-t border-foreground/10">
                   <td className="px-4 py-3 font-medium">{item.productName}</td>
                   <td className="px-4 py-3 text-foreground/70">{formatNumber(item.quantity)}</td>
                 </tr>

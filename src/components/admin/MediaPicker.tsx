@@ -33,7 +33,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
                 alt=""
                 fill
                 sizes="80px"
-                className="rounded-lg border border-white/10 object-cover"
+                className="rounded-lg border border-foreground/10 object-cover"
               />
               <button
                 type="button"
@@ -51,7 +51,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-white/15 px-4 py-3 text-center text-sm text-foreground/60 transition-colors hover:border-accent-500/40"
+        className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-foreground/15 px-4 py-3 text-center text-sm text-foreground/60 transition-colors hover:border-accent-500/40"
       >
         <ImagePlus className="size-4" />
         {value.length > 0 ? "تغییر تصویر" : "انتخاب تصویر"}

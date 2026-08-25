@@ -12,7 +12,7 @@ type Props = { customer: Customer | null; isAdmin: boolean };
 
 export function CustomerCardMobile({ customer, isAdmin }: Props) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="min-w-0">
         {customer ? (
           <>
@@ -62,7 +62,7 @@ export function CustomerCardMobile({ customer, isAdmin }: Props) {
         </dd>
       </dl>
       {isAdmin && (
-        <div className="mt-3 flex justify-end border-t border-white/5 pt-3">
+        <div className="mt-3 flex justify-end border-t border-foreground/5 pt-3">
           {customer ? (
             <DeleteEntityButton
               endpoint={`/api/admin/customers/${customer.id}`}
@@ -80,7 +80,7 @@ export function CustomerCardMobile({ customer, isAdmin }: Props) {
 
 export function CustomerRowDesktop({ customer, isAdmin }: Props) {
   return (
-    <tr className="border-t border-white/10">
+    <tr className="border-t border-foreground/10">
       <td className="px-4 py-3 font-medium">
         {customer ? (
           <>

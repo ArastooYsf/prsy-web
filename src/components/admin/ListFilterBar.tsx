@@ -8,7 +8,7 @@ import ToggleSwitch from "@/components/ToggleSwitch";
 import { scrollFieldAboveKeyboard } from "@/lib/scroll-into-view";
 
 const selectClass =
-  "min-h-11 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50";
+  "min-h-11 rounded-lg border border-foreground/10 bg-foreground/5 px-3 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50";
 
 export type SelectFilter = {
   key: string;
@@ -72,7 +72,7 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
             onChange={(e) => setQuery(e.target.value)}
             onFocus={(e) => scrollFieldAboveKeyboard(e.currentTarget)}
             placeholder={searchPlaceholder}
-            className="min-h-11 w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-3 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
+            className="min-h-11 w-full rounded-lg border border-foreground/10 bg-foreground/5 py-2 pl-3 pr-9 text-sm outline-none transition-colors placeholder:text-foreground/40 focus:border-accent-500/50"
           />
         </div>
       )}

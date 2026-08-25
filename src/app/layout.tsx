@@ -110,7 +110,7 @@ export default async function RootLayout({
           <SessionProviderWrapper>
             <ToastProvider>
               <SkeletonTheme
-                baseColor="rgba(255,255,255,0.06)"
+                baseColor="rgb(var(--foreground) / 0.06)"
                 highlightColor="rgba(249,146,63,0.12)"
                 borderRadius="0.5rem"
                 direction="rtl"

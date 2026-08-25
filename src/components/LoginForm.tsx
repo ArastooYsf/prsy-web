@@ -7,7 +7,7 @@ import TurnstileWidget from "@/components/TurnstileWidget";
 import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -144,7 +144,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading || totpCode.length !== 6}
-          className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "در حال بررسی..." : "تأیید کد"}
         </button>
@@ -206,7 +206,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading || !turnstileToken}
-        className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "در حال ورود..." : "ورود"}
       </button>

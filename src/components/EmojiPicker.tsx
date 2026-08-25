@@ -28,7 +28,7 @@ export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) =>
         <button
           type="button"
           aria-label="افزودن ایموجی"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
@@ -56,7 +56,7 @@ export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) =>
               }}
             />
           ) : (
-            <div className="flex h-[300px] w-[280px] items-center justify-center rounded-xl border border-white/10 bg-background text-xs text-foreground/40">
+            <div className="flex h-[300px] w-[280px] items-center justify-center rounded-xl border border-foreground/10 bg-background text-xs text-foreground/40">
               در حال بارگذاری...
             </div>
           )}

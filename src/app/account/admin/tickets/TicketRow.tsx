@@ -12,7 +12,7 @@ export type TicketWithUser = Prisma.TicketGetPayload<{ include: { user: true } }
 // on its own, so the loading row is always exactly this row's real shape.
 export function TicketCardMobile({ ticket }: { ticket: TicketWithUser | null }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="flex items-center justify-between gap-3">
         {ticket ? (
           <Link
@@ -46,7 +46,7 @@ export function TicketCardMobile({ ticket }: { ticket: TicketWithUser | null }) 
           </dd>
         </div>
       </dl>
-      <div className="mt-3 flex justify-end border-t border-white/5 pt-3">
+      <div className="mt-3 flex justify-end border-t border-foreground/5 pt-3">
         {ticket ? (
           <DeleteEntityButton
             endpoint={`/api/admin/tickets/${ticket.id}`}
@@ -63,7 +63,7 @@ export function TicketCardMobile({ ticket }: { ticket: TicketWithUser | null }) 
 
 export function TicketRowDesktop({ ticket }: { ticket: TicketWithUser | null }) {
   return (
-    <tr className="border-t border-white/10">
+    <tr className="border-t border-foreground/10">
       <td className="px-4 py-3 font-medium">
         {ticket ? (
           <Link href={`/account/admin/tickets/${ticket.id}`} className="hover:text-accent-400">

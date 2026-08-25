@@ -75,7 +75,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
     .filter((social) => social.href);
 
   return (
-    <footer className="border-t border-foreground/10 bg-black/20">
+    <footer className="border-t border-foreground/10 bg-background/20">
       <motion.div
         initial="hidden"
         whileInView="visible"

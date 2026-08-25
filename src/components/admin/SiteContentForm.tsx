@@ -12,7 +12,7 @@ import type { HeroSlideContent, ProductCategoryContent } from "@/lib/site-conten
 import type { CategoryIconKey } from "@/lib/category-icons";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 const CONDITION_OPTIONS: { value: "new" | "used" | "service"; label: string }[] = [
   { value: "new", label: "نو" },
@@ -109,7 +109,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
         </div>
         <div className="space-y-6">
           {heroSlides.map((slide, i) => (
-            <div key={slide.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div key={slide.id} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-semibold">اسلاید {i + 1}</p>
                 <button
@@ -149,7 +149,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
             </div>
           ))}
           {heroSlides.length === 0 && (
-            <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-foreground/50">
+            <p className="rounded-2xl border border-dashed border-foreground/15 p-6 text-center text-sm text-foreground/50">
               هیچ اسلایدی وجود ندارد.
             </p>
           )}
@@ -170,7 +170,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
         </div>
         <div className="space-y-6">
           {categories.map((category, i) => (
-            <div key={category.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div key={category.id} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-semibold">{category.title || `دسته ${i + 1}`}</p>
                 <button
@@ -211,7 +211,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
                         className={`inline-flex min-h-11 items-center rounded-full border px-4 text-xs font-medium transition-colors ${
                           category.conditions.includes(opt.value)
                             ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                            : "border-white/10 text-foreground/60 hover:border-white/20"
+                            : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
                         }`}
                       >
                         {opt.label}
@@ -247,7 +247,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
             </div>
           ))}
           {categories.length === 0 && (
-            <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-foreground/50">
+            <p className="rounded-2xl border border-dashed border-foreground/15 p-6 text-center text-sm text-foreground/50">
               هیچ دسته‌ای وجود ندارد.
             </p>
           )}

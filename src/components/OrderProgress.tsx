@@ -22,8 +22,8 @@ export default function OrderProgress({ status }: { status: string }) {
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-colors duration-300 ${
                   done
-                    ? "border-accent-500 bg-accent-500 text-white"
-                    : "border-white/15 bg-white/5 text-foreground/40"
+                    ? "border-accent-500 bg-accent-500 text-primary-foreground"
+                    : "border-foreground/15 bg-foreground/5 text-foreground/40"
                 }`}
               >
                 {index + 1}
@@ -35,7 +35,7 @@ export default function OrderProgress({ status }: { status: string }) {
             {!isLast && (
               <span
                 className={`mx-2 h-0.5 flex-1 rounded-full transition-colors duration-300 ${
-                  index < currentIndex ? "bg-accent-500" : "bg-white/10"
+                  index < currentIndex ? "bg-accent-500" : "bg-foreground/10"
                 }`}
               />
             )}

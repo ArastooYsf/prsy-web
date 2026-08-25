@@ -30,7 +30,7 @@ export function TicketListItem({ ticket }: { ticket: Ticket | null }) {
 
   if (!ticket) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
         {content}
       </div>
     );
@@ -39,7 +39,7 @@ export function TicketListItem({ ticket }: { ticket: Ticket | null }) {
   return (
     <Link
       href={`/account/tickets/${ticket.id}`}
-      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-accent-500/30"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-colors hover:border-accent-500/30"
     >
       {content}
     </Link>

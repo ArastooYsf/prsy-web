@@ -12,7 +12,7 @@ type Props = { contract: ContractWithUser | null; isAdmin: boolean };
 
 export function ContractCardMobile({ contract, isAdmin }: Props) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="flex items-start justify-between gap-3">
         {contract ? <p className="font-medium">{contract.title}</p> : <Skeleton width="60%" height={15} />}
         {contract ? (
@@ -49,11 +49,11 @@ export function ContractCardMobile({ contract, isAdmin }: Props) {
           </dd>
         </div>
       </dl>
-      <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/5 pt-3">
+      <div className="mt-3 flex items-center justify-end gap-2 border-t border-foreground/5 pt-3">
         {contract ? (
           <Link
             href={`/account/admin/contracts/${contract.id}`}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
             {isAdmin ? "ویرایش" : "مشاهده"}
@@ -77,7 +77,7 @@ export function ContractCardMobile({ contract, isAdmin }: Props) {
 
 export function ContractRowDesktop({ contract, isAdmin }: Props) {
   return (
-    <tr className="border-t border-white/10">
+    <tr className="border-t border-foreground/10">
       <td className="px-4 py-3 font-medium">{contract ? contract.title : <Skeleton width="80%" height={13} />}</td>
       <td className="px-4 py-3 text-foreground/70">
         {contract ? contract.user.name || contract.user.email : <Skeleton width={100} height={13} />}
@@ -105,7 +105,7 @@ export function ContractRowDesktop({ contract, isAdmin }: Props) {
           {contract ? (
             <Link
               href={`/account/admin/contracts/${contract.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+              className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
             >
               {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
               {isAdmin ? "ویرایش" : "مشاهده"}

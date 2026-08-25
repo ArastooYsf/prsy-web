@@ -24,11 +24,11 @@ export default function Loading() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Skeleton height={320} borderRadius={16} className="border border-white/10" />
+          <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
         </div>
-        <Skeleton height={320} borderRadius={16} className="border border-white/10" />
+        <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
         <div className="lg:col-span-3">
-          <Skeleton height={320} borderRadius={16} className="border border-white/10" />
+          <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
         </div>
       </div>
     </div>

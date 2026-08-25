@@ -6,7 +6,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
-import { useLandingTheme } from "@/components/RouteThemeScope";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 import { cn } from "@/lib/utils";
 
 const SLIDE_DURATION = 5;
@@ -22,7 +23,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
   // two things Tailwind classes alone can't theme-switch — the typography
   // plugin's prose/prose-invert and the grid background's line color — need
   // to read the live theme instead of assuming light.
-  const isDark = useLandingTheme()?.theme === "dark";
+  const isDark = useSiteTheme()?.theme === "dark";
 
   const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
 
@@ -38,12 +39,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
 
   return (
     <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-0 bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]",
-          isDark ? "bg-grid-pattern" : "bg-grid-pattern-dark",
-        )}
-      />
+      <ThemedGridBackdrop />
 
       <div className="container relative z-10">
         <div className="relative">

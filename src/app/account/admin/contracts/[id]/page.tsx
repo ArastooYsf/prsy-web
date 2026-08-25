@@ -26,7 +26,7 @@ export default async function AdminContractDetailPage({ params }: { params: { id
 
   if (!isAdmin) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">{contract.title}</h2>
           <span
@@ -47,7 +47,7 @@ export default async function AdminContractDetailPage({ params }: { params: { id
             href={getMediaUrl(contract.fileUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
             دانلود پیوست

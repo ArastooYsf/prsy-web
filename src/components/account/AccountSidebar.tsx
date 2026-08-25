@@ -80,7 +80,7 @@ function NavItem({
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
         collapsed && "justify-center",
-        active ? "bg-accent-500/10 text-accent-400" : "text-foreground/60 hover:bg-white/5 hover:text-foreground",
+        active ? "bg-accent-500/10 text-accent-400" : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground",
       )}
     >
       <Icon className="size-[18px] shrink-0" strokeWidth={1.8} />
@@ -124,7 +124,7 @@ function SidebarContents({
 
         {adminLinks.length > 0 && (
           <>
-            <div className="my-2 border-t border-white/10" />
+            <div className="my-2 border-t border-foreground/10" />
             {!collapsed && (
               <p className="px-3 pb-1 text-[11px] font-semibold text-foreground/35">مدیریت سایت</p>
             )}
@@ -143,7 +143,7 @@ function SidebarContents({
         )}
       </nav>
 
-      <div className="space-y-1 border-t border-white/10 p-3">
+      <div className="space-y-1 border-t border-foreground/10 p-3">
         <NavItem
           href="/"
           label="بازگشت به سایت اصلی"
@@ -192,7 +192,7 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
       <motion.aside
         animate={{ width: collapsed ? 76 : 236 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="hidden h-full shrink-0 flex-col border-l border-white/10 bg-white/[0.015] lg:flex"
+        className="hidden h-full shrink-0 flex-col border-l border-foreground/10 bg-foreground/[0.015] lg:flex"
       >
         <div className="flex items-center justify-between px-3 pt-3">
           {!collapsed && <span className="text-xs font-semibold text-foreground/40">حساب کاربری</span>}
@@ -201,7 +201,7 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
             onClick={() => setCollapsed((v) => !v)}
             aria-label={collapsed ? "باز کردن نوار کناری" : "بستن نوار کناری"}
             className={cn(
-              "flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 transition-colors hover:bg-white/10 hover:text-foreground",
+              "flex h-7 w-7 items-center justify-center rounded-lg text-foreground/50 transition-colors hover:bg-foreground/10 hover:text-foreground",
               collapsed && "mx-auto",
             )}
           >
@@ -213,13 +213,13 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
       </motion.aside>
 
       {/* Mobile trigger */}
-      <div className="container flex items-center justify-between border-b border-white/10 pt-4 pb-4 lg:hidden">
+      <div className="container flex items-center justify-between border-b border-foreground/10 pt-4 pb-4 lg:hidden">
         <span className="text-xs font-semibold text-foreground/40">حساب کاربری</span>
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="باز کردن منو"
-          className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
         >
           <Menu className="size-[18px]" />
         </button>
@@ -241,15 +241,15 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-y-0 right-0 z-[80] flex w-64 flex-col border-l border-white/10 bg-background shadow-2xl lg:hidden"
+              className="fixed inset-y-0 right-0 z-[80] flex w-64 flex-col border-l border-foreground/10 bg-background shadow-2xl lg:hidden"
             >
-              <div className="flex items-center justify-between border-b border-white/10 p-3">
+              <div className="flex items-center justify-between border-b border-foreground/10 p-3">
                 <span className="text-sm font-semibold text-foreground/70">منوی حساب کاربری</span>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
                   aria-label="بستن منو"
-                  className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground/50 hover:bg-white/10 hover:text-foreground"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground/50 hover:bg-foreground/10 hover:text-foreground"
                 >
                   <X className="size-4" />
                 </button>

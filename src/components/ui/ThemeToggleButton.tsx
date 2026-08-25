@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLandingTheme } from "@/components/RouteThemeScope";
+import { useSiteTheme } from "@/components/RouteThemeScope";
 import { cn } from "@/lib/utils";
 
 // Same easing curve as the header search dropdown / mega menu's open
@@ -17,7 +17,7 @@ const ICON_TRANSITION = { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const };
 // static icon change or a plain opacity crossfade, so the click reads as
 // "this flips to the other state" at a glance.
 export function ThemeToggleButton({ fullWidth }: { fullWidth?: boolean }) {
-  const ctx = useLandingTheme();
+  const ctx = useSiteTheme();
   if (!ctx) return null;
   const { theme, toggle } = ctx;
   const isLight = theme === "light";

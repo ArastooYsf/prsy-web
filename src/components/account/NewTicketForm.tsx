@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function NewTicketForm() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function NewTicketForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">موضوع</label>
         <input
@@ -69,7 +69,7 @@ export default function NewTicketForm() {
       <button
         type="submit"
         disabled={saving}
-        className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "در حال ثبت..." : "ثبت تیکت"}
       </button>

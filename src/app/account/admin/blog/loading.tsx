@@ -14,7 +14,7 @@ export default function Loading() {
         </h2>
         <Link
           href="/account/admin/blog/new"
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
         >
           <Plus className="size-4" />
           پست جدید
@@ -29,7 +29,7 @@ export default function Loading() {
       </div>
 
       {/* Desktop/tablet: table */}
-      <div className="hidden rounded-2xl border border-white/10 md:block">
+      <div className="hidden rounded-2xl border border-foreground/10 md:block">
         <table className="w-full text-sm">
           <thead className="text-foreground/60">
             <tr>

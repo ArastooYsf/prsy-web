@@ -6,6 +6,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { getMediaUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { cn } from "@/lib/utils";
 
 type RichTextEditorProps = {
   value: string;
@@ -33,7 +35,7 @@ function ToolbarButton({
       title={label}
       aria-label={label}
       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-        active ? "bg-accent-500 text-white" : "text-foreground/70 hover:bg-white/10 hover:text-foreground"
+        active ? "bg-accent-500 text-white" : "text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
       }`}
     >
       {children}
@@ -42,7 +44,7 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <span className="mx-1 h-5 w-px shrink-0 bg-white/10" />;
+  return <span className="mx-1 h-5 w-px shrink-0 bg-foreground/10" />;
 }
 
 function Icon({ children }: { children: React.ReactNode }) {
@@ -55,7 +57,7 @@ function Icon({ children }: { children: React.ReactNode }) {
 
 function Toolbar({ editor, onOpenImagePicker }: { editor: Editor; onOpenImagePicker: () => void }) {
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-background p-2">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-foreground/10 bg-background p-2">
       <ToolbarButton label="بولد" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
         <Icon>
           <path stroke="currentColor" d="M7 5h6a3.5 3.5 0 010 7H7V5zM7 12h7a3.5 3.5 0 010 7H7v-7z" />
@@ -174,24 +176,30 @@ function Toolbar({ editor, onOpenImagePicker }: { editor: Editor; onOpenImagePic
 
 export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const [imagePickerOpen, setImagePickerOpen] = useState(false);
+  const isDark = useSiteTheme()?.theme === "dark";
 
-  const editor = useEditor({
-    extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image],
-    content: value,
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-invert prose-sm max-w-none min-h-[240px] px-4 py-3 text-sm leading-7 outline-none [&_a]:text-accent-400",
+  const editor = useEditor(
+    {
+      extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image],
+      content: value,
+      immediatelyRender: false,
+      editorProps: {
+        attributes: {
+          class: cn(
+            "prose prose-sm max-w-none min-h-[240px] px-4 py-3 text-sm leading-7 outline-none [&_a]:text-accent-400",
+            isDark && "prose-invert",
+          ),
+        },
       },
+      onUpdate: ({ editor }) => onChange(editor.getHTML()),
     },
-    onUpdate: ({ editor }) => onChange(editor.getHTML()),
-  });
+    [isDark],
+  );
 
   if (!editor) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5">
+    <div className="rounded-lg border border-foreground/10 bg-foreground/5">
       <Toolbar editor={editor} onOpenImagePicker={() => setImagePickerOpen(true)} />
       <EditorContent editor={editor} dir="rtl" />
 

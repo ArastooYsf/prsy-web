@@ -34,13 +34,13 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
         </span>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+      <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
         <OrderProgress status={order.status} />
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10">
+      <div className="mt-6 overflow-x-auto rounded-2xl border border-foreground/10">
         <table className="w-full min-w-[320px] text-sm">
-          <thead className="bg-white/[0.03] text-foreground/60">
+          <thead className="bg-foreground/[0.03] text-foreground/60">
             <tr>
               <th className="px-4 py-3 text-right font-medium">نام محصول</th>
               <th className="px-4 py-3 text-right font-medium">تعداد</th>
@@ -48,7 +48,7 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
           </thead>
           <tbody>
             {order.items.map((item) => (
-              <tr key={item.id} className="border-t border-white/10">
+              <tr key={item.id} className="border-t border-foreground/10">
                 <td className="px-4 py-3 font-medium">{item.productName}</td>
                 <td className="px-4 py-3 text-foreground/70">{formatNumber(item.quantity)}</td>
               </tr>

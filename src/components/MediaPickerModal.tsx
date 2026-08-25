@@ -198,15 +198,15 @@ export default function MediaPickerModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+        className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
           <h3 className="text-base font-bold">{KIND_LABEL[kind]}</h3>
           <button
             type="button"
             onClick={onClose}
             aria-label="بستن"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/5 hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -214,12 +214,12 @@ export default function MediaPickerModal({
           </button>
         </div>
 
-        <div className="flex gap-2 border-b border-white/10 px-5 py-3">
+        <div className="flex gap-2 border-b border-foreground/10 px-5 py-3">
           <button
             type="button"
             onClick={() => setTab("gallery")}
             className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              tab === "gallery" ? "bg-accent-500 text-white" : "border border-white/10 text-foreground/70 hover:border-accent-500/40"
+              tab === "gallery" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
             }`}
           >
             گالری
@@ -228,7 +228,7 @@ export default function MediaPickerModal({
             type="button"
             onClick={() => setTab("upload")}
             className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              tab === "upload" ? "bg-accent-500 text-white" : "border border-white/10 text-foreground/70 hover:border-accent-500/40"
+              tab === "upload" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
             }`}
           >
             آپلود
@@ -256,13 +256,13 @@ export default function MediaPickerModal({
                         type="button"
                         onClick={() => toggleSelect(item.url)}
                         className={`relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-lg border-2 transition-colors ${
-                          selected ? "border-accent-500" : "border-transparent hover:border-white/20"
+                          selected ? "border-accent-500" : "border-transparent hover:border-foreground/20"
                         }`}
                       >
                         {isImage ? (
                           <Image src={getMediaUrl(item.url)} alt={item.filename} fill sizes="200px" className="object-cover" />
                         ) : (
-                          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-white/[0.04] p-2">
+                          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-foreground/[0.04] p-2">
                             <FileTypeIcon kind={fileKindFromMime(item.mimeType)} className="h-6 w-6" />
                             <span className="line-clamp-2 w-full break-words text-center text-[10px] text-foreground/60">
                               {item.filename}
@@ -270,7 +270,7 @@ export default function MediaPickerModal({
                           </div>
                         )}
                         {selected && (
-                          <span className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-500 text-white">
+                          <span className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-500 text-primary-foreground">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                               <path
                                 d="M5 13l4 4L19 7"
@@ -311,7 +311,7 @@ export default function MediaPickerModal({
               </div>
             )
           ) : (
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-6 py-12 text-center transition-colors hover:border-accent-500/40">
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-foreground/15 px-6 py-12 text-center transition-colors hover:border-accent-500/40">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -330,13 +330,13 @@ export default function MediaPickerModal({
 
         </div>
 
-        <div className="flex items-center justify-between border-t border-white/10 px-5 py-4">
+        <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-4">
           <span className="text-xs text-foreground/50">{draftSelected.length} مورد انتخاب‌شده</span>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium text-foreground/70 transition-colors hover:border-white/20"
+              className="rounded-full border border-foreground/10 px-5 py-2.5 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground/20"
             >
               انصراف
             </button>
@@ -344,7 +344,7 @@ export default function MediaPickerModal({
               type="button"
               onClick={confirm}
               disabled={draftSelected.length === 0}
-              className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-full bg-accent-500 px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               انتخاب
             </button>

@@ -36,19 +36,19 @@ function MessageRow({ side, width, lines }: (typeof ROWS)[number]) {
 // is the real async gap, not TicketChat's own client state).
 export default function TicketChatSkeleton() {
   return (
-    <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-black/10">
+    <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-gradient-to-b from-foreground/[0.02] to-background/10">
       <div className="flex-1 space-y-3 overflow-hidden p-4 sm:p-6">
         {ROWS.map((row, i) => (
           <MessageRow key={i} {...row} />
         ))}
       </div>
 
-      <div className="border-t border-white/10 bg-background/60 p-3 sm:p-4">
+      <div className="border-t border-foreground/10 bg-background/60 p-3 sm:p-4">
         <div className="mb-2 flex items-center gap-1">
           <Skeleton circle width={32} height={32} />
           <Skeleton circle width={32} height={32} />
         </div>
-        <div className="flex items-end gap-2 rounded-xl border border-white/10 bg-white/5 p-1.5">
+        <div className="flex items-end gap-2 rounded-xl border border-foreground/10 bg-foreground/5 p-1.5">
           <Skeleton height={36} borderRadius={8} containerClassName="flex-1" />
           <Skeleton circle width={36} height={36} containerClassName="shrink-0" />
         </div>

@@ -26,7 +26,7 @@ export default async function AccountOrdersPage() {
       </h2>
 
       {orders.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           هنوز سفارشی برای شما ثبت نشده است.
         </p>
       ) : (
@@ -35,7 +35,7 @@ export default async function AccountOrdersPage() {
             <Link
               key={order.id}
               href={`/account/orders/${order.id}`}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-accent-500/30"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-colors hover:border-accent-500/30"
             >
               <div>
                 <p dir="ltr" className="text-right font-semibold">

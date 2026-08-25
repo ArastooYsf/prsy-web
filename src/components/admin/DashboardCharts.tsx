@@ -42,16 +42,18 @@ const ORDER_COLOR = "#60a5fa";
 const RANGE_OPTIONS: StatsRange[] = ["today", "7d", "30d", "1y", "all"];
 
 const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
+  backgroundColor: "rgb(var(--popover))",
+  border: "1px solid rgb(var(--foreground) / 0.1)",
   borderRadius: 12,
   fontSize: 12,
   direction: "rtl" as const,
 };
 
+const tooltipLabelStyle = { color: "rgb(var(--popover-foreground))" };
+
 function ChartCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold text-foreground/80">{title}</p>
         {action}
@@ -75,7 +77,7 @@ function RangeFilter({ value, onChange, disabled }: { value: StatsRange; onChang
           className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             value === r
               ? "border-accent-500/40 bg-accent-500/10 text-accent-400"
-              : "border-white/10 text-foreground/60 hover:border-white/20"
+              : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
           }`}
         >
           {RANGE_LABELS[r]}
@@ -106,13 +108,13 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
     <ChartCard title="روند ثبت قراردادها و سفارش‌ها" action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} interval={range === "1y" || range === "all" ? 0 : "preserveStartEnd"} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
+          <XAxis dataKey="label" tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} interval={range === "1y" || range === "all" ? 0 : "preserveStartEnd"} />
+          <YAxis allowDecimals={false} tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
           <Tooltip
             contentStyle={tooltipStyle}
-            labelStyle={{ color: "#fff" }}
-            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            labelStyle={tooltipLabelStyle}
+            cursor={{ fill: "rgb(var(--foreground) / 0.05)" }}
             formatter={(value) => toPersianDigits(String(value ?? ""))}
           />
           <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
@@ -145,7 +147,7 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-foreground/60">
           <Eye className="size-4" />
@@ -163,13 +165,13 @@ export function OrderStatusChart({ data }: { data: StatusCount[] }) {
     <ChartCard title="سفارش‌ها به تفکیک وضعیت">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
+          <XAxis dataKey="label" tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} />
+          <YAxis allowDecimals={false} tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
           <Tooltip
             contentStyle={tooltipStyle}
-            labelStyle={{ color: "#fff" }}
-            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            labelStyle={tooltipLabelStyle}
+            cursor={{ fill: "rgb(var(--foreground) / 0.05)" }}
             formatter={(value) => toPersianDigits(String(value ?? ""))}
           />
           <Bar dataKey="count" name="تعداد" radius={[6, 6, 0, 0]}>
@@ -209,7 +211,7 @@ export function TicketStatusChart({ data }: { data: StatusCount[] }) {
             </Pie>
             <Tooltip
               contentStyle={tooltipStyle}
-              labelStyle={{ color: "#fff" }}
+              labelStyle={tooltipLabelStyle}
               formatter={(value) => toPersianDigits(String(value ?? ""))}
             />
             <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />

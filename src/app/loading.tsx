@@ -11,7 +11,7 @@ export default function Loading() {
         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16">
           <Skeleton
             borderRadius={24}
-            className="aspect-[4/3] w-full border border-white/10 sm:aspect-[16/10] lg:aspect-square"
+            className="aspect-[4/3] w-full border border-foreground/10 sm:aspect-[16/10] lg:aspect-square"
             containerClassName="order-1 lg:order-2"
           />
 

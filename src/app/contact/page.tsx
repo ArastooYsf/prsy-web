@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import ThemedMapFrame from "@/components/ui/ThemedMapFrame";
+import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 export const metadata: Metadata = {
   title: "تماس با ما",
@@ -100,9 +102,9 @@ export default function ContactPage() {
   return (
     <>
       <section className="relative overflow-hidden pb-8 pt-14 sm:pt-20">
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+        <ThemedGridBackdrop />
         <div className="container relative text-center">
-          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
             تماس با ما
           </span>
@@ -122,7 +124,7 @@ export default function ContactPage() {
             {CONTACT_ITEMS.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-transparent bg-white/[0.03] p-6 text-center"
+                className="rounded-2xl border border-transparent bg-foreground/[0.03] p-6 text-center"
               >
                 <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400">
                   {item.icon}
@@ -145,13 +147,11 @@ export default function ContactPage() {
             ))}
           </div>
 
-          <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-white/10">
-            <iframe
+          <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-foreground/10">
+            <ThemedMapFrame
               title="نقشه موقعیت ما"
               src={`https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`}
-              className="h-72 w-full grayscale invert sm:h-80"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
+              className="h-72 w-full sm:h-80"
             />
           </div>
 
@@ -165,7 +165,7 @@ export default function ContactPage() {
                   key={social.name}
                   href={social.href}
                   aria-label={social.name}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                 >
                   {social.icon}
                 </a>

@@ -6,7 +6,7 @@ import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 type CustomerFormProps = {
   submitLabel: string;
@@ -106,7 +106,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
           <button
             type="button"
             onClick={generatePassword}
-            className="shrink-0 rounded-lg border border-white/10 px-4 py-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="shrink-0 rounded-lg border border-foreground/10 px-4 py-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             تولید خودکار
           </button>
@@ -123,7 +123,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
             className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
               customerType === "INDIVIDUAL"
                 ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-white/10 text-foreground/60 hover:border-white/20"
+                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
             }`}
           >
             حقیقی
@@ -134,7 +134,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
             className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
               customerType === "LEGAL"
                 ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-white/10 text-foreground/60 hover:border-white/20"
+                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
             }`}
           >
             حقوقی

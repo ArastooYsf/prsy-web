@@ -9,7 +9,7 @@ import { useToast } from "@/components/ToastProvider";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 const CUSTOM_TYPE_VALUE = "__custom__";
 

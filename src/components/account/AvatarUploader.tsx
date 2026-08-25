@@ -18,7 +18,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative">
-        <div className="relative flex size-24 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5">
+        <div className="relative flex size-24 items-center justify-center overflow-hidden rounded-full border border-foreground/10 bg-foreground/5">
           {value ? (
             <Image src={getMediaUrl(value)} alt={nameForAlt} fill sizes="96px" className="object-cover" />
           ) : (
@@ -29,7 +29,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
           type="button"
           onClick={() => setOpen(true)}
           aria-label="تغییر عکس پروفایل"
-          className="absolute -bottom-1 -left-1 flex size-9 items-center justify-center rounded-full border-2 border-background bg-accent-500 text-white shadow-lg transition-colors hover:bg-accent-600"
+          className="absolute -bottom-1 -left-1 flex size-9 items-center justify-center rounded-full border-2 border-background bg-accent-500 text-primary-foreground shadow-lg transition-colors hover:bg-accent-600"
         >
           <Camera className="size-4" />
         </button>

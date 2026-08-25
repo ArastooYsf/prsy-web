@@ -121,7 +121,15 @@ function SeenTicks({ seen, onGradient }: { seen: boolean; onGradient: boolean })
       height="9"
       viewBox="0 0 20 12"
       fill="none"
-      className={onGradient ? (seen ? "text-white" : "text-white/60") : seen ? "text-accent-300" : "text-current opacity-60"}
+      className={
+        onGradient
+          ? seen
+            ? "text-primary-foreground"
+            : "text-primary-foreground/60"
+          : seen
+            ? "text-accent-300"
+            : "text-current opacity-60"
+      }
     >
       <path d="M1 6l3.5 3.5L11 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       {seen && <path d="M8 6l3.5 3.5L18 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />}
@@ -137,11 +145,15 @@ function Avatar({ isStaff, visible }: { isStaff: boolean; visible: boolean }) {
     <div
       className={cn(
         "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-        isStaff ? "bg-accent-500" : "bg-white/10",
+        isStaff ? "bg-accent-500" : "bg-foreground/10",
         !visible && "invisible",
       )}
     >
-      {isStaff ? <LifeBuoy className="size-3.5 text-white" /> : <User className="size-3.5 text-foreground/70" />}
+      {isStaff ? (
+        <LifeBuoy className="size-3.5 text-primary-foreground" />
+      ) : (
+        <User className="size-3.5 text-foreground/70" />
+      )}
     </div>
   );
 }
@@ -157,7 +169,7 @@ function TypingIndicator() {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="inline-flex items-center gap-1 rounded-2xl bg-white/[0.07] px-4 py-3 backdrop-blur-sm"
+      className="inline-flex items-center gap-1 rounded-2xl bg-foreground/[0.07] px-4 py-3 backdrop-blur-sm"
     >
       {[0, 1, 2].map((i) => (
         <motion.span
@@ -192,8 +204,8 @@ function Bubble({ side, mine, children }: BubbleProps) {
       className={cn(
         "w-fit rounded-2xl px-3.5 py-2",
         mine
-          ? "bg-accent-500 text-white shadow-[0_4px_12px_-4px_rgba(249,115,22,0.3)]"
-          : "bg-white/[0.07] text-foreground shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm",
+          ? "bg-accent-500 text-primary-foreground shadow-[0_4px_12px_-4px_rgba(249,115,22,0.3)]"
+          : "bg-foreground/[0.07] text-foreground shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm",
       )}
     >
       {children}
@@ -230,7 +242,7 @@ function MessageMenu({
           type="button"
           aria-label="گزینه‌های پیام"
           className={cn(
-            "flex h-7 w-7 shrink-0 self-start items-center justify-center rounded-full text-foreground/40 opacity-0 transition-opacity hover:bg-white/10 hover:text-foreground group-hover:opacity-100",
+            "flex h-7 w-7 shrink-0 self-start items-center justify-center rounded-full text-foreground/40 opacity-0 transition-opacity hover:bg-foreground/10 hover:text-foreground group-hover:opacity-100",
             (forceVisible || open) && "opacity-100",
           )}
         >
@@ -243,12 +255,12 @@ function MessageMenu({
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-36 overflow-hidden rounded-xl border border-white/10 bg-background p-1 shadow-2xl"
+          className="z-50 w-36 overflow-hidden rounded-xl border border-foreground/10 bg-background p-1 shadow-2xl"
         >
           {onDownload && (
             <DropdownMenu.Item
               onSelect={onDownload}
-              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-foreground/10"
             >
               دانلود
             </DropdownMenu.Item>
@@ -256,7 +268,7 @@ function MessageMenu({
           {onSave && (
             <DropdownMenu.Item
               onSelect={onSave}
-              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-foreground/10"
             >
               ذخیره در گالری من
             </DropdownMenu.Item>
@@ -264,7 +276,7 @@ function MessageMenu({
           {onEdit && (
             <DropdownMenu.Item
               onSelect={onEdit}
-              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-white/10"
+              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-foreground/10"
             >
               ویرایش
             </DropdownMenu.Item>
@@ -612,9 +624,9 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   };
 
   return (
-    <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-black/10">
+    <div className="flex min-h-[420px] flex-1 flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-gradient-to-b from-foreground/[0.02] to-background/10">
       {hasOwnMessages && (
-        <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2 sm:px-6">
+        <div className="flex items-center justify-between gap-3 border-b border-foreground/10 px-4 py-2 sm:px-6">
           {selectMode ? (
             <>
               <span className="text-xs font-medium text-foreground/60">
@@ -633,7 +645,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 <button
                   type="button"
                   onClick={toggleSelectMode}
-                  className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-foreground/60 transition-colors hover:bg-white/10"
+                  className="flex items-center gap-1.5 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/60 transition-colors hover:bg-foreground/10"
                 >
                   <X className="size-3.5" />
                   لغو انتخاب
@@ -644,7 +656,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
             <button
               type="button"
               onClick={toggleSelectMode}
-              className="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium text-foreground/50 transition-colors hover:bg-white/10 hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium text-foreground/50 transition-colors hover:bg-foreground/10 hover:text-foreground"
             >
               <ListChecks className="size-3.5" />
               انتخاب پیام‌ها
@@ -688,8 +700,10 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                     }}
                     rows={2}
                     className={cn(
-                      "w-full resize-none rounded-lg bg-black/10 px-2 py-1.5 text-sm outline-none",
-                      isMine ? "text-white placeholder:text-white/50" : "text-foreground placeholder:text-foreground/40",
+                      "w-full resize-none rounded-lg bg-background/10 px-2 py-1.5 text-sm outline-none",
+                      isMine
+                        ? "text-primary-foreground placeholder:text-primary-foreground/50"
+                        : "text-foreground placeholder:text-foreground/40",
                     )}
                   />
                   <div className="flex items-center justify-end gap-2 text-xs">
@@ -700,14 +714,14 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                       type="button"
                       onClick={() => saveEdit(m)}
                       disabled={savingEdit}
-                      className="rounded-full bg-black/20 px-3 py-1 font-semibold hover:bg-black/30 disabled:opacity-50"
+                      className="rounded-full bg-background/20 px-3 py-1 font-semibold hover:bg-background/30 disabled:opacity-50"
                     >
                       {savingEdit ? "..." : "ذخیره"}
                     </button>
                   </div>
                 </div>
               ) : m.deletedAt ? (
-                <p className={cn("text-sm italic", isMine ? "text-white/70" : "text-foreground/40")}>
+                <p className={cn("text-sm italic", isMine ? "text-primary-foreground/70" : "text-foreground/40")}>
                   این پیام حذف شد
                 </p>
               ) : (
@@ -734,7 +748,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={cn(
-                                  "relative block overflow-hidden rounded-lg border border-white/10",
+                                  "relative block overflow-hidden rounded-lg border border-foreground/10",
                                   images.length === 1
                                     ? "h-[220px] w-[176px] max-w-full sm:h-[400px] sm:w-[320px]"
                                     : "aspect-square w-full",
@@ -760,7 +774,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                                 href={getMediaUrl(f.url)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs hover:border-white/30"
+                                className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-background/10 px-3 py-2 text-xs hover:border-foreground/30"
                               >
                                 <FileTypeIcon kind={fileKindFromName(f.filename)} />
                                 <span className="min-w-0 flex-1 truncate">{f.filename}</span>
@@ -776,7 +790,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                   <div
                     className={cn(
                       "mt-1 flex items-center justify-end gap-1.5 text-[10px]",
-                      isMine ? "text-white/70" : "text-foreground/40",
+                      isMine ? "text-primary-foreground/70" : "text-foreground/40",
                     )}
                   >
                     {m.editedAt && <span>ویرایش شد ·</span>}
@@ -809,8 +823,8 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 className={cn(
                   "flex h-7 w-7 shrink-0 self-start items-center justify-center rounded-full border transition-colors",
                   selectedIds.has(m.id)
-                    ? "border-accent-500 bg-accent-500 text-white"
-                    : "border-white/20 bg-transparent text-transparent hover:border-white/40",
+                    ? "border-accent-500 bg-accent-500 text-primary-foreground"
+                    : "border-foreground/20 bg-transparent text-transparent hover:border-foreground/40",
                 )}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -862,7 +876,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       </div>
 
       {canReply ? (
-        <form onSubmit={handleSend} className="border-t border-white/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
+        <form onSubmit={handleSend} className="border-t border-foreground/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
           <div className="mb-2 flex items-center gap-1">
             <EmojiPicker
               onSelect={(emoji) => (editingId ? setEditingText((prev) => prev + emoji) : setText((prev) => prev + emoji))}
@@ -880,7 +894,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
               type="button"
               onClick={() => setAttachmentPickerOpen(true)}
               aria-label="پیوست فایل"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-white/10 hover:text-foreground"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
@@ -894,7 +908,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
             </button>
           </div>
 
-          <div className="flex flex-col gap-1.5 rounded-xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-sm transition-colors focus-within:border-accent-500/50">
+          <div className="flex flex-col gap-1.5 rounded-xl border border-foreground/10 bg-foreground/5 p-1.5 backdrop-blur-sm transition-colors focus-within:border-accent-500/50">
             {pendingAttachments.length > 0 &&
               (() => {
                 const images = pendingAttachments.filter((a) => isImageMime(a.mimeType));
@@ -909,7 +923,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                         {images.map((img) => (
                           <div
                             key={img.tempId}
-                            className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-white/10"
+                            className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-foreground/10"
                           >
                             <Image src={getMediaUrl(img.url)} alt={img.filename} fill sizes="56px" className="object-cover" />
                             <button
@@ -930,7 +944,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                     {files.length > 0 && (
                       <div className="flex flex-col gap-1">
                         {files.map((f) => (
-                          <div key={f.tempId} className="flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs">
+                          <div key={f.tempId} className="flex items-center gap-2 rounded-lg bg-foreground/5 px-2.5 py-1.5 text-xs">
                             <FileTypeIcon kind={fileKindFromName(f.filename)} className="h-4 w-4 shrink-0" />
                             <span className="min-w-0 flex-1 truncate text-foreground/80">{f.filename}</span>
                             <span className="shrink-0 text-foreground/40">{formatFileSize(f.size)}</span>
@@ -938,7 +952,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                               type="button"
                               onClick={() => removeOne(f.tempId)}
                               aria-label="حذف پیوست"
-                              className="shrink-0 rounded-full p-1 text-foreground/40 hover:bg-white/10 hover:text-red-400"
+                              className="shrink-0 rounded-full p-1 text-foreground/40 hover:bg-foreground/10 hover:text-red-400"
                             >
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                                 <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -969,7 +983,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={sending || throttled || (!text.trim() && pendingAttachments.length === 0)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-500 text-white shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-500 text-primary-foreground shadow-lg shadow-accent-500/25 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="ارسال"
               >
                 {sending ? (
@@ -994,7 +1008,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
         </form>
       ) : (
-        <div className="border-t border-white/10 p-4 text-center text-sm text-foreground/50">
+        <div className="border-t border-foreground/10 p-4 text-center text-sm text-foreground/50">
           این تیکت بسته شده است.
         </div>
       )}

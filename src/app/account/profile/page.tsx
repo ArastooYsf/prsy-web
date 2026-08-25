@@ -44,7 +44,7 @@ export default async function AccountProfilePage() {
             <Link
               key={stat.label}
               href={stat.href}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors hover:border-accent-500/30"
+              className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-colors hover:border-accent-500/30"
             >
               <div className="flex items-center gap-2 text-foreground/60">
                 <stat.icon className="size-4" />

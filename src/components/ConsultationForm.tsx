@@ -66,7 +66,7 @@ export default function ConsultationForm() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-accent-500/30 bg-accent-500/10 p-10 text-center shadow-xl shadow-accent-500/10"
+        className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-accent-500/30 bg-accent-500/10 p-10 text-center"
       >
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-500/20 text-accent-400 shadow-md shadow-accent-500/10">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -100,7 +100,7 @@ export default function ConsultationForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-xl shadow-black/10 sm:p-8"
+      className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
@@ -110,6 +110,7 @@ export default function ConsultationForm() {
           <input
             id="name"
             name="name"
+            autoComplete="name"
             value={form.name}
             onChange={handleChange}
             className={inputClass}
@@ -123,6 +124,9 @@ export default function ConsultationForm() {
           <input
             id="phone"
             name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={form.phone}
             onChange={handleChange}
             className={inputClass}
@@ -138,6 +142,7 @@ export default function ConsultationForm() {
             id="email"
             name="email"
             type="email"
+            autoComplete="email"
             value={form.email}
             onChange={handleChange}
             className={inputClass}
@@ -181,7 +186,7 @@ export default function ConsultationForm() {
 
       <button
         type="submit"
-        className="mt-6 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30 sm:w-auto sm:text-base"
+        className="mt-6 w-full rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-accent-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto sm:text-base"
       >
         ارسال درخواست
       </button>

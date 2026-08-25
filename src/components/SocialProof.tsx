@@ -97,7 +97,7 @@ export default function SocialProof() {
             <motion.div
               key={testimonial.name}
               variants={fadeInUp}
-              className="flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-7"
+              className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-7"
             >
               <svg
                 width="28"
@@ -115,7 +115,7 @@ export default function SocialProof() {
                 {testimonial.quote}
               </p>
               <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500 text-sm font-bold text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>

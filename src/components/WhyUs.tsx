@@ -85,22 +85,22 @@ export default function WhyUs() {
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          variants={staggerContainer(0.15)}
-          className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          variants={staggerContainer(0.1)}
+          className="mt-14 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] sm:mt-16"
         >
           {ADVANTAGES.map((advantage) => (
             <motion.div
               key={advantage.title}
               variants={fadeInUp}
-              whileHover={{ y: -8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="group flex flex-col rounded-2xl border border-transparent bg-white/[0.03] p-8 transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
+              className="group flex flex-col items-start gap-5 p-6 transition-colors duration-300 hover:bg-white/[0.02] sm:flex-row sm:p-8"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 transition-colors duration-300 group-hover:bg-accent-500/20">
                 {advantage.icon}
               </div>
-              <h3 className="mt-6 text-xl font-bold">{advantage.title}</h3>
-              <p className="mt-3 leading-7 text-foreground/70">{advantage.description}</p>
+              <div>
+                <h3 className="text-lg font-bold">{advantage.title}</h3>
+                <p className="mt-2 leading-7 text-foreground/70">{advantage.description}</p>
+              </div>
             </motion.div>
           ))}
         </motion.div>

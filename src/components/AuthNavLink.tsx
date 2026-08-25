@@ -1,8 +1,12 @@
 "use client";
 
+import type { MouseEvent, ReactNode } from "react";
+import { useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { isPlainLeftClick } from "@/lib/is-plain-left-click";
 
 const UserIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -20,6 +24,33 @@ const PanelIcon = () => (
   </svg>
 );
 
+// Icon-only nav buttons feel unresponsive on a click that just sits there
+// until the destination route renders — so the icon itself spins in place
+// from click until the transition commits. useTransition's isPending is the
+// standard App Router signal for "navigation in flight" (not a manual
+// pathname-watch), and the click handler only intercepts a plain left-click
+// so Cmd/Ctrl/middle-click still open a new tab exactly like a normal <Link>.
+function IconNavButton({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!isPlainLeftClick(e)) return;
+    e.preventDefault();
+    startTransition(() => router.push(href));
+  };
+
+  return (
+    <Button size="icon" variant="outline" className="h-9 w-9" asChild>
+      <Link href={href} aria-label={label} onClick={handleClick}>
+        <span className={isPending ? "inline-flex animate-spin motion-reduce:animate-none" : "inline-flex"}>
+          {icon}
+        </span>
+      </Link>
+    </Button>
+  );
+}
+
 type AuthNavLinkProps = {
   variant?: "icon" | "block";
   onNavigate?: () => void;
@@ -34,13 +65,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
 
   if (status === "authenticated" && (session.user.role === "ADMIN" || session.user.role === "SUPPORT")) {
     if (variant === "icon") {
-      return (
-        <Button size="icon" variant="outline" className="h-9 w-9" asChild>
-          <Link href="/account/admin" aria-label="پنل مدیریت">
-            <PanelIcon />
-          </Link>
-        </Button>
-      );
+      return <IconNavButton href="/account/admin" label="پنل مدیریت" icon={<PanelIcon />} />;
     }
     return (
       <Button variant="outline" className="w-full" asChild>
@@ -53,13 +78,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
 
   if (status === "authenticated") {
     if (variant === "icon") {
-      return (
-        <Button size="icon" variant="outline" className="h-9 w-9" asChild>
-          <Link href="/account" aria-label="حساب کاربری">
-            <UserIcon />
-          </Link>
-        </Button>
-      );
+      return <IconNavButton href="/account" label="حساب کاربری" icon={<UserIcon />} />;
     }
     return (
       <Button variant="outline" className="w-full" asChild>
@@ -71,13 +90,7 @@ export default function AuthNavLink({ variant = "icon", onNavigate }: AuthNavLin
   }
 
   if (variant === "icon") {
-    return (
-      <Button size="icon" variant="outline" className="h-9 w-9" asChild>
-        <Link href="/login" aria-label="ورود">
-          <UserIcon />
-        </Link>
-      </Button>
-    );
+    return <IconNavButton href="/login" label="ورود" icon={<UserIcon />} />;
   }
 
   return (

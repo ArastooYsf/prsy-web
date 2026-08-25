@@ -118,15 +118,13 @@ export default function Features() {
             <motion.div
               key={feature.title}
               variants={fadeInUp}
-              whileHover={{ y: -8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="group relative overflow-hidden rounded-2xl border border-transparent bg-white/[0.03] p-8 transition-all duration-300 hover:border-accent-500/40 hover:shadow-xl hover:shadow-black/10"
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-8 transition-colors duration-300 hover:border-accent-500/30"
             >
               <span className="pointer-events-none absolute -top-3 left-4 text-6xl font-bold text-white/[0.06] transition-colors duration-300 group-hover:text-accent-500/10">
                 {feature.index}
               </span>
 
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10 transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-500/20">
+              <div className="relative flex h-14 w-14 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 transition-colors duration-300 group-hover:bg-accent-500/20">
                 {feature.icon}
               </div>
 

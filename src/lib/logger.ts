@@ -1,23 +1,65 @@
 import { appendFile, mkdir, readdir, readFile, rm, stat, writeFile } from "fs/promises";
+import os from "os";
 import path from "path";
 import { toJalaali } from "jalaali-js";
 import { formatJalaliDateTime } from "@/lib/jalali";
 
-// Deliberately NOT under /public: that folder is served statically without
-// any auth check, and log lines can contain user emails/roles/actions — a
-// leak we can't risk. Deliberately NOT under /src either, since that's
-// wiped/replaced on every deploy. This sits at the project root next to
-// /public, on the same local disk the media uploads currently use, so it
-// has the same durability characteristics as uploads today. If uploads ever
-// move to external object storage, this should move alongside them.
-const LOG_DIR = path.join(process.cwd(), "logs");
+// Deliberately OUTSIDE the app's own checked-out directory (process.cwd()):
+// a redeploy (fresh checkout, `git clean`, container rebuild) wipes that
+// tree, and this data must survive it. Same reasoning that already kept it
+// out of /public — that folder is served statically with no auth check, and
+// log lines can contain user emails/roles/actions, a leak we can't risk.
+// Override with LOG_DIR for a specific deploy (e.g. a mounted persistent
+// volume); the default is a dotfolder under the process's home directory —
+// a standard place for app data that lives outside the app's own source
+// tree. NOTE for later: this whole module is meant to be swapped for a
+// client that writes to external log/object storage — this local-disk
+// implementation is a placeholder for that, not something to grow.
+const LOG_DIR = process.env.LOG_DIR ? path.resolve(process.env.LOG_DIR) : path.join(os.homedir(), ".prsy-website", "logs");
 
-// Adjustable: total size cap for the whole logs/ directory. Once exceeded,
-// the oldest *unlocked* daily files are deleted (oldest first) until back
-// under the cap. Locked files are never touched, no matter how old.
+// Adjustable: total size cap for the whole log directory. Once exceeded,
+// the oldest *unlocked* files (by actual last-write time, any category) are
+// deleted oldest-first until back under the cap. Locked files are never
+// touched, no matter how old or how far over the cap that leaves things —
+// see enforceRetention below.
 export const LOG_DIR_SIZE_CAP_BYTES = 300 * 1024 * 1024; // 300MB
 
-export type LogCategory = "general" | "crash" | "security" | "notification";
+// Two different storage strategies, chosen per category:
+//
+//  - DAILY categories rotate on a 24h (Jalali calendar day) timer: one file
+//    per CATEGORY per day (not one shared file for the whole day — a
+//    "general" day and an "important" day are different files), unlocked
+//    by default, manually lockable by an admin from the logs page.
+//
+//  - EVENT categories never rotate on a timer — a file is only created when
+//    a real crash/security event actually happens, and it's locked from
+//    the moment it's created, unconditionally (see logEvent below; this is
+//    enforced in the write path itself, not left to a UI default). Events
+//    that land close together in time reuse the same file instead of each
+//    getting its own (see EVENT_GROUPING_WINDOW_MS) — otherwise a burst
+//    (the same crash repeating, or an attack in progress) would spam the
+//    disk with hundreds of one-line files.
+//
+// "access" (دسترسی) is split out of "security": routine, high-volume,
+// low-severity access-control noise (a mistyped password) versus a rare,
+// high-severity security incident (an account actually getting locked out,
+// a forged/failed bot-check, a real unauthorized-access attempt) — these
+// deserve different retention policies, which is exactly what per-category
+// files make possible. "notification" is kept from the previous design
+// (delivery success/failure of outbound notifications) since it already had
+// a real producer (src/lib/notifications/events.ts) and dropping it would
+// lose that granularity for no reason.
+export const DAILY_CATEGORIES = ["general", "important", "access", "notification"] as const;
+export const EVENT_CATEGORIES = ["crash", "security"] as const;
+export type LogCategory = (typeof DAILY_CATEGORIES)[number] | (typeof EVENT_CATEGORIES)[number];
+
+function isEventCategory(category: LogCategory): boolean {
+  return (EVENT_CATEGORIES as readonly string[]).includes(category);
+}
+
+// How close together (by the target file's last-write time) two crash/security
+// events have to be to share one file instead of each getting its own.
+const EVENT_GROUPING_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 export type LogAction =
   | "create"
@@ -31,6 +73,20 @@ export type LogAction =
   | "crash"
   | "notification_sent"
   | "notification_failed";
+
+// A caller can always pass an explicit `category`; this is only the default
+// when they don't (the existing admin CRUD call sites don't, so this alone
+// upgrades their categorization — no call-site changes needed).
+const ACTION_DEFAULT_CATEGORY: Partial<Record<LogAction, LogCategory>> = {
+  delete: "important",
+  role_change: "important",
+  approval_change: "important",
+  login_failed: "access",
+  unauthorized_access: "security",
+  crash: "crash",
+  notification_sent: "notification",
+  notification_failed: "notification",
+};
 
 export type LogActor = {
   id: string;
@@ -67,27 +123,80 @@ export function actorFromSession(session: {
   };
 }
 
-function jalaliFilename(date: Date): string {
+function jalaliDatePart(date: Date): string {
   const { jy, jm, jd } = toJalaali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-  return `${jy}-${String(jm).padStart(2, "0")}-${String(jd).padStart(2, "0")}.log`;
+  return `${jy}-${String(jm).padStart(2, "0")}-${String(jd).padStart(2, "0")}`;
+}
+
+function dailyFilename(category: LogCategory, date: Date): string {
+  return `${category}-${jalaliDatePart(date)}.log`;
+}
+
+function eventTimestampPart(date: Date): string {
+  const hh = String(date.getHours()).padStart(2, "0");
+  const mm = String(date.getMinutes()).padStart(2, "0");
+  const ss = String(date.getSeconds()).padStart(2, "0");
+  return `${jalaliDatePart(date)}T${hh}-${mm}-${ss}`;
+}
+
+function newEventFilename(category: LogCategory, date: Date): string {
+  return `${category}-${eventTimestampPart(date)}.log`;
 }
 
 function lockFilePath(filename: string): string {
   return path.join(LOG_DIR, `${filename}.lock.json`);
 }
 
-const LOG_FILENAME_PATTERN = /^\d{4}-\d{2}-\d{2}\.log$/;
+const DAILY_FILENAME_PATTERN = /^(general|important|access|notification)-\d{4}-\d{2}-\d{2}\.log$/;
+const EVENT_FILENAME_PATTERN = /^(crash|security)-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.log$/;
 
 // Only ever reads files from LOG_DIR by exact name, and the name is always
-// either our own generated `${jalaliDate}.log` or validated against this
-// pattern before use — no path-traversal surface anywhere in this module.
+// either one we generated ourselves or validated against these patterns
+// before use — no path-traversal surface anywhere in this module.
 export function isValidLogFilename(filename: string): boolean {
-  return LOG_FILENAME_PATTERN.test(filename);
+  return DAILY_FILENAME_PATTERN.test(filename) || EVENT_FILENAME_PATTERN.test(filename);
+}
+
+// Category now lives in the filename itself (one category per file, by
+// design), so listing files no longer has to read+parse every one just to
+// know what's in it.
+export function categoryFromFilename(filename: string): LogCategory | null {
+  const match = filename.match(/^([a-z]+)-/);
+  const prefix = match?.[1];
+  if (!prefix) return null;
+  if ((DAILY_CATEGORIES as readonly string[]).includes(prefix)) return prefix as LogCategory;
+  if ((EVENT_CATEGORIES as readonly string[]).includes(prefix)) return prefix as LogCategory;
+  return null;
+}
+
+// Picks which file a new crash/security event should append to: the most
+// recent file for that category if it was last written within the grouping
+// window, otherwise a brand-new one. Sliding window (measured from the
+// target file's last write, not its creation) so a burst of related events
+// keeps extending the same file for as long as they keep coming close
+// together, and only a real gap starts a new one.
+async function resolveEventFilename(category: LogCategory, now: Date): Promise<string> {
+  const prefix = `${category}-`;
+  const entries = await readdir(LOG_DIR).catch(() => [] as string[]);
+  const candidates = entries.filter((f) => f.startsWith(prefix) && EVENT_FILENAME_PATTERN.test(f)).sort();
+  const latest = candidates[candidates.length - 1];
+  if (!latest) return newEventFilename(category, now);
+
+  const latestStat = await stat(path.join(LOG_DIR, latest)).catch(() => null);
+  if (latestStat && now.getTime() - latestStat.mtime.getTime() <= EVENT_GROUPING_WINDOW_MS) {
+    return latest;
+  }
+  return newEventFilename(category, now);
 }
 
 /**
- * Appends one event to today's (Jalali calendar day) log file, creating it
- * if needed — one file per day, every event of that day appended to it.
+ * Appends one event to the right log file for its category, creating that
+ * file if needed.
+ *  - general/important/access/notification: one file per category per
+ *    Jalali calendar day, unlocked unless `options.locked` is passed.
+ *  - crash/security: one file per burst of nearby events (see
+ *    resolveEventFilename), locked unconditionally — `options.locked` can't
+ *    turn this off, by design.
  * Never throws: a logging failure must not break the request that
  * triggered it, so errors are swallowed after a console warning.
  */
@@ -98,15 +207,19 @@ export async function logEvent(
   try {
     await mkdir(LOG_DIR, { recursive: true });
     const now = new Date();
-    const filename = jalaliFilename(now);
-    const category = entry.category ?? "general";
+    const category = entry.category ?? ACTION_DEFAULT_CATEGORY[entry.action] ?? "general";
     const full: LogEntry = { ...entry, timestamp: now.toISOString(), category };
+
+    const eventDriven = isEventCategory(category);
+    const filename = eventDriven ? await resolveEventFilename(category, now) : dailyFilename(category, now);
+
     await appendFile(path.join(LOG_DIR, filename), `${JSON.stringify(full)}\n`, "utf8");
 
-    // crash/security events matter more than general ones — the whole day's
-    // file gets locked automatically so cleanup can never sweep it away.
-    // An admin can still unlock it by hand from the logs page.
-    if (options?.locked || category === "crash" || category === "security") {
+    // crash/security files are ALWAYS locked, unconditionally — not just
+    // "locked unless told otherwise". Re-locking an already-locked file is
+    // a harmless no-op (rewrites the same sidecar), so this line alone is
+    // the whole guarantee, independent of whatever `options.locked` says.
+    if (eventDriven || options?.locked) {
       await setLogFileLocked(filename, true);
     }
 
@@ -153,18 +266,24 @@ async function statAllLogFiles(): Promise<RawFileStat[]> {
 }
 
 /**
- * If the logs/ directory exceeds LOG_DIR_SIZE_CAP_BYTES, deletes the oldest
- * *unlocked* daily files (oldest Jalali date first — filenames sort
- * lexicographically since they're zero-padded YYYY-MM-DD) until back under
- * the cap. Locked files (including auto-locked crash/security days) are
- * never deleted, so if only-locked files remain the cap can stay exceeded.
+ * If the log directory exceeds LOG_DIR_SIZE_CAP_BYTES, deletes the oldest
+ * *unlocked* files (by real last-write time — filenames no longer share one
+ * sortable shape now that each category has its own prefix) until back
+ * under the cap.
+ *
+ * Locked files (including the always-locked crash/security ones) are never
+ * deleted, full stop — this is the one and only place this module deletes a
+ * log file, and every deletion here re-checks `f.locked` immediately before
+ * the `rm` call, so there is no code path, automatic or manual, that can
+ * remove a locked file. If only locked files remain, the cap can stay
+ * exceeded indefinitely — that is the intended trade-off, not a bug.
  */
 export async function enforceRetention(capBytes: number = LOG_DIR_SIZE_CAP_BYTES): Promise<string[]> {
   const files = await statAllLogFiles();
   let total = files.reduce((sum, f) => sum + f.size, 0);
   if (total <= capBytes) return [];
 
-  const oldestFirst = [...files].sort((a, b) => a.filename.localeCompare(b.filename));
+  const oldestFirst = [...files].sort((a, b) => a.mtime.localeCompare(b.mtime));
   const deleted: string[] = [];
 
   for (const f of oldestFirst) {
@@ -197,11 +316,11 @@ export async function readLogEntries(filename: string): Promise<LogEntry[]> {
 
 export type LogFileSummary = {
   filename: string;
+  category: LogCategory;
   size: number;
   entryCount: number;
   locked: boolean;
   modifiedAt: string;
-  categories: LogCategory[];
 };
 
 export async function listLogFiles(): Promise<LogFileSummary[]> {
@@ -210,12 +329,12 @@ export async function listLogFiles(): Promise<LogFileSummary[]> {
   const summaries = await Promise.all(
     base.map(async ({ filename, size, mtime, locked }) => {
       const entries = await readLogEntries(filename);
-      const categories = Array.from(new Set(entries.map((e) => e.category ?? "general"))) as LogCategory[];
-      return { filename, size, entryCount: entries.length, locked, modifiedAt: mtime, categories };
+      const category = categoryFromFilename(filename) ?? "general";
+      return { filename, category, size, entryCount: entries.length, locked, modifiedAt: mtime };
     }),
   );
 
-  return summaries.sort((a, b) => b.filename.localeCompare(a.filename));
+  return summaries.sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt));
 }
 
 const ACTION_LABELS_FA: Record<LogAction, string> = {
@@ -243,6 +362,6 @@ export function formatLogEntryHuman(entry: LogEntry): string {
 
 export async function formatLogFileAsText(filename: string): Promise<string> {
   const entries = await readLogEntries(filename);
-  if (entries.length === 0) return "این فایل روزانه هیچ رویدادی ندارد.\n";
+  if (entries.length === 0) return "این فایل هیچ رویدادی ندارد.\n";
   return entries.map(formatLogEntryHuman).join("\n") + "\n";
 }

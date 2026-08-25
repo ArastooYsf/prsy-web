@@ -31,7 +31,7 @@ export default async function AccountContractsPage() {
       </h2>
 
       {contracts.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           هنوز قراردادی برای شما ثبت نشده است.
         </p>
       ) : (
@@ -43,7 +43,7 @@ export default async function AccountContractsPage() {
             return (
               <div
                 key={contract.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5"
               >
                 <div>
                   <p className="font-semibold">{contract.title}</p>
@@ -70,7 +70,7 @@ export default async function AccountContractsPage() {
                       href={getMediaUrl(contract.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                     >
                       <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
                       دانلود پیوست

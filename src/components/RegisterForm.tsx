@@ -9,7 +9,7 @@ import { useToast } from "@/components/ToastProvider";
 import { isValidEmail } from "@/lib/validation";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -197,7 +197,7 @@ export default function RegisterForm() {
             className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
               customerType === "INDIVIDUAL"
                 ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-white/10 text-foreground/60 hover:border-white/20"
+                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
             }`}
           >
             حقیقی
@@ -208,7 +208,7 @@ export default function RegisterForm() {
             className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
               customerType === "LEGAL"
                 ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-white/10 text-foreground/60 hover:border-white/20"
+                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
             }`}
           >
             حقوقی
@@ -260,12 +260,12 @@ export default function RegisterForm() {
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
-          className="mt-0.5 size-4 shrink-0 rounded border-white/20 bg-white/5"
+          className="mt-0.5 size-4 shrink-0 rounded border-foreground/20 bg-foreground/5"
           style={{ accentColor: "#f97316" }}
           required
         />
         <span>
-          <Link href="/terms" target="_blank" className="font-medium text-accent-400 transition-colors hover:text-white">
+          <Link href="/terms" target="_blank" className="font-medium text-accent-400 transition-colors hover:text-foreground">
             قوانین و مقررات
           </Link>{" "}
           را می‌پذیرم
@@ -285,7 +285,7 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={loading || !turnstileToken || !acceptedTerms}
-        className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
       </button>

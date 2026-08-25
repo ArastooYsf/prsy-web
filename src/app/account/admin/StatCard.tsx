@@ -8,7 +8,7 @@ type Props = { label: string; value: ReactNode | null; icon: LucideIcon };
 // the label is static copy, never async, so it always renders for real.
 export function StatCard({ label, value, icon: Icon }: Props) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
       <div className="flex items-center gap-2 text-foreground/60">
         <Icon className="size-4" />
         <p className="text-sm">{label}</p>

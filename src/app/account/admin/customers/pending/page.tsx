@@ -28,7 +28,7 @@ export default async function PendingCustomersPage() {
       </p>
 
       {pending.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           درخواست در انتظار تأییدی وجود ندارد.
         </p>
       ) : (
@@ -36,7 +36,7 @@ export default async function PendingCustomersPage() {
           {pending.map((customer) => (
             <div
               key={customer.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5"
             >
               <div>
                 <p className="font-semibold">{customer.companyName || customer.name || customer.email}</p>

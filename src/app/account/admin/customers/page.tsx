@@ -55,33 +55,33 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/admin/customers/export${filterQueryString(searchParams)}`}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <FileSpreadsheet className="size-4" />
             دانلود اکسل
           </a>
           <Link
             href="/account/admin/customers/pending"
-            className="relative inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="relative inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <UserCheck className="size-4" />
             درخواست‌های تأیید مشتری حقوقی
             {pendingCount > 0 && (
-              <span className="mr-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="mr-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {pendingCount}
               </span>
             )}
           </Link>
           <Link
             href="/account/admin/customers/migrate"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <Import className="size-4" />
             Migrate مشتریان قدیمی
           </Link>
           <Link
             href="/account/admin/customers/new"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
           >
             <UserPlus className="size-4" />
             افزودن مشتری
@@ -117,7 +117,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
       />
 
       {customers.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           مشتری‌ای با این مشخصات یافت نشد.
         </p>
       ) : (
@@ -130,7 +130,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-white/10 md:block">
+          <div className="hidden rounded-2xl border border-foreground/10 md:block">
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>

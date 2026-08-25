@@ -11,9 +11,11 @@ import DateInput from "@/components/admin/DateInput";
 import { slugify } from "@/lib/slugify";
 import { getMediaUrl } from "@/lib/media";
 import { useToast } from "@/components/ToastProvider";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { cn } from "@/lib/utils";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 type BlogPostFormProps = {
   mode: "create" | "edit";
@@ -32,6 +34,7 @@ type BlogPostFormProps = {
 export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
+  const isDark = useSiteTheme()?.theme === "dark";
 
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
@@ -91,10 +94,10 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex h-dvh flex-col">
-      <header className="flex shrink-0 flex-wrap items-center gap-3 border-b border-white/10 px-4 py-3 sm:px-6">
+      <header className="flex shrink-0 flex-wrap items-center gap-3 border-b border-foreground/10 px-4 py-3 sm:px-6">
         <Link
           href="/account/admin/blog"
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-white/20 hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground/20 hover:text-foreground"
         >
           <ArrowRight className="size-4" />
           بازگشت به لیست وبلاگ
@@ -114,7 +117,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
         {/* Writing panel — right side in RTL (first in DOM), full-height + independently scrollable at lg+ */}
-        <div className="border-b border-white/10 p-4 sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:border-b-0 lg:border-l">
+        <div className="border-b border-foreground/10 p-4 sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:border-b-0 lg:border-l">
           <div className="mx-auto max-w-2xl space-y-5">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-foreground/80">عنوان</label>
@@ -164,13 +167,13 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
               <RichTextEditor value={content} onChange={setContent} />
             </div>
 
-            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+            <div className="rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3">
               <label className="flex items-center gap-2 text-sm text-foreground/80">
                 <input
                   type="checkbox"
                   checked={published}
                   onChange={(e) => setPublished(e.target.checked)}
-                  className="h-4 w-4 rounded border-white/20 accent-accent-500"
+                  className="h-4 w-4 rounded border-foreground/20 accent-accent-500"
                 />
                 منتشر شود
               </label>
@@ -185,17 +188,20 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
         </div>
 
         {/* Preview panel — left side in RTL, full-height + independently scrollable at lg+ */}
-        <div className="bg-white/[0.02] p-4 sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <div className="bg-foreground/[0.02] p-4 sm:p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
           <div className="mx-auto max-w-2xl">
             <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-foreground/40">پیش‌نمایش زنده</p>
             <h1 className="text-balance text-2xl font-bold leading-tight sm:text-3xl">{title || "عنوان پست"}</h1>
             {coverImage && (
-              <div className="relative mt-6 aspect-video w-full overflow-hidden rounded-2xl border border-white/10">
+              <div className="relative mt-6 aspect-video w-full overflow-hidden rounded-2xl border border-foreground/10">
                 <Image src={getMediaUrl(coverImage)} alt="" fill sizes="(min-width: 1024px) 42rem, 100vw" className="object-cover" />
               </div>
             )}
             <div
-              className="prose prose-invert prose-sm mt-6 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400"
+              className={cn(
+                "prose prose-sm mt-6 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400",
+                isDark && "prose-invert",
+              )}
               dangerouslySetInnerHTML={{
                 __html:
                   content && content !== "<p></p>"

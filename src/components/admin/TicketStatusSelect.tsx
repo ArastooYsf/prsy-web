@@ -28,7 +28,7 @@ export default function TicketStatusSelect({ ticketId, status }: { ticketId: str
       value={value}
       disabled={saving}
       onChange={(e) => handleChange(e.target.value)}
-      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50 disabled:opacity-60"
+      className="rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-1.5 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50 disabled:opacity-60"
     >
       {OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value} className="bg-background">

@@ -58,7 +58,7 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/admin/contracts/export${filterQueryString(searchParams)}`}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <FileSpreadsheet className="size-4" />
             دانلود اکسل
@@ -66,7 +66,7 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
           {isAdmin && (
             <Link
               href="/account/admin/contracts/new"
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
             >
               <Plus className="size-4" />
               ثبت قرارداد جدید
@@ -96,7 +96,7 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
       />
 
       {contracts.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           قراردادی با این مشخصات یافت نشد.
         </p>
       ) : (
@@ -109,7 +109,7 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-white/10 md:block">
+          <div className="hidden rounded-2xl border border-foreground/10 md:block">
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>

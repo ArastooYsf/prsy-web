@@ -7,7 +7,7 @@ import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 type ProfileFormProps = {
   role: string;
@@ -86,7 +86,7 @@ export default function ProfileForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <h3 className="text-base font-bold">اطلاعات شخصی</h3>
 
       <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} nameForAlt={name || email} />
@@ -147,7 +147,7 @@ export default function ProfileForm({
       )}
 
       {isLegalCustomer && (
-        <div className="grid grid-cols-1 gap-5 border-t border-white/10 pt-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 border-t border-foreground/10 pt-5 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام شرکت</label>
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={inputClass} />
@@ -167,7 +167,7 @@ export default function ProfileForm({
       <button
         type="submit"
         disabled={saving}
-        className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "در حال ذخیره..." : "ذخیره تغییرات"}
       </button>

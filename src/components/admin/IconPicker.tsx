@@ -22,7 +22,7 @@ export default function IconPicker({ value, onChange }: IconPickerProps) {
             className={`flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
               value === key
                 ? "border-accent-500 bg-accent-500/15 text-accent-400"
-                : "border-white/10 text-foreground/60 hover:border-white/20 hover:text-foreground"
+                : "border-foreground/10 text-foreground/60 hover:border-foreground/20 hover:text-foreground"
             }`}
           >
             {CATEGORY_ICONS[key]}

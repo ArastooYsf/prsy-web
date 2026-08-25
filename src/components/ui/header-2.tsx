@@ -18,7 +18,7 @@ import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
 import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
 import AuthNavLink from '@/components/AuthNavLink';
-import { useLandingTheme } from '@/components/RouteThemeScope';
+import { useSiteTheme } from '@/components/RouteThemeScope';
 import type { ProductCategoryContent } from '@/lib/site-content-defaults';
 
 // How far (in px) the user needs to scroll before the header's ambient glow
@@ -28,7 +28,7 @@ const GLOW_MAX_SHADOW = '0 8px 40px -4px rgba(249, 115, 22, 0.25)';
 // This is a hardcoded rgba string driven straight through framer-motion's
 // style prop, not a Tailwind class, so it can't pick up the CSS-variable
 // override .theme-white-blue uses elsewhere — it needs its own blue variant,
-// picked at render time by route (see isLandingPage below).
+// picked at render time from the live theme (see isLightTheme below).
 const GLOW_MAX_SHADOW_BLUE = '0 8px 40px -4px rgba(37, 99, 235, 0.25)';
 
 // The hover "speed bump" indicator: a full-nav-height silhouette — a rounded
@@ -66,9 +66,8 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
 	const isAccountArea = pathname?.startsWith('/account');
-	const isLandingPage = pathname === '/';
-	const landingTheme = useLandingTheme();
-	const isLightTheme = isLandingPage && landingTheme?.theme !== 'dark';
+	const siteTheme = useSiteTheme();
+	const isLightTheme = siteTheme?.theme !== 'dark';
 
 	// The mobile drawer is `position:fixed`, so its `top` offset has to match
 	// the header's actual rendered height in px — not a hardcoded Tailwind
@@ -375,7 +374,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						</Button>
 						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
 						<AuthNavLink variant="icon" />
-						{isLandingPage && <ThemeToggleButton />}
+						<ThemeToggleButton />
 					</div>
 				</div>
 				<Button
@@ -451,7 +450,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 							onNavigate={() => setOpen(false)}
 						/>
 						<AuthNavLink variant="block" onNavigate={() => setOpen(false)} />
-						{isLandingPage && <ThemeToggleButton fullWidth />}
+						<ThemeToggleButton fullWidth />
 					</div>
 				</div>
 			</div>

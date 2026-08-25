@@ -13,11 +13,11 @@ const NOTIFICATION_OPTIONS = [
 // and these toggles stay disabled until that's built.
 export default function NotificationSettingsPreview() {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <div className="flex items-center gap-2">
         <Bell className="size-4 text-foreground/50" />
         <h3 className="text-base font-bold">تنظیمات اعلان</h3>
-        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium text-foreground/50">
+        <span className="rounded-full border border-foreground/10 bg-foreground/5 px-2.5 py-0.5 text-[11px] font-medium text-foreground/50">
           به‌زودی قابل تنظیم
         </span>
       </div>
@@ -31,7 +31,7 @@ export default function NotificationSettingsPreview() {
             <span>{opt.label}</span>
             <span
               dir="ltr"
-              className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-white/15"
+              className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-foreground/15"
               aria-disabled="true"
             >
               <span className="inline-block size-3.5 translate-x-[4px] rounded-full bg-white shadow-sm" />

@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizeRichText } from "@/lib/sanitize";
 import BlogViewTracker from "@/components/BlogViewTracker";
+import ThemedProse from "@/components/ui/ThemedProse";
+import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 export const revalidate = 60;
 
@@ -47,7 +49,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <article className="relative pb-20 pt-14 sm:pb-28 sm:pt-20">
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+      <ThemedGridBackdrop />
       <BlogViewTracker postId={post.id} />
       <div className="container relative">
         <div className="mx-auto max-w-2xl">
@@ -58,7 +60,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {canEdit && (
               <Link
                 href={`/account/admin/blog/${post.id}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-1.5 text-xs font-semibold text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-4 py-1.5 text-xs font-semibold text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path
@@ -81,7 +83,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           <h1 className="mt-2 text-balance text-3xl font-bold leading-tight sm:text-4xl">{post.title}</h1>
 
           {post.coverImage && (
-            <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl border border-white/10">
+            <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl border border-foreground/10">
               <Image
                 src={getMediaUrl(post.coverImage)}
                 alt={post.title}
@@ -93,9 +95,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
           )}
 
-          <div
-            className="prose prose-invert prose-sm mt-8 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400"
-            dangerouslySetInnerHTML={{ __html: safeContent }}
+          <ThemedProse
+            html={safeContent}
+            className="prose prose-sm mt-8 max-w-none leading-8 sm:prose-base [&_a]:text-accent-400"
           />
         </div>
       </div>

@@ -6,7 +6,7 @@ import { Save } from "lucide-react";
 import type { FooterContactContent } from "@/lib/site-content";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function FooterContactForm({ initialContact }: { initialContact: FooterContactContent }) {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function FooterContactForm({ initialContact }: { initialContact: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="mb-1.5 block text-sm font-medium text-foreground/80">آدرس</label>

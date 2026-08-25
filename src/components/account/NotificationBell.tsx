@@ -66,7 +66,7 @@ function NotificationRow({
         if (!notification.read) onRead(notification.id);
         onNavigate();
       }}
-      className="block px-4 py-3 hover:bg-white/5"
+      className="block px-4 py-3 hover:bg-foreground/5"
     >
       {content}
     </Link>
@@ -74,7 +74,7 @@ function NotificationRow({
     <button
       type="button"
       onClick={() => !notification.read && onRead(notification.id)}
-      className="block w-full px-4 py-3 text-right hover:bg-white/5"
+      className="block w-full px-4 py-3 text-right hover:bg-foreground/5"
     >
       {content}
     </button>
@@ -132,11 +132,11 @@ export default function NotificationBell() {
         <button
           type="button"
           aria-label="اعلان‌ها"
-          className="relative flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground/70 transition-colors hover:border-accent-500/30 hover:text-foreground"
+          className="relative flex size-10 items-center justify-center rounded-full border border-foreground/10 bg-foreground/5 text-foreground/70 transition-colors hover:border-accent-500/30 hover:text-foreground"
         >
           <Bell className="size-4" />
           {unreadCount > 0 && (
-            <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-white">
+            <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-primary-foreground">
               {unreadCount > 9 ? "۹+" : formatNumber(unreadCount)}
             </span>
           )}
@@ -148,9 +148,9 @@ export default function NotificationBell() {
           align="end"
           sideOffset={8}
           collisionPadding={12}
-          className="z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-white/10 bg-background shadow-2xl"
+          className="z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
         >
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
             <p className="text-sm font-bold">اعلان‌ها</p>
             {unreadCount > 0 && (
               <button
@@ -168,7 +168,7 @@ export default function NotificationBell() {
             {notifications?.length === 0 ? (
               <p className="p-6 text-center text-sm text-foreground/50">اعلانی وجود ندارد.</p>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-foreground/5">
                 {rows.map((n, i) => (
                   <NotificationRow key={n?.id ?? i} notification={n} onRead={markRead} onNavigate={() => setOpen(false)} />
                 ))}

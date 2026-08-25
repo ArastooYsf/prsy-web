@@ -15,19 +15,19 @@ export default function Loading() {
           مشتریان
         </h2>
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70">
+          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70">
             <FileSpreadsheet className="size-4" />
             دانلود اکسل
           </span>
-          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70">
+          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70">
             <UserCheck className="size-4" />
             درخواست‌های تأیید مشتری حقوقی
           </span>
-          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/10 px-4 text-sm font-medium text-foreground/70">
+          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70">
             <Import className="size-4" />
             Migrate مشتریان قدیمی
           </span>
-          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25">
+          <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25">
             <UserPlus className="size-4" />
             افزودن مشتری
           </span>
@@ -69,7 +69,7 @@ export default function Loading() {
       </div>
 
       {/* Desktop/tablet: table */}
-      <div className="hidden rounded-2xl border border-white/10 md:block">
+      <div className="hidden rounded-2xl border border-foreground/10 md:block">
         <table className="w-full text-sm">
           <thead className="text-foreground/60">
             <tr>

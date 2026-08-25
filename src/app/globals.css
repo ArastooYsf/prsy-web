@@ -60,8 +60,8 @@ body {
 }
 
 ::selection {
-  background-color: #f97316;
-  color: #ffffff;
+  background-color: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
 }
 
 @layer utilities {
@@ -85,15 +85,16 @@ body {
   }
 }
 
-/* White + blue palette preview, scoped to the landing page only (applied via
-   RouteThemeScope when pathname === "/"). Deliberately unlayered (outside
-   @tailwind's utilities layer) so it beats Tailwind's generated utility
-   rules regardless of selector specificity — CSS Cascade Layers give
-   unlayered styles priority over any layered ones. Chosen with ui-ux-pro-max
-   (--domain color, "industrial B2B trust" profile): navy text on white/slate
-   surfaces, a single restrained blue (Tailwind's blue-600, not the brighter
-   500) as the one signal color, matching this site's existing "One Signal
-   Rule" — just swapping which hue plays that role. */
+/* Site-wide white + blue light theme, applied via RouteThemeScope's toggle
+   (see ThemeToggleButton) on top of the default dark/orange theme in :root
+   above. Deliberately unlayered (outside @tailwind's utilities layer) so it
+   beats Tailwind's generated utility rules regardless of selector
+   specificity — CSS Cascade Layers give unlayered styles priority over any
+   layered ones. Chosen with ui-ux-pro-max (--domain color, "industrial B2B
+   trust" profile): navy text on white/slate surfaces, a single restrained
+   blue (Tailwind's blue-600, not the brighter 500) as the one signal color,
+   matching this site's existing "One Signal Rule" — just swapping which hue
+   plays that role. */
 .theme-white-blue {
   --background: 248 250 252; /* slate-50 */
   --foreground: 15 23 42; /* slate-900 */

@@ -58,7 +58,7 @@ export default function CsvImportForm() {
         اول همیشه به‌عنوان سرتیتر نادیده گرفته می‌شود. مشتریان ایمپورت‌شده به‌صورت «حقیقی» و «تأییدشده» ثبت می‌شوند.
       </p>
 
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-6 py-6 text-center transition-colors hover:border-accent-500/40">
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-foreground/15 px-6 py-6 text-center transition-colors hover:border-accent-500/40">
         <input ref={fileInputRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
         <span className="text-sm font-medium text-foreground/80">برای انتخاب فایل CSV کلیک کنید</span>
         <span className="text-xs text-foreground/50">یا محتوای CSV را مستقیم پایین بچسبانید</span>
@@ -70,7 +70,7 @@ export default function CsvImportForm() {
         rows={8}
         dir="ltr"
         placeholder={"name,email,phone,notes\nعلی رضایی,ali@example.com,09120000000,مشتری قدیمی از سال 1401"}
-        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 font-mono text-xs text-foreground placeholder:text-foreground/30 outline-none transition-colors focus:border-accent-500/50"
+        className="w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 font-mono text-xs text-foreground placeholder:text-foreground/30 outline-none transition-colors focus:border-accent-500/50"
       />
 
       {result && result.skipped.length > 0 && (

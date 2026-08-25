@@ -32,7 +32,7 @@ export default function ConfirmDialog({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[85vh] w-full max-w-sm flex-col rounded-2xl border border-white/10 bg-background p-5 shadow-2xl"
+        className="flex max-h-[85vh] w-full max-w-sm flex-col rounded-2xl border border-foreground/10 bg-background p-5 shadow-2xl"
       >
         <h3 className="text-base font-bold">{title}</h3>
         <p className="mt-2 overflow-y-auto whitespace-pre-line text-sm leading-6 text-foreground/70">{message}</p>
@@ -40,7 +40,7 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-white/20"
+            className="rounded-full border border-foreground/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground/20"
           >
             {cancelLabel}
           </button>
@@ -48,10 +48,10 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className={`rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold shadow-lg transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
               danger
-                ? "bg-red-500 shadow-red-500/25 hover:bg-red-600"
-                : "bg-accent-500 shadow-accent-500/25 hover:bg-accent-600"
+                ? "bg-red-500 text-destructive-foreground shadow-red-500/25 hover:bg-red-600"
+                : "bg-accent-500 text-primary-foreground shadow-accent-500/25 hover:bg-accent-600"
             }`}
           >
             {loading ? "..." : confirmLabel}

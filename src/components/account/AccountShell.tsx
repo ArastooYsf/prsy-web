@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import AdminSearchBox from "@/components/admin/AdminSearchBox";
 import NotificationBell from "@/components/account/NotificationBell";
+import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
 
 // The blog editor (new + edit) owns its own full-screen split-panel layout
 // (see /account/admin/blog/[id] and /account/admin/blog/new) — no sidebar,
@@ -40,7 +41,7 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
               : "container flex min-h-0 flex-1 flex-col py-6 sm:py-12"
           }
         >
-          <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-8 flex flex-col gap-4 border-b border-foreground/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-medium text-foreground/50">حساب کاربری</p>
               <h1 className="mt-1 text-xl font-bold sm:text-2xl">
@@ -50,6 +51,7 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
             <div className="flex items-center gap-3 sm:justify-end">
               {isAdmin && canSearch && <AdminSearchBox />}
               <NotificationBell />
+              <ThemeToggleButton />
             </div>
           </div>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>

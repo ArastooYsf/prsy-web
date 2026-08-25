@@ -22,7 +22,7 @@ export default function MigrateCustomersPage() {
       </p>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
           <h3 className="mb-4 text-base font-bold">ثبت دستی یک مشتری</h3>
           <CustomerForm
             submitLabel="ثبت مشتری قدیمی"
@@ -31,7 +31,7 @@ export default function MigrateCustomersPage() {
           />
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <section className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
           <h3 className="mb-4 text-base font-bold">ایمپورت گروهی از CSV</h3>
           <CsvImportForm />
         </section>

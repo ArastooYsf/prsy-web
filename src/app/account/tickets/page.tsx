@@ -25,7 +25,7 @@ export default async function AccountTicketsPage() {
         </h2>
         <Link
           href="/account/tickets/new"
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
         >
           <Plus className="size-4" />
           ثبت تیکت جدید
@@ -33,7 +33,7 @@ export default async function AccountTicketsPage() {
       </div>
 
       {tickets.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center text-sm text-foreground/60">
+        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
           هنوز تیکتی ثبت نکرده‌اید.
         </p>
       ) : (

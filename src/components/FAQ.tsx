@@ -12,7 +12,7 @@ function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   return (
     <span
       className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
-        isOpen ? "border-accent-500/40 text-accent-400" : "border-white/10"
+        isOpen ? "border-accent-500/40 text-accent-400" : "border-foreground/10"
       }`}
     >
       <motion.span
@@ -34,7 +34,7 @@ export default function FAQ({ full = false }: { full?: boolean }) {
   const items = full ? FAQS : FAQS.slice(0, PREVIEW_COUNT);
 
   return (
-    <section id="faq" className="section-padding relative border-t border-white/10">
+    <section id="faq" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <motion.div
           initial="hidden"
@@ -69,7 +69,7 @@ export default function FAQ({ full = false }: { full?: boolean }) {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer(0.08)}
-          className="mx-auto mt-14 max-w-3xl divide-y divide-white/10 sm:mt-16"
+          className="mx-auto mt-14 max-w-3xl divide-y divide-foreground/10 sm:mt-16"
         >
           {items.map((faq, index) => {
             const isOpen = openIndex === index;
@@ -120,7 +120,7 @@ export default function FAQ({ full = false }: { full?: boolean }) {
           >
             <Link
               href="/faq"
-              className="group inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors duration-300 hover:text-white"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors duration-300 hover:text-foreground"
             >
               مشاهده همه سوالات متداول
               <svg

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ToastProvider";
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 export default function PasswordForm() {
   const { showToast } = useToast();
@@ -48,7 +48,7 @@ export default function PasswordForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <h3 className="text-base font-bold">تغییر رمز عبور</h3>
 
       <div>
@@ -88,7 +88,7 @@ export default function PasswordForm() {
       <button
         type="submit"
         disabled={saving}
-        className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full border border-foreground/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-foreground/5 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "در حال ذخیره..." : "تغییر رمز عبور"}
       </button>

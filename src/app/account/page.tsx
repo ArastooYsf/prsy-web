@@ -71,7 +71,7 @@ export default async function AccountOverviewPage() {
           <Link
             key={stat.label}
             href={stat.href}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-accent-500/30"
+            className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 transition-colors hover:border-accent-500/30"
           >
             <div className="flex items-center gap-2 text-foreground/60">
               <stat.icon className="size-4" />
@@ -82,12 +82,12 @@ export default async function AccountOverviewPage() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+      <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
         <h2 className="text-base font-bold">آخرین فعالیت‌ها</h2>
         {activity.length === 0 ? (
           <p className="mt-4 text-sm text-foreground/60">هنوز فعالیتی ثبت نشده است.</p>
         ) : (
-          <div className="mt-4 divide-y divide-white/10">
+          <div className="mt-4 divide-y divide-foreground/10">
             {activity.map((item) => (
               <Link
                 key={item.key}

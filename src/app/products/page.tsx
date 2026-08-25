@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
 import { getProductCategories } from "@/lib/site-content";
+import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 export const metadata: Metadata = {
   title: "محصولات",
@@ -15,9 +16,9 @@ export default async function ProductsPage() {
   return (
     <>
       <section className="relative overflow-hidden pb-8 pt-14 sm:pt-20">
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+        <ThemedGridBackdrop />
         <div className="container relative text-center">
-          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
             محصولات و خدمات
           </span>

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "@/lib/motion";
+import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 type ErrorPageShellProps = {
   code: string;
@@ -28,7 +29,7 @@ export default function ErrorPageShell({
 }: ErrorPageShellProps) {
   return (
     <section className="section-padding relative flex min-h-[70vh] items-center overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-grid-pattern bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_40%,transparent_100%)]" />
+      <ThemedGridBackdrop />
       <div className="container relative z-10">
         <motion.div
           initial="hidden"
@@ -54,14 +55,14 @@ export default function ErrorPageShell({
           <motion.div variants={fadeInUp} className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href={primaryHref}
-              className="rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30"
+              className="rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-xl hover:shadow-accent-500/30"
             >
               {primaryLabel}
             </Link>
             {secondaryHref && secondaryLabel && (
               <Link
                 href={secondaryHref}
-                className="rounded-full border border-white/10 px-7 py-3.5 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+                className="rounded-full border border-foreground/10 px-7 py-3.5 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
               >
                 {secondaryLabel}
               </Link>

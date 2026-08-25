@@ -30,7 +30,7 @@ export default function SearchDropdownBanner({
         {imageSrc ? (
           <Image src={imageSrc} alt="" fill sizes="56px" className="object-cover" />
         ) : (
-          <Sparkles className="size-6 text-white" />
+          <Sparkles className="size-6 text-primary-foreground" />
         )}
       </div>
 

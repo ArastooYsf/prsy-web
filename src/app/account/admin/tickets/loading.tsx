@@ -34,7 +34,7 @@ export default function Loading() {
       </div>
 
       {/* Desktop/tablet: table */}
-      <div className="hidden rounded-2xl border border-white/10 md:block">
+      <div className="hidden rounded-2xl border border-foreground/10 md:block">
         <table className="w-full text-sm">
           <thead className="text-foreground/60">
             <tr>

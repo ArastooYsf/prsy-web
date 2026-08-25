@@ -69,7 +69,7 @@ export default function TermsPage() {
           برای هرگونه سوال درباره این قوانین، از طریق{" "}
           <Link
             href="/contact"
-            className="font-semibold text-accent-400 transition-colors hover:text-white"
+            className="font-semibold text-accent-400 transition-colors hover:text-foreground"
           >
             صفحه تماس با ما
           </Link>{" "}

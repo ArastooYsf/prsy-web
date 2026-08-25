@@ -6,7 +6,7 @@ import ConsultationForm from "@/components/ConsultationForm";
 
 export default function ConsultationSection() {
   return (
-    <section id="consultation" className="section-padding relative border-t border-white/10">
+    <section id="consultation" className="section-padding relative border-t border-foreground/10">
       <div className="container">
         <motion.div
           initial="hidden"

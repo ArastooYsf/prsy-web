@@ -6,7 +6,7 @@ import { ShieldCheck, ShieldOff } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
 
 const codeInputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm tracking-[0.5em] text-foreground outline-none transition-colors focus:border-accent-500/50";
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-center text-sm tracking-[0.5em] text-foreground outline-none transition-colors focus:border-accent-500/50";
 
 type SetupState = { secret: string; qrCodeDataUrl: string } | null;
 
@@ -74,7 +74,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
   }
 
   return (
-    <div className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+    <div className="space-y-5 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-bold">احراز هویت دومرحله‌ای</h3>
         {enabled ? (
@@ -83,7 +83,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
             فعال
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-foreground/50">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1 text-xs font-semibold text-foreground/50">
             <ShieldOff className="size-3.5" />
             غیرفعال
           </span>
@@ -100,7 +100,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
           type="button"
           onClick={startSetup}
           disabled={loading}
-          className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "در حال آماده‌سازی..." : "فعال‌سازی احراز هویت دومرحله‌ای"}
         </button>
@@ -108,7 +108,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
 
       {!enabled && setup && (
         <form onSubmit={confirmSetup} className="space-y-4">
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-5">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-foreground/10 bg-foreground/5 p-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={setup.qrCodeDataUrl} alt="QR کد احراز هویت دومرحله‌ای" className="size-44 rounded-lg bg-white p-2" />
             <p dir="ltr" className="break-all text-center text-xs text-foreground/50">
@@ -137,7 +137,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
             <button
               type="submit"
               disabled={loading || code.length !== 6}
-              className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "در حال بررسی..." : "تأیید و فعال‌سازی"}
             </button>
@@ -147,7 +147,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
                 setSetup(null);
                 setCode("");
               }}
-              className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
+              className="rounded-full border border-foreground/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-foreground/5"
             >
               انصراف
             </button>
@@ -197,7 +197,7 @@ export default function TwoFactorSetup({ initialEnabled }: { initialEnabled: boo
                 setShowDisable(false);
                 setCode("");
               }}
-              className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-white/5"
+              className="rounded-full border border-foreground/15 px-7 py-3 text-sm font-semibold transition-colors hover:bg-foreground/5"
             >
               انصراف
             </button>

@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { LifeBuoy, User, MoreVertical, ListChecks, Trash2, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
+import { triggerBlobDownload } from "@/lib/blob-download";
 import { cn } from "@/lib/utils";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import EmojiPicker from "@/components/EmojiPicker";
@@ -595,14 +596,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       try {
         const res = await fetch(getMediaUrl(a.url));
         const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = a.filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(blobUrl);
+        triggerBlobDownload(blob, a.filename);
       } catch {
         showToast("خطا در دانلود فایل.", "error");
       }

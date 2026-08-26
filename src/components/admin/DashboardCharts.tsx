@@ -17,7 +17,7 @@ import {
 import { Eye } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import type { StatusCount, TrendPoint } from "@/lib/admin-stats";
-import { RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
+import { ALL_STATS_RANGES, RANGE_LABELS, type StatsRange } from "@/lib/stats-range";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
@@ -39,9 +39,10 @@ const TICKET_STATUS_COLORS: Record<string, string> = {
 const CONTRACT_COLOR = "#f97316";
 const ORDER_COLOR = "#60a5fa";
 
-const RANGE_OPTIONS: StatsRange[] = ["today", "7d", "30d", "1y", "all"];
-
-const tooltipStyle = {
+// Exported so every recharts-based admin card (this file and
+// LogsDashboardCharts.tsx) shares one tooltip/axis-tick treatment instead of
+// each redeclaring the same style objects.
+export const tooltipStyle = {
   backgroundColor: "rgb(var(--popover))",
   border: "1px solid rgb(var(--foreground) / 0.1)",
   borderRadius: 12,
@@ -49,26 +50,41 @@ const tooltipStyle = {
   direction: "rtl" as const,
 };
 
-const tooltipLabelStyle = { color: "rgb(var(--popover-foreground))" };
+export const tooltipLabelStyle = { color: "rgb(var(--popover-foreground))" };
+export const axisTick = { fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 };
 
-function ChartCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+// `height` defaults to this file's own cards (h-64); LogsDashboardCharts.tsx
+// passes a smaller value for its denser card grid.
+export function ChartCard({
+  title,
+  action,
+  height = 64,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  height?: 56 | 64;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold text-foreground/80">{title}</p>
         {action}
       </div>
-      <div dir="ltr" className="h-64 w-full">
+      <div dir="ltr" className={height === 56 ? "h-56 w-full" : "h-64 w-full"}>
         {children}
       </div>
     </div>
   );
 }
 
-function RangeFilter({ value, onChange, disabled }: { value: StatsRange; onChange: (r: StatsRange) => void; disabled?: boolean }) {
+// Exported so other range-filterable charts on the admin side (e.g. the logs
+// dashboard's event trend) reuse this exact filter instead of rebuilding it.
+export function RangeFilter({ value, onChange, disabled }: { value: StatsRange; onChange: (r: StatsRange) => void; disabled?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-1">
-      {RANGE_OPTIONS.map((r) => (
+      {ALL_STATS_RANGES.map((r) => (
         <button
           key={r}
           type="button"
@@ -96,12 +112,18 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
     if (next === range) return;
     setRange(next);
     setLoading(true);
-    const res = await fetch(`/api/admin/dashboard/trend?range=${next}`);
-    if (res.ok) {
-      const body = await res.json();
-      setData(body.trend);
+    try {
+      const res = await fetch(`/api/admin/dashboard/trend?range=${next}`);
+      if (res.ok) {
+        const body = await res.json();
+        setData(body.trend);
+      }
+    } catch {
+      // Network failure: leave the previous data showing rather than
+      // getting permanently stuck with every range button disabled.
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -109,8 +131,8 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} interval={range === "1y" || range === "all" ? 0 : "preserveStartEnd"} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <XAxis dataKey="label" tick={axisTick} interval={range === "1y" || range === "all" ? 0 : "preserveStartEnd"} />
+          <YAxis allowDecimals={false} tick={axisTick} width={28} tickFormatter={formatNumber} />
           <Tooltip
             contentStyle={tooltipStyle}
             labelStyle={tooltipLabelStyle}
@@ -138,12 +160,18 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
     if (next === range) return;
     setRange(next);
     setLoading(true);
-    const res = await fetch(`/api/admin/dashboard/pageviews?range=${next}`);
-    if (res.ok) {
-      const body = await res.json();
-      setCount(body.count);
+    try {
+      const res = await fetch(`/api/admin/dashboard/pageviews?range=${next}`);
+      if (res.ok) {
+        const body = await res.json();
+        setCount(body.count);
+      }
+    } catch {
+      // Network failure: leave the previous count showing rather than
+      // getting permanently stuck with every range button disabled.
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -166,8 +194,8 @@ export function OrderStatusChart({ data }: { data: StatusCount[] }) {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} />
-          <YAxis allowDecimals={false} tick={{ fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 }} width={28} tickFormatter={formatNumber} />
+          <XAxis dataKey="label" tick={axisTick} />
+          <YAxis allowDecimals={false} tick={axisTick} width={28} tickFormatter={formatNumber} />
           <Tooltip
             contentStyle={tooltipStyle}
             labelStyle={tooltipLabelStyle}

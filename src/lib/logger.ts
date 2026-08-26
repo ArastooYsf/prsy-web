@@ -3,6 +3,23 @@ import os from "os";
 import path from "path";
 import { toJalaali } from "jalaali-js";
 import { formatJalaliDateTime } from "@/lib/jalali";
+import {
+  ACTION_LABELS_FA,
+  CATEGORY_LABELS_FA,
+  DAILY_CATEGORIES,
+  EVENT_CATEGORIES,
+  type LogAction,
+  type LogActor,
+  type LogCategory,
+  type LogEntry,
+  type LogTarget,
+} from "@/lib/log-types";
+
+// Re-exported so existing server-side imports from "@/lib/logger" keep
+// working unchanged — see log-types.ts for why these live in their own
+// Node-free module in the first place.
+export { ACTION_LABELS_FA, DAILY_CATEGORIES, EVENT_CATEGORIES };
+export type { LogAction, LogActor, LogCategory, LogEntry, LogTarget };
 
 // Deliberately OUTSIDE the app's own checked-out directory (process.cwd()):
 // a redeploy (fresh checkout, `git clean`, container rebuild) wipes that
@@ -49,9 +66,12 @@ export const LOG_DIR_SIZE_CAP_BYTES = 300 * 1024 * 1024; // 300MB
 // (delivery success/failure of outbound notifications) since it already had
 // a real producer (src/lib/notifications/events.ts) and dropping it would
 // lose that granularity for no reason.
-export const DAILY_CATEGORIES = ["general", "important", "access", "notification"] as const;
-export const EVENT_CATEGORIES = ["crash", "security"] as const;
-export type LogCategory = (typeof DAILY_CATEGORIES)[number] | (typeof EVENT_CATEGORIES)[number];
+//
+// The categories/actions/entry shape themselves live in @/lib/log-types
+// (imported above), not here — that module has no Node-only imports, so
+// client components can pull in things like ACTION_LABELS_FA without
+// dragging this file's fs/promises-based implementation into the browser
+// bundle.
 
 function isEventCategory(category: LogCategory): boolean {
   return (EVENT_CATEGORIES as readonly string[]).includes(category);
@@ -60,19 +80,6 @@ function isEventCategory(category: LogCategory): boolean {
 // How close together (by the target file's last-write time) two crash/security
 // events have to be to share one file instead of each getting its own.
 const EVENT_GROUPING_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
-
-export type LogAction =
-  | "create"
-  | "update"
-  | "delete"
-  | "status_change"
-  | "approval_change"
-  | "role_change"
-  | "login_failed"
-  | "unauthorized_access"
-  | "crash"
-  | "notification_sent"
-  | "notification_failed";
 
 // A caller can always pass an explicit `category`; this is only the default
 // when they don't (the existing admin CRUD call sites don't, so this alone
@@ -86,30 +93,6 @@ const ACTION_DEFAULT_CATEGORY: Partial<Record<LogAction, LogCategory>> = {
   crash: "crash",
   notification_sent: "notification",
   notification_failed: "notification",
-};
-
-export type LogActor = {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-};
-
-export type LogTarget = {
-  type: string;
-  id: string;
-  /** Human-readable label, e.g. «تیکت «سوال درباره گارانتی»» — never just a raw id. */
-  label: string;
-};
-
-export type LogEntry = {
-  timestamp: string; // ISO
-  category: LogCategory;
-  actor: LogActor;
-  action: LogAction;
-  target: LogTarget;
-  /** Extra detail beyond the verb, e.g. "از «باز» به «بسته‌شده»". */
-  summary?: string;
 };
 
 export function actorFromSession(session: {
@@ -323,6 +306,36 @@ export type LogFileSummary = {
   modifiedAt: string;
 };
 
+/**
+ * Filenames only, for one or more categories (or "all") — stops at
+ * statAllLogFiles()'s stat+lock-check pass and never reads a file's
+ * content, unlike listLogFiles() (which reads every file just to compute
+ * entryCount for the file-list UI). For a caller that only needs "which
+ * files am I about to zip", that per-file content read would be pure waste,
+ * doubled again once the export itself reads each file for real.
+ */
+export async function listLogFilenames(category: LogCategory[] | "all"): Promise<string[]> {
+  const base = await statAllLogFiles();
+  return base
+    .filter((f) => category === "all" || category.includes(categoryFromFilename(f.filename) as LogCategory))
+    .map((f) => f.filename);
+}
+
+export type LogFileMetaSummary = { filename: string; category: LogCategory; modifiedAt: string };
+
+/**
+ * Same "stat-only, no content read" shape as listLogFilenames, but keeps
+ * category/modifiedAt per file instead of flattening to bare filenames — for
+ * callers (the trend chart's range-refetch endpoint) that need to filter by
+ * category/window before reading, but have no use for entryCount/size/locked.
+ */
+export async function listLogFileMetas(): Promise<LogFileMetaSummary[]> {
+  const base = await statAllLogFiles();
+  return base
+    .map(({ filename, mtime }) => ({ filename, category: categoryFromFilename(filename), modifiedAt: mtime }))
+    .filter((f): f is LogFileMetaSummary => f.category !== null);
+}
+
 export async function listLogFiles(): Promise<LogFileSummary[]> {
   const base = await statAllLogFiles();
 
@@ -337,31 +350,74 @@ export async function listLogFiles(): Promise<LogFileSummary[]> {
   return summaries.sort((a, b) => b.modifiedAt.localeCompare(a.modifiedAt));
 }
 
-const ACTION_LABELS_FA: Record<LogAction, string> = {
-  create: "ایجاد کرد",
-  update: "ویرایش کرد",
-  delete: "حذف کرد",
-  status_change: "تغییر وضعیت داد",
-  approval_change: "وضعیت تأیید را تغییر داد",
-  role_change: "نقش را تغییر داد",
-  login_failed: "تلاش ورود ناموفق داشت",
-  unauthorized_access: "تلاش دسترسی غیرمجاز انجام داد",
-  crash: "با خطای سیستمی مواجه شد",
-  notification_sent: "اعلان ارسال کرد",
-  notification_failed: "ارسال اعلان ناموفق بود",
-};
+export type LogFileMeta = Omit<LogFileSummary, "filename" | "entryCount">;
 
-export function formatLogEntryHuman(entry: LogEntry): string {
-  const dateTimeStr = formatJalaliDateTime(entry.timestamp);
-  const actorName = entry.actor.name || entry.actor.email || "کاربر ناشناس";
-  const actorLabel = `${actorName} (${entry.actor.role})`;
-  const verb = ACTION_LABELS_FA[entry.action] ?? entry.action;
-  const detail = entry.summary ? ` — ${entry.summary}` : "";
-  return `${dateTimeStr} — ${actorLabel} ${entry.target.label} را ${verb}${detail}`;
+/**
+ * Metadata for exactly one file (category/size/locked/modifiedAt), without
+ * the listLogFiles() cost of statting and reading every other file in the
+ * directory — for the detail page, which already reads this file's entries
+ * itself and only needs its own stats alongside them.
+ */
+export async function getLogFileMeta(filename: string): Promise<LogFileMeta | null> {
+  if (!isValidLogFilename(filename)) return null;
+  try {
+    const fileStat = await stat(path.join(LOG_DIR, filename));
+    const locked = await isLogFileLocked(filename);
+    const category = categoryFromFilename(filename) ?? "general";
+    return { category, size: fileStat.size, locked, modifiedAt: fileStat.mtime.toISOString() };
+  } catch {
+    return null;
+  }
 }
 
-export async function formatLogFileAsText(filename: string): Promise<string> {
+
+const CSV_COLUMNS = ["زمان", "دسته", "نوع عملیات", "کاربر انجام‌دهنده", "ایمیل کاربر", "نقش کاربر", "موجودیت هدف", "نوع موجودیت", "آدرس IP", "User Agent", "توضیحات"];
+
+// A cell starting with =, +, -, @, or a tab/CR can be read as a formula by
+// Excel/LibreOffice/Sheets on open (CSV/DDE injection) — several fields here
+// (actor name, target label, summary) can hold user-supplied text (e.g. a
+// customer's ticket subject), not just values this app generated itself.
+const FORMULA_INJECTION_PREFIX = /^[=+\-@\t\r]/;
+
+// A field needs quoting the moment it could be misread as more than one
+// field or run past its own line — a bare comma or newline would otherwise
+// silently shift every later column.
+function csvField(value: string): string {
+  const safe = FORMULA_INJECTION_PREFIX.test(value) ? `'${value}` : value;
+  if (/[",\n]/.test(safe)) {
+    return `"${safe.replace(/"/g, '""')}"`;
+  }
+  return safe;
+}
+
+function logEntryToCsvRow(entry: LogEntry): string {
+  return [
+    formatJalaliDateTime(entry.timestamp),
+    CATEGORY_LABELS_FA[entry.category] ?? entry.category,
+    ACTION_LABELS_FA[entry.action] ?? entry.action,
+    entry.actor.name || "کاربر ناشناس",
+    entry.actor.email,
+    entry.actor.role,
+    entry.target.label,
+    entry.target.type,
+    entry.ip ?? "",
+    entry.userAgent ?? "",
+    entry.summary ?? "",
+  ]
+    .map(csvField)
+    .join(",");
+}
+
+/**
+ * Same content as formatLogFileAsText, but as a proper column-per-field CSV
+ * (for the ZIP export) instead of one free-text sentence per line — a
+ * spreadsheet needs real columns, not prose to re-parse. Leads with a UTF-8
+ * BOM so Excel opens the Persian text as UTF-8 instead of guessing a
+ * Windows-1256-style legacy codepage and mangling it.
+ */
+export async function formatLogFileAsCsv(filename: string): Promise<string> {
   const entries = await readLogEntries(filename);
-  if (entries.length === 0) return "این فایل هیچ رویدادی ندارد.\n";
-  return entries.map(formatLogEntryHuman).join("\n") + "\n";
+  const header = CSV_COLUMNS.join(",");
+  const rows = entries.map(logEntryToCsvRow);
+  return `﻿${[header, ...rows].join("\r\n")}\r\n`;
 }

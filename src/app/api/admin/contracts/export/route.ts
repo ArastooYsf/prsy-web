@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { buildExcelResponse, type ExcelColumn } from "@/lib/excel-export";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
-import { dateRangeWhere, param } from "@/lib/list-query";
+import { dateOnwardsWhere, param } from "@/lib/list-query";
 import type { Contract, User } from "@/generated/prisma/client";
 
 type ContractRow = Contract & { user: User };
@@ -30,16 +30,16 @@ export async function GET(request: Request) {
   const status = param(searchParams, "status");
   const type = param(searchParams, "type");
   const q = param(searchParams, "q");
-  const startRange = dateRangeWhere(searchParams, "startFrom", "startTo");
-  const endRange = dateRangeWhere(searchParams, "endFrom", "endTo");
+  const startFrom = dateOnwardsWhere(searchParams, "startDate");
+  const endFrom = dateOnwardsWhere(searchParams, "endDate");
 
   const contracts = await prisma.contract.findMany({
     where: {
       deletedAt: null,
       ...(status ? { status: status as never } : {}),
       ...(type ? { type } : {}),
-      ...(startRange ? { startDate: startRange } : {}),
-      ...(endRange ? { endDate: endRange } : {}),
+      ...(startFrom ? { startDate: startFrom } : {}),
+      ...(endFrom ? { endDate: endFrom } : {}),
       ...(q
         ? { OR: [{ title: { contains: q } }, { user: { name: { contains: q } } }, { user: { email: { contains: q } } }] }
         : {}),

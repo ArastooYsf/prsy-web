@@ -54,6 +54,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Toast auto-dismiss countdown bar (ToastProvider.tsx) — a CSS animation
+   (not a setInterval re-render loop) so the browser drives the shrink, and
+   `animation-play-state: paused` on hover freezes it at its exact current
+   position for free instead of needing manual frame-by-frame bookkeeping. */
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 body {
   color: rgb(var(--foreground));
   background: rgb(var(--background));

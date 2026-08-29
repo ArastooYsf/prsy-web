@@ -42,9 +42,9 @@ export default function Loading() {
             options: [],
           },
         ]}
-        dateRanges={[
-          { fromKey: "startFrom", toKey: "startTo", label: "بازه‌ی تاریخ شروع" },
-          { fromKey: "endFrom", toKey: "endTo", label: "بازه‌ی تاریخ پایان" },
+        dates={[
+          { key: "startDate", label: "تاریخ شروع" },
+          { key: "endDate", label: "تاریخ پایان" },
         ]}
       />
 

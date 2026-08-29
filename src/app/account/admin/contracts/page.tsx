@@ -4,7 +4,7 @@ import { FileSpreadsheet, Plus, ScrollText } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
-import { dateRangeWhere, filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
+import { dateOnwardsWhere, filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { ContractCardMobile, ContractRowDesktop } from "./ContractRow";
@@ -26,8 +26,8 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
   const status = param(searchParams, "status");
   const type = param(searchParams, "type");
   const q = param(searchParams, "q");
-  const startRange = dateRangeWhere(searchParams, "startFrom", "startTo");
-  const endRange = dateRangeWhere(searchParams, "endFrom", "endTo");
+  const startFrom = dateOnwardsWhere(searchParams, "startDate");
+  const endFrom = dateOnwardsWhere(searchParams, "endDate");
   const { field, dir } = sortParams(searchParams, SORT_FIELDS, "createdAt");
 
   const [contracts, typeRows] = await Promise.all([
@@ -36,8 +36,8 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
         deletedAt: null,
         ...(status ? { status: status as never } : {}),
         ...(type ? { type } : {}),
-        ...(startRange ? { startDate: startRange } : {}),
-        ...(endRange ? { endDate: endRange } : {}),
+        ...(startFrom ? { startDate: startFrom } : {}),
+        ...(endFrom ? { endDate: endFrom } : {}),
         ...(q
           ? { OR: [{ title: { contains: q } }, { user: { name: { contains: q } } }, { user: { email: { contains: q } } }] }
           : {}),
@@ -89,9 +89,9 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
             options: typeRows.map((t) => ({ value: t.type, label: t.type })),
           },
         ]}
-        dateRanges={[
-          { fromKey: "startFrom", toKey: "startTo", label: "بازه‌ی تاریخ شروع" },
-          { fromKey: "endFrom", toKey: "endTo", label: "بازه‌ی تاریخ پایان" },
+        dates={[
+          { key: "startDate", label: "تاریخ شروع" },
+          { key: "endDate", label: "تاریخ پایان" },
         ]}
       />
 

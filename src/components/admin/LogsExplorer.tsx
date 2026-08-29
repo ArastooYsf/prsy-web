@@ -6,7 +6,6 @@ import { Download, Lock, Unlock } from "lucide-react";
 import { isoToJalali } from "@/lib/jalali";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import DateInput, { type Calendar } from "@/components/admin/DateInput";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_META, CategoryBadge } from "@/components/admin/log-category-meta";
@@ -225,36 +224,25 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
           ))}
         </div>
 
-        <div className="mr-auto flex flex-col gap-1.5">
-          <div className="flex justify-end">
-            <ToggleSwitch
-              checked={calendar === "jalali"}
-              onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
-              onLabel="شمسی"
-              offLabel="میلادی"
-              className="min-h-0"
-            />
+        <div className="mr-auto flex flex-wrap items-start gap-2">
+          <div className="w-36">
+            <DateInput label="از" value={fromDate} onChange={setFromDate} calendar={calendar} onCalendarChange={setCalendar} />
           </div>
-          <div className="flex flex-wrap items-start gap-2">
-            <div className="w-36">
-              <DateInput label="از" value={fromDate} onChange={setFromDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
-            </div>
-            <div className="w-36">
-              <DateInput label="تا" value={toDate} onChange={setToDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
-            </div>
-            {(fromDate || toDate) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setFromDate("");
-                  setToDate("");
-                }}
-                className="self-center text-xs text-foreground/50 underline decoration-dotted hover:text-foreground/80"
-              >
-                پاک کردن بازه
-              </button>
-            )}
+          <div className="w-36">
+            <DateInput label="تا" value={toDate} onChange={setToDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
           </div>
+          {(fromDate || toDate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setFromDate("");
+                setToDate("");
+              }}
+              className="self-center text-xs text-foreground/50 underline decoration-dotted hover:text-foreground/80"
+            >
+              پاک کردن بازه
+            </button>
+          )}
         </div>
       </div>
 

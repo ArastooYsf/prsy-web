@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowLeftRight } from "lucide-react";
 import { formatGregorian, formatJalali } from "@/lib/jalali";
 import JalaliDatePicker from "@/components/admin/JalaliDatePicker";
 import GregorianDatePicker from "@/components/admin/GregorianDatePicker";
-import ToggleSwitch from "@/components/ToggleSwitch";
 
 export type Calendar = "jalali" | "gregorian";
 
@@ -32,16 +32,35 @@ export default function DateInput({ label, value, onChange, calendar: calendarPr
   return (
     <div>
       {(label || !hideToggle) && (
-        <div className="mb-1.5 flex items-center justify-between gap-2">
+        // min-h-12 matches the toggle button's own real height (see below) —
+        // applied unconditionally so a hideToggle sibling's plain label row
+        // reserves the same space, keeping paired fields (از/تا, شروع/پایان)
+        // aligned instead of only the one with a visible toggle growing taller.
+        <div className="mb-1.5 flex min-h-12 items-center gap-1">
           {label && <label className="text-sm font-medium text-foreground/80">{label}</label>}
           {!hideToggle && (
-            <ToggleSwitch
-              checked={calendar === "jalali"}
-              onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
-              onLabel="شمسی"
-              offLabel="میلادی"
-              className="mr-auto min-h-0"
-            />
+            // Compact inline toggle next to the label instead of a full-height
+            // switch on its own row — a separate row (like the ToggleSwitch
+            // this replaced) makes this field noticeably taller than plain
+            // siblings in the same form row. Vertical padding is real (not
+            // negative-margin-cancelled): an invisible oversized hit area
+            // would silently overlap whatever sits a few px below (the date
+            // picker trigger) or above, stealing its taps. Horizontal padding
+            // stays negative-margin-cancelled — there's no interactive
+            // neighbor to the side, only label text, so widening the row's
+            // flow footprint there would just wrap the label for nothing.
+            <button
+              type="button"
+              role="switch"
+              aria-checked={calendar === "jalali"}
+              onClick={() => setCalendar(calendar === "jalali" ? "gregorian" : "jalali")}
+              aria-label={`تقویم ${calendar === "jalali" ? "شمسی" : "میلادی"} — برای تغییر کلیک کنید`}
+              title="تغییر تقویم"
+              className="-mx-4 flex items-center gap-0.5 rounded-full px-4 py-4 text-[11px] font-medium text-foreground/40 transition-colors hover:text-accent-400"
+            >
+              <ArrowLeftRight className="size-3" />
+              {calendar === "jalali" ? "شمسی" : "میلادی"}
+            </button>
           )}
         </div>
       )}

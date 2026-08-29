@@ -6,6 +6,10 @@ export function param(searchParams: ListSearchParams, key: string): string | und
   return value ? value : undefined;
 }
 
+function dayStart(dateOnly: string): Date {
+  return new Date(`${dateOnly}T00:00:00`);
+}
+
 // Inclusive on both ends: `to` is bumped to the start of the next day since
 // the stored value is a full DateTime, not a date-only column.
 export function dateRangeWhere(
@@ -18,13 +22,21 @@ export function dateRangeWhere(
   if (!from && !to) return undefined;
 
   const range: { gte?: Date; lte?: Date } = {};
-  if (from) range.gte = new Date(`${from}T00:00:00`);
+  if (from) range.gte = dayStart(from);
   if (to) {
-    const end = new Date(`${to}T00:00:00`);
+    const end = dayStart(to);
     end.setDate(end.getDate() + 1);
     range.lte = end;
   }
   return range;
+}
+
+// Single-cutoff filter (>= only) for fields that need one date, not a bounded
+// range — e.g. contracts' start/end date filters ("از این تاریخ به بعد").
+export function dateOnwardsWhere(searchParams: ListSearchParams, key: string): { gte: Date } | undefined {
+  const from = param(searchParams, key);
+  if (!from) return undefined;
+  return { gte: dayStart(from) };
 }
 
 // Carries the active filters (and only the filters, not sort/dir) over to

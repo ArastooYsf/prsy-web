@@ -81,25 +81,37 @@ export function ChartCard({
 
 // Exported so other range-filterable charts on the admin side (e.g. the logs
 // dashboard's event trend) reuse this exact filter instead of rebuilding it.
-export function RangeFilter({ value, onChange, disabled }: { value: StatsRange; onChange: (r: StatsRange) => void; disabled?: boolean }) {
+// A single dropdown instead of a row of pill buttons — these 5 options are
+// mutually exclusive (exactly one active range), which a <select> expresses
+// directly instead of needing a wide button group repeated on every chart card.
+export function RangeFilter({
+  value,
+  onChange,
+  disabled,
+  ariaLabel = "بازه‌ی زمانی",
+}: {
+  value: StatsRange;
+  onChange: (r: StatsRange) => void;
+  disabled?: boolean;
+  /** The button group this replaced sat visibly under the chart's own title,
+   * so its purpose was obvious; a bare <select> needs its own accessible
+   * name instead of relying on nearby text a screen reader won't associate with it. */
+  ariaLabel?: string;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-1">
+    <select
+      value={value}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.value as StatsRange)}
+      aria-label={ariaLabel}
+      className="min-h-11 rounded-lg border border-foreground/10 bg-foreground/5 px-3 text-xs font-medium text-foreground/70 outline-none transition-colors focus:border-accent-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+    >
       {ALL_STATS_RANGES.map((r) => (
-        <button
-          key={r}
-          type="button"
-          disabled={disabled}
-          onClick={() => onChange(r)}
-          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-            value === r
-              ? "border-accent-500/40 bg-accent-500/10 text-accent-400"
-              : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
-          }`}
-        >
+        <option key={r} value={r} className="bg-background">
           {RANGE_LABELS[r]}
-        </button>
+        </option>
       ))}
-    </div>
+    </select>
   );
 }
 
@@ -127,7 +139,10 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
   };
 
   return (
-    <ChartCard title="روند ثبت قراردادها و سفارش‌ها" action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />}>
+    <ChartCard
+      title="روند ثبت قراردادها و سفارش‌ها"
+      action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} ariaLabel="بازه‌ی زمانی روند ثبت قراردادها و سفارش‌ها" />}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
@@ -181,7 +196,7 @@ export function SiteViewsCard({ initialCount, initialRange }: { initialCount: nu
           <Eye className="size-4" />
           <p className="text-sm">بازدیدهای کلی سایت</p>
         </div>
-        <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />
+        <RangeFilter value={range} onChange={handleRangeChange} disabled={loading} ariaLabel="بازه‌ی زمانی بازدیدهای کلی سایت" />
       </div>
       <p className="mt-2 text-3xl font-bold">{count !== null ? formatNumber(count) : <Skeleton width={64} height={30} />}</p>
     </div>

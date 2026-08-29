@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import DateInput, { type Calendar } from "@/components/admin/DateInput";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import { scrollFieldAboveKeyboard } from "@/lib/scroll-into-view";
 
 const selectClass =
@@ -17,14 +16,17 @@ export type SelectFilter = {
   allLabel?: string;
 };
 export type DateRangeFilter = { fromKey: string; toKey: string; label: string };
+/** A single-cutoff date filter (one field, not a from/to pair) — e.g. "تاریخ شروع". */
+export type DateFilter = { key: string; label: string };
 
 type ListFilterBarProps = {
   searchPlaceholder?: string;
   selects?: SelectFilter[];
   dateRanges?: DateRangeFilter[];
+  dates?: DateFilter[];
 };
 
-export default function ListFilterBar({ searchPlaceholder, selects = [], dateRanges = [] }: ListFilterBarProps) {
+export default function ListFilterBar({ searchPlaceholder, selects = [], dateRanges = [], dates = [] }: ListFilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -59,7 +61,8 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
   const hasActiveFilters =
     !!searchParams.get("q") ||
     selects.some((s) => !!searchParams.get(s.key)) ||
-    dateRanges.some((d) => !!searchParams.get(d.fromKey) || !!searchParams.get(d.toKey));
+    dateRanges.some((d) => !!searchParams.get(d.fromKey) || !!searchParams.get(d.toKey)) ||
+    dates.some((d) => !!searchParams.get(d.key));
 
   return (
     <div className="mb-4 flex flex-wrap items-start gap-2">
@@ -93,48 +96,49 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
         </select>
       ))}
 
-      {dateRanges.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex justify-end">
-            <ToggleSwitch
-              checked={calendar === "jalali"}
-              onChange={(v) => setCalendar(v ? "jalali" : "gregorian")}
-              onLabel="شمسی"
-              offLabel="میلادی"
-              className="min-h-0"
-            />
-          </div>
-          <div className="flex flex-wrap items-start gap-3">
-            {dateRanges.map((d) => (
-              <div key={d.fromKey} className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-foreground/50">{d.label}</span>
-                <div className="flex items-start gap-2">
-                  <div className="w-36">
-                    <DateInput
-                      label="از"
-                      value={searchParams.get(d.fromKey) ?? ""}
-                      onChange={(v) => updateParam(d.fromKey, v || null)}
-                      calendar={calendar}
-                      onCalendarChange={setCalendar}
-                      hideToggle
-                    />
-                  </div>
-                  <div className="w-36">
-                    <DateInput
-                      label="تا"
-                      value={searchParams.get(d.toKey) ?? ""}
-                      onChange={(v) => updateParam(d.toKey, v || null)}
-                      calendar={calendar}
-                      onCalendarChange={setCalendar}
-                      hideToggle
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+      {dateRanges.map((d, i) => (
+        <div key={d.fromKey} className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-foreground/50">{d.label}</span>
+          <div className="flex items-start gap-2">
+            <div className="w-36">
+              <DateInput
+                label="از"
+                value={searchParams.get(d.fromKey) ?? ""}
+                onChange={(v) => updateParam(d.fromKey, v || null)}
+                calendar={calendar}
+                onCalendarChange={setCalendar}
+                hideToggle={i > 0}
+              />
+            </div>
+            <div className="w-36">
+              <DateInput
+                label="تا"
+                value={searchParams.get(d.toKey) ?? ""}
+                onChange={(v) => updateParam(d.toKey, v || null)}
+                calendar={calendar}
+                onCalendarChange={setCalendar}
+                hideToggle
+              />
+            </div>
           </div>
         </div>
-      )}
+      ))}
+
+      {dates.map((d, i) => (
+        <div key={d.key} className="w-36">
+          <DateInput
+            label={d.label}
+            value={searchParams.get(d.key) ?? ""}
+            onChange={(v) => updateParam(d.key, v || null)}
+            calendar={calendar}
+            onCalendarChange={setCalendar}
+            // Only the very first date field in the whole bar shows a toggle
+            // (rendered in JSX order: dateRanges, then dates) — if dateRanges
+            // already rendered one, every `dates` field hides its own too.
+            hideToggle={dateRanges.length > 0 || i > 0}
+          />
+        </div>
+      ))}
 
       {hasActiveFilters && (
         <button

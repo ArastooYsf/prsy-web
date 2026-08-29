@@ -55,7 +55,11 @@ export function LogEventsTrendChart({ initialData, initialRange }: { initialData
   const total = data.reduce((sum, point) => sum + ALL_LOG_CATEGORIES.reduce((s, c) => s + point[c], 0), 0);
 
   return (
-    <ChartCard title="روند رویدادهای لاگ" height={56} action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} />}>
+    <ChartCard
+      title="روند رویدادهای لاگ"
+      height={56}
+      action={<RangeFilter value={range} onChange={handleRangeChange} disabled={loading} ariaLabel="بازه‌ی زمانی روند رویدادهای لاگ" />}
+    >
       {total === 0 ? (
         <div className="flex h-full items-center justify-center text-sm text-foreground/40">در این بازه رویدادی ثبت نشده است.</div>
       ) : (

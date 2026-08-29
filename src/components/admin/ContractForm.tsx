@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContractFileUploadField from "@/components/admin/ContractFileUploadField";
 import DateInput, { type Calendar } from "@/components/admin/DateInput";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import { useToast } from "@/components/ToastProvider";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 
@@ -145,12 +144,9 @@ export default function ContractForm({ mode, customers, contract }: ContractForm
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm font-medium text-foreground/80">بازه قرارداد</p>
-          <ToggleSwitch checked={calendar === "jalali"} onChange={(v) => setCalendar(v ? "jalali" : "gregorian")} onLabel="شمسی" offLabel="میلادی" />
-        </div>
+        <p className="mb-2 text-sm font-medium text-foreground/80">بازه قرارداد</p>
         <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2">
-          <DateInput label="تاریخ شروع" value={startDate} onChange={setStartDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
+          <DateInput label="تاریخ شروع" value={startDate} onChange={setStartDate} calendar={calendar} onCalendarChange={setCalendar} />
           <DateInput label="تاریخ پایان" value={endDate} onChange={setEndDate} calendar={calendar} onCalendarChange={setCalendar} hideToggle />
         </div>
       </div>

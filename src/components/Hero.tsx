@@ -8,6 +8,7 @@ import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
 import { useSiteTheme } from "@/components/RouteThemeScope";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
+import SpotlightCursor from "@/components/ui/SpotlightCursor";
 import { cn } from "@/lib/utils";
 
 const SLIDE_DURATION = 5;
@@ -40,6 +41,11 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
   return (
     <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
       <ThemedGridBackdrop />
+      {/* Trial run of the cursor-following spotlight — z-[1] keeps it above
+          the grid backdrop but below the actual content (z-10), so it washes
+          the empty background only and never dims/tints the title, copy, or
+          CTA sitting on top of it. */}
+      <SpotlightCursor className="z-[1]" />
 
       <div className="container relative z-10">
         <div className="relative">

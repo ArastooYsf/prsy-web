@@ -32,33 +32,49 @@ const GLOW_MAX_SHADOW = '0 8px 40px -4px rgba(249, 115, 22, 0.25)';
 // picked at render time from the live theme (see isLightTheme below).
 const GLOW_MAX_SHADOW_BLUE = '0 8px 40px -4px rgba(37, 99, 235, 0.25)';
 
-// The hover "speed bump" indicator: a full-nav-height silhouette — a rounded
-// cap tapering out of the hairline border, flowing straight down to the
-// nav's bottom edge, like a hill sloping down into a column — behind
-// whichever nav item is hovered. Geometry (radius/fillet/pad) is expressed
-// in SVG user units == px, recomputed live from each item's real
-// getBoundingClientRect() — never hardcoded per-item, since label widths
-// differ. Position/size animate via spring (not a raw transition on the `d`
-// string, which can't interpolate between different shapes) so moving
-// between items slides smoothly instead of jump-cutting.
-const BUMP_TOP_RADIUS = 8;
-const BUMP_HEIGHT = 48; // matches nav's lg:h-12 — bump spans the full row, not just a sliver at the top
-const BUMP_PAD = 8;
-const BUMP_FILLET = 8;
+// The hover "speed bump" indicator: one continuous filled polygon — a thin
+// baseline bar the full width of the nav row, always visible, that rises
+// into a flat-topped trapezoid ("platform") directly under whichever nav
+// item (data-nav-bump) is hovered. Pure straight lines (SVG `L`, never `C`/
+// `Q`) with sharp corners — no fillets, no curves. The platform's own
+// proportions come from the hovered item's real width (never hardcoded):
+// the flat top matches the item's width exactly, each ramp runs out half
+// that width beyond the item's edge (so the trapezoid's base is ~2x the top,
+// per spec), and the rise is set equal to that same run — a 1:1 slope, i.e.
+// a 45° ramp. Position/width/height all animate via spring (not a raw `d`
+// transition, which can't interpolate between differently-shaped paths) so
+// both sliding between items and rising/settling back to the flat baseline
+// stay smooth instead of jump-cutting.
+const BASE_THICKNESS = 5; // idle baseline bar height — a visible strip, not a hairline
+const BUMP_HEIGHT = 48; // matches nav's lg:h-12 — the polygon's bottom edge sits flush with the row's bottom
 const BUMP_SPRING = { stiffness: 500, damping: 40 };
-const BUMP_OPACITY_SPRING = { stiffness: 400, damping: 35 };
 
-function buildBumpPath(cx: number, halfW: number) {
+function buildTrapezoidPath(navWidth: number, cx: number, halfW: number, rise: number) {
+	const baseTopY = BUMP_HEIGHT - BASE_THICKNESS;
+	const bottomY = BUMP_HEIGHT;
+	// Capped to baseTopY: an uncapped rise would push the plateau above y=0 —
+	// past the row's own top edge, into the header's border/search-bar area —
+	// for any item wider than the row is tall (e.g. "سوالات متداول"). Capping
+	// `run` to the same value keeps the 45° slope exact up to that limit
+	// instead of only flattening the height while the ramp keeps widening.
+	const clampedRise = Math.min(rise, baseTopY);
+	const plateauY = baseTopY - clampedRise;
+	const run = clampedRise; // 45°: horizontal ramp run equals its (capped) vertical rise
 	const left = cx - halfW;
 	const right = cx + halfW;
-	const f = Math.min(BUMP_FILLET, halfW);
+	// Clamped so a hovered item near the row's own edge can't push a ramp
+	// past the SVG's own bounds and fold the path back on itself.
+	const rampLeftBase = Math.max(0, left - run);
+	const rampRightBase = Math.min(navWidth, right + run);
 	return [
-		`M ${left} ${BUMP_HEIGHT}`,
-		`L ${left} ${BUMP_TOP_RADIUS}`,
-		`Q ${left} 0 ${left + f} 0`,
-		`L ${right - f} 0`,
-		`Q ${right} 0 ${right} ${BUMP_TOP_RADIUS}`,
-		`L ${right} ${BUMP_HEIGHT}`,
+		`M 0 ${baseTopY}`,
+		`L ${rampLeftBase} ${baseTopY}`,
+		`L ${left} ${plateauY}`,
+		`L ${right} ${plateauY}`,
+		`L ${rampRightBase} ${baseTopY}`,
+		`L ${navWidth} ${baseTopY}`,
+		`L ${navWidth} ${bottomY}`,
+		`L 0 ${bottomY}`,
 		'Z',
 	].join(' ');
 }
@@ -114,16 +130,37 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	// the GPU just cross-fades an already-painted layer instead.
 	const glowShadow = isLightTheme ? GLOW_MAX_SHADOW_BLUE : GLOW_MAX_SHADOW;
 
-	// Nav hover "speed bump" indicator — see buildBumpPath above.
+	// Nav hover "speed bump" indicator — see buildTrapezoidPath above.
 	const navRowRef = React.useRef<HTMLDivElement>(null);
 	const hasPositionedBump = React.useRef(false);
 	const bumpTargetX = useMotionValue(0);
 	const bumpTargetHalfW = useMotionValue(0);
-	const bumpTargetOpacity = useMotionValue(0);
+	const bumpTargetRise = useMotionValue(0);
 	const bumpX = useSpring(bumpTargetX, BUMP_SPRING);
 	const bumpHalfW = useSpring(bumpTargetHalfW, BUMP_SPRING);
-	const bumpOpacity = useSpring(bumpTargetOpacity, BUMP_OPACITY_SPRING);
-	const bumpPath = useTransform([bumpX, bumpHalfW], ([cx, hw]) => buildBumpPath(cx as number, hw as number));
+	const bumpRise = useSpring(bumpTargetRise, BUMP_SPRING);
+
+	// The polygon's own width has to match the row's real rendered width —
+	// not assumed from a Tailwind class — since it changes with viewport size
+	// and with the `scrolled` padding swap (lg:px-2) above. Same
+	// "measure, don't hardcode" reasoning as headerHeight below. Kept as a
+	// motion value (not React state) so the useTransform below picks up a
+	// resize the same declarative way it already picks up bumpX/bumpHalfW/
+	// bumpRise changes, instead of needing a separate manual subscription.
+	const navWidth = useMotionValue(0);
+	React.useEffect(() => {
+		const el = navRowRef.current;
+		if (!el) return;
+		const measure = () => navWidth.set(el.getBoundingClientRect().width);
+		measure();
+		const ro = new ResizeObserver(measure);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, [navWidth]);
+
+	const bumpPath = useTransform([navWidth, bumpX, bumpHalfW, bumpRise], ([nw, cx, hw, rise]) =>
+		buildTrapezoidPath(nw as number, cx as number, hw as number, rise as number),
+	);
 
 	// `onMouseOver` bubbles, so sweeping the cursor across a row of inline
 	// elements can fire it several times per item (text nodes, icon glyphs)
@@ -155,23 +192,29 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 			const containerRect = container.getBoundingClientRect();
 			const itemRect = item.getBoundingClientRect();
 			const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
-			const halfW = itemRect.width / 2 + BUMP_PAD;
+			// Flat top matches the item's real width exactly; the rise is set
+			// equal to half that width, which (at the ramps' fixed 45° slope,
+			// baked into buildTrapezoidPath as run === rise) makes the platform's
+			// base — top width plus one run on each side — come out to ~2x the
+			// top width, per spec.
+			const halfW = itemRect.width / 2;
 			bumpTargetX.set(centerX);
 			bumpTargetHalfW.set(halfW);
 			if (!hasPositionedBump.current) {
-				// First hover this session: jump the spring outputs straight to
-				// position instead of animating in from x=0 — only the fade-in
-				// should be visible, not a sweep across the whole nav row.
+				// First hover this session: jump the position/width springs
+				// straight there instead of sliding in from x=0 — only the rise
+				// (baseline lifting into a platform) should animate, not a sweep
+				// across the whole nav row.
 				bumpX.jump(centerX);
 				bumpHalfW.jump(halfW);
 				hasPositionedBump.current = true;
 			}
-			bumpTargetOpacity.set(1);
+			bumpTargetRise.set(halfW);
 		});
 	};
 
 	const handleNavRowLeave = () => {
-		bumpTargetOpacity.set(0);
+		bumpTargetRise.set(0);
 	};
 
 	const links = [
@@ -309,7 +352,14 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 				anywhere else. */}
 			<SpotlightCursor className="rounded-[inherit]" />
 
-			<div className="w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
+			{/* `relative` (a no-op for its own layout) is load-bearing here: without
+				it this div paints in CSS's "in-flow, non-positioned" step, which
+				comes *before* positioned z-index:auto siblings like SpotlightCursor's
+				absolute glow layer above — so the glow would paint over the search
+				bar instead of staying confined to the empty nav background under it.
+				`relative` moves it into the same positioned-siblings step, where its
+				later tree position keeps it painting on top as intended. */}
+			<div className="relative w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
 				<HeaderSearch />
 			</div>
 
@@ -327,17 +377,18 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 					},
 				)}
 			>
-				{/* Hover "speed bump": a full-row-height highlight tapering out of
-					the hairline border above whichever nav item (data-nav-bump) is
-					hovered, sliding/resizing via spring between items. Desktop-only,
-					same as the links it tracks. Painted first so it sits behind the
-					nav items in source order; the low fill opacity keeps it reading
-					as an underlay even where stacking order overlaps text. */}
+				{/* Hover "speed bump": a single filled polygon, always visible as a
+					thin baseline bar the full width of the row, that rises into a
+					flat-topped platform under whichever nav item (data-nav-bump) is
+					hovered — see buildTrapezoidPath above. Desktop-only, same as the
+					links it tracks. Painted first so it sits behind the nav items in
+					source order; the low fill opacity keeps it reading as an underlay
+					even where stacking order overlaps text. */}
 				<svg
 					aria-hidden
 					className="pointer-events-none absolute inset-x-0 top-0 hidden h-12 w-full overflow-visible lg:block"
 				>
-					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-foreground/[0.06]" />
+					<motion.path d={bumpPath} className="fill-foreground/[0.06]" />
 				</svg>
 
 				<Link

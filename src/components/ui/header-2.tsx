@@ -17,6 +17,7 @@ import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
 import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
+import SpotlightCursor from '@/components/ui/SpotlightCursor';
 import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
 import type { ProductCategoryContent } from '@/lib/site-content-defaults';
@@ -105,9 +106,13 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 		stiffness: 400,
 		damping: 40,
 	});
-	const glowShadow = useTransform(glowProgress, (p) =>
-		p <= 0.01 ? 'none' : (isLightTheme ? GLOW_MAX_SHADOW_BLUE : GLOW_MAX_SHADOW).replace('0.25', (p * 0.25).toFixed(3)),
-	);
+	// The shadow's *shape* never changes as the user scrolls, only its
+	// intensity — so the animated property is `opacity` on a layer painted
+	// once at full intensity, not the `box-shadow` value itself. Interpolating
+	// the shadow string every frame (the old approach) forces the browser to
+	// repaint the blur on every scroll tick; opacity is compositor-only, so
+	// the GPU just cross-fades an already-painted layer instead.
+	const glowShadow = isLightTheme ? GLOW_MAX_SHADOW_BLUE : GLOW_MAX_SHADOW;
 
 	// Nav hover "speed bump" indicator — see buildBumpPath above.
 	const navRowRef = React.useRef<HTMLDivElement>(null);
@@ -284,8 +289,25 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 				which would silently kill the scrolled "lift" shadow. This layer
 				only carries the ambient glow; `rounded-[inherit]` follows whatever
 				radius the header itself currently has, without duplicating that
-				conditional here. */}
-			<motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit]" style={{ boxShadow: glowShadow }} />
+				conditional here.
+
+				`boxShadow` itself is a static, pre-painted value — only `opacity`
+				animates as the user scrolls, which the compositor can cross-fade
+				without re-painting the blur on every scroll tick.
+				`will-change: opacity` is scoped to just this element (not the
+				header or any ancestor) so the GPU layer promotion it requests
+				stays cheap. */}
+			<motion.div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 rounded-[inherit] will-change-[opacity]"
+				style={{ boxShadow: glowShadow, opacity: glowProgress }}
+			/>
+
+			{/* Trial run of the cursor-following spotlight (see SpotlightCursor) —
+				scoped to just the navbar for now, per the plan to measure its
+				Lighthouse impact here and on the Hero before considering it
+				anywhere else. */}
+			<SpotlightCursor className="rounded-[inherit]" />
 
 			<div className="w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
 				<HeaderSearch />

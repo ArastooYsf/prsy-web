@@ -6,6 +6,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, TrendingUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/ui/EmptyState";
 import SearchDropdownBanner from "@/components/ui/SearchDropdownBanner";
 import { useSiteTheme } from "@/components/RouteThemeScope";
 
@@ -127,7 +128,7 @@ export function HeaderSearch() {
               ))}
             </div>
           ) : (
-            <p className="px-5 py-7 text-center text-sm text-foreground/50">نتیجه‌ای یافت نشد.</p>
+            <EmptyState size="sm" icon={<Search />} title="نتیجه‌ای یافت نشد." description="با عبارت دیگه‌ای امتحان کنید." />
           )}
 
           {!trimmed && (

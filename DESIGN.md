@@ -16,25 +16,25 @@ colors:
   destructive-on: "rgb(6 10 23)"
 typography:
   display:
-    fontFamily: "Vazirmatn, sans-serif"
+    fontFamily: "Shabnam FD, Vazirmatn, sans-serif"
     fontSize: "clamp(1.875rem, 4vw, 3rem)"
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "-0.01em"
   headline:
-    fontFamily: "Vazirmatn, sans-serif"
+    fontFamily: "Shabnam FD, Vazirmatn, sans-serif"
     fontSize: "clamp(1.5rem, 3vw, 2.25rem)"
     fontWeight: 700
     lineHeight: 1.25
   body:
-    fontFamily: "Vazirmatn, sans-serif"
+    fontFamily: "Shabnam FD, Vazirmatn, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: "Vazirmatn, sans-serif"
+    fontFamily: "Shabnam FD, Vazirmatn, sans-serif"
     fontSize: "0.6875rem"
-    fontWeight: 600
+    fontWeight: 700 # Shabnam FD has no real 600 — font-semibold is aliased to 700 in tailwind.config.ts
     letterSpacing: "0.02em"
 rounded:
   pill: "9999px"
@@ -84,7 +84,7 @@ components:
 - تیره‌ی مطلق با یک لکه‌ی نارنجی، نه طیف رنگی
 - بدون سایه در حالت استراحت؛ عمق فقط با لایه‌های سفید بسیار کم‌رنگ
 - گوشه‌های نرم و پیوسته (rounded-lg تا rounded-2xl) روی زمینه‌ی کاملاً تیره
-- تایپوگرافی تک‌خانواده (Vazirmatn) با تکیه بر وزن فونت برای سلسله‌مراتب، نه تغییر فونت
+- تایپوگرافی تک‌خانواده (Shabnam FD) با تکیه بر وزن فونت برای سلسله‌مراتب، نه تغییر فونت
 
 ## Colors
 
@@ -109,9 +109,9 @@ components:
 
 ## Typography
 
-**Display/Body/Label Font:** Vazirmatn (Google Fonts, Persian/Arabic subset, `font-display: swap`) — تک‌خانواده برای همه‌چیز.
+**Display/Body/Label Font:** Shabnam FD (self-hosted, `public/fonts/shabnam-fd`, SIL OFL, `font-display: swap`) — تک‌خانواده برای همه‌چیز. فقط وزن‌های واقعاً استفاده‌شده (۳۰۰/۴۰۰/۵۰۰/۷۰۰) به‌صورت جدا لود می‌شن، نه کل خانواده. Vazirmatn (Google Fonts، از قبل self-hosted) به‌عنوان fallback در `font-display: swap` نگه داشته شده — یک چهره‌ی فارسی واقعی جای عوض‌شدن به sans-serif عمومی می‌شینه تا Shabnam لود بشه.
 
-**Character:** خوانا، بی‌تجمل، بدون شخصیت تزئینی. سلسله‌مراتب فقط از طریق وزن فونت (۴۰۰ تا ۷۰۰) و اندازه ساخته می‌شه، نه تغییر فونت — دقیقاً مثل برچسب‌های روی یک دستگاه صنعتی: خوانایی مطلق، بدون افکت.
+**Character:** خوانا، بی‌تجمل، بدون شخصیت تزئینی. سلسله‌مراتب فقط از طریق وزن فونت (۳۰۰ تا ۷۰۰) و اندازه ساخته می‌شه، نه تغییر فونت — دقیقاً مثل برچسب‌های روی یک دستگاه صنعتی: خوانایی مطلق، بدون افکت. Shabnam FD وزن ۶۰۰ واقعی نداره؛ `font-semibold` در tailwind.config.ts روی ۷۰۰ alias شده.
 
 ### Hierarchy
 - **Display** (bold ۷۰۰، `text-3xl` تا `sm:text-5xl`، leading-tight، tracking-tight): تیتر هیرو، تنها یک بار در صفحه.
@@ -182,4 +182,4 @@ components:
 - **Don't** رنگ آبی شناسایی رو به‌عنوان دکمه یا CTA استفاده نکن — نقشش فقط بج/برچسب است.
 - **Don't** سایه‌ی پیش‌فرض (بدون hover) به کارت‌ها اضافه نکن — این سیستم مسطح است، لایه‌ای نیست.
 - **Don't** از گلس‌مورفیسم پررنگ، گرادیانت تزئینی سنگین، یا انیمیشن پیچیده/اسکرول غیراستاندارد استفاده نکن — مخاطب این سایت به سادگی و اعتماد نیاز داره، نه شگفتی بصری.
-- **Don't** فونت دوم اضافه نکن؛ Vazirmatn تنها خانواده‌ی فونت سایت است.
+- **Don't** فونت سومی اضافه نکن؛ Shabnam FD تنها خانواده‌ی فونت واقعی سایته (Vazirmatn فقط fallback بارگذاریه، جایی رندر نهایی نمی‌شه).

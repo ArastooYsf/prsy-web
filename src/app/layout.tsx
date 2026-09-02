@@ -7,6 +7,7 @@ import PageLoader from "@/components/PageLoader";
 import PageViewTracker from "@/components/PageViewTracker";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
+import OfflineBanner from "@/components/OfflineBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
 import { getFooterContact, getProductCategories } from "@/lib/site-content";
@@ -125,6 +126,7 @@ export default async function RootLayout({
             </ToastProvider>
           </SessionProviderWrapper>
           <CookieConsentBanner />
+          <OfflineBanner />
         </RouteThemeScope>
       </body>
     </html>

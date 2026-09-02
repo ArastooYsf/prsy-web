@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import EmojiPicker from "@/components/EmojiPicker";
 import { useToast } from "@/components/ToastProvider";
+import InlineErrorState from "@/components/ui/InlineErrorState";
+import Spinner from "@/components/ui/Spinner";
 import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
 import MediaPickerModal from "@/components/MediaPickerModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -302,6 +304,11 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  // Shown as an inline retry row above the input, not a toast — a toast
+  // disappears on its own and the failed message's text/attachments are
+  // still sitting right there in the input either way, so a persistent,
+  // actionable notice reads better than an ephemeral one here.
+  const [sendError, setSendError] = useState<string | null>(null);
   const [throttled, setThrottled] = useState(false);
   const lastSendAtRef = useRef(0);
   const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([]);
@@ -419,26 +426,38 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
     window.setTimeout(() => setThrottled(false), SEND_COOLDOWN_MS);
 
     setSending(true);
+    setSendError(null);
 
-    const res = await fetch(replyEndpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: text,
-        attachments: pendingAttachments.map((a) => ({
-          url: a.url,
-          filename: a.filename,
-          mimeType: a.mimeType,
-          size: a.size,
-        })),
-      }),
-    });
+    let res: Response;
+    try {
+      res = await fetch(replyEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          attachments: pendingAttachments.map((a) => ({
+            url: a.url,
+            filename: a.filename,
+            mimeType: a.mimeType,
+            size: a.size,
+          })),
+        }),
+      });
+    } catch {
+      // The fetch itself threw — a real network failure (offline,
+      // connection dropped mid-request), not a server error response.
+      // text/pendingAttachments are left untouched so retry resends exactly
+      // what failed to send.
+      setSending(false);
+      setSendError("پیام ارسال نشد. اتصال اینترنت خود را بررسی کنید.");
+      return;
+    }
 
     setSending(false);
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      showToast(body?.error || "خطا در ارسال پیام.", "error");
+      setSendError(body?.error || "خطا در ارسال پیام.");
       return;
     }
 
@@ -871,6 +890,9 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
       {canReply ? (
         <form onSubmit={handleSend} className="border-t border-foreground/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
+          {sendError && (
+            <InlineErrorState message={sendError} onRetry={sendMessage} className="mb-2.5" />
+          )}
           <div className="mb-2 flex items-center gap-1">
             <EmojiPicker
               onSelect={(emoji) => (editingId ? setEditingText((prev) => prev + emoji) : setText((prev) => prev + emoji))}
@@ -981,10 +1003,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 aria-label="ارسال"
               >
                 {sending ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" strokeOpacity="0.3" />
-                    <path d="M21 12a9 9 0 00-9-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
+                  <Spinner className="size-4 text-primary-foreground" />
                 ) : (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path

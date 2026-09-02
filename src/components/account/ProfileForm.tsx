@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
 import { useToast } from "@/components/ToastProvider";
+import FormErrorBanner from "@/components/ui/FormErrorBanner";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
@@ -45,6 +46,11 @@ export default function ProfileForm({
   const [companyName, setCompanyName] = useState(initialCompanyName);
   const [economicCode, setEconomicCode] = useState(initialEconomicCode);
   const [saving, setSaving] = useState(false);
+  // Field-level problems (invalid email/phone, checked before the request
+  // even goes out) stay on the toast below — this is only for the request
+  // itself failing, which the toast alone (gone in a few seconds) doesn't
+  // leave any trace of once the user looks back at the form.
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const isCustomer = role === "CUSTOMER";
   const isLegalCustomer = isCustomer && customerType === "LEGAL";
@@ -66,18 +72,26 @@ export default function ProfileForm({
     }
 
     setSaving(true);
+    setSaveError(null);
 
-    const res = await fetch("/api/account/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, email, alternatePhone, address, avatarUrl, companyName, economicCode }),
-    });
+    let res: Response;
+    try {
+      res = await fetch("/api/account/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, alternatePhone, address, avatarUrl, companyName, economicCode }),
+      });
+    } catch {
+      setSaving(false);
+      setSaveError("اتصال برقرار نشد. اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.");
+      return;
+    }
 
     setSaving(false);
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      showToast(body?.error || "خطا در بروزرسانی اطلاعات.", "error");
+      setSaveError(body?.error || "خطا در بروزرسانی اطلاعات. لطفاً دوباره تلاش کنید.");
       return;
     }
 
@@ -163,6 +177,8 @@ export default function ProfileForm({
           </div>
         </div>
       )}
+
+      {saveError && <FormErrorBanner message={saveError} onDismiss={() => setSaveError(null)} />}
 
       <button
         type="submit"

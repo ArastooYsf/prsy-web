@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shabnam FD (Farsi-Digits build — Persian digits stay Persian regardless of
+   locale, unlike the base Shabnam build) — self-hosted from public/fonts,
+   SIL OFL licensed (see public/fonts/shabnam-fd/LICENSE). Only the four
+   weights actually used anywhere in the site are declared below, each
+   pinned to its own font-weight (not a variable range), so the browser only
+   ever fetches the exact file a given weight needs — never the rest of the
+   family. font-display: swap shows the Vazirmatn fallback (already
+   self-hosted via next/font, see tailwind.config.ts's font-sans stack)
+   immediately and swaps in Shabnam once it loads, instead of a blank-text
+   flash. */
+@font-face {
+  font-family: "Shabnam FD";
+  src: url("/fonts/shabnam-fd/Shabnam-Light-FD.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shabnam FD";
+  src: url("/fonts/shabnam-fd/Shabnam-FD.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shabnam FD";
+  src: url("/fonts/shabnam-fd/Shabnam-Medium-FD.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shabnam FD";
+  src: url("/fonts/shabnam-fd/Shabnam-Bold-FD.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* All tokens are raw "R G B" channel triplets (no rgb()/commas) so Tailwind
      can compose them as rgb(var(--x) / <alpha-value>) and opacity modifiers

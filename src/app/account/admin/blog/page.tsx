@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { Newspaper, Plus } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
@@ -35,9 +36,12 @@ export default async function AdminBlogListPage() {
       </div>
 
       {posts.length === 0 ? (
-        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
-          هنوز پستی ثبت نشده است.
-        </p>
+        <EmptyState
+          icon={<Newspaper />}
+          title="هنوز پستی ثبت نشده است."
+          description="اولین پست وبلاگ رو ثبت کنید تا اینجا نمایش داده بشه."
+          action={{ label: "پست جدید", href: "/account/admin/blog/new" }}
+        />
       ) : (
         <>
           {/* Mobile/tablet: card list */}

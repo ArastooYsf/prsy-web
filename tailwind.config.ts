@@ -75,7 +75,22 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-vazirmatn)", "sans-serif"],
+        // Shabnam FD first (self-hosted, see globals.css's @font-face block
+        // + public/fonts/shabnam-fd), Vazirmatn second as the font-display:
+        // swap fallback — it's already self-hosted via next/font/google
+        // (see layout.tsx), so the fallback paint is another real Persian
+        // face with a similar x-height, not the browser's generic sans.
+        sans: ["Shabnam FD", "var(--font-vazirmatn)", "sans-serif"],
+      },
+      // Shabnam FD is a static font family (300/400/500/700 only) — unlike
+      // Vazirmatn, the variable font it replaces as the primary face, it has
+      // no real 600 weight. Left at Tailwind's default, `font-semibold`
+      // (used ~130 places across the site) would fall back to the browser's
+      // own nearest-weight matching, which lands on 700 anyway for a
+      // requested weight above 500 — aliasing it here just makes that
+      // explicit instead of relying on implicit fallback behavior.
+      fontWeight: {
+        semibold: "700",
       },
       container: {
         center: true,

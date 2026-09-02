@@ -1,4 +1,5 @@
 import { Headset } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
 import { dateRangeWhere, param, sortParams, type ListSearchParams } from "@/lib/list-query";
@@ -61,9 +62,7 @@ export default async function AdminTicketsPage({ searchParams }: { searchParams:
       />
 
       {tickets.length === 0 ? (
-        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
-          تیکتی با این مشخصات یافت نشد.
-        </p>
+        <EmptyState icon={<Headset />} title="تیکتی با این مشخصات یافت نشد." />
       ) : (
         <>
           {/* Mobile/tablet: card list */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 // A soft, cursor-following highlight for a section's background — not a
 // dimming vignette (that would read as muddy on the site's light-themed
@@ -10,15 +11,19 @@ import { useEffect, useRef } from "react";
 //
 // Position updates never touch React state or trigger a re-render: the
 // raw pointer coordinates are stashed in a ref on every `pointermove`, and
-// the actual DOM read (the container's rect) + write (the CSS custom
-// properties the gradient is centered on) happen together, once, inside a
-// single requestAnimationFrame callback — the same rAF-batching pattern
-// header-2.tsx's nav hover indicator already uses, so a fast mouse sweep
-// costs at most one forced layout per frame, never one per raw event.
+// the actual DOM write (the CSS custom properties the gradient is centered
+// on) happens once per frame inside a single requestAnimationFrame callback
+// — the same rAF-batching pattern header-2.tsx's nav hover indicator
+// already uses, so a fast mouse sweep costs at most one write per frame,
+// never one per raw event. The container's own rect is cached rather than
+// re-measured (a forced layout) on every one of those frames — it only
+// actually moves on resize or scroll (this sits in a `sticky` header, whose
+// rect changes as it docks), so it's invalidated on those instead.
 export default function SpotlightCursor({ className = "" }: { className?: string }) {
   const layerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const pointerRef = useRef({ x: 0, y: 0 });
+  const rectRef = useRef<DOMRect | null>(null);
 
   useEffect(() => {
     const layer = layerRef.current;
@@ -28,9 +33,12 @@ export default function SpotlightCursor({ className = "" }: { className?: string
     // glow stuck wherever the last tap landed.
     if (!window.matchMedia("(hover: hover)").matches) return;
 
+    const invalidateRect = () => {
+      rectRef.current = null;
+    };
     const applyPosition = () => {
       rafRef.current = null;
-      const rect = container.getBoundingClientRect();
+      const rect = rectRef.current ?? (rectRef.current = container.getBoundingClientRect());
       layer.style.setProperty("--spotlight-x", `${pointerRef.current.x - rect.left}px`);
       layer.style.setProperty("--spotlight-y", `${pointerRef.current.y - rect.top}px`);
     };
@@ -45,10 +53,14 @@ export default function SpotlightCursor({ className = "" }: { className?: string
     container.addEventListener("pointermove", handleMove);
     container.addEventListener("pointerenter", handleEnter);
     container.addEventListener("pointerleave", handleLeave);
+    window.addEventListener("resize", invalidateRect);
+    window.addEventListener("scroll", invalidateRect, { passive: true });
     return () => {
       container.removeEventListener("pointermove", handleMove);
       container.removeEventListener("pointerenter", handleEnter);
       container.removeEventListener("pointerleave", handleLeave);
+      window.removeEventListener("resize", invalidateRect);
+      window.removeEventListener("scroll", invalidateRect);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, []);
@@ -57,7 +69,10 @@ export default function SpotlightCursor({ className = "" }: { className?: string
     <div
       ref={layerRef}
       aria-hidden
-      className={`pointer-events-none absolute inset-0 opacity-[var(--spotlight-opacity,0)] transition-opacity duration-500 will-change-[opacity] ${className}`}
+      className={cn(
+        "pointer-events-none absolute inset-0 opacity-[var(--spotlight-opacity,0)] transition-opacity duration-500 will-change-[opacity]",
+        className,
+      )}
       style={{
         background:
           "radial-gradient(480px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgb(var(--accent-500) / 0.10), transparent 70%)",

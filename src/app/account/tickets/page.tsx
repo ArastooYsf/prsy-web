@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { MessageSquare, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import EmptyState from "@/components/ui/EmptyState";
 import { TicketListItem } from "./TicketListItem";
 
 export const dynamic = "force-dynamic";
@@ -33,9 +34,12 @@ export default async function AccountTicketsPage() {
       </div>
 
       {tickets.length === 0 ? (
-        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
-          هنوز تیکتی ثبت نکرده‌اید.
-        </p>
+        <EmptyState
+          icon={<MessageSquare />}
+          title="هنوز تیکتی ثبت نکرده‌اید."
+          description="سوال یا مشکلی دارید؟ یک تیکت جدید ثبت کنید تا تیم پشتیبانی بررسیش کنه."
+          action={{ label: "ثبت تیکت جدید", href: "/account/tickets/new" }}
+        />
       ) : (
         <div className="space-y-3">
           {tickets.map((ticket) => (

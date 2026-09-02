@@ -15,8 +15,10 @@ import { cn } from '@/lib/utils';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
+import { MobileProductsAccordion } from '@/components/ui/MobileProductsAccordion';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
 import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
+import { NavActionGlow } from '@/components/ui/NavActionGlow';
 import SpotlightCursor from '@/components/ui/SpotlightCursor';
 import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
@@ -32,51 +34,70 @@ const GLOW_MAX_SHADOW = '0 8px 40px -4px rgba(249, 115, 22, 0.25)';
 // picked at render time from the live theme (see isLightTheme below).
 const GLOW_MAX_SHADOW_BLUE = '0 8px 40px -4px rgba(37, 99, 235, 0.25)';
 
-// The hover "speed bump" indicator: one continuous filled polygon — a thin
-// baseline bar the full width of the nav row, always visible, that rises
-// into a flat-topped trapezoid ("platform") directly under whichever nav
-// item (data-nav-bump) is hovered. Pure straight lines (SVG `L`, never `C`/
-// `Q`) with sharp corners — no fillets, no curves. The platform's own
-// proportions come from the hovered item's real width (never hardcoded):
-// the flat top matches the item's width exactly, each ramp runs out half
-// that width beyond the item's edge (so the trapezoid's base is ~2x the top,
-// per spec), and the rise is set equal to that same run — a 1:1 slope, i.e.
-// a 45° ramp. Position/width/height all animate via spring (not a raw `d`
-// transition, which can't interpolate between differently-shaped paths) so
-// both sliding between items and rising/settling back to the flat baseline
-// stay smooth instead of jump-cutting.
-const BASE_THICKNESS = 5; // idle baseline bar height — a visible strip, not a hairline
-const BUMP_HEIGHT = 48; // matches nav's lg:h-12 — the polygon's bottom edge sits flush with the row's bottom
+// The hover "speed bump" indicator: a standalone flat-topped trapezoid
+// ("platform") that fades in directly under whichever nav item is hovered —
+// nothing renders at all while nothing is hovered (no persistent baseline).
+// Only its width and horizontal position come from the hovered item's real
+// measured bounds (never hardcoded, since label widths differ); its height
+// is a fixed constant so every item's platform reads as the same physical
+// object rather than growing/shrinking with the label, which would make the
+// row feel unstable. Corners are rounded (small fillets via SVG `Q`, not
+// sharp `L`-to-`L` joins). Position/width animate via spring and visibility
+// via a fast opacity spring (not a raw `d` transition, which can't
+// interpolate between differently-shaped paths) so both sliding between
+// items and fading in/out stay smooth instead of jump-cutting.
+const BUMP_HEIGHT = 48; // matches nav's lg:h-12 — the platform's own bottom edge sits flush with the row's bottom
+const PLATFORM_RISE = 14; // fixed platform height — never derived from item width
+const PLATFORM_CORNER_RADIUS = 4;
 const BUMP_SPRING = { stiffness: 500, damping: 40 };
+const BUMP_OPACITY_SPRING = { stiffness: 600, damping: 45 }; // snappy, non-bouncy fade in/out
 
-function buildTrapezoidPath(navWidth: number, cx: number, halfW: number, rise: number) {
-	const baseTopY = BUMP_HEIGHT - BASE_THICKNESS;
+type Point = readonly [number, number];
+
+// Traces a closed polygon with each corner rounded to `radius` (clamped to
+// half the shorter adjacent edge so fillets on a small shape never overlap
+// past the corner into each other) — a small quadratic-Bezier fillet at each
+// vertex instead of a sharp `L`-to-`L` join.
+function roundedPolygonPath(points: Point[], radius: number): string {
+	const n = points.length;
+	const commands: string[] = [];
+	for (let i = 0; i < n; i++) {
+		const curr = points[i];
+		const prev = points[(i - 1 + n) % n];
+		const next = points[(i + 1) % n];
+		const distPrev = Math.hypot(prev[0] - curr[0], prev[1] - curr[1]);
+		const distNext = Math.hypot(next[0] - curr[0], next[1] - curr[1]);
+		const r = Math.min(radius, distPrev / 2, distNext / 2);
+		// A zero-length adjacent edge (e.g. halfW === 0 before the first-ever
+		// hover, when the top edge collapses to a single point) would divide
+		// by zero below — fall back to the vertex itself rather than NaN.
+		const startPt: Point = distPrev === 0 ? curr : [curr[0] + ((prev[0] - curr[0]) / distPrev) * r, curr[1] + ((prev[1] - curr[1]) / distPrev) * r];
+		const endPt: Point = distNext === 0 ? curr : [curr[0] + ((next[0] - curr[0]) / distNext) * r, curr[1] + ((next[1] - curr[1]) / distNext) * r];
+		commands.push(i === 0 ? `M ${startPt[0]} ${startPt[1]}` : `L ${startPt[0]} ${startPt[1]}`);
+		commands.push(`Q ${curr[0]} ${curr[1]} ${endPt[0]} ${endPt[1]}`);
+	}
+	commands.push('Z');
+	return commands.join(' ');
+}
+
+function buildTrapezoidPath(cx: number, halfW: number, navWidth: number) {
 	const bottomY = BUMP_HEIGHT;
-	// Capped to baseTopY: an uncapped rise would push the plateau above y=0 —
-	// past the row's own top edge, into the header's border/search-bar area —
-	// for any item wider than the row is tall (e.g. "سوالات متداول"). Capping
-	// `run` to the same value keeps the 45° slope exact up to that limit
-	// instead of only flattening the height while the ramp keeps widening.
-	const clampedRise = Math.min(rise, baseTopY);
-	const plateauY = baseTopY - clampedRise;
-	const run = clampedRise; // 45°: horizontal ramp run equals its (capped) vertical rise
+	const topY = BUMP_HEIGHT - PLATFORM_RISE;
 	const left = cx - halfW;
 	const right = cx + halfW;
-	// Clamped so a hovered item near the row's own edge can't push a ramp
-	// past the SVG's own bounds and fold the path back on itself.
-	const rampLeftBase = Math.max(0, left - run);
-	const rampRightBase = Math.min(navWidth, right + run);
-	return [
-		`M 0 ${baseTopY}`,
-		`L ${rampLeftBase} ${baseTopY}`,
-		`L ${left} ${plateauY}`,
-		`L ${right} ${plateauY}`,
-		`L ${rampRightBase} ${baseTopY}`,
-		`L ${navWidth} ${baseTopY}`,
-		`L ${navWidth} ${bottomY}`,
-		`L 0 ${bottomY}`,
-		'Z',
-	].join(' ');
+	// Clamped so an item near the row's own edge can't push a ramp past the
+	// SVG's bounds — the row has no overflow-hidden of its own, so an
+	// unclamped ramp there would visibly bleed past the header's edge.
+	// PLATFORM_RISE also doubles as the 45° ramp's horizontal run.
+	const rampLeftBase = Math.max(0, left - PLATFORM_RISE);
+	const rampRightBase = navWidth > 0 ? Math.min(navWidth, right + PLATFORM_RISE) : right + PLATFORM_RISE;
+	const points: Point[] = [
+		[rampLeftBase, bottomY],
+		[left, topY],
+		[right, topY],
+		[rampRightBase, bottomY],
+	];
+	return roundedPolygonPath(points, PLATFORM_CORNER_RADIUS);
 }
 
 export function Header({ productCategories = [] }: { productCategories?: ProductCategoryContent[] }) {
@@ -135,87 +156,85 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	const hasPositionedBump = React.useRef(false);
 	const bumpTargetX = useMotionValue(0);
 	const bumpTargetHalfW = useMotionValue(0);
-	const bumpTargetRise = useMotionValue(0);
+	const bumpTargetOpacity = useMotionValue(0);
 	const bumpX = useSpring(bumpTargetX, BUMP_SPRING);
 	const bumpHalfW = useSpring(bumpTargetHalfW, BUMP_SPRING);
-	const bumpRise = useSpring(bumpTargetRise, BUMP_SPRING);
+	const bumpOpacity = useSpring(bumpTargetOpacity, BUMP_OPACITY_SPRING);
+	// Refreshed on every hover (handleItemEnter below already measures the
+	// row's rect for centerX) rather than tracked live via its own
+	// ResizeObserver — the platform is invisible whenever nothing is
+	// hovered, so there's nothing for a resize to visibly desync while
+	// idle, and a value that's fresh as of the most recent hover is fresh
+	// enough for the edge clamp below.
+	const navWidthRef = React.useRef(0);
+	const bumpPath = useTransform([bumpX, bumpHalfW], ([cx, hw]) => buildTrapezoidPath(cx as number, hw as number, navWidthRef.current));
 
-	// The polygon's own width has to match the row's real rendered width —
-	// not assumed from a Tailwind class — since it changes with viewport size
-	// and with the `scrolled` padding swap (lg:px-2) above. Same
-	// "measure, don't hardcode" reasoning as headerHeight below. Kept as a
-	// motion value (not React state) so the useTransform below picks up a
-	// resize the same declarative way it already picks up bumpX/bumpHalfW/
-	// bumpRise changes, instead of needing a separate manual subscription.
-	const navWidth = useMotionValue(0);
+	// The row's own rect only actually moves on resize or scroll (scrolling
+	// can toggle the `scrolled` padding swap above, and can dock/undock the
+	// sticky header) — cached and invalidated on those instead of
+	// re-measured on every single hover, same pattern SpotlightCursor.tsx
+	// uses for its own container rect.
+	const navRowRectRef = React.useRef<DOMRect | null>(null);
 	React.useEffect(() => {
-		const el = navRowRef.current;
-		if (!el) return;
-		const measure = () => navWidth.set(el.getBoundingClientRect().width);
-		measure();
-		const ro = new ResizeObserver(measure);
-		ro.observe(el);
-		return () => ro.disconnect();
-	}, [navWidth]);
-
-	const bumpPath = useTransform([navWidth, bumpX, bumpHalfW, bumpRise], ([nw, cx, hw, rise]) =>
-		buildTrapezoidPath(nw as number, cx as number, hw as number, rise as number),
-	);
-
-	// `onMouseOver` bubbles, so sweeping the cursor across a row of inline
-	// elements can fire it several times per item (text nodes, icon glyphs)
-	// well within a single frame. Each firing wants two getBoundingClientRect()
-	// reads, which force a synchronous layout — batching to one measurement
-	// per animation frame (using only the latest event's target) means a fast
-	// sweep still costs at most one forced layout per frame instead of one per
-	// bubbled event, with no visible difference since nothing needs to react
-	// faster than a frame anyway.
-	const hoverRafRef = React.useRef<number | null>(null);
-	const pendingHoverTargetRef = React.useRef<HTMLElement | null>(null);
-
-	React.useEffect(() => {
+		const invalidate = () => {
+			navRowRectRef.current = null;
+		};
+		window.addEventListener('resize', invalidate);
+		window.addEventListener('scroll', invalidate, { passive: true });
 		return () => {
-			if (hoverRafRef.current !== null) cancelAnimationFrame(hoverRafRef.current);
+			window.removeEventListener('resize', invalidate);
+			window.removeEventListener('scroll', invalidate);
 		};
 	}, []);
 
-	const handleNavItemHover = (e: React.MouseEvent<HTMLDivElement>) => {
-		const target = (e.target as HTMLElement).closest<HTMLElement>('[data-nav-bump]');
-		if (!target) return;
-		pendingHoverTargetRef.current = target;
-		if (hoverRafRef.current !== null) return;
-		hoverRafRef.current = requestAnimationFrame(() => {
-			hoverRafRef.current = null;
-			const container = navRowRef.current;
-			const item = pendingHoverTargetRef.current;
-			if (!container || !item) return;
-			const containerRect = container.getBoundingClientRect();
-			const itemRect = item.getBoundingClientRect();
-			const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
-			// Flat top matches the item's real width exactly; the rise is set
-			// equal to half that width, which (at the ramps' fixed 45° slope,
-			// baked into buildTrapezoidPath as run === rise) makes the platform's
-			// base — top width plus one run on each side — come out to ~2x the
-			// top width, per spec.
-			const halfW = itemRect.width / 2;
-			bumpTargetX.set(centerX);
-			bumpTargetHalfW.set(halfW);
-			if (!hasPositionedBump.current) {
-				// First hover this session: jump the position/width springs
-				// straight there instead of sliding in from x=0 — only the rise
-				// (baseline lifting into a platform) should animate, not a sweep
-				// across the whole nav row.
-				bumpX.jump(centerX);
-				bumpHalfW.jump(halfW);
-				hasPositionedBump.current = true;
-			}
-			bumpTargetRise.set(halfW);
-		});
+	// Bound directly to each nav item's own real element (its `onMouseEnter`/
+	// `onMouseLeave` below — see the JSX), not a padded wrapper around it and
+	// not a bubbled `onMouseOver` on their shared container: `mouseenter`/
+	// `mouseleave` don't bubble and fire exactly at that element's own
+	// rendered box, so the platform tracks precisely what the eye sees as
+	// "the button" — appearing only inside it and disappearing the instant
+	// the cursor leaves it, with no larger or looser hit area. Because these
+	// fire once per real enter/exit (never repeatedly while the cursor just
+	// sits still or sweeps across a single element), no rAF-batching is
+	// needed here — unlike a `mousemove`-driven effect, there's nothing to
+	// throttle.
+	const handleItemEnter = (item: HTMLElement) => {
+		const container = navRowRef.current;
+		if (!container) return;
+		const containerRect = navRowRectRef.current ?? (navRowRectRef.current = container.getBoundingClientRect());
+		const itemRect = item.getBoundingClientRect();
+		navWidthRef.current = containerRect.width;
+		const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
+		const halfW = itemRect.width / 2;
+		bumpTargetX.set(centerX);
+		bumpTargetHalfW.set(halfW);
+		if (!hasPositionedBump.current) {
+			// First hover this session: jump the position/width springs straight
+			// there instead of sliding in from x=0 — only the fade-in should be
+			// visible, not a sweep across the whole nav row.
+			bumpX.jump(centerX);
+			bumpHalfW.jump(halfW);
+			hasPositionedBump.current = true;
+		}
+		bumpTargetOpacity.set(1);
 	};
 
-	const handleNavRowLeave = () => {
-		bumpTargetRise.set(0);
+	// Deliberate trade-off, not an oversight: because the hit area is now the
+	// exact Link box (see handleItemEnter above) and adjacent items have a
+	// small real gap between their boxes (wrapper padding, and a shorter
+	// Link than the row's own height), sweeping through that gap fires this
+	// before the next item's onMouseEnter, which can visibly dip the
+	// platform's opacity between items rather than gliding without a blip —
+	// the explicit trade-off for the platform never lingering past the
+	// button's real edge.
+	const handleItemLeave = () => {
+		bumpTargetOpacity.set(0);
 	};
+
+	// Spread onto every nav item's own trigger element (plain links and the
+	// mega-menu's inner trigger alike) so the four call sites below don't
+	// each re-type the same enter/leave wiring.
+	const bumpHoverProps = { onMouseEnter: (e: React.MouseEvent<HTMLElement>) => handleItemEnter(e.currentTarget), onMouseLeave: handleItemLeave };
 
 	const links = [
 		{
@@ -349,17 +368,14 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 			{/* Trial run of the cursor-following spotlight (see SpotlightCursor) —
 				scoped to just the navbar for now, per the plan to measure its
 				Lighthouse impact here and on the Hero before considering it
-				anywhere else. */}
-			<SpotlightCursor className="rounded-[inherit]" />
+				anywhere else. z-[1] keeps it above the header's own background
+				but below the real content (z-10 below), same convention Hero.tsx
+				uses for its own instance — an explicit stacking layer any sibling
+				participates in correctly by default, rather than relying on which
+				siblings happen to already be `position`ed. */}
+			<SpotlightCursor className="z-[1] rounded-[inherit]" />
 
-			{/* `relative` (a no-op for its own layout) is load-bearing here: without
-				it this div paints in CSS's "in-flow, non-positioned" step, which
-				comes *before* positioned z-index:auto siblings like SpotlightCursor's
-				absolute glow layer above — so the glow would paint over the search
-				bar instead of staying confined to the empty nav background under it.
-				`relative` moves it into the same positioned-siblings step, where its
-				later tree position keeps it painting on top as intended. */}
-			<div className="relative w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
+			<div className="relative z-10 w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
 				<HeaderSearch />
 			</div>
 
@@ -370,25 +386,25 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 					// nav-links row and the hover-bump wrappers inside it fill the
 					// full row height instead of sizing to their own content — the
 					// hover hit-area fix depends on this. Mobile stays items-center
-					// since the links row is hidden there anyway.
-					'relative flex h-14 w-full items-center justify-between px-4 lg:h-12 lg:items-stretch lg:transition-all lg:duration-300 lg:ease-in-out',
+					// since the links row is hidden there anyway. z-10 keeps it above
+					// SpotlightCursor's z-[1] glow layer — see the comment above.
+					'relative z-10 flex h-14 w-full items-center justify-between px-4 lg:h-12 lg:items-stretch lg:transition-all lg:duration-300 lg:ease-in-out',
 					{
 						'lg:px-2': scrolled,
 					},
 				)}
 			>
-				{/* Hover "speed bump": a single filled polygon, always visible as a
-					thin baseline bar the full width of the row, that rises into a
-					flat-topped platform under whichever nav item (data-nav-bump) is
-					hovered — see buildTrapezoidPath above. Desktop-only, same as the
-					links it tracks. Painted first so it sits behind the nav items in
-					source order; the low fill opacity keeps it reading as an underlay
-					even where stacking order overlaps text. */}
+				{/* Hover "speed bump": a standalone rounded platform that fades in
+					under whichever nav item is currently hovered — see
+					buildTrapezoidPath above. Desktop-only, same as the links it
+					tracks. Painted first so it sits behind the nav items in source
+					order; the low fill opacity keeps it reading as an underlay even
+					where stacking order overlaps text. */}
 				<svg
 					aria-hidden
 					className="pointer-events-none absolute inset-x-0 top-0 hidden h-12 w-full overflow-visible lg:block"
 				>
-					<motion.path d={bumpPath} className="fill-foreground/[0.06]" />
+					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-foreground/[0.06]" />
 				</svg>
 
 				<Link
@@ -402,52 +418,61 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						پویش راه صنعت<span className="text-accent-400"> یاشار</span>
 					</span>
 				</Link>
-				<div
-					className="hidden items-stretch lg:flex [&:has(a:hover)_a:not(:hover)]:opacity-50"
-					onMouseOver={handleNavItemHover}
-					onMouseLeave={handleNavRowLeave}
-				>
-					{/* Each plain link gets a full-row-height wrapper (not just the
-						link's own h-9 pill) carrying data-nav-bump, so hovering
-						anywhere in the item's column — including the vertical
-						whitespace above/below the pill and the small horizontal
-						buffer between items — counts as "hovering this item", matching
-						what actually reads as the item's clickable region. The wrapper
-						sits edge-to-edge with its neighbors (no container gap) so
-						there's no dead pixel between items either; its own small px
-						reproduces the old visual spacing without opening a gap the
-						bump detection can fall into. */}
-					<div className="flex h-full items-center px-0.5" data-nav-bump>
+				<div className="hidden items-stretch lg:flex [&:has(a:hover)_a:not(:hover)]:opacity-50">
+					{/* This wrapper is layout only (vertical centering within the
+						full-row-height flex parent) — the platform's hit area binds to
+						the Link itself below (onMouseEnter/onMouseLeave), not to this
+						div's own padded bounds. */}
+					<div className="flex h-full items-center px-0.5">
 						<Link
 							className={cn(buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }), 'transition-opacity duration-200')}
 							href={links[0].href}
+							{...bumpHoverProps}
 						>
 							{links[0].label}
 						</Link>
 					</div>
-					<ProductsMegaMenu categories={productCategories} />
+					<ProductsMegaMenu
+						categories={productCategories}
+						onBumpEnter={handleItemEnter}
+						onBumpLeave={handleItemLeave}
+						headerRef={headerRef}
+					/>
 					{links.slice(1).map((link, i) => (
-						<div key={i} className="flex h-full items-center px-0.5" data-nav-bump>
+						<div key={i} className="flex h-full items-center px-0.5">
 							<Link
 								className={cn(buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }), 'transition-opacity duration-200')}
 								href={link.href}
+								{...bumpHoverProps}
 							>
 								{link.label}
 							</Link>
 						</div>
 					))}
-					{/* This trio isn't part of the hover-bump system above, so unlike
-						those wrappers it doesn't need to sit edge-to-edge with its
-						neighbors — it needs its own breathing room instead. Grouped in
-						one wrapper with a real gap, plus a margin off the last nav
-						link, so they don't touch. */}
+					{/* This trio isn't part of the shared sliding indicator above, so
+						unlike those wrappers it doesn't need to sit edge-to-edge with
+						its neighbors — it needs its own breathing room instead. Grouped
+						in one wrapper with a real gap, plus a margin off the last nav
+						link, so they don't touch. Every one of these four gets its own
+						independent NavActionGlow ring on hover/focus, each colored to
+						match that specific button's own real surface — the solid CTA's
+						`--primary` fill, the three outline-style buttons' shared
+						`--input` border — never one generic tone for all of them. */}
 					<div className="mr-1 flex items-center gap-2">
-						<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
-							<Link href="/contact">تماس با ما</Link>
-						</Button>
-						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
-						<AuthNavLink variant="icon" />
-						<ThemeToggleButton />
+						<NavActionGlow colorVar="var(--input)">
+							<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
+								<Link href="/contact">تماس با ما</Link>
+							</Button>
+						</NavActionGlow>
+						<NavActionGlow colorVar="var(--primary)">
+							<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
+						</NavActionGlow>
+						<NavActionGlow colorVar="var(--input)">
+							<AuthNavLink variant="icon" />
+						</NavActionGlow>
+						<NavActionGlow colorVar="var(--input)">
+							<ThemeToggleButton />
+						</NavActionGlow>
 					</div>
 				</div>
 				<Button
@@ -488,15 +513,10 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						>
 							{links[0].label}
 						</Link>
-						{/* Plain link on mobile — the hover-driven mega menu doesn't
-							translate to touch, so this stays a normal nav item here. */}
-						<Link
-							className={buttonVariants({ variant: 'ghost', className: 'justify-start' })}
-							href="/products"
-							onClick={() => setOpen(false)}
-						>
-							محصولات
-						</Link>
+						{/* The hover-driven mega menu doesn't translate to touch, so
+							mobile gets its own vertical-accordion rendering of the same
+							real category/brand data — see MobileProductsAccordion. */}
+						<MobileProductsAccordion categories={productCategories} drawerOpen={open} onNavigate={() => setOpen(false)} />
 						{links.slice(1).map((link) => (
 							<Link
 								key={link.label}

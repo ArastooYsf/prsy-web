@@ -7,7 +7,15 @@ import { fadeInUp, staggerContainer } from "@/lib/motion";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 type ErrorPageShellProps = {
-  code: string;
+  // Used to build the default eyebrow ("خطای {code}") for genuine HTTP
+  // errors (404/500/403). Optional because a non-error status page
+  // (maintenance mode) has no code to show and passes `eyebrow` instead.
+  code?: string;
+  // The eyebrow reads "خطای {code}" by default (404/500/403 are genuine
+  // errors) — maintenance mode isn't an error, so it passes a full replacement
+  // string here instead of a code that would force an awkward "خطای
+  // به‌روزرسانی" ("error: update") reading.
+  eyebrow?: string;
   icon: ReactNode;
   title: string;
   description: string;
@@ -19,6 +27,7 @@ type ErrorPageShellProps = {
 
 export default function ErrorPageShell({
   code,
+  eyebrow,
   icon,
   title,
   description,
@@ -41,7 +50,7 @@ export default function ErrorPageShell({
             {icon}
           </motion.div>
           <motion.span variants={fadeInUp} className="mt-6 text-sm font-semibold text-accent-400">
-            خطای {code}
+            {eyebrow ?? `خطای ${code}`}
           </motion.span>
           <motion.h1
             variants={fadeInUp}

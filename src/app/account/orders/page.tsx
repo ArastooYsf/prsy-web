@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { Package } from "lucide-react";
+import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
@@ -26,9 +27,11 @@ export default async function AccountOrdersPage() {
       </h2>
 
       {orders.length === 0 ? (
-        <p className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-8 text-center text-sm text-foreground/60">
-          هنوز سفارشی برای شما ثبت نشده است.
-        </p>
+        <EmptyState
+          icon={<Package />}
+          title="هنوز سفارشی برای شما ثبت نشده است."
+          description="وقتی تیم ما سفارشی براتون ثبت کنه، همین‌جا نمایش داده می‌شه."
+        />
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (

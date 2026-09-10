@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - **No test framework in this repo.** Verification per task = `npx tsc --noEmit` clean + `npm run lint` clean + the task's explicit manual/CLI check. Do NOT add a test runner.
-- **DB is MySQL.** No Prisma scalar lists. `Product.images`/`specs` are `Json`.
+- **DB is MySQL.** No Prisma scalar lists. `Product.images`/`specs` are `Json`. `Product.price` is a Prisma `Int` (MySQL `INT`, max `2_147_483_647`) — **do not change the price column type**; any seed/test price must stay under `2_000_000_000`.
 - **`npm run build` corrupts a running `next dev`'s `.next`.** Any step that runs `build` must first `pkill -f "next dev"`, and restart `npm run dev` (backgrounded) + `rm -rf .next` afterward if a dev server is needed again.
 - **Prisma:** `import { prisma } from "@/lib/prisma"`; types `import type { Prisma } from "@/generated/prisma/client"`; runtime enum values are the string literals (`"IN_STOCK"` etc.).
 - **All public + admin copy is Persian (fa-IR), RTL.** Numbers in Persian digits via `formatNumber` / `toPersianDigits` from `@/lib/format-number`.
@@ -136,9 +136,11 @@ const CATEGORIES: CatSeed[] = [
 ];
 
 // [sub-slug, brand-slug, name, availability, showPrice, price|null]
+// NOTE: `Product.price` is a Prisma `Int` (MySQL INT, max 2_147_483_647).
+// Every price below MUST stay under 2_000_000_000. Do NOT change the schema.
 const PRODUCTS: [string, string, string, "IN_STOCK" | "OUT_OF_STOCK" | "CALL", boolean, number | null][] = [
-  ["diesel-generator-industrial", "caterpillar", "دیزل ژنراتور کاترپیلار ۵۰۰ کاوا", "IN_STOCK", true, 4500000000],
-  ["diesel-generator-industrial", "cummins", "دیزل ژنراتور کامینز ۴۰۰ کاوا", "IN_STOCK", true, 3800000000],
+  ["diesel-generator-industrial", "caterpillar", "دیزل ژنراتور کاترپیلار ۵۰۰ کاوا", "IN_STOCK", true, 1950000000],
+  ["diesel-generator-industrial", "cummins", "دیزل ژنراتور کامینز ۴۰۰ کاوا", "IN_STOCK", true, 1750000000],
   ["diesel-generator-industrial", "perkins", "دیزل ژنراتور پرکینز ۲۵۰ کاوا", "CALL", false, null],
   ["diesel-generator-marine", "volvo", "دیزل ژنراتور دریایی ولوو ۱۵۰ کاوا", "IN_STOCK", false, null],
   ["diesel-generator-marine", "cummins", "دیزل ژنراتور دریایی کامینز ۲۰۰ کاوا", "OUT_OF_STOCK", false, null],

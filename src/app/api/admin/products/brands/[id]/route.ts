@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
@@ -37,6 +38,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     where: { id: existing.id },
     data: { name, slug, description, logo, order },
   });
+  revalidatePath("/products/all");
   return NextResponse.json({ brand });
 }
 
@@ -58,5 +60,6 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   }
 
   await prisma.brand.delete({ where: { id: existing.id } });
+  revalidatePath("/products/all");
   return NextResponse.json({ ok: true });
 }

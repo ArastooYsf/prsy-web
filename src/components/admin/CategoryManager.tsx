@@ -154,13 +154,13 @@ export default function CategoryManager({ categories }: { categories: ProductCat
                   <p className="truncate text-sm font-medium">{root.name}</p>
                   <p dir="ltr" className="truncate text-xs text-foreground/40">{root.slug}</p>
                 </div>
-                <button type="button" onClick={() => openCreate(root.id)} aria-label="افزودن زیردسته" className="flex size-9 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
+                <button type="button" onClick={() => openCreate(root.id)} aria-label="افزودن زیردسته" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
                   <Plus className="size-4" />
                 </button>
-                <button type="button" onClick={() => openEdit(root)} aria-label="ویرایش" className="flex size-9 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
+                <button type="button" onClick={() => openEdit(root)} aria-label="ویرایش" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
                   <Pencil className="size-4" />
                 </button>
-                <button type="button" onClick={() => setDeleteTarget(root)} aria-label="حذف" className="flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
+                <button type="button" onClick={() => setDeleteTarget(root)} aria-label="حذف" className="flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
                   <Trash2 className="size-4" />
                 </button>
               </div>
@@ -175,10 +175,10 @@ export default function CategoryManager({ categories }: { categories: ProductCat
                         <p className="truncate text-sm">{child.name}</p>
                         <p dir="ltr" className="truncate text-xs text-foreground/40">{child.slug}</p>
                       </div>
-                      <button type="button" onClick={() => openEdit(child)} aria-label="ویرایش" className="flex size-8 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
+                      <button type="button" onClick={() => openEdit(child)} aria-label="ویرایش" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
                         <Pencil className="size-3.5" />
                       </button>
-                      <button type="button" onClick={() => setDeleteTarget(child)} aria-label="حذف" className="flex size-8 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
+                      <button type="button" onClick={() => setDeleteTarget(child)} aria-label="حذف" className="flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
                         <Trash2 className="size-3.5" />
                       </button>
                     </li>

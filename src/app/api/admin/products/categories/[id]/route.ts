@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
@@ -57,6 +58,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     where: { id: existing.id },
     data: { name, slug, icon, order, parentId },
   });
+  revalidatePath("/products/all");
   return NextResponse.json({ category });
 }
 
@@ -68,7 +70,7 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
 
   const existing = await prisma.productCategory.findUnique({
     where: { id: params.id },
-    include: { _count: { select: { children: true, products: true } } },
+    include: { _count: { select: { children: true, products: { where: { deletedAt: null } } } } },
   });
   if (!existing) return NextResponse.json({ error: "دسته یافت نشد." }, { status: 404 });
 
@@ -83,5 +85,6 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   }
 
   await prisma.productCategory.delete({ where: { id: existing.id } });
+  revalidatePath("/products/all");
   return NextResponse.json({ ok: true });
 }

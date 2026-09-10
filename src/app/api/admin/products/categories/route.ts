@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
@@ -42,5 +43,6 @@ export async function POST(request: Request) {
   });
 
   const category = await prisma.productCategory.create({ data: { name, slug, icon, order, parentId } });
+  revalidatePath("/products/all");
   return NextResponse.json({ category }, { status: 201 });
 }

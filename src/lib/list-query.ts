@@ -53,6 +53,13 @@ export function filterQueryString(searchParams: ListSearchParams): string {
   return qs ? `?${qs}` : "";
 }
 
+/** Multi-value query param: "a,b,c" -> ["a","b","c"] (trimmed, non-empty, de-duped). */
+export function paramList(searchParams: ListSearchParams, key: string): string[] {
+  const raw = param(searchParams, key);
+  if (!raw) return [];
+  return [...new Set(raw.split(",").map((s) => s.trim()).filter(Boolean))];
+}
+
 export function sortParams<T extends string>(
   searchParams: ListSearchParams,
   allowed: readonly T[],

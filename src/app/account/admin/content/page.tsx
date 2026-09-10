@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { LayoutTemplate, MapPin } from "lucide-react";
 import { authOptions } from "@/lib/auth";
-import { getHeroSlides, getProductCategories, getFooterContact } from "@/lib/site-content";
+import { getHeroSlides, getFooterContact } from "@/lib/site-content";
 import SiteContentForm from "@/components/admin/SiteContentForm";
 import FooterContactForm from "@/components/admin/FooterContactForm";
 
@@ -14,9 +14,8 @@ export default async function AdminContentPage() {
     redirect("/account/admin");
   }
 
-  const [heroSlides, categories, footerContact] = await Promise.all([
+  const [heroSlides, footerContact] = await Promise.all([
     getHeroSlides(),
-    getProductCategories(),
     getFooterContact(),
   ]);
 
@@ -28,9 +27,9 @@ export default async function AdminContentPage() {
           محتوای سایت
         </h2>
         <p className="mb-6 text-sm text-foreground/60">
-          اسلایدر صفحه اصلی و دسته‌بندی محصولات را می‌توانید ویرایش، اضافه یا حذف کنید.
+          اسلایدر صفحه اصلی را می‌توانید ویرایش، اضافه یا حذف کنید.
         </p>
-        <SiteContentForm initialHeroSlides={heroSlides} initialCategories={categories} />
+        <SiteContentForm initialHeroSlides={heroSlides} />
       </div>
 
       <div>

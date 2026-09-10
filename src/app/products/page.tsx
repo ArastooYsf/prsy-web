@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
 import { getProductCategories } from "@/lib/site-content";
@@ -30,6 +31,14 @@ export default async function ProductsPage() {
             تأمین انواع دیزل ژنراتور، موتور برق، قطعات یدکی، موتور ژنراتور و
             دینام/آلترناتور با برندهای معتبر جهانی، به‌صورت نو و دست‌دوم.
           </p>
+          <div className="mt-8">
+            <Link
+              href="/products/all"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent-500 px-6 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            >
+              مشاهده‌ی همه‌ی محصولات
+            </Link>
+          </div>
         </div>
       </section>
 

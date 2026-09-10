@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { ProductCategoryContent } from "@/lib/site-content-defaults";
@@ -11,76 +11,28 @@ import { cn } from "@/lib/utils";
 
 // Close is delayed (not instant on mouseleave) so moving the cursor from the
 // trigger toward the panel — which briefly leaves both — doesn't flicker the
-// menu shut. Same open/close asymmetry as the header search dropdown: opens
-// a little slower and softer, closes quickly.
+// menu shut. Opens a little slower and softer, closes quickly.
 const CLOSE_DELAY = 180;
-const OPEN_TRANSITION = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
-const CLOSE_TRANSITION = { duration: 0.18, ease: "easeIn" as const };
+const OPEN_TRANSITION = { duration: 0.22, ease: [0.16, 1, 0.3, 1] as const };
+const CLOSE_TRANSITION = { duration: 0.16, ease: "easeIn" as const };
+// The rail→panel swap is the defining interaction of this pattern: it must
+// feel instant. This is a soft fade-in only (no exit wait), so the new
+// category's content is on screen the same frame the cursor lands.
+const PANEL_SWAP_TRANSITION = { duration: 0.14, ease: [0.16, 1, 0.3, 1] as const };
 
 type ProductsMegaMenuProps = {
   categories: ProductCategoryContent[];
-  // The shared nav-bump indicator (header-2.tsx) needs to react to hover on
-  // this component's own trigger link specifically — not the whole flyout
-  // wrapper below, which has its own independent open/close hover area with
-  // its own delay. Optional so this component still works standalone.
+  // The shared nav-bump indicator (header-2.tsx) reacts to hover on this
+  // component's own trigger link specifically — not the flyout wrapper, which
+  // has its own independent open/close hover area with its own delay.
   onBumpEnter?: (el: HTMLElement) => void;
   onBumpLeave?: () => void;
-  // The full-bleed panel is `position:fixed` so it spans the true viewport
-  // width regardless of where its trigger sits in the header — it can't
-  // breed off a `relative` ancestor the way the old `w-[36rem]` dropdown
-  // did, since that ancestor is only as wide as the trigger link itself.
-  // headerRef is the same ref header-2.tsx already measures for the mobile
-  // drawer's `top` offset; reading its live rect here (not the header's
-  // static `offsetHeight`) keeps the panel flush under the header even
-  // while it's floating/inset on desktop scroll (`lg:top-4`).
-  headerRef: React.RefObject<HTMLElement | null>;
 };
 
-export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerRef }: ProductsMegaMenuProps) {
+export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave }: ProductsMegaMenuProps) {
   const [open, setOpen] = useState(false);
-  // Lazily read on first render (not useState(0)) so the panel's very first
-  // open of the session already has the real header-bottom offset instead
-  // of a stale 0 — without this it paints pinned to the top of the screen
-  // for one frame before the resize-driven effect below corrects it.
-  const [panelTop, setPanelTop] = useState(() => (typeof window === "undefined" ? 0 : headerRef.current?.getBoundingClientRect().bottom ?? 0));
+  const [activeId, setActiveId] = useState<string | undefined>(categories[0]?.id);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const measureRaf = useRef<number | null>(null);
-  // Tailwind Typography's prose-invert (light text) vs prose (dark text)
-  // isn't a CSS-variable-driven choice like the rest of the .theme-white-blue
-  // override, so it needs its own check — this component is shared by every
-  // page via the header. The panel itself is deliberately always-dark (a
-  // "control room" surface, matching the site's own default palette) rather
-  // than following the page's light/dark theme, so its own prose is always
-  // prose-invert regardless of isLightTheme.
-
-  const measureTop = () => {
-    if (headerRef.current) setPanelTop(headerRef.current.getBoundingClientRect().bottom);
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    measureTop();
-    // rAF-batched, same as SpotlightCursor's pointermove handling — scroll
-    // fires far more often than once per frame, so this collapses a fast
-    // scroll burst into at most one layout read + re-render per frame
-    // instead of one per raw event.
-    const scheduleMeasure = () => {
-      if (measureRaf.current !== null) return;
-      measureRaf.current = requestAnimationFrame(() => {
-        measureRaf.current = null;
-        measureTop();
-      });
-    };
-    window.addEventListener("resize", scheduleMeasure);
-    window.addEventListener("scroll", scheduleMeasure, { passive: true });
-    return () => {
-      window.removeEventListener("resize", scheduleMeasure);
-      window.removeEventListener("scroll", scheduleMeasure);
-      if (measureRaf.current !== null) cancelAnimationFrame(measureRaf.current);
-      measureRaf.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, headerRef]);
 
   if (categories.length === 0) {
     return (
@@ -100,6 +52,8 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
     );
   }
 
+  const activeCategory = categories.find((c) => c.id === activeId) ?? categories[0];
+
   const clearCloseTimer = () => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
@@ -109,13 +63,11 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
 
   const handleEnter = () => {
     clearCloseTimer();
-    // Measured synchronously here (not left to the effect below) so the
-    // panel's first commit with open=true already carries the real
-    // header-bottom offset — React 18 batches this with setOpen(true) into
-    // one render, so there's never a frame painted at a stale `top` even if
-    // the header's own position (e.g. its `lg:top-4` scrolled state) moved
-    // since the last time this measured.
-    measureTop();
+    // Only reset the active category on a real open — not on every bubbled
+    // focus event. onFocus bubbles here from the rail/panel links too, and
+    // resetting then would snap a keyboard user back to the first category
+    // each time they tab to another one.
+    if (!open) setActiveId(categories[0]?.id);
     setOpen(true);
   };
 
@@ -126,15 +78,9 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
 
   return (
     // onFocus/onBlur (not just mouse events) so keyboard-only navigation can
-    // reach the flyout too — React's focus/blur are bubbling synthetic
-    // events, so tabbing into any link inside the panel keeps it open the
-    // same way onMouseEnter does, and tabbing past the last one closes it.
-    // This wrapper's own hover area (full row height, generous width) is
-    // deliberately larger than the trigger link itself — that's the flyout's
-    // own open/close hit area, independent of and unrelated to the shared
-    // nav-bump indicator below, which instead binds directly to the trigger
-    // Link's own onMouseEnter/onMouseLeave so it tracks that link's exact
-    // rendered bounds, not this wrapper's.
+    // reach the flyout too — React's focus/blur are bubbling synthetic events,
+    // so tabbing into any link inside the panel keeps it open and tabbing past
+    // the last one closes it.
     <div
       className="relative flex h-full items-center px-0.5"
       onMouseEnter={handleEnter}
@@ -146,8 +92,6 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
         href="/products"
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 px-2.5" }),
-          // The shared speed-bump platform is this trigger's hover surface —
-          // strip ghost's own hover:bg so there aren't two layers to sync.
           "hover:bg-transparent hover:text-foreground",
         )}
         aria-haspopup="true"
@@ -162,73 +106,128 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0, transition: OPEN_TRANSITION }}
-            exit={{ opacity: 0, y: -10, transition: CLOSE_TRANSITION }}
-            style={{ top: panelTop }}
-            className="fixed inset-x-0 z-50 border-y border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl shadow-black/40"
+            exit={{ opacity: 0, y: -8, transition: CLOSE_TRANSITION }}
+            // A bounded box anchored under the trigger (RTL: right edge aligns
+            // with the trigger, box grows toward the centre) — not the old
+            // full-bleed bar. `absolute` relative to this `relative` wrapper
+            // means it tracks the trigger through the header's scrolled/floating
+            // states with no measurement code.
+            className="absolute right-0 top-full z-50 mt-2 w-[37rem] max-w-[calc(100vw-2rem)]"
           >
-            {/* max-h + overflow-y-auto: this is `position:fixed`, so unlike
-                normal in-flow content it can't grow the page and scroll into
-                view — a CMS-added category or a long brand list on a short
-                viewport needs its own scroll container instead of clipping
-                silently against the viewport edge. */}
-            <div className="container grid max-h-[calc(100vh-6rem)] grid-cols-3 gap-x-8 gap-y-8 overflow-y-auto py-8 xl:grid-cols-6 xl:gap-x-6">
-              {categories.map((category) => (
-                <div key={category.id} className="flex flex-col">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 [&_svg]:size-4">
-                      {CATEGORY_ICONS[category.iconKey]}
-                    </span>
-                    <h3 className="text-sm font-bold text-white">{category.title}</h3>
-                  </div>
-
-                  <div
-                    className="prose prose-invert prose-sm mt-2.5 max-w-none text-xs leading-6 text-slate-400 [&_p]:m-0"
-                    dangerouslySetInnerHTML={{ __html: category.description }}
-                  />
-
-                  {/* Real per-category data only goes two levels deep (category →
-                      flat brand names, no per-brand description) — brands are
-                      listed as items in their own right rather than padded out
-                      with invented copy. The arrow is a UI affordance, not a
-                      brand-specific icon, and sits on the row's other side per
-                      spec, revealing on hover. */}
-                  {category.brands.length > 0 && (
-                    <ul className="mt-4 flex flex-col gap-0.5">
-                      {category.brands.map((brand) => (
-                        <li key={brand}>
-                          <Link
-                            href={`/products#${category.id}`}
-                            onClick={() => setOpen(false)}
-                            className="group flex items-center justify-between gap-2 rounded-md px-1.5 py-1.5 text-xs text-slate-300 transition-colors hover:bg-white/5 hover:text-accent-400"
+            <div className="overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/40">
+              {/* min-h (not a fixed height): the rail's own content is
+                  identical for every category and is the tallest element, so
+                  the box height is effectively constant and does not jump as
+                  the panel content swaps — without stranding empty space under
+                  a category that has only a few brands. */}
+              <div className="flex min-h-[17rem] max-h-[calc(100vh-8rem)]">
+                {/* Narrow rail: every main category, hover (or focus) swaps the
+                    panel beside it. Click still navigates to the category. */}
+                <ul className="w-56 shrink-0 overflow-y-auto border-l border-border bg-foreground/[0.03] p-2">
+                  {categories.map((category) => {
+                    const isActive = category.id === activeCategory.id;
+                    return (
+                      <li key={category.id}>
+                        <Link
+                          href={`/products#${category.id}`}
+                          onClick={() => setOpen(false)}
+                          onMouseEnter={() => setActiveId(category.id)}
+                          onFocus={() => setActiveId(category.id)}
+                          className={cn(
+                            "group flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-xs font-medium leading-snug transition-colors",
+                            isActive
+                              ? "bg-accent-500/10 text-accent-500"
+                              : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "flex size-7 shrink-0 items-center justify-center rounded-md transition-colors [&_svg]:size-4",
+                              isActive ? "bg-accent-500/15 text-accent-500" : "bg-foreground/5 text-foreground/50",
+                            )}
                           >
-                            <span className="truncate">{brand}</span>
-                            <ArrowLeft
-                              aria-hidden
-                              className="size-3 shrink-0 -translate-x-1 text-slate-600 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-accent-400 group-hover:opacity-100"
-                            />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                            {CATEGORY_ICONS[category.iconKey]}
+                          </span>
+                          <span className="min-w-0 flex-1">{category.title}</span>
+                          <ChevronLeft
+                            aria-hidden
+                            className={cn(
+                              "size-4 shrink-0 transition-all",
+                              isActive
+                                ? "text-accent-500 opacity-100"
+                                : "-translate-x-1 text-foreground/30 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                            )}
+                          />
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
 
-                  <Link
-                    href={`/products#${category.id}`}
-                    onClick={() => setOpen(false)}
-                    className={buttonVariants({
-                      variant: "outline",
-                      size: "sm",
-                      className:
-                        "group mt-4 gap-1.5 self-start border-white/15 bg-transparent text-xs text-white hover:border-accent-400/50 hover:bg-white/5 hover:text-accent-400",
-                    })}
+                {/* Wide panel: keyed on the active category so it re-mounts and
+                    re-fades on every rail change. No AnimatePresence / exit —
+                    the new content mounts the same frame, so switching feels
+                    instant (the defining behaviour of this pattern). */}
+                <div className="min-w-0 flex-1 overflow-y-auto p-5">
+                  <motion.div
+                    key={activeCategory.id}
+                    initial={{ opacity: 0, x: 8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={PANEL_SWAP_TRANSITION}
                   >
-                    مشاهده همه
-                    <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
-                  </Link>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-500 [&_svg]:size-5">
+                          {CATEGORY_ICONS[activeCategory.iconKey]}
+                        </span>
+                        <h3 className="text-sm font-bold">{activeCategory.title}</h3>
+                      </div>
+                      <Link
+                        href={`/products#${activeCategory.id}`}
+                        onClick={() => setOpen(false)}
+                        className="group inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs font-medium text-accent-500 transition-colors hover:bg-accent-500/10"
+                      >
+                        مشاهده همه
+                        <ArrowLeft aria-hidden className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
+                      </Link>
+                    </div>
+
+                    {activeCategory.description && (
+                      <div
+                        className="mt-2 text-xs leading-6 text-muted-foreground [&_p]:m-0"
+                        dangerouslySetInnerHTML={{ __html: activeCategory.description }}
+                      />
+                    )}
+
+                    {activeCategory.brands.length > 0 && (
+                      <div className="mt-4">
+                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                          برندها
+                        </p>
+                        <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          {activeCategory.brands.map((brand) => (
+                            <li key={brand}>
+                              <Link
+                                href={`/products#${activeCategory.id}`}
+                                onClick={() => setOpen(false)}
+                                className="group flex items-center justify-between gap-2 rounded-md px-1.5 py-1.5 text-xs text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-accent-500"
+                              >
+                                <span className="truncate">{brand}</span>
+                                <ArrowLeft
+                                  aria-hidden
+                                  className="size-3 shrink-0 -translate-x-1 text-foreground/20 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-accent-500 group-hover:opacity-100"
+                                />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </motion.div>
                 </div>
-              ))}
+              </div>
             </div>
           </motion.div>
         )}

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import { Header } from "@/components/ui/header-2";
 import Footer from "@/components/Footer";
@@ -18,10 +19,29 @@ import "./globals.css";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
+// Primary face. Self-hosted via next/font/local (build-time fingerprint +
+// automatic <link rel=preload> for the first weight), only the four weights
+// the site actually uses. SIL OFL — see src/fonts/shabnam-fd/LICENSE.
+const shabnamFD = localFont({
+  src: [
+    { path: "../fonts/shabnam-fd/Shabnam-Light-FD.woff2", weight: "300", style: "normal" },
+    { path: "../fonts/shabnam-fd/Shabnam-FD.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/shabnam-fd/Shabnam-Medium-FD.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/shabnam-fd/Shabnam-Bold-FD.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-shabnam",
+  display: "swap",
+});
+
+// Kept only as the font-display: swap fallback in the font-sans stack (see
+// tailwind.config.ts) — a real Persian face to paint while Shabnam loads,
+// not the browser's generic sans. preload: false because it's never the
+// face that actually renders, so it shouldn't compete for startup priority.
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
   variable: "--font-vazirmatn",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -63,7 +83,7 @@ export default async function RootLayout({
   const [footerContact, productCategories] = await Promise.all([getFooterContact(), getProductCategories()]);
 
   return (
-    <html lang="fa" dir="rtl" className={vazirmatn.variable} suppressHydrationWarning>
+    <html lang="fa" dir="rtl" className={`${shabnamFD.variable} ${vazirmatn.variable}`} suppressHydrationWarning>
       <head>
         {/* A plain <script> here (NOT next/script) is required: next/script's
             beforeInteractive strategy still ships its body through Next's RSC

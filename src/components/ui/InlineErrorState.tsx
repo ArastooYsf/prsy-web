@@ -13,11 +13,17 @@ export default function InlineErrorState({
   message = "این عملیات انجام نشد.",
   onRetry,
   retryLabel = "تلاش مجدد",
+  // For callers whose retry action has its own cooldown/in-flight guard
+  // (e.g. a send-message throttle) that would otherwise make a click here
+  // silently no-op with no visible feedback — pass the same guard through
+  // so the button reflects it instead.
+  disabled = false,
   className,
 }: {
   message?: string;
   onRetry: () => void;
   retryLabel?: string;
+  disabled?: boolean;
   className?: string;
 }) {
   return (
@@ -33,7 +39,8 @@ export default function InlineErrorState({
       <button
         type="button"
         onClick={onRetry}
-        className="shrink-0 rounded-full border border-destructive/30 px-3 py-1 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10"
+        disabled={disabled}
+        className="shrink-0 rounded-full border border-destructive/30 px-3 py-1 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {retryLabel}
       </button>

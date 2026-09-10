@@ -18,10 +18,10 @@ import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
 import { MobileProductsAccordion } from '@/components/ui/MobileProductsAccordion';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
 import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
-import { NavActionGlow } from '@/components/ui/NavActionGlow';
 import SpotlightCursor from '@/components/ui/SpotlightCursor';
 import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import type { ProductCategoryContent } from '@/lib/site-content-defaults';
 
 // How far (in px) the user needs to scroll before the header's ambient glow
@@ -47,7 +47,13 @@ const GLOW_MAX_SHADOW_BLUE = '0 8px 40px -4px rgba(37, 99, 235, 0.25)';
 // interpolate between differently-shaped paths) so both sliding between
 // items and fading in/out stay smooth instead of jump-cutting.
 const BUMP_HEIGHT = 48; // matches nav's lg:h-12 — the platform's own bottom edge sits flush with the row's bottom
-const PLATFORM_RISE = 14; // fixed platform height — never derived from item width
+// The flat top of the platform sits this many px below the row's top edge. The
+// nav links are `size:sm` (h-9, 36px) centred in the 48px row, so their own top
+// is ~6px down — a value just under that puts the platform's top level with (a
+// hair above) the button, instead of the old sliver that stopped well short and
+// let the button stick out above it.
+const PLATFORM_TOP_Y = 3;
+const PLATFORM_RAMP_RUN = 12; // 45°-ish base ramp's horizontal run — kept short so the tall platform doesn't flare wide
 const PLATFORM_CORNER_RADIUS = 4;
 const BUMP_SPRING = { stiffness: 500, damping: 40 };
 const BUMP_OPACITY_SPRING = { stiffness: 600, damping: 45 }; // snappy, non-bouncy fade in/out
@@ -82,15 +88,14 @@ function roundedPolygonPath(points: Point[], radius: number): string {
 
 function buildTrapezoidPath(cx: number, halfW: number, navWidth: number) {
 	const bottomY = BUMP_HEIGHT;
-	const topY = BUMP_HEIGHT - PLATFORM_RISE;
+	const topY = PLATFORM_TOP_Y;
 	const left = cx - halfW;
 	const right = cx + halfW;
 	// Clamped so an item near the row's own edge can't push a ramp past the
 	// SVG's bounds — the row has no overflow-hidden of its own, so an
 	// unclamped ramp there would visibly bleed past the header's edge.
-	// PLATFORM_RISE also doubles as the 45° ramp's horizontal run.
-	const rampLeftBase = Math.max(0, left - PLATFORM_RISE);
-	const rampRightBase = navWidth > 0 ? Math.min(navWidth, right + PLATFORM_RISE) : right + PLATFORM_RISE;
+	const rampLeftBase = Math.max(0, left - PLATFORM_RAMP_RUN);
+	const rampRightBase = navWidth > 0 ? Math.min(navWidth, right + PLATFORM_RAMP_RUN) : right + PLATFORM_RAMP_RUN;
 	const points: Point[] = [
 		[rampLeftBase, bottomY],
 		[left, topY],
@@ -106,6 +111,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	const isAccountArea = pathname?.startsWith('/account');
 	const siteTheme = useSiteTheme();
 	const isLightTheme = siteTheme?.theme !== 'dark';
+	const isOffline = useOnlineStatus();
 
 	// The mobile drawer is `position:fixed`, so its `top` offset has to match
 	// the header's actual rendered height in px — not a hardcoded Tailwind
@@ -116,14 +122,22 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 	// on mount and on resize so it can't drift out of sync again.
 	const headerRef = React.useRef<HTMLElement>(null);
 	const [headerHeight, setHeaderHeight] = React.useState(0);
-	React.useEffect(() => {
-		const measure = () => {
-			if (headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
-		};
-		measure();
-		window.addEventListener('resize', measure);
-		return () => window.removeEventListener('resize', measure);
+	const measureHeader = React.useCallback(() => {
+		if (headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
 	}, []);
+	React.useEffect(() => {
+		measureHeader();
+		window.addEventListener('resize', measureHeader);
+		return () => window.removeEventListener('resize', measureHeader);
+	}, [measureHeader]);
+	// isOffline isn't a viewport resize, but it does change the header's own
+	// rendered height (the pt-12 above) — re-measure so the mobile drawer's
+	// `top: headerHeight` (below) doesn't drift stale by that amount while
+	// the offline banner is showing. Separate from the listener effect above
+	// so toggling connectivity doesn't churn the resize subscription.
+	React.useEffect(() => {
+		measureHeader();
+	}, [isOffline, measureHeader]);
 
 	const toggleButtonRef = React.useRef<HTMLButtonElement>(null);
 	const drawerRef = React.useRef<HTMLDivElement>(null);
@@ -342,6 +356,14 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 					'lg:rounded-t-2xl lg:top-4 lg:max-w-5xl lg:shadow-lg lg:shadow-black/10 lg:backdrop-blur-lg':
 						scrolled && !open,
 					'bg-background/90': open,
+					// OfflineBanner (fixed, top-0) is min-h-9 (36px) on one line,
+					// but its message wraps to two lines on narrow phones (~45px
+					// measured at 375px) — pt-12 covers that wrapped height with
+					// margin, padding the header's own top down so its sticky
+					// top-0 box stays in place while its actual clickable content
+					// (search bar, nav) moves out from under the banner instead
+					// of the two overlapping.
+					'pt-12': isOffline,
 				},
 			)}
 		>
@@ -453,26 +475,16 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						unlike those wrappers it doesn't need to sit edge-to-edge with
 						its neighbors — it needs its own breathing room instead. Grouped
 						in one wrapper with a real gap, plus a margin off the last nav
-						link, so they don't touch. Every one of these four gets its own
-						independent NavActionGlow ring on hover/focus, each colored to
-						match that specific button's own real surface — the solid CTA's
-						`--primary` fill, the three outline-style buttons' shared
-						`--input` border — never one generic tone for all of them. */}
+						link, so they don't touch. These carry their own button styling
+						(fill / outline / icon) and deliberately get no hover platform —
+						that indicator belongs only to the plain nav links above. */}
 					<div className="mr-1 flex items-center gap-2">
-						<NavActionGlow colorVar="var(--input)">
-							<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
-								<Link href="/contact">تماس با ما</Link>
-							</Button>
-						</NavActionGlow>
-						<NavActionGlow colorVar="var(--primary)">
-							<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
-						</NavActionGlow>
-						<NavActionGlow colorVar="var(--input)">
-							<AuthNavLink variant="icon" />
-						</NavActionGlow>
-						<NavActionGlow colorVar="var(--input)">
-							<ThemeToggleButton />
-						</NavActionGlow>
+						<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
+							<Link href="/contact">تماس با ما</Link>
+						</Button>
+						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
+						<AuthNavLink variant="icon" />
+						<ThemeToggleButton />
 					</div>
 				</div>
 				<Button

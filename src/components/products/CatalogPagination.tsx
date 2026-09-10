@@ -24,7 +24,7 @@ export default function CatalogPagination({
   const pages = windowed(page, pageCount);
 
   const cell =
-    "inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-foreground/10 px-3 text-sm font-medium transition-colors";
+    "inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-foreground/10 px-3 text-sm font-medium transition-colors";
 
   return (
     <nav aria-label="صفحه‌بندی" className="mt-8 flex flex-wrap items-center justify-center gap-1.5">

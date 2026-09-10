@@ -56,7 +56,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
           ) : (
             <Link
               href="/contact"
-              className="inline-flex min-h-9 items-center rounded-full border border-accent-500/40 px-4 text-xs font-semibold text-accent-500 transition-colors hover:bg-accent-500/10"
+              className="inline-flex min-h-11 items-center rounded-full border border-accent-500/40 px-4 text-xs font-semibold text-accent-500 transition-colors hover:bg-accent-500/10"
             >
               درخواست قیمت
             </Link>

@@ -146,10 +146,10 @@ export default function BrandManager({ brands }: { brands: Brand[] }) {
                 <p className="truncate text-sm font-medium">{brand.name}</p>
                 <p dir="ltr" className="truncate text-xs text-foreground/40">{brand.slug}</p>
               </div>
-              <button type="button" onClick={() => startEdit(brand)} aria-label="ویرایش" className="flex size-9 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
+              <button type="button" onClick={() => startEdit(brand)} aria-label="ویرایش" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
                 <Pencil className="size-4" />
               </button>
-              <button type="button" onClick={() => setDeleteTarget(brand)} aria-label="حذف" className="flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
+              <button type="button" onClick={() => setDeleteTarget(brand)} aria-label="حذف" className="flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
                 <Trash2 className="size-4" />
               </button>
             </li>

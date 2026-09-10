@@ -446,7 +446,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						پویش راه صنعت<span className="text-accent-400"> یاشار</span>
 					</span>
 				</Link>
-				<div className="hidden items-stretch lg:flex [&:has(a:hover)_a:not(:hover)]:opacity-50">
+				<div className="hidden items-stretch lg:flex">
 					{/* This wrapper is layout only (vertical centering within the
 						full-row-height flex parent) — the platform's hit area binds to
 						the Link itself below (onMouseEnter/onMouseLeave), not to this
@@ -458,7 +458,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 								// Strip ghost's own hover:bg-accent / hover:text-accent-foreground:
 								// the shared speed-bump platform below is the hover surface for
 								// these links, so the button must not paint a second one.
-								'transition-opacity duration-200 hover:bg-transparent hover:text-foreground',
+								'hover:bg-transparent hover:text-foreground',
 							)}
 							href={links[0].href}
 							{...bumpHoverProps}
@@ -470,14 +470,13 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						categories={productCategories}
 						onBumpEnter={handleItemEnter}
 						onBumpLeave={handleItemLeave}
-						headerRef={headerRef}
 					/>
 					{links.slice(1).map((link, i) => (
 						<div key={i} className="flex h-full items-center px-0.5">
 							<Link
 								className={cn(
 									buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }),
-									'transition-opacity duration-200 hover:bg-transparent hover:text-foreground',
+									'hover:bg-transparent hover:text-foreground',
 								)}
 								href={link.href}
 								{...bumpHoverProps}

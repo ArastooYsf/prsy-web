@@ -419,14 +419,20 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 				{/* Hover "speed bump": a standalone rounded platform that fades in
 					under whichever nav item is currently hovered — see
 					buildTrapezoidPath above. Desktop-only, same as the links it
-					tracks. Painted first so it sits behind the nav items in source
-					order; the low fill opacity keeps it reading as an underlay even
-					where stacking order overlaps text. */}
+					tracks. Its fill is `--accent`, the exact colour a `ghost`
+					button uses for `hover:bg-accent` — but the nav links here have
+					that hover background stripped off (see below), so this platform
+					IS their hover surface, not a second layer stacked on one. One
+					element, one opacity spring, so the hover fill can't fall out of
+					sync with itself. `-z-10` (a negative z-index — painted before the
+					row's non-positioned links) drops it below the labels so the
+					opaque fill reads as the button's own surface stretching
+					outward, never as a slab over the label. */}
 				<svg
 					aria-hidden
-					className="pointer-events-none absolute inset-x-0 top-0 hidden h-12 w-full overflow-visible lg:block"
+					className="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-12 w-full overflow-visible lg:block"
 				>
-					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-foreground/[0.06]" />
+					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-[rgb(var(--accent))]" />
 				</svg>
 
 				<Link
@@ -447,7 +453,13 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						div's own padded bounds. */}
 					<div className="flex h-full items-center px-0.5">
 						<Link
-							className={cn(buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }), 'transition-opacity duration-200')}
+							className={cn(
+								buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }),
+								// Strip ghost's own hover:bg-accent / hover:text-accent-foreground:
+								// the shared speed-bump platform below is the hover surface for
+								// these links, so the button must not paint a second one.
+								'transition-opacity duration-200 hover:bg-transparent hover:text-foreground',
+							)}
 							href={links[0].href}
 							{...bumpHoverProps}
 						>
@@ -463,7 +475,10 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 					{links.slice(1).map((link, i) => (
 						<div key={i} className="flex h-full items-center px-0.5">
 							<Link
-								className={cn(buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }), 'transition-opacity duration-200')}
+								className={cn(
+									buttonVariants({ variant: 'ghost', size: 'sm', className: 'px-2.5' }),
+									'transition-opacity duration-200 hover:bg-transparent hover:text-foreground',
+								)}
 								href={link.href}
 								{...bumpHoverProps}
 							>

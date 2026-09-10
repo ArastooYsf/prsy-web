@@ -87,7 +87,10 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
       <div className="flex h-full items-center px-0.5">
         <Link
           href="/products"
-          className={buttonVariants({ variant: "ghost", size: "sm", className: "px-2.5" })}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "sm", className: "px-2.5" }),
+            "hover:bg-transparent hover:text-foreground",
+          )}
           onMouseEnter={(e) => onBumpEnter?.(e.currentTarget)}
           onMouseLeave={() => onBumpLeave?.()}
         >
@@ -141,7 +144,12 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave, headerR
     >
       <Link
         href="/products"
-        className={buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 px-2.5" })}
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 px-2.5" }),
+          // The shared speed-bump platform is this trigger's hover surface —
+          // strip ghost's own hover:bg so there aren't two layers to sync.
+          "hover:bg-transparent hover:text-foreground",
+        )}
         aria-haspopup="true"
         aria-expanded={open}
         onMouseEnter={(e) => onBumpEnter?.(e.currentTarget)}

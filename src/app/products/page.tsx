@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
-import { getProductCategories } from "@/lib/site-content";
+import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
-  const categories = await getProductCategories();
+  const { categories } = await getMenuTaxonomy();
 
   return (
     <>

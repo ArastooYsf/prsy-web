@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Boxes,
   LayoutDashboard,
   MessageSquare,
   FileText,
@@ -46,6 +47,7 @@ const ADMIN_LINKS: { href: string; label: string; icon: LucideIcon; roles: strin
   { href: "/account/admin/customers", label: "مشتریان", icon: Users, roles: ["ADMIN", "SUPPORT"] },
   { href: "/account/admin/contracts", label: "قراردادها (مدیریت)", icon: ScrollText, roles: ["ADMIN", "SUPPORT"] },
   { href: "/account/admin/orders", label: "سفارش‌ها (مدیریت)", icon: PackageSearch, roles: ["ADMIN", "SUPPORT"] },
+  { href: "/account/admin/products", label: "محصولات (مدیریت)", icon: Boxes, roles: ["ADMIN"] },
   { href: "/account/admin/blog", label: "وبلاگ", icon: Newspaper, roles: ["ADMIN"] },
   { href: "/account/admin/content", label: "محتوای سایت", icon: LayoutTemplate, roles: ["ADMIN"] },
   { href: "/account/admin/logs", label: "گزارش رویدادها", icon: History, roles: ["ADMIN"] },

@@ -163,16 +163,17 @@ export type MenuBrand = { id: string; name: string; slug: string };
 export type MenuCategory = {
   id: string; name: string; slug: string; icon: CategoryIconKey | null;
   children: { id: string; name: string; slug: string }[];
+  brands: MenuBrand[];   // brands present among active products in this top category's subtree
 };
-export type MenuTaxonomy = { categories: MenuCategory[]; brands: MenuBrand[] };
+export type MenuTaxonomy = { categories: MenuCategory[] };
 
 export const getMenuTaxonomy: () => Promise<MenuTaxonomy>;
 ```
-`unstable_cache`d, tags `["product-taxonomy"]`, `revalidate: 300`. Reads top-level `ProductCategory` (`parentId: null`) ordered `[{order},{name}]` with `children` similarly ordered, plus all `Brand` ordered `[{order},{name}]`. On DB error returns `{ categories: [], brands: [] }` (menu falls back to a plain "محصولات" link, as it already does for the empty case).
+`unstable_cache`d, tags `["product-taxonomy"]`, `revalidate: 300`. Reads top-level `ProductCategory` (`parentId: null`) ordered `[{order},{name}]` with `children` similarly ordered; then one `prisma.product.findMany({ where: { isActive: true, deletedAt: null, brandId: { not: null } }, select: { categoryId: true, brand: { select: { id, name, slug } } }, distinct: ["categoryId", "brandId"] })` to build, per top category, the set of brands appearing on its own or its children's products (`brands` sorted by `Brand.order` then name via a preceding brand fetch, or by name). On DB error returns `{ categories: [] }` (menu falls back to a plain "محصولات" link → `/products/all`, as it already does for the empty case).
 
 ### 7.2 `ProductsMegaMenu.tsx` / `MobileProductsAccordion.tsx` — rewrite data, keep interaction
 
-- Prop becomes `taxonomy: MenuTaxonomy` (or `categories: MenuCategory[]` + `brands: MenuBrand[]`). Keep every hover/animation/close-delay/focus detail unchanged.
+- Prop becomes `categories: MenuCategory[]` (each carrying its own `children` and `brands`). Keep every hover/animation/close-delay/focus detail unchanged.
 - Empty case (`categories.length === 0`) unchanged: plain `<Link href="/products/all">محصولات</Link>`.
 - Rail item → `/products/${cat.slug}`; icon from `CATEGORY_ICONS[cat.icon ?? "box"]`.
 - Panel (desktop) / second level (mobile): show that category's **subcategories** as links `/products/${cat.slug}?sub=${child.slug}` under a «زیردسته‌ها» heading, then its **brands** as links `/products/${cat.slug}?brand=${brand.slug}` under «برندها». "مشاهده همه" → `/products/${cat.slug}`.

@@ -12,6 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:catalog": "tsx prisma/seed-catalog.ts",
     "db:studio": "prisma studio",
     "db:backup": "tsx scripts/backup-db.ts",
     "notify:contracts": "tsx scripts/notify-expiring-contracts.ts"

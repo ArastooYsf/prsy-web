@@ -45,3 +45,11 @@ export const ORDER_STEPS = [
 export function orderStepIndex(status: string): number {
   return ORDER_STEPS.findIndex((s) => s.status === status);
 }
+
+export const PRODUCT_AVAILABILITY: Record<string, { label: string; className: string }> = {
+  IN_STOCK: { label: "موجود", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" },
+  OUT_OF_STOCK: { label: "ناموجود", className: "border-red-500/30 bg-red-500/10 text-red-400" },
+  CALL: { label: "تماس بگیرید", className: "border-accent-500/30 bg-accent-500/10 text-accent-400" },
+};
+
+export const PRODUCT_AVAILABILITIES = Object.keys(PRODUCT_AVAILABILITY);

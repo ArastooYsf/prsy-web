@@ -46,6 +46,9 @@ function EmptyCrate({ icon }: { icon: ReactNode }) {
 
 type EmptyStateAction = { label: string; href: string } | { label: string; onClick: () => void };
 
+const actionClass =
+  "inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600";
+
 type EmptyStateProps = {
   icon: ReactNode;
   title: string;
@@ -93,18 +96,11 @@ export default function EmptyState({ icon, title, description, action, size = "d
       {action && (
         <motion.div variants={fadeInUp} className="mt-5">
           {"href" in action ? (
-            <Link
-              href={action.href}
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
-            >
+            <Link href={action.href} className={actionClass}>
               {action.label}
             </Link>
           ) : (
-            <button
-              type="button"
-              onClick={action.onClick}
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
-            >
+            <button type="button" onClick={action.onClick} className={actionClass}>
               {action.label}
             </button>
           )}

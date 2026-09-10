@@ -75,12 +75,12 @@ const config: Config = {
         },
       },
       fontFamily: {
-        // Shabnam FD first (self-hosted, see globals.css's @font-face block
-        // + public/fonts/shabnam-fd), Vazirmatn second as the font-display:
-        // swap fallback — it's already self-hosted via next/font/google
-        // (see layout.tsx), so the fallback paint is another real Persian
-        // face with a similar x-height, not the browser's generic sans.
-        sans: ["Shabnam FD", "var(--font-vazirmatn)", "sans-serif"],
+        // Shabnam FD first (self-hosted via next/font/local, see layout.tsx),
+        // Vazirmatn second as the font-display: swap fallback — also
+        // self-hosted via next/font, so the fallback paint is another real
+        // Persian face with a similar x-height, not the browser's generic
+        // sans.
+        sans: ["var(--font-shabnam)", "var(--font-vazirmatn)", "sans-serif"],
       },
       // Shabnam FD is a static font family (300/400/500/700 only) — unlike
       // Vazirmatn, the variable font it replaces as the primary face, it has

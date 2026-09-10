@@ -461,7 +461,19 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       return;
     }
 
-    const { reply } = await res.json();
+    // The server already accepted and stored the message at this point (it
+    // returned 2xx) — an unparseable body here is rare (a dropped
+    // connection mid-response) and only a display problem, not a send
+    // failure, but it still needs to surface something rather than the
+    // message silently vanishing from the UI with no trace.
+    let reply: { id: string; authorId: string; message: string; attachments?: ChatAttachment[]; createdAt: string };
+    try {
+      ({ reply } = await res.json());
+    } catch {
+      setSendError("پیام ارسال شد ولی نمایش آن با خطا مواجه شد. صفحه را رفرش کنید.");
+      return;
+    }
+
     setMessages((prev) => [
       ...prev,
       {
@@ -891,7 +903,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       {canReply ? (
         <form onSubmit={handleSend} className="border-t border-foreground/10 bg-background/60 p-3 backdrop-blur-sm sm:p-4">
           {sendError && (
-            <InlineErrorState message={sendError} onRetry={sendMessage} className="mb-2.5" />
+            <InlineErrorState
+              message={sendError}
+              onRetry={sendMessage}
+              disabled={sending || throttled}
+              className="mb-2.5"
+            />
           )}
           <div className="mb-2 flex items-center gap-1">
             <EmojiPicker

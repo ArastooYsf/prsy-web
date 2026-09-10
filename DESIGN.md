@@ -109,7 +109,7 @@ components:
 
 ## Typography
 
-**Display/Body/Label Font:** Shabnam FD (self-hosted, `public/fonts/shabnam-fd`, SIL OFL, `font-display: swap`) — تک‌خانواده برای همه‌چیز. فقط وزن‌های واقعاً استفاده‌شده (۳۰۰/۴۰۰/۵۰۰/۷۰۰) به‌صورت جدا لود می‌شن، نه کل خانواده. Vazirmatn (Google Fonts، از قبل self-hosted) به‌عنوان fallback در `font-display: swap` نگه داشته شده — یک چهره‌ی فارسی واقعی جای عوض‌شدن به sans-serif عمومی می‌شینه تا Shabnam لود بشه.
+**Display/Body/Label Font:** Shabnam FD (self-hosted via `next/font/local`، فایل‌ها در `src/fonts/shabnam-fd`، SIL OFL، `font-display: swap`) — تک‌خانواده برای همه‌چیز. فقط وزن‌های واقعاً استفاده‌شده (۳۰۰/۴۰۰/۵۰۰/۷۰۰) لود می‌شن، نه کل خانواده. Vazirmatn (Google Fonts، `preload: false`) فقط به‌عنوان fallback در `font-display: swap` نگه داشته شده — یک چهره‌ی فارسی واقعی جای عوض‌شدن به sans-serif عمومی می‌شینه تا Shabnam لود بشه.
 
 **Character:** خوانا، بی‌تجمل، بدون شخصیت تزئینی. سلسله‌مراتب فقط از طریق وزن فونت (۳۰۰ تا ۷۰۰) و اندازه ساخته می‌شه، نه تغییر فونت — دقیقاً مثل برچسب‌های روی یک دستگاه صنعتی: خوانایی مطلق، بدون افکت. Shabnam FD وزن ۶۰۰ واقعی نداره؛ `font-semibold` در tailwind.config.ts روی ۷۰۰ alias شده.
 

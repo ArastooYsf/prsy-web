@@ -275,3 +275,67 @@ model MediaAsset {
   @@index([scope])
   @@map("media_assets")
 }
+
+enum ProductAvailability {
+  IN_STOCK
+  OUT_OF_STOCK
+  CALL
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  logo        String?
+  description String?   @db.Text
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+
+  @@map("brands")
+}
+
+model ProductCategory {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  icon      String?
+  parentId  String?
+  parent    ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  children  ProductCategory[] @relation("CategoryTree")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([parentId])
+  @@map("product_categories")
+}
+
+model Product {
+  id           String              @id @default(cuid())
+  name         String
+  slug         String              @unique
+  description  String?             @db.Text
+  images       Json
+  specs        Json
+  categoryId   String?
+  category     ProductCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brandId      String?
+  brand        Brand?              @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  availability ProductAvailability @default(IN_STOCK)
+  showPrice    Boolean             @default(false)
+  price        Int?
+  isActive     Boolean             @default(true)
+  deletedAt    DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([deletedAt])
+  @@map("products")
+}

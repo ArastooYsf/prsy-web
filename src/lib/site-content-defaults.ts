@@ -1,5 +1,3 @@
-import type { CategoryIconKey } from "@/lib/category-icons";
-
 // Deliberately free of server-only imports (no Prisma) — this module is
 // imported by client components (Hero, ProductCategories, SiteContentForm)
 // as well as the server-only src/lib/site-content.ts. Pulling in Prisma here
@@ -12,16 +10,6 @@ export type HeroSlideContent = {
   ctaLabel: string;
   ctaHref: string;
   image: string;
-};
-
-export type ProductCategoryContent = {
-  id: string;
-  title: string;
-  description: string; // rich HTML (Bold/list), sanitized on read
-  iconKey: CategoryIconKey;
-  conditions: ("new" | "used" | "service")[];
-  brands: string[];
-  image?: string;
 };
 
 export type FooterContactContent = {
@@ -80,56 +68,5 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
     ctaLabel: "بیشتر بدانید",
     ctaHref: "/products#overhaul",
     image: "products/overhaul.svg",
-  },
-];
-
-export const DEFAULT_PRODUCT_CATEGORIES: ProductCategoryContent[] = [
-  {
-    id: "diesel-generators",
-    title: "دیزل ژنراتور",
-    description: "<p>دیزل ژنراتورهای صنعتی و تجاری در ظرفیت‌های مختلف</p>",
-    iconKey: "generator",
-    conditions: ["new", "used"],
-    brands: ["کاترپیلار", "کامینز", "پرکینز", "ولوو", "ویچای", "جی‌ام (GM)"],
-  },
-  {
-    id: "power-engines",
-    title: "موتور برق",
-    description: "<p>موتور برق‌های قابل‌حمل و ثابت برای مصارف خانگی و تجاری</p>",
-    iconKey: "engine",
-    conditions: ["new", "used"],
-    brands: ["کواکس", "فروسکی", "هیوندا", "سایر برندها"],
-  },
-  {
-    id: "spare-parts",
-    title: "قطعات یدکی دیزل ژنراتور و موتور برق",
-    description: "<p>قطعات یدکی اورجینال برای انواع دیزل ژنراتور و موتور برق</p>",
-    iconKey: "parts",
-    conditions: ["new"],
-    brands: ["کاترپیلار", "ولوو", "کامینز", "ویچای", "پرکینز", "جی‌ام"],
-  },
-  {
-    id: "generator-engines",
-    title: "موتور ژنراتور",
-    description: "<p>موتور به‌صورت مجزا، جدای از ژنراتور کامل</p>",
-    iconKey: "generator-engine",
-    conditions: ["new", "used"],
-    brands: ["کاترپیلار", "کامینز", "پرکینز", "ولوو", "ویچای", "جی‌ام", "کواکس", "فروسکی", "هیوندا"],
-  },
-  {
-    id: "alternators",
-    title: "دینام / آلترناتور",
-    description: "<p>دینام و آلترناتورهای سازگار با انواع دیزل ژنراتور</p>",
-    iconKey: "alternator",
-    conditions: ["new", "used"],
-    brands: ["استمفورد", "مک‌الت", "کینز", "مارلی"],
-  },
-  {
-    id: "overhaul",
-    title: "خدمات اورهال و تعمیرات",
-    description: "<p>اورهال و تعمیرات تخصصی دیزل ژنراتور و موتور برق</p>",
-    iconKey: "service",
-    conditions: ["service"],
-    brands: ["کاترپیلار", "کامینز", "پرکینز", "ولوو", "ویچای", "جی‌ام", "و سایر برندها"],
   },
 ];

@@ -5,20 +5,12 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import MediaPicker from "@/components/admin/MediaPicker";
 import SimpleRichTextEditor from "@/components/admin/SimpleRichTextEditor";
-import IconPicker from "@/components/admin/IconPicker";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
-import type { HeroSlideContent, ProductCategoryContent } from "@/lib/site-content-defaults";
-import type { CategoryIconKey } from "@/lib/category-icons";
+import type { HeroSlideContent } from "@/lib/site-content-defaults";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
-
-const CONDITION_OPTIONS: { value: "new" | "used" | "service"; label: string }[] = [
-  { value: "new", label: "نو" },
-  { value: "used", label: "دست‌دوم" },
-  { value: "service", label: "خدمات" },
-];
 
 function genId(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -28,46 +20,24 @@ function emptySlide(): HeroSlideContent {
   return { id: genId("slide"), title: "", description: "", ctaLabel: "بیشتر بدانید", ctaHref: "/products", image: "" };
 }
 
-function emptyCategory(): ProductCategoryContent {
-  return { id: genId("category"), title: "", description: "", iconKey: "box", conditions: ["new"], brands: [], image: "" };
-}
-
 type SiteContentFormProps = {
   initialHeroSlides: HeroSlideContent[];
-  initialCategories: ProductCategoryContent[];
 };
 
-export default function SiteContentForm({ initialHeroSlides, initialCategories }: SiteContentFormProps) {
+export default function SiteContentForm({ initialHeroSlides }: SiteContentFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [heroSlides, setHeroSlides] = useState<HeroSlideContent[]>(initialHeroSlides);
-  const [categories, setCategories] = useState<ProductCategoryContent[]>(initialCategories);
   const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ type: "slide" | "category"; index: number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ index: number } | null>(null);
 
   const updateSlide = (index: number, patch: Partial<HeroSlideContent>) => {
     setHeroSlides((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
   };
 
-  const updateCategory = (index: number, patch: Partial<ProductCategoryContent>) => {
-    setCategories((prev) => prev.map((c, i) => (i === index ? { ...c, ...patch } : c)));
-  };
-
-  const toggleCondition = (index: number, condition: "new" | "used" | "service") => {
-    const category = categories[index];
-    const has = category.conditions.includes(condition);
-    updateCategory(index, {
-      conditions: has ? category.conditions.filter((c) => c !== condition) : [...category.conditions, condition],
-    });
-  };
-
   const confirmDelete = () => {
     if (!deleteTarget) return;
-    if (deleteTarget.type === "slide") {
-      setHeroSlides((prev) => prev.filter((_, i) => i !== deleteTarget.index));
-    } else {
-      setCategories((prev) => prev.filter((_, i) => i !== deleteTarget.index));
-    }
+    setHeroSlides((prev) => prev.filter((_, i) => i !== deleteTarget.index));
     setDeleteTarget(null);
   };
 
@@ -78,7 +48,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
     const res = await fetch("/api/admin/site-content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ heroSlides, productCategories: categories }),
+      body: JSON.stringify({ heroSlides }),
     });
 
     setSaving(false);
@@ -114,7 +84,7 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
                 <p className="text-sm font-semibold">اسلاید {i + 1}</p>
                 <button
                   type="button"
-                  onClick={() => setDeleteTarget({ type: "slide", index: i })}
+                  onClick={() => setDeleteTarget({ index: i })}
                   className="inline-flex min-h-11 items-center text-xs font-medium text-red-400 transition-colors hover:text-red-300"
                 >
                   حذف اسلاید
@@ -156,104 +126,6 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
         </div>
       </section>
 
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-bold text-accent-400">دسته‌بندی محصولات</h3>
-          <button
-            type="button"
-            onClick={() => setCategories((prev) => [...prev, emptyCategory()])}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-4 text-xs font-semibold text-accent-400 transition-colors hover:bg-accent-500/20"
-          >
-            <Plus className="size-3.5" />
-            افزودن دسته
-          </button>
-        </div>
-        <div className="space-y-6">
-          {categories.map((category, i) => (
-            <div key={category.id} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm font-semibold">{category.title || `دسته ${i + 1}`}</p>
-                <button
-                  type="button"
-                  onClick={() => setDeleteTarget({ type: "category", index: i })}
-                  className="inline-flex min-h-11 items-center text-xs font-medium text-red-400 transition-colors hover:text-red-300"
-                >
-                  حذف دسته
-                </button>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground/80">عنوان</label>
-                  <input
-                    value={category.title}
-                    onChange={(e) => updateCategory(i, { title: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground/80">توضیحات</label>
-                  <SimpleRichTextEditor
-                    value={category.description}
-                    onChange={(html) => updateCategory(i, { description: html })}
-                  />
-                </div>
-
-                <IconPicker value={category.iconKey} onChange={(key: CategoryIconKey) => updateCategory(i, { iconKey: key })} />
-
-                <div>
-                  <p className="mb-1.5 block text-sm font-medium text-foreground/80">وضعیت محصول</p>
-                  <div className="flex flex-wrap gap-2">
-                    {CONDITION_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => toggleCondition(i, opt.value)}
-                        className={`inline-flex min-h-11 items-center rounded-full border px-4 text-xs font-medium transition-colors ${
-                          category.conditions.includes(opt.value)
-                            ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                            : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground/80">برندها (با ویرگول جدا کنید)</label>
-                  <input
-                    value={category.brands.join("، ")}
-                    onChange={(e) =>
-                      updateCategory(i, {
-                        brands: e.target.value
-                          .split(/[,،]/)
-                          .map((b) => b.trim())
-                          .filter(Boolean),
-                      })
-                    }
-                    className={inputClass}
-                    placeholder="مثلاً: کاترپیلار، کامینز، پرکینز"
-                  />
-                </div>
-
-                <MediaPicker
-                  label="تصویر (اختیاری)"
-                  multiple={false}
-                  value={category.image ? [category.image] : []}
-                  onChange={(paths) => updateCategory(i, { image: paths[0] ?? "" })}
-                />
-              </div>
-            </div>
-          ))}
-          {categories.length === 0 && (
-            <p className="rounded-2xl border border-dashed border-foreground/15 p-6 text-center text-sm text-foreground/50">
-              هیچ دسته‌ای وجود ندارد.
-            </p>
-          )}
-        </div>
-      </section>
-
       <button
         type="submit"
         disabled={saving}
@@ -264,12 +136,8 @@ export default function SiteContentForm({ initialHeroSlides, initialCategories }
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title={deleteTarget?.type === "slide" ? "حذف اسلاید" : "حذف دسته"}
-        message={
-          deleteTarget?.type === "slide"
-            ? "این اسلاید حذف شود؟ برای اعمال نهایی باید «ذخیره تغییرات» را هم بزنید."
-            : "این دسته حذف شود؟ برای اعمال نهایی باید «ذخیره تغییرات» را هم بزنید."
-        }
+        title="حذف اسلاید"
+        message="این اسلاید حذف شود؟ برای اعمال نهایی باید «ذخیره تغییرات» را هم بزنید."
         confirmLabel="حذف کن"
         danger
         onConfirm={confirmDelete}

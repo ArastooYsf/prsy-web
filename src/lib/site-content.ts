@@ -3,20 +3,17 @@ import { prisma } from "@/lib/prisma";
 import { sanitizeRichText } from "@/lib/sanitize";
 import {
   DEFAULT_HERO_SLIDES,
-  DEFAULT_PRODUCT_CATEGORIES,
   DEFAULT_FOOTER_CONTACT,
   type HeroSlideContent,
-  type ProductCategoryContent,
   type FooterContactContent,
 } from "@/lib/site-content-defaults";
 
-export { DEFAULT_HERO_SLIDES, DEFAULT_PRODUCT_CATEGORIES, DEFAULT_FOOTER_CONTACT };
-export type { HeroSlideContent, ProductCategoryContent, FooterContactContent };
+export { DEFAULT_HERO_SLIDES, DEFAULT_FOOTER_CONTACT };
+export type { HeroSlideContent, FooterContactContent };
 
 export const SITE_CONTENT_TAG = "site-content";
 
 const HERO_SLIDES_KEY = "hero.slides";
-const PRODUCT_CATEGORIES_KEY = "products.categories";
 export const FOOTER_CONTACT_KEY = "footer.contact";
 
 async function loadSiteContentMap(): Promise<Record<string, string>> {
@@ -53,12 +50,6 @@ export async function getHeroSlides(): Promise<HeroSlideContent[]> {
   const map = await getSiteContentMap();
   const slides = parseJsonArray<HeroSlideContent>(map[HERO_SLIDES_KEY], DEFAULT_HERO_SLIDES);
   return slides.map((slide) => ({ ...slide, description: sanitizeRichText(slide.description) }));
-}
-
-export async function getProductCategories(): Promise<ProductCategoryContent[]> {
-  const map = await getSiteContentMap();
-  const categories = parseJsonArray<ProductCategoryContent>(map[PRODUCT_CATEGORIES_KEY], DEFAULT_PRODUCT_CATEGORIES);
-  return categories.map((category) => ({ ...category, description: sanitizeRichText(category.description) }));
 }
 
 function parseJsonObject<T extends object>(raw: string | undefined, fallback: T): T {

@@ -38,11 +38,12 @@ enum ProductAvailability {
 }
 ```
 
-### `MediaScope` — add one value
+### Media
 
-```
-PRODUCT_IMAGE
-```
+Product images reuse the existing `MediaPicker` admin component as-is, which
+uploads under the `SITE_CONTENT` scope (identical to how blog cover images
+work). No change to the `MediaScope` enum or the media upload/list subsystem
+— keeps the security-sensitive scope gating untouched.
 
 ### `Brand`
 

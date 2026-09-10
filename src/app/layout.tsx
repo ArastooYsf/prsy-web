@@ -11,7 +11,8 @@ import CookieConsentBanner from "@/components/CookieConsentBanner";
 import OfflineBanner from "@/components/OfflineBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
-import { getFooterContact, getProductCategories } from "@/lib/site-content";
+import { getFooterContact } from "@/lib/site-content";
+import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
 import RouteThemeScope from "@/components/RouteThemeScope";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -80,7 +81,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [footerContact, productCategories] = await Promise.all([getFooterContact(), getProductCategories()]);
+  const [footerContact, menuTaxonomy] = await Promise.all([getFooterContact(), getMenuTaxonomy()]);
 
   return (
     <html lang="fa" dir="rtl" className={`${shabnamFD.variable} ${vazirmatn.variable}`} suppressHydrationWarning>
@@ -139,7 +140,7 @@ export default async function RootLayout({
               >
                 <PageViewTracker />
                 <PageLoader />
-                <Header productCategories={productCategories} />
+                <Header menuCategories={menuTaxonomy.categories} />
                 <main>{children}</main>
                 <Footer contact={footerContact} />
               </SkeletonTheme>

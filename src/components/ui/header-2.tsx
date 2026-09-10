@@ -22,7 +22,7 @@ import SpotlightCursor from '@/components/ui/SpotlightCursor';
 import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import type { ProductCategoryContent } from '@/lib/site-content-defaults';
+import type { MenuCategory } from '@/lib/menu-taxonomy';
 
 // How far (in px) the user needs to scroll before the header's ambient glow
 // reaches full intensity. Matches GLOW_MAX_SHADOW below.
@@ -105,7 +105,7 @@ function buildTrapezoidPath(cx: number, halfW: number, navWidth: number) {
 	return roundedPolygonPath(points, PLATFORM_CORNER_RADIUS);
 }
 
-export function Header({ productCategories = [] }: { productCategories?: ProductCategoryContent[] }) {
+export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[] }) {
 	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
 	const isAccountArea = pathname?.startsWith('/account');
@@ -467,7 +467,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						</Link>
 					</div>
 					<ProductsMegaMenu
-						categories={productCategories}
+						categories={menuCategories}
 						onBumpEnter={handleItemEnter}
 						onBumpLeave={handleItemLeave}
 					/>
@@ -542,7 +542,7 @@ export function Header({ productCategories = [] }: { productCategories?: Product
 						{/* The hover-driven mega menu doesn't translate to touch, so
 							mobile gets its own vertical-accordion rendering of the same
 							real category/brand data — see MobileProductsAccordion. */}
-						<MobileProductsAccordion categories={productCategories} drawerOpen={open} onNavigate={() => setOpen(false)} />
+						<MobileProductsAccordion categories={menuCategories} drawerOpen={open} onNavigate={() => setOpen(false)} />
 						{links.slice(1).map((link) => (
 							<Link
 								key={link.label}

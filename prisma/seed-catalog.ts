@@ -68,6 +68,37 @@ const PRODUCTS: [string, string, string, "IN_STOCK" | "OUT_OF_STOCK" | "CALL", b
   ["alternator-brushless", "stamford", "آلترناتور استمفورد UCI274", "IN_STOCK", true, 180000000],
 ];
 
+const GALLERY_IMAGES = ["products/diesel-generators.svg", "products/power-engines.svg", "products/spare-parts.svg"];
+
+// Gives a handful of seeded products richer images/specs than the loop's
+// defaults below, so the product-detail page's gallery/lightbox and specs
+// table have real multi-item data to render during QA. Keyed by product
+// name (not slug — the slug is derived from the name further down).
+const PRODUCT_OVERRIDES: Record<string, { images?: string[]; specs?: { label: string; value: string }[] }> = {
+  "دیزل ژنراتور کاترپیلار ۵۰۰ کاوا": {
+    images: GALLERY_IMAGES,
+    specs: [
+      { label: "توان خروجی", value: "۵۰۰ کاوا" },
+      { label: "مدل موتور", value: "Caterpillar C15" },
+      { label: "ولتاژ", value: "۴۰۰/۲۳۰ ولت" },
+      { label: "وزن", value: "۴٬۲۰۰ کیلوگرم" },
+    ],
+  },
+  "دیزل ژنراتور پرکینز ۲۵۰ کاوا": {
+    images: GALLERY_IMAGES.slice(0, 2),
+    specs: [
+      { label: "توان خروجی", value: "۲۵۰ کاوا" },
+      { label: "مدل موتور", value: "Perkins 2206C-E13TAG2" },
+    ],
+  },
+  "موتور برق بنزینی ۵ کاوا": {
+    images: GALLERY_IMAGES.slice(0, 1),
+  },
+  "دیزل ژنراتور دریایی ولوو ۱۵۰ کاوا": {
+    specs: [],
+  },
+};
+
 const INACTIVE_SLUG = "seed-inactive-product";
 
 async function main() {
@@ -103,17 +134,20 @@ async function main() {
   for (const [subSlug, brandSlug, name, availability, showPrice, price] of PRODUCTS) {
     const slug = name
       .trim().replace(/\s+/g, "-").replace(/[^\p{L}\p{N}-]+/gu, "").replace(/-+/g, "-").toLowerCase();
+    const override = PRODUCT_OVERRIDES[name];
+    const images = override?.images ?? [];
+    const specs = override?.specs ?? [{ label: "برند", value: name.split(" ").pop() ?? "" }];
     await prisma.product.upsert({
       where: { slug },
       update: {
         name, categoryId: subIdBySlug.get(subSlug) ?? null, brandId: brandIdBySlug.get(brandSlug) ?? null,
         availability, showPrice, price, isActive: true, deletedAt: null,
-        images: [], specs: [{ label: "برند", value: name.split(" ").pop() ?? "" }],
+        images, specs,
       },
       create: {
         name, slug, categoryId: subIdBySlug.get(subSlug) ?? null, brandId: brandIdBySlug.get(brandSlug) ?? null,
         availability, showPrice, price, isActive: true,
-        images: [], specs: [{ label: "برند", value: name.split(" ").pop() ?? "" }],
+        images, specs,
       },
     });
   }

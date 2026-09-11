@@ -5,7 +5,7 @@ export type Crumb = { label: string; href?: string };
 
 export default function Breadcrumb({ items }: { items: Crumb[] }) {
   return (
-    <nav aria-label="مسیر ناوبری" className="flex flex-wrap items-center gap-1.5 text-xs text-foreground/50">
+    <nav aria-label="مسیر ناوبری" className="flex flex-wrap items-center gap-1.5 text-xs text-foreground/70">
       {items.map((item, i) => {
         const last = i === items.length - 1;
         return (

@@ -9,7 +9,7 @@ export type CatalogQueryInput = {
   searchParams: ListSearchParams;
   categoryId?: string;
   childCategoryIds: string[];
-  validSubSlugs: Map<string, string>;
+  validSubSlugs: Map<string, string[]>;
   validBrandSlugs: Map<string, string>;
 };
 
@@ -45,9 +45,7 @@ export function buildCatalogQuery(input: CatalogQueryInput): CatalogQuery {
   const where: Prisma.ProductWhereInput = { isActive: true, deletedAt: null };
 
   // Category / subcategory scope.
-  const subIds = paramList(searchParams, "sub")
-    .map((s) => validSubSlugs.get(s))
-    .filter((v): v is string => Boolean(v));
+  const subIds = paramList(searchParams, "sub").flatMap((s) => validSubSlugs.get(s) ?? []);
   if (subIds.length > 0) {
     where.categoryId = { in: subIds };
   } else if (categoryId) {
@@ -82,8 +80,9 @@ export function buildCatalogQuery(input: CatalogQueryInput): CatalogQuery {
     : "newest";
 
   // Page.
+  const MAX_PAGE = 100000;
   const rawPage = Number(param(searchParams, "page"));
-  const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1;
+  const page = Number.isSafeInteger(rawPage) && rawPage >= 1 && rawPage <= MAX_PAGE ? rawPage : 1;
 
   return {
     where,

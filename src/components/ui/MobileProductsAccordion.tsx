@@ -84,7 +84,7 @@ export function MobileProductsAccordion({
                                 href={`/products/${category.slug}?sub=${child.slug}`}
                                 onClick={onNavigate}
                                 tabIndex={open && isCategoryOpen ? 0 : -1}
-                                className="block rounded-md px-2 py-2 text-xs text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-accent-400"
+                                className="flex min-h-11 items-center rounded-md px-2 py-2 text-xs text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-accent-400"
                               >
                                 {child.name}
                               </Link>
@@ -100,7 +100,7 @@ export function MobileProductsAccordion({
                               href={`/products/${category.slug}?brand=${brand.slug}`}
                               onClick={onNavigate}
                               tabIndex={open && isCategoryOpen ? 0 : -1}
-                              className="rounded-md bg-foreground/5 px-2 py-1 text-xs text-foreground/60 transition-colors hover:bg-accent-500/10 hover:text-accent-400"
+                              className="flex min-h-11 items-center rounded-md bg-foreground/5 px-2 py-1 text-xs text-foreground/60 transition-colors hover:bg-accent-500/10 hover:text-accent-400"
                             >
                               {brand.name}
                             </Link>
@@ -111,7 +111,7 @@ export function MobileProductsAccordion({
                         href={`/products/${category.slug}`}
                         onClick={onNavigate}
                         tabIndex={open && isCategoryOpen ? 0 : -1}
-                        className="mb-2 mr-9 inline-flex items-center gap-1.5 text-xs font-semibold text-accent-400"
+                        className="mb-2 mr-9 inline-flex min-h-11 items-center gap-1.5 text-xs font-semibold text-accent-400"
                       >
                         مشاهده همه {category.name}
                         <ArrowLeft className="size-3.5" />

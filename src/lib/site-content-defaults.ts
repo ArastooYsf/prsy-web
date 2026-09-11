@@ -41,7 +41,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
     description:
       "<p>تأمین انواع دیزل ژنراتور در ظرفیت‌های مختلف، با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم.</p>",
     ctaLabel: "مشاهده محصول",
-    ctaHref: "/products#diesel-generators",
+    ctaHref: "/products/diesel-generator",
     image: "products/diesel-generators.svg",
   },
   {
@@ -50,7 +50,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
     description:
       "<p>موتور برق‌های قابل‌حمل و ثابت، مناسب مصارف خانگی و تجاری، با گارانتی و پشتیبانی کامل.</p>",
     ctaLabel: "مشاهده محصول",
-    ctaHref: "/products#power-engines",
+    ctaHref: "/products/power-engine",
     image: "products/power-engines.svg",
   },
   {
@@ -58,7 +58,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
     title: "قطعات یدکی اورجینال",
     description: "<p>تأمین قطعات یدکی اورجینال برای انواع دیزل ژنراتور و موتور برق، فقط به‌صورت نو.</p>",
     ctaLabel: "بیشتر بدانید",
-    ctaHref: "/products#spare-parts",
+    ctaHref: "/products/spare-parts",
     image: "products/spare-parts.svg",
   },
   {
@@ -66,7 +66,7 @@ export const DEFAULT_HERO_SLIDES: HeroSlideContent[] = [
     title: "خدمات اورهال و تعمیرات",
     description: "<p>اورهال و تعمیرات تخصصی دیزل ژنراتور و موتور برق، توسط تیم فنی مجرب.</p>",
     ctaLabel: "بیشتر بدانید",
-    ctaHref: "/products#overhaul",
+    ctaHref: "/contact",
     image: "products/overhaul.svg",
   },
 ];

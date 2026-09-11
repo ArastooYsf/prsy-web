@@ -95,7 +95,7 @@ export default async function CatalogView({ category, basePath, searchParams }: 
       orderBy: q.orderBy,
       skip: q.skip,
       take: q.take,
-      include: { brand: true },
+      include: { brand: true, category: { include: { parent: true } } },
     }) as Promise<CatalogProduct[]>,
     prisma.product.count({ where: q.where }),
   ]);

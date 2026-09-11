@@ -9,7 +9,7 @@ import ProductGrid from "@/components/products/ProductGrid";
 import CatalogPagination from "@/components/products/CatalogPagination";
 import CatalogSortSelect from "@/components/products/CatalogSortSelect";
 import CatalogFilterPanel, { type FacetOption } from "@/components/products/CatalogFilterPanel";
-import type { CatalogProduct } from "@/components/products/ProductCard";
+import { catalogProductInclude } from "@/components/products/ProductCard";
 import type { Prisma } from "@/generated/prisma/client";
 
 type CatalogCategory = {
@@ -95,8 +95,8 @@ export default async function CatalogView({ category, basePath, searchParams }: 
       orderBy: q.orderBy,
       skip: q.skip,
       take: q.take,
-      include: { brand: true, category: { include: { parent: true } } },
-    }) as Promise<CatalogProduct[]>,
+      include: catalogProductInclude,
+    }),
     prisma.product.count({ where: q.where }),
   ]);
 

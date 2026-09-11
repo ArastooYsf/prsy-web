@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ProductGrid from "@/components/products/ProductGrid";
-import type { CatalogProduct } from "@/components/products/ProductCard";
+import { catalogProductInclude, type CatalogProduct } from "@/components/products/ProductCard";
 
 export default async function RelatedProducts({
   categoryId,
@@ -9,7 +9,7 @@ export default async function RelatedProducts({
   categoryId: string;
   excludeProductId: string;
 }) {
-  const products = (await prisma.product.findMany({
+  const products: CatalogProduct[] = await prisma.product.findMany({
     where: {
       categoryId,
       isActive: true,
@@ -18,8 +18,8 @@ export default async function RelatedProducts({
     },
     orderBy: { createdAt: "desc" },
     take: 4,
-    include: { brand: true, category: { include: { parent: true } } },
-  })) as CatalogProduct[];
+    include: catalogProductInclude,
+  });
 
   if (products.length === 0) return null;
 

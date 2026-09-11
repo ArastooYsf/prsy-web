@@ -6,9 +6,12 @@ import { formatNumber } from "@/lib/format-number";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import type { Prisma } from "@/generated/prisma/client";
 
-export type CatalogProduct = Prisma.ProductGetPayload<{
-  include: { brand: true; category: { include: { parent: true } } };
-}>;
+export const catalogProductInclude = {
+  brand: true,
+  category: { include: { parent: true } },
+} satisfies Prisma.ProductInclude;
+
+export type CatalogProduct = Prisma.ProductGetPayload<{ include: typeof catalogProductInclude }>;
 
 function firstImage(images: Prisma.JsonValue): string | null {
   return Array.isArray(images) && typeof images[0] === "string" ? images[0] : null;

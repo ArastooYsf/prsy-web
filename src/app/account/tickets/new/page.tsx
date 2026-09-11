@@ -11,7 +11,16 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function NewTicketPage() {
+function firstParam(value: string | string[] | undefined): string {
+  const v = Array.isArray(value) ? value[0] : value;
+  return typeof v === "string" ? v.slice(0, 500) : "";
+}
+
+export default async function NewTicketPage({
+  searchParams,
+}: {
+  searchParams: { subject?: string | string[]; message?: string | string[] };
+}) {
   const session = await getServerSession(authOptions);
 
   if (session!.user.role !== "CUSTOMER") {
@@ -22,7 +31,10 @@ export default async function NewTicketPage() {
     <div>
       <h2 className="mb-6 text-lg font-bold">ثبت تیکت جدید</h2>
       <div className="mx-auto max-w-xl">
-        <NewTicketForm />
+        <NewTicketForm
+          initialSubject={firstParam(searchParams.subject)}
+          initialMessage={firstParam(searchParams.message)}
+        />
       </div>
     </div>
   );

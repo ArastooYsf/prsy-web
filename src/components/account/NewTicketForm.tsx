@@ -7,11 +7,17 @@ import { useToast } from "@/components/ToastProvider";
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
-export default function NewTicketForm() {
+export default function NewTicketForm({
+  initialSubject = "",
+  initialMessage = "",
+}: {
+  initialSubject?: string;
+  initialMessage?: string;
+}) {
   const router = useRouter();
   const { showToast } = useToast();
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  const [subject, setSubject] = useState(initialSubject);
+  const [message, setMessage] = useState(initialMessage);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

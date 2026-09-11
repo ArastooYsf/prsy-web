@@ -26,6 +26,8 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
   const showPrev = () => setActiveIndex((i) => (i - 1 + images.length) % images.length);
   const showNext = () => setActiveIndex((i) => (i + 1) % images.length);
 
+  const activeImage = images[activeIndex] ?? images[0];
+
   return (
     <div>
       <Dialog.Root open={lightboxOpen} onOpenChange={setLightboxOpen}>
@@ -36,7 +38,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
             className="relative block aspect-square w-full overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/5"
           >
             <Image
-              src={getMediaUrl(images[activeIndex])}
+              src={getMediaUrl(activeImage)}
               alt={alt}
               fill
               priority
@@ -48,7 +50,10 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/85" />
-          <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <Dialog.Content
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            aria-describedby={undefined}
+          >
             <Dialog.Title className="sr-only">{alt}</Dialog.Title>
             <Dialog.Close asChild>
               <button
@@ -72,7 +77,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
             )}
 
             <div className="relative h-[80vh] w-full max-w-4xl">
-              <Image src={getMediaUrl(images[activeIndex])} alt={alt} fill sizes="90vw" className="object-contain" />
+              <Image src={getMediaUrl(activeImage)} alt={alt} fill sizes="90vw" className="object-contain" />
             </div>
 
             {images.length > 1 && (
@@ -97,7 +102,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
               type="button"
               onClick={() => setActiveIndex(i)}
               aria-label={`تصویر ${i + 1}`}
-              aria-current={i === activeIndex}
+              aria-current={i === activeIndex ? "true" : undefined}
               className={`relative size-16 shrink-0 overflow-hidden rounded-lg border transition-colors ${
                 i === activeIndex ? "border-accent-500" : "border-foreground/10 hover:border-foreground/30"
               }`}

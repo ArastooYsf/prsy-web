@@ -9,6 +9,7 @@ import DateInput, { type Calendar } from "@/components/admin/DateInput";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_META, CategoryBadge } from "@/components/admin/log-category-meta";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import type { LogFileSummary } from "@/lib/logger";
 import { ALL_LOG_CATEGORIES, type LogCategory } from "@/lib/log-types";
@@ -321,16 +322,16 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="rounded-tr-2xl bg-background px-4 py-3 text-right font-medium">تاریخ</th>
-                  <th className="bg-background px-4 py-3 text-right font-medium">دسته</th>
-                  <th className="bg-background px-4 py-3 text-right font-medium">حجم</th>
-                  <th className="bg-background px-4 py-3 text-right font-medium">تعداد رویداد</th>
-                  <th className="bg-background px-4 py-3 text-right font-medium">قفل</th>
-                  <th className="rounded-tl-2xl bg-background px-4 py-3 text-right font-medium">دانلود</th>
+                  <AdminTh corner="start">تاریخ</AdminTh>
+                  <AdminTh>دسته</AdminTh>
+                  <AdminTh>حجم</AdminTh>
+                  <AdminTh>تعداد رویداد</AdminTh>
+                  <AdminTh>قفل</AdminTh>
+                  <AdminTh corner="end">دانلود</AdminTh>
                 </tr>
               </thead>
               <tbody>
@@ -379,7 +380,7 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
 

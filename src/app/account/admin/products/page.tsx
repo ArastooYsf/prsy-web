@@ -5,6 +5,7 @@ import { Boxes, Plus, FolderTree, Tag } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { param, sortParams, type ListSearchParams } from "@/lib/list-query";
@@ -115,27 +116,27 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
             ))}
           </div>
 
-          <div className="hidden overflow-x-auto rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  <AdminTh corner="start">
                     <SortableHeader field="name" label="نام" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="category" label="دسته" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="brand" label="برند" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="availability" label="موجودی" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="price" label="قیمت" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">انتشار</th>
-                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12"></th>
+                  </AdminTh>
+                  <AdminTh>انتشار</AdminTh>
+                  <AdminTh corner="end" />
                 </tr>
               </thead>
               <tbody>
@@ -144,7 +145,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
     </div>

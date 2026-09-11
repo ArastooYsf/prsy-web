@@ -5,6 +5,7 @@ import { TICKET_STATUS } from "@/lib/status-labels";
 import { dateRangeWhere, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { TicketCardMobile, TicketRowDesktop } from "./TicketRow";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -73,23 +74,23 @@ export default async function AdminTicketsPage({ searchParams }: { searchParams:
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  <AdminTh corner="start">
                     <SortableHeader field="subject" label="موضوع" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="user" label="مشتری" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="status" label="وضعیت" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="updatedAt" label="آخرین بروزرسانی" />
-                  </th>
-                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
+                  </AdminTh>
+                  <AdminTh corner="end" />
                 </tr>
               </thead>
               <tbody>
@@ -98,7 +99,7 @@ export default async function AdminTicketsPage({ searchParams }: { searchParams:
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
     </div>

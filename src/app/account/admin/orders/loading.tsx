@@ -2,6 +2,7 @@ import { FileSpreadsheet, PackagePlus, PackageSearch } from "lucide-react";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { OrderCardMobile, OrderRowDesktop } from "./OrderRow";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 6 });
@@ -46,26 +47,26 @@ export default function Loading() {
       </div>
 
       {/* Desktop/tablet: table */}
-      <div className="hidden rounded-2xl border border-foreground/10 md:block">
+      <AdminTableScroll>
         <table className="w-full text-sm">
           <thead className="text-foreground/60">
             <tr>
-              <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+              <AdminTh corner="start">
                 <SortableHeader field="orderNumber" label="شماره سفارش" />
-              </th>
-              <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+              </AdminTh>
+              <AdminTh>
                 <SortableHeader field="user" label="مشتری" />
-              </th>
-              <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+              </AdminTh>
+              <AdminTh>
                 <SortableHeader field="items" label="اقلام" />
-              </th>
-              <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+              </AdminTh>
+              <AdminTh>
                 <SortableHeader field="status" label="وضعیت" />
-              </th>
-              <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+              </AdminTh>
+              <AdminTh>
                 <SortableHeader field="createdAt" label="تاریخ ثبت" />
-              </th>
-              <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
+              </AdminTh>
+              <AdminTh corner="end" />
             </tr>
           </thead>
           <tbody>
@@ -74,7 +75,7 @@ export default function Loading() {
             ))}
           </tbody>
         </table>
-      </div>
+      </AdminTableScroll>
     </div>
   );
 }

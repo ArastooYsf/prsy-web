@@ -6,12 +6,15 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
-import { useSiteTheme } from "@/components/RouteThemeScope";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
-import SpotlightCursor from "@/components/ui/SpotlightCursor";
-import { cn } from "@/lib/utils";
 
 const SLIDE_DURATION = 5;
+// Shared by the background and text AnimatePresence trees below so their
+// fades stay in lockstep — they can't be one motion.div because the text's
+// y-offset animation would add a `transform` on its ancestor and break the
+// background image's `absolute inset-0` full-bleed sizing (transform creates
+// a new containing block).
+const SLIDE_TRANSITION = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const };
 
 type HeroProps = {
   slides?: HeroSlideContent[];
@@ -19,12 +22,6 @@ type HeroProps = {
 
 export default function Hero({ slides: slidesProp }: HeroProps) {
   const [index, setIndex] = useState(0);
-  // Hero only ever renders on "/", but that route's own palette is now
-  // toggleable (see RouteThemeScope) rather than permanently light, so the
-  // two things Tailwind classes alone can't theme-switch — the typography
-  // plugin's prose/prose-invert and the grid background's line color — need
-  // to read the live theme instead of assuming light.
-  const isDark = useSiteTheme()?.theme === "dark";
 
   const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
 
@@ -39,80 +36,84 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
   };
 
   return (
-    <section className="relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
-      <ThemedGridBackdrop />
-      {/* Trial run of the cursor-following spotlight — z-[1] keeps it above
-          the grid backdrop but below the actual content (z-10), so it washes
-          the empty background only and never dims/tints the title, copy, or
-          CTA sitting on top of it. */}
-      <SpotlightCursor className="z-[1]" />
+    <section className="group relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
+      {/* Full-bleed slide background: the slide image itself (cropped via
+          object-cover) is the hero's background, with a dark overlay for
+          guaranteed text contrast regardless of what the admin uploads. A
+          single transparent link spans the whole slide so clicking anywhere
+          on it — not just the visible CTA button below — goes to the same
+          place; the visible title/description stay real page content (not
+          swallowed into the link's accessible name) and let clicks fall
+          through via pointer-events-none on their wrapper. */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={slide.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={SLIDE_TRANSITION}
+          className="absolute inset-0"
+        >
+          {slide.image ? (
+            <Image
+              src={getMediaUrl(slide.image)}
+              alt=""
+              fill
+              sizes="100vw"
+              priority={index === 0}
+              className="object-cover"
+            />
+          ) : (
+            <ThemedGridBackdrop />
+          )}
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/25" />
+          <Link
+            href={slide.ctaHref}
+            aria-label={`${slide.title} — ${slide.ctaLabel}`}
+            className="absolute inset-0 focus:outline-none"
+          />
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="container relative z-10">
-        <div className="relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.id}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -18 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16"
-            >
-              <div className="relative order-1 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] sm:aspect-[16/10] lg:order-1 lg:aspect-square">
-                <span aria-hidden className="absolute right-3 top-3 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-foreground/20" />
-                <span aria-hidden className="absolute left-3 top-3 h-5 w-5 rounded-tl-md border-l-2 border-t-2 border-foreground/20" />
-                <span aria-hidden className="absolute bottom-3 right-3 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-foreground/20" />
-                <span aria-hidden className="absolute bottom-3 left-3 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-foreground/20" />
-                {slide.image && (
-                  <Image
-                    src={getMediaUrl(slide.image)}
-                    alt={slide.title}
-                    fill
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    priority={index === 0}
-                    className="object-contain p-10 sm:p-14"
-                  />
-                )}
-              </div>
-
-              <div className="order-2 text-center lg:order-2 lg:text-right">
-                <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-                  {slide.title}
-                </h1>
-                <div
-                  className={cn(
-                    "prose prose-sm mt-4 max-w-none text-balance leading-8 text-foreground/70 sm:text-lg [&_p]:m-0",
-                    isDark && "prose-invert",
-                  )}
-                  dangerouslySetInnerHTML={{ __html: slide.description }}
+      <div className="container relative z-10 pointer-events-none">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={slide.id}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -18 }}
+            transition={SLIDE_TRANSITION}
+            className="mx-auto max-w-2xl text-center text-white"
+          >
+            <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+              {slide.title}
+            </h1>
+            <div
+              className="prose prose-invert prose-sm mt-4 max-w-none text-balance leading-8 text-white/85 sm:text-lg [&_p]:m-0"
+              dangerouslySetInnerHTML={{ __html: slide.description }}
+            />
+            <span className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-primary/90 group-focus-within:ring-2 group-focus-within:ring-white group-focus-within:ring-offset-2 group-focus-within:ring-offset-black/50 sm:text-base">
+              {slide.ctaLabel}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
+              >
+                <path
+                  d="M19 12H5M5 12L11 6M5 12L11 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
-                <Link
-                  href={slide.ctaHref}
-                  className="group mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-accent-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-base"
-                >
-                  {slide.ctaLabel}
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
-                  >
-                    <path
-                      d="M19 12H5M5 12L11 6M5 12L11 18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </Link>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+              </svg>
+            </span>
+          </motion.div>
+        </AnimatePresence>
 
-        <div className="mx-auto mt-10 flex max-w-md items-center gap-2 lg:mt-14">
+        <div className="pointer-events-auto mx-auto mt-10 flex max-w-md items-center gap-2 lg:mt-14">
           {slides.map((s, i) => (
             <button
               key={s.id}
@@ -120,11 +121,9 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
               onClick={() => goTo(i)}
               aria-label={`رفتن به اسلاید ${s.title}`}
               aria-current={i === index}
-              className="relative h-1 flex-1 overflow-hidden rounded-full bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
-              {i < index && (
-                <span className="absolute inset-0 bg-accent-500" />
-              )}
+              {i < index && <span className="absolute inset-0 bg-accent-500" />}
               {i === index && (
                 <motion.span
                   key={`${s.id}-${index}`}
@@ -147,7 +146,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.5 }}
         aria-label="مشاهده‌ی ادامه‌ی محتوا"
-        className="absolute inset-x-0 bottom-3 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-foreground/40 transition-colors hover:text-foreground/70 sm:bottom-4"
+        className="absolute inset-x-0 bottom-3 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-white/60 transition-colors hover:text-white sm:bottom-4"
       >
         <motion.svg
           width="20"

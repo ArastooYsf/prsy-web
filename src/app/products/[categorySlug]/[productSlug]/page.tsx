@@ -16,6 +16,14 @@ import ThemedProse from "@/components/ui/ThemedProse";
 
 export const dynamic = "force-dynamic";
 
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 async function loadProduct(slug: string) {
   return prisma.product.findUnique({
     where: { slug },
@@ -28,7 +36,7 @@ export async function generateMetadata({
 }: {
   params: { categorySlug: string; productSlug: string };
 }): Promise<Metadata> {
-  const product = await loadProduct(params.productSlug);
+  const product = await loadProduct(safeDecode(params.productSlug));
   if (!product || !product.isActive || product.deletedAt) return { title: "محصول" };
 
   const plainDescription = product.description
@@ -52,14 +60,14 @@ export default async function ProductDetailPage({
 }: {
   params: { categorySlug: string; productSlug: string };
 }) {
-  const product = await loadProduct(params.productSlug);
+  const product = await loadProduct(safeDecode(params.productSlug));
   if (!product || !product.isActive || product.deletedAt) notFound();
 
   const leafCategory = product.category;
   const rootSlug = leafCategory?.parent?.slug ?? leafCategory?.slug ?? null;
   if (!rootSlug) notFound();
 
-  if (params.categorySlug !== rootSlug) {
+  if (safeDecode(params.categorySlug) !== rootSlug) {
     redirect(`/products/${rootSlug}/${product.slug}`);
   }
 

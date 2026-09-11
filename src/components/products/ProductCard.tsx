@@ -47,7 +47,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.02] transition-colors hover:border-accent-500/40">
       {href ? (
-        <Link href={href} className="contents">
+        <Link href={href} className="contents" aria-label={product.name}>
           {media}
         </Link>
       ) : (

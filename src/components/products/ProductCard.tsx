@@ -55,7 +55,13 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
       )}
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        {href ? <Link href={href}>{title}</Link> : title}
+        {href ? (
+          <Link href={href} className="flex min-h-11 items-center">
+            {title}
+          </Link>
+        ) : (
+          title
+        )}
 
         <div className="flex flex-wrap items-center gap-1.5">
           {product.brand && (

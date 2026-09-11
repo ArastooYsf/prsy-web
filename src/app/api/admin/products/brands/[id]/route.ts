@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
+import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -39,6 +40,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     data: { name, slug, description, logo, order },
   });
   revalidatePath("/products/all");
+  revalidateTag(PRODUCT_TAXONOMY_TAG);
   return NextResponse.json({ brand });
 }
 
@@ -61,5 +63,6 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
 
   await prisma.brand.delete({ where: { id: existing.id } });
   revalidatePath("/products/all");
+  revalidateTag(PRODUCT_TAXONOMY_TAG);
   return NextResponse.json({ ok: true });
 }

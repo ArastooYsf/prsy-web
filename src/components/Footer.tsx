@@ -19,11 +19,11 @@ const QUICK_LINKS = [
 ];
 
 const SERVICES = [
-  { label: "دیزل ژنراتور", href: "/products#diesel-generators" },
-  { label: "موتور برق", href: "/products#power-engines" },
-  { label: "قطعات یدکی", href: "/products#spare-parts" },
-  { label: "دینام و آلترناتور", href: "/products#alternators" },
-  { label: "اورهال و تعمیرات", href: "/products#overhaul" },
+  { label: "دیزل ژنراتور", href: "/products/diesel-generator" },
+  { label: "موتور برق", href: "/products/power-engine" },
+  { label: "قطعات یدکی", href: "/products/spare-parts" },
+  { label: "دینام و آلترناتور", href: "/products/alternator" },
+  { label: "اورهال و تعمیرات", href: "/contact" },
 ];
 
 // Icons stay hardcoded per platform; only the destination URL is admin-editable

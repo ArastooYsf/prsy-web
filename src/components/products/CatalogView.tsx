@@ -27,23 +27,30 @@ export type CatalogViewProps = {
 
 export default async function CatalogView({ category, basePath, searchParams }: CatalogViewProps) {
   // --- facet inputs ---
-  // Subcategory facet: the category's children, or (unscoped) all top-level categories.
-  const subFacetRows = category
-    ? category.children
-    : await prisma.productCategory.findMany({
-        where: { parentId: null },
-        orderBy: [{ order: "asc" }, { name: "asc" }],
-        select: { id: true, name: true, slug: true },
-      });
+  // Subcategory facet: the category's children (each maps to itself only), or
+  // (unscoped) all top-level categories (each maps to itself + its children —
+  // products live on leaf categories, never directly on a root).
+  const subFacetRows: { id: string; name: string; slug: string; descendantIds: string[] }[] = category
+    ? category.children.map((c) => ({ ...c, descendantIds: [c.id] }))
+    : (
+        await prisma.productCategory.findMany({
+          where: { parentId: null },
+          orderBy: [{ order: "asc" }, { name: "asc" }],
+          select: { id: true, name: true, slug: true, children: { select: { id: true } } },
+        })
+      ).map((r) => ({
+        id: r.id,
+        name: r.name,
+        slug: r.slug,
+        descendantIds: [r.id, ...r.children.map((c) => c.id)],
+      }));
 
   const childIds = category ? category.children.map((c) => c.id) : [];
-  const validSubSlugs = new Map<string, string>(subFacetRows.map((r) => [r.slug, r.id]));
+  const validSubSlugs = new Map<string, string[]>(subFacetRows.map((r) => [r.slug, r.descendantIds]));
 
   // Category scope used for deriving the brand + price facets (ignores brand/price filters).
   const scopeWhere: Prisma.ProductWhereInput = { isActive: true, deletedAt: null };
-  const scopedSubIds = paramList(searchParams, "sub")
-    .map((s) => validSubSlugs.get(s))
-    .filter((v): v is string => Boolean(v));
+  const scopedSubIds = paramList(searchParams, "sub").flatMap((s) => validSubSlugs.get(s) ?? []);
   if (scopedSubIds.length > 0) scopeWhere.categoryId = { in: scopedSubIds };
   else if (category) scopeWhere.categoryId = { in: [category.id, ...childIds] };
 

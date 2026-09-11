@@ -108,7 +108,7 @@ export default function CatalogFilterPanel({ basePath, subLabel, subOptions, bra
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 text-xs font-medium text-foreground/50 transition-colors hover:text-red-400"
+            className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-foreground/50 transition-colors hover:text-red-400"
           >
             <X className="size-3.5" />
             پاک‌کردن

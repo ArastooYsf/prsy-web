@@ -8,6 +8,7 @@ import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { CustomerCardMobile, CustomerRowDesktop } from "./CustomerRow";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -129,26 +130,26 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  <AdminTh corner="start">
                     <SortableHeader field="name" label="نام" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="email" label="ایمیل" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="customerType" label="نوع" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="approvalStatus" label="وضعیت" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="createdAt" label="تاریخ عضویت" />
-                  </th>
-                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12" />
+                  </AdminTh>
+                  <AdminTh corner="end" />
                 </tr>
               </thead>
               <tbody>
@@ -157,7 +158,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
     </div>

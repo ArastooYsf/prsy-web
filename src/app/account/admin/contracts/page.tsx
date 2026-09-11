@@ -8,6 +8,7 @@ import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { dateOnwardsWhere, filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { ContractCardMobile, ContractRowDesktop } from "./ContractRow";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -108,29 +109,29 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  <AdminTh corner="start">
                     <SortableHeader field="title" label="عنوان" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="user" label="مشتری" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="type" label="نوع" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="status" label="وضعیت" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="startDate" label="شروع" />
-                  </th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">
+                  </AdminTh>
+                  <AdminTh>
                     <SortableHeader field="endDate" label="پایان" />
-                  </th>
-                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12"></th>
+                  </AdminTh>
+                  <AdminTh corner="end" />
                 </tr>
               </thead>
               <tbody>
@@ -139,7 +140,7 @@ export default async function AdminContractsPage({ searchParams }: { searchParam
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
     </div>

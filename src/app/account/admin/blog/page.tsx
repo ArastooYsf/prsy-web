@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { Newspaper, Plus } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
+import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
@@ -52,15 +53,15 @@ export default async function AdminBlogListPage() {
           </div>
 
           {/* Desktop/tablet: table */}
-          <div className="hidden rounded-2xl border border-foreground/10 md:block">
+          <AdminTableScroll>
             <table className="w-full text-sm">
               <thead className="text-foreground/60">
                 <tr>
-                  <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">عنوان</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">وضعیت</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">تاریخ انتشار</th>
-                  <th className="sticky top-14 z-10 bg-background px-4 py-3 text-right font-medium lg:top-12">بازدید</th>
-                  <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12"></th>
+                  <AdminTh corner="start">عنوان</AdminTh>
+                  <AdminTh>وضعیت</AdminTh>
+                  <AdminTh>تاریخ انتشار</AdminTh>
+                  <AdminTh>بازدید</AdminTh>
+                  <AdminTh corner="end" />
                 </tr>
               </thead>
               <tbody>
@@ -69,7 +70,7 @@ export default async function AdminBlogListPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </AdminTableScroll>
         </>
       )}
     </div>

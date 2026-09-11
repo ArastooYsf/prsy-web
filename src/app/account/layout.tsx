@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import AccountShell from "@/components/account/AccountShell";
@@ -19,7 +20,8 @@ export default async function AccountLayout({
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    redirect("/login?callbackUrl=/account");
+    const pathname = headers().get("x-pathname") ?? "/account";
+    redirect(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
   }
 
   return (

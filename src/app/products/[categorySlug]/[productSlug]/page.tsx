@@ -13,16 +13,9 @@ import ProductGallery from "@/components/products/ProductGallery";
 import ProductSpecsTable from "@/components/products/ProductSpecsTable";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import ThemedProse from "@/components/ui/ThemedProse";
+import { safeDecode } from "@/lib/slug-param";
 
 export const dynamic = "force-dynamic";
-
-function safeDecode(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
 
 async function loadProduct(slug: string) {
   return prisma.product.findUnique({

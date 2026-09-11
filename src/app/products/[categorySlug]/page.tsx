@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import CatalogView from "@/components/products/CatalogView";
 import type { ListSearchParams } from "@/lib/list-query";
+import { safeDecode } from "@/lib/slug-param";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ async function loadCategory(slug: string) {
 }
 
 export async function generateMetadata({ params }: { params: { categorySlug: string } }): Promise<Metadata> {
-  const category = await loadCategory(params.categorySlug);
+  const category = await loadCategory(safeDecode(params.categorySlug));
   if (!category || category.parentId) return { title: "محصولات" };
   return {
     title: category.name,
@@ -29,7 +30,7 @@ export default async function CategoryCatalogPage({
   params: { categorySlug: string };
   searchParams: ListSearchParams;
 }) {
-  const category = await loadCategory(params.categorySlug);
+  const category = await loadCategory(safeDecode(params.categorySlug));
   if (!category || category.parentId) notFound();
 
   return (

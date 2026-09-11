@@ -23,7 +23,11 @@ export default async function NewTicketPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (session!.user.role !== "CUSTOMER") {
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  if (session.user.role !== "CUSTOMER") {
     redirect("/account/admin");
   }
 

@@ -120,11 +120,14 @@ land back on generic `/account` after logging in, losing the prefilled
 ticket. Since this is likely the common case for a public product page,
 it's fixed as part of this chunk:
 
-- New `middleware.ts` at the project root, scoped via
-  `export const config = { matcher: "/account/:path*" }`, that clones the
-  request headers and sets `x-pathname` to
-  `request.nextUrl.pathname + request.nextUrl.search`, then
-  `NextResponse.next({ request: { headers } })`.
+- `middleware.ts` already exists at the project root (it gates `/admin/:path*`
+  and `/api/admin/:path*` with a JWT role check). Extend its matcher with
+  `/account/:path*` and add an early-return branch for that prefix that
+  clones the request headers, sets `x-pathname` to
+  `request.nextUrl.pathname + request.nextUrl.search`, and returns
+  `NextResponse.next({ request: { headers } })` — before the existing
+  admin-token check, so that logic is unaffected. Next.js supports only one
+  middleware file, so this must be an edit, not a new file.
 - `AccountLayout` reads `headers().get("x-pathname") ?? "/account"` and
   builds `redirect(\`/login?callbackUrl=${encodeURIComponent(pathname)}\`)`.
 - No other behavior of the login flow changes — `LoginForm` already reads

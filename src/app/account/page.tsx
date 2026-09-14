@@ -7,12 +7,15 @@ import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS, CONTRACT_STATUS, ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import StatusBadge from "@/components/ui/StatusBadge";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 const dateFmt = (d: Date) => d.toLocaleDateString("fa-IR");
 
 export default async function AccountOverviewPage() {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
 
   // Personal stats (open tickets/active contracts/orders) only apply to a

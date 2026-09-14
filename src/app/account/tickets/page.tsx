@@ -5,10 +5,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/ui/EmptyState";
 import { TicketListItem } from "./TicketListItem";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountTicketsPage() {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const userId = session!.user.id;
 

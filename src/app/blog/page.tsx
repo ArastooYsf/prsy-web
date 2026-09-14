@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { BlogPostCard } from "./BlogPostCard";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const metadata: Metadata = {
   title: "وبلاگ",
@@ -22,6 +23,8 @@ async function getPosts() {
 }
 
 export default async function BlogPage() {
+  await debugSlowLoad();
+
   const posts = await getPosts();
 
   return (

@@ -7,10 +7,13 @@ import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBlogListPage() {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") {
     redirect("/account/admin");

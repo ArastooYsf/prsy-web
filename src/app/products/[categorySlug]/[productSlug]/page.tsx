@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
+import { toPersianDigits } from "@/lib/format-number";
 import { SITE_URL } from "@/lib/site-url";
 import Breadcrumb, { type Crumb } from "@/components/products/Breadcrumb";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductSpecsTable from "@/components/products/ProductSpecsTable";
 import ProductBuyBox from "@/components/products/ProductBuyBox";
 import ProductTabs, { type ProductTabSection } from "@/components/products/ProductTabs";
+import ProductComments, { type ProductCommentItem } from "@/components/products/ProductComments";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import ThemedProse from "@/components/ui/ThemedProse";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -73,6 +77,22 @@ export default async function ProductDetailPage({
   const keyFeatures = specs.slice(0, KEY_FEATURE_COUNT);
   const availability = PRODUCT_AVAILABILITY[product.availability] ?? PRODUCT_AVAILABILITY.IN_STOCK;
 
+  const [session, approvedComments] = await Promise.all([
+    getServerSession(authOptions),
+    prisma.productComment.findMany({
+      where: { productId: product.id, status: "APPROVED" },
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { name: true, email: true } } },
+    }),
+  ]);
+  const comments: ProductCommentItem[] = approvedComments.map((comment) => ({
+    id: comment.id,
+    text: comment.text,
+    rating: comment.rating,
+    createdAt: comment.createdAt.toISOString(),
+    authorName: comment.user.name || comment.user.email,
+  }));
+
   const crumbs: Crumb[] = [{ label: "همه‌ی محصولات", href: "/products/all" }];
   if (leafCategory?.parent) {
     crumbs.push({ label: leafCategory.parent.name, href: `/products/${leafCategory.parent.slug}` });
@@ -107,6 +127,12 @@ export default async function ProductDetailPage({
       ),
     });
   }
+
+  tabSections.push({
+    id: "comments",
+    label: `دیدگاه‌ها (${toPersianDigits(comments.length)})`,
+    content: <ProductComments productId={product.id} comments={comments} isLoggedIn={!!session?.user} />,
+  });
 
   return (
     <section className="container pb-24 pt-8 lg:pb-8">

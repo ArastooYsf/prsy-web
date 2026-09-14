@@ -11,6 +11,7 @@ import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { ContractCardMobile, ContractRowDesktop } from "./ContractRow";
 import type { Prisma } from "@/generated/prisma/client";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,8 @@ function buildOrderBy(field: (typeof SORT_FIELDS)[number], dir: "asc" | "desc"):
 }
 
 export default async function AdminContractsPage({ searchParams }: { searchParams: ListSearchParams }) {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const isAdmin = session!.user.role === "ADMIN";
 

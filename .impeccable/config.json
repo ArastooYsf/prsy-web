@@ -47,6 +47,12 @@
         ],
         "createdAt": "2026-09-14T18:49:41.539Z",
         "reason": "pre-existing literal font size unrelated to this icon-migration task, not introduced by this change"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "createdAt": "2026-09-14T19:55:30.886Z",
+        "reason": "pre-existing codebase convention: text-[10px] already used for pending-count badges in AccountSidebar.tsx and customers/page.tsx; not a new invented size"
       }
     ]
   }

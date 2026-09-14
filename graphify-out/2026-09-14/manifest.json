@@ -266,79 +266,79 @@
   "prisma/migrations/20260804073349_init/migration.sql": {
     "mtime": 1785828829.4778802,
     "seen": 1789393764.3697047,
-    "ast_hash": "38770abb4370d10e78761e7fb4cb425b",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260804121810_add_customer_account_system/migration.sql": {
     "mtime": 1785845912.377027,
     "seen": 1789393764.3697073,
-    "ast_hash": "6c68556bdde47fee28358933bbf5d03f",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260805070244_ticket_chat/migration.sql": {
     "mtime": 1785913378.2305548,
     "seen": 1789393764.369708,
-    "ast_hash": "dc9dd73f4ebf249d1db4f17b447e9699",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260805111845_contract_types_and_status/migration.sql": {
     "mtime": 1785916133.7034853,
     "seen": 1789393764.3697085,
-    "ast_hash": "a3fb3336e855a08ce0d53d1a3e0fd8b0",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260805120433_customer_type_and_approval/migration.sql": {
     "mtime": 1785918884.8691046,
     "seen": 1789393764.3697093,
-    "ast_hash": "e4cefa61f9577609a220f6a015513261",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260811083617_add_ticket_typing_status/migration.sql": {
     "mtime": 1786437377.3253794,
     "seen": 1789393764.36971,
-    "ast_hash": "6ad22810d0680699a4e206689e6f059c",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260813131601_add_ticket_reply_edit_delete/migration.sql": {
     "mtime": 1786626961.8877347,
     "seen": 1789393764.369711,
-    "ast_hash": "7d30a7d1dc0433e32717b1a604d0de42",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260813140045_add_ticket_attachment_table/migration.sql": {
     "mtime": 1786629645.3475308,
     "seen": 1789393764.3697114,
-    "ast_hash": "e314f8f6736cef3dc85b3043f55f86ad",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260813140322_drop_ticket_reply_legacy_attachment_fields/migration.sql": {
     "mtime": 1786629802.0511696,
     "seen": 1789393764.3697119,
-    "ast_hash": "171c301d4fc7f57e62903aebde878168",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260813141139_add_soft_delete_fields/migration.sql": {
     "mtime": 1786630299.273006,
     "seen": 1789393764.3697126,
-    "ast_hash": "a0439a755d795d78809e7a72cb9def5a",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260815060057_add_user_profile_fields/migration.sql": {
     "mtime": 1786773657.5242312,
     "seen": 1789393764.369713,
-    "ast_hash": "b5fadb82e5d87b9e073e32576845db11",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260815084523_add_login_security_and_2fa_fields/migration.sql": {
     "mtime": 1786783523.2583878,
     "seen": 1789393764.3697135,
-    "ast_hash": "8f1074a9cbf1923d15738fae91eb962f",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260815192756_add_notifications_system/migration.sql": {
     "mtime": 1786822076.6924393,
     "seen": 1789393764.3697145,
-    "ast_hash": "b4e80bda7d5c42167e342268c8dbf1e8",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/seed.ts": {
@@ -792,9 +792,9 @@
     "semantic_hash": ""
   },
   "src/app/blog/[slug]/page.tsx": {
-    "mtime": 1787648041.4107096,
-    "seen": 1788345201.5816536,
-    "ast_hash": "c5867c78c487d58c6da248b7a6c2897c",
+    "mtime": 1789393997.7748024,
+    "seen": 1789394276.6953409,
+    "ast_hash": "7e740eb7a37b340030fad7a4534dcd69",
     "semantic_hash": ""
   },
   "src/app/blog/page.tsx": {
@@ -1434,9 +1434,9 @@
     "semantic_hash": ""
   },
   "src/lib/site-content.ts": {
-    "mtime": 1789137623.9193773,
-    "seen": 1789379128.761139,
-    "ast_hash": "1997bc50a35ecf08470726cf69c3644c",
+    "mtime": 1789393957.525263,
+    "seen": 1789394276.698228,
+    "ast_hash": "3023197dd76b704f889fcc43243199b2",
     "semantic_hash": ""
   },
   "src/lib/slugify.ts": {
@@ -2030,13 +2030,13 @@
   "prisma/migrations/20260818100120_add_page_view_model/migration.sql": {
     "mtime": 1787047280.2331161,
     "seen": 1789393764.3697152,
-    "ast_hash": "8b2759027648e132a0f14b78f6dc735c",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "prisma/migrations/20260818100848_add_blog_post_view_count/migration.sql": {
     "mtime": 1787047728.1182442,
     "seen": 1789393764.369716,
-    "ast_hash": "03e5b98830b384daeff706cfb2c610d6",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "src/app/api/admin/dashboard/pageviews/route.ts": {
@@ -2090,7 +2090,7 @@
   "prisma/migrations/20260820135944_add_media_scope/migration.sql": {
     "mtime": 1787234384.1914759,
     "seen": 1789393764.369717,
-    "ast_hash": "aecc8a52ff5e9bcda5359910cdfdad90",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "src/app/api/account/tickets/[id]/attachments/[attachmentId]/save/route.ts": {
@@ -2108,7 +2108,7 @@
   "prisma/migrations/20260820144415_add_ticket_waiting_reply_status/migration.sql": {
     "mtime": 1787237055.2106485,
     "seen": 1789393764.3697176,
-    "ast_hash": "d97b3e1f27922989204a76ca0cfa651c",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "src/components/admin/DateInput.tsx": {
@@ -3582,9 +3582,9 @@
     "semantic_hash": ""
   },
   "src/app/products/[categorySlug]/[productSlug]/page.tsx": {
-    "mtime": 1789331619.8571732,
-    "seen": 1789379128.759299,
-    "ast_hash": "708af669659f1f3e16e41a05c368b104",
+    "mtime": 1789393977.2864208,
+    "seen": 1789394276.695585,
+    "ast_hash": "06f9965adb7a25fa360d88855a5f9bd6",
     "semantic_hash": ""
   },
   "src/app/products/[categorySlug]/page.tsx": {
@@ -3812,7 +3812,13 @@
   "prisma/migrations/20260910183855_add_product_catalog/migration.sql": {
     "mtime": 1789076037.242187,
     "seen": 1789393764.3697188,
-    "ast_hash": "24fffe9f0204962fce381e9cc7c26e75",
+    "ast_hash": "",
+    "semantic_hash": ""
+  },
+  "src/lib/site-section-links.ts": {
+    "mtime": 1789393936.951534,
+    "seen": 1789394276.6982448,
+    "ast_hash": "3f26c8f8aace6374de84cf9516f2ee62",
     "semantic_hash": ""
   }
 }

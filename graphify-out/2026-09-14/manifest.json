@@ -3150,9 +3150,9 @@
     "semantic_hash": ""
   },
   "src/components/ui/HeaderSearch.tsx": {
-    "mtime": 1789378520.3398185,
-    "seen": 1789379128.7605393,
-    "ast_hash": "36ec313b7d571111e2d62d7d5fbc258e",
+    "mtime": 1789393071.7143807,
+    "seen": 1789393162.7258809,
+    "ast_hash": "84a54a5f14df2074df7fe2038ddbd976",
     "semantic_hash": ""
   },
   "src/components/ui/SearchDropdownBanner.tsx": {
@@ -3795,6 +3795,18 @@
     "mtime": 1789139405.6742322,
     "seen": 1789379128.7636375,
     "ast_hash": "ed02afc484a5c64f3b8e14d7d977dd1a",
+    "semantic_hash": ""
+  },
+  "src/app/api/search/route.ts": {
+    "mtime": 1789392992.0687492,
+    "seen": 1789393162.7236705,
+    "ast_hash": "6aeae544a62ac7a31823be5814f827ad",
+    "semantic_hash": ""
+  },
+  "src/lib/site-search.ts": {
+    "mtime": 1789392972.5009153,
+    "seen": 1789393162.7266986,
+    "ast_hash": "198bc30247c7bf208f93da08123e9386",
     "semantic_hash": ""
   }
 }

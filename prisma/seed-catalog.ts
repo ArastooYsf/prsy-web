@@ -8,7 +8,7 @@ config({ path: ".env.local", override: true });
 const prisma = new PrismaClient({ adapter: new PrismaMariaDb(process.env.DATABASE_URL ?? "") });
 
 type SubSeed = { slug: string; name: string };
-type CatSeed = { slug: string; name: string; icon: string; order: number; children: SubSeed[] };
+type CatSeed = { slug: string; name: string; icon: string; order: number; specTemplateKey?: string; children: SubSeed[] };
 
 const BRANDS: { slug: string; name: string; order: number }[] = [
   { slug: "caterpillar", name: "کاترپیلار", order: 1 },
@@ -20,7 +20,7 @@ const BRANDS: { slug: string; name: string; order: number }[] = [
 ];
 
 const CATEGORIES: CatSeed[] = [
-  { slug: "diesel-generator", name: "دیزل ژنراتور", icon: "generator", order: 1, children: [
+  { slug: "diesel-generator", name: "دیزل ژنراتور", icon: "generator", order: 1, specTemplateKey: "generator", children: [
     { slug: "diesel-generator-industrial", name: "دیزل ژنراتور صنعتی" },
     { slug: "diesel-generator-marine", name: "دیزل ژنراتور دریایی" },
     { slug: "diesel-generator-portable", name: "دیزل ژنراتور پرتابل" },
@@ -29,7 +29,7 @@ const CATEGORIES: CatSeed[] = [
     { slug: "power-engine-gasoline", name: "موتور برق بنزینی" },
     { slug: "power-engine-diesel", name: "موتور برق دیزلی" },
   ]},
-  { slug: "spare-parts", name: "قطعات یدکی", icon: "parts", order: 3, children: [
+  { slug: "spare-parts", name: "قطعات یدکی", icon: "parts", order: 3, specTemplateKey: "spare-parts", children: [
     { slug: "spare-parts-engine", name: "قطعات موتور" },
     { slug: "spare-parts-alternator", name: "قطعات آلترناتور" },
     { slug: "spare-parts-control", name: "قطعات تابلو کنترل" },
@@ -116,8 +116,8 @@ async function main() {
   for (const c of CATEGORIES) {
     const parent = await prisma.productCategory.upsert({
       where: { slug: c.slug },
-      update: { name: c.name, icon: c.icon, order: c.order, parentId: null },
-      create: { slug: c.slug, name: c.name, icon: c.icon, order: c.order },
+      update: { name: c.name, icon: c.icon, order: c.order, parentId: null, specTemplateKey: c.specTemplateKey ?? null },
+      create: { slug: c.slug, name: c.name, icon: c.icon, order: c.order, specTemplateKey: c.specTemplateKey ?? null },
     });
     let i = 1;
     for (const s of c.children) {

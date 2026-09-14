@@ -13,7 +13,7 @@ export default async function NewProductPage() {
   const [categories, brands] = await Promise.all([
     prisma.productCategory.findMany({
       orderBy: [{ order: "asc" }, { name: "asc" }],
-      select: { id: true, name: true, parentId: true },
+      select: { id: true, name: true, parentId: true, specTemplateKey: true },
     }),
     prisma.brand.findMany({ orderBy: [{ order: "asc" }, { name: "asc" }], select: { id: true, name: true } }),
   ]);

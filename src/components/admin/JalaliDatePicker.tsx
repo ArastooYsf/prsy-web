@@ -18,13 +18,14 @@ function leadingEmptyCells(jy: number, jm: number): number {
 type JalaliDatePickerProps = {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 };
 
 // Years are paged 12 at a time (matches the 12-month grid's layout), anchored
 // so the current view year always falls inside the visible page.
 const YEARS_PER_PAGE = 12;
 
-export default function JalaliDatePicker({ value, onChange }: JalaliDatePickerProps) {
+export default function JalaliDatePicker({ value, onChange, placeholder }: JalaliDatePickerProps) {
   const [open, setOpen] = useState(false);
   const thisYear = currentJalaliYear();
   const parsed = isoToJalali(value);
@@ -77,9 +78,12 @@ export default function JalaliDatePicker({ value, onChange }: JalaliDatePickerPr
       <Popover.Trigger asChild>
         <button
           type="button"
+          aria-label={placeholder ? `${placeholder}: ${value ? formatJalali(value) : "خالی"}` : undefined}
           className="flex w-full items-center justify-between gap-2 rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-3 text-sm text-foreground outline-none transition-colors hover:border-foreground/20 focus:border-accent-500/50"
         >
-          <span dir="ltr">{value ? formatJalali(value) : ""}</span>
+          <span aria-hidden dir={value ? "ltr" : "rtl"} className={value ? undefined : "text-foreground/40"}>
+            {value ? formatJalali(value) : placeholder}
+          </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-foreground/50">
             <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
             <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

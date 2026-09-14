@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
-import { formatNumber } from "@/lib/format-number";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
@@ -11,11 +9,15 @@ import { SITE_URL } from "@/lib/site-url";
 import Breadcrumb, { type Crumb } from "@/components/products/Breadcrumb";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductSpecsTable from "@/components/products/ProductSpecsTable";
+import ProductBuyBox from "@/components/products/ProductBuyBox";
+import ProductTabs, { type ProductTabSection } from "@/components/products/ProductTabs";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import ThemedProse from "@/components/ui/ThemedProse";
 import { safeDecode } from "@/lib/slug-param";
 
 export const dynamic = "force-dynamic";
+
+const KEY_FEATURE_COUNT = 4;
 
 async function loadProduct(slug: string) {
   return prisma.product.findUnique({
@@ -66,6 +68,7 @@ export default async function ProductDetailPage({
 
   const images = parseProductImages(product.images);
   const specs = parseProductSpecs(product.specs);
+  const keyFeatures = specs.slice(0, KEY_FEATURE_COUNT);
   const availability = PRODUCT_AVAILABILITY[product.availability] ?? PRODUCT_AVAILABILITY.IN_STOCK;
 
   const crumbs: Crumb[] = [{ label: "همه‌ی محصولات", href: "/products/all" }];
@@ -84,13 +87,31 @@ export default async function ProductDetailPage({
   const requestPriceHref = `/account/tickets/new?subject=${encodeURIComponent(
     `استعلام قیمت: ${product.name}`
   )}&message=${encodeURIComponent(`درخواست قیمت برای محصول: ${product.name}\n${canonicalUrl}`)}`;
+  const ctaLabel = product.showPrice && product.price != null ? "سفارش این محصول" : "درخواست قیمت";
+
+  const tabSections: ProductTabSection[] = [];
+  if (specs.length > 0) {
+    tabSections.push({ id: "specs", label: "مشخصات فنی", content: <ProductSpecsTable specs={specs} /> });
+  }
+  if (product.description) {
+    tabSections.push({
+      id: "description",
+      label: "توضیحات",
+      content: (
+        <ThemedProse
+          html={sanitizeRichText(product.description)}
+          className="prose prose-sm max-w-none leading-8 [&_a]:text-accent-400"
+        />
+      ),
+    });
+  }
 
   return (
-    <section className="container py-8">
+    <section className="container pb-24 pt-8 lg:pb-8">
       <Breadcrumb items={crumbs} />
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        <ProductGallery images={images} alt={product.name} />
+      <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,32rem)_1fr_20rem]">
+        <ProductGallery key={product.id} images={images} alt={product.name} />
 
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{product.name}</h1>
@@ -106,34 +127,31 @@ export default async function ProductDetailPage({
             </span>
           </div>
 
-          <div className="mt-6">
-            {product.showPrice && product.price != null ? (
-              <p dir="ltr" className="text-right text-2xl font-bold text-foreground">
-                {formatNumber(product.price)} تومان
-              </p>
-            ) : (
-              <Link
-                href={requestPriceHref}
-                className="inline-flex min-h-11 items-center rounded-full bg-accent-500 px-6 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-all hover:-translate-y-0.5 hover:bg-accent-600"
-              >
-                درخواست قیمت
-              </Link>
-            )}
-          </div>
-
-          {product.description && (
-            <ThemedProse
-              html={sanitizeRichText(product.description)}
-              className="prose prose-sm mt-6 max-w-none leading-8 [&_a]:text-accent-400"
-            />
+          {keyFeatures.length > 0 && (
+            <ul className="mt-5 space-y-2 border-t border-foreground/10 pt-5">
+              {keyFeatures.map((spec) => (
+                <li key={spec.label} className="flex items-baseline gap-2 text-sm">
+                  <span className="text-foreground/50">{spec.label}:</span>
+                  <span className="font-semibold text-foreground">{spec.value}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
+
+        <ProductBuyBox
+          showPrice={product.showPrice}
+          price={product.price}
+          availabilityLabel={availability.label}
+          availabilityClassName={availability.className}
+          ctaHref={requestPriceHref}
+          ctaLabel={ctaLabel}
+        />
       </div>
 
-      {specs.length > 0 && (
+      {tabSections.length > 0 && (
         <div className="mt-10">
-          <h2 className="mb-4 text-lg font-bold sm:text-xl">مشخصات فنی</h2>
-          <ProductSpecsTable specs={specs} />
+          <ProductTabs sections={tabSections} />
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { FileSpreadsheet, Import, UserCheck, UserPlus, Users } from "lucide-react";
+import { FileSpreadsheet, UserCheck, UserPlus, Users } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -73,13 +73,6 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
                 {pendingCount}
               </span>
             )}
-          </Link>
-          <Link
-            href="/account/admin/customers/migrate"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-          >
-            <Import className="size-4" />
-            Migrate مشتریان قدیمی
           </Link>
           <Link
             href="/account/admin/customers/new"

@@ -15,7 +15,7 @@ export default async function EditProductPage({ params }: { params: { id: string
     prisma.product.findUnique({ where: { id: params.id } }),
     prisma.productCategory.findMany({
       orderBy: [{ order: "asc" }, { name: "asc" }],
-      select: { id: true, name: true, parentId: true },
+      select: { id: true, name: true, parentId: true, specTemplateKey: true },
     }),
     prisma.brand.findMany({ orderBy: [{ order: "asc" }, { name: "asc" }], select: { id: true, name: true } }),
   ]);

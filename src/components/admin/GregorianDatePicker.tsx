@@ -47,12 +47,13 @@ const YEARS_PER_PAGE = 12;
 type GregorianDatePickerProps = {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 };
 
 // Styled to match JalaliDatePicker exactly (same panel, same month/year
 // quick-jump views) so switching calendars doesn't feel like a different app —
 // see category 7 of the mobile QA pass.
-export default function GregorianDatePicker({ value, onChange }: GregorianDatePickerProps) {
+export default function GregorianDatePicker({ value, onChange, placeholder }: GregorianDatePickerProps) {
   const [open, setOpen] = useState(false);
   const thisYear = new Date().getFullYear();
   const parsed = isoToParts(value);
@@ -102,9 +103,12 @@ export default function GregorianDatePicker({ value, onChange }: GregorianDatePi
       <Popover.Trigger asChild>
         <button
           type="button"
+          aria-label={placeholder ? `${placeholder}: ${value ? formatGregorian(value) : "خالی"}` : undefined}
           className="flex w-full items-center justify-between gap-2 rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-3 text-sm text-foreground outline-none transition-colors hover:border-foreground/20 focus:border-accent-500/50"
         >
-          <span dir="ltr">{value ? formatGregorian(value) : ""}</span>
+          <span aria-hidden dir={value ? "ltr" : "rtl"} className={value ? undefined : "text-foreground/40"}>
+            {value ? formatGregorian(value) : placeholder}
+          </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-foreground/50">
             <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
             <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

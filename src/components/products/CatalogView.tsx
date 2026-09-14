@@ -1,11 +1,14 @@
+import { cookies } from "next/headers";
 import { Boxes } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { buildCatalogQuery, CATALOG_PAGE_SIZE } from "@/lib/catalog-query";
 import { paramList, type ListSearchParams } from "@/lib/list-query";
 import { formatNumber } from "@/lib/format-number";
+import { PRODUCT_VIEW_MODE_COOKIE, resolveProductViewMode } from "@/lib/product-view-mode";
 import EmptyState from "@/components/ui/EmptyState";
 import Breadcrumb, { type Crumb } from "@/components/products/Breadcrumb";
-import ProductGrid from "@/components/products/ProductGrid";
+import ProductGrid, { CATALOG_GRID_CLASS } from "@/components/products/ProductGrid";
+import ViewModeToggle from "@/components/products/ViewModeToggle";
 import CatalogPagination from "@/components/products/CatalogPagination";
 import CatalogSortSelect from "@/components/products/CatalogSortSelect";
 import CatalogFilterPanel, { type FacetOption } from "@/components/products/CatalogFilterPanel";
@@ -101,6 +104,7 @@ export default async function CatalogView({ category, basePath, searchParams }: 
   ]);
 
   const pageCount = Math.ceil(count / CATALOG_PAGE_SIZE);
+  const mode = resolveProductViewMode(cookies().get(PRODUCT_VIEW_MODE_COOKIE)?.value);
 
   // --- breadcrumb ---
   const crumbs: Crumb[] = [{ label: "همه‌ی محصولات", href: "/products/all" }];
@@ -145,7 +149,10 @@ export default async function CatalogView({ category, basePath, searchParams }: 
         <div className="mt-6 min-w-0 lg:mt-0">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-foreground/60">{formatNumber(count)} محصول</p>
-            <CatalogSortSelect basePath={basePath} />
+            <div className="flex flex-wrap items-center gap-3">
+              <ViewModeToggle mode={mode} />
+              <CatalogSortSelect basePath={basePath} />
+            </div>
           </div>
 
           {count === 0 ? (
@@ -156,7 +163,7 @@ export default async function CatalogView({ category, basePath, searchParams }: 
             />
           ) : (
             <>
-              <ProductGrid products={products} />
+              <ProductGrid products={products} variant={mode} className={CATALOG_GRID_CLASS[mode]} />
               <CatalogPagination page={q.page} pageCount={pageCount} makeHref={makeHref} />
             </>
           )}

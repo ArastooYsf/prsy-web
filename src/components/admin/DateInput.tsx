@@ -31,49 +31,42 @@ export default function DateInput({ label, value, onChange, calendar: calendarPr
 
   return (
     <div>
-      {(label || !hideToggle) && (
-        // min-h-12 matches the toggle button's own real height (see below) —
-        // applied unconditionally so a hideToggle sibling's plain label row
-        // reserves the same space, keeping paired fields (از/تا, شروع/پایان)
-        // aligned instead of only the one with a visible toggle growing taller.
-        <div className="mb-1.5 flex min-h-12 items-center gap-1">
-          {label && <label className="text-sm font-medium text-foreground/80">{label}</label>}
-          {!hideToggle && (
-            // Compact inline toggle next to the label instead of a full-height
-            // switch on its own row — a separate row (like the ToggleSwitch
-            // this replaced) makes this field noticeably taller than plain
-            // siblings in the same form row. Vertical padding is real (not
-            // negative-margin-cancelled): an invisible oversized hit area
-            // would silently overlap whatever sits a few px below (the date
-            // picker trigger) or above, stealing its taps. Horizontal padding
-            // stays negative-margin-cancelled — there's no interactive
-            // neighbor to the side, only label text, so widening the row's
-            // flow footprint there would just wrap the label for nothing.
-            <button
-              type="button"
-              role="switch"
-              aria-checked={calendar === "jalali"}
-              onClick={() => setCalendar(calendar === "jalali" ? "gregorian" : "jalali")}
-              aria-label={`تقویم ${calendar === "jalali" ? "شمسی" : "میلادی"} — برای تغییر کلیک کنید`}
-              title="تغییر تقویم"
-              className="-mx-4 flex items-center gap-0.5 rounded-full px-4 py-4 text-[11px] font-medium text-foreground/40 transition-colors hover:text-accent-400"
-            >
-              <ArrowLeftRight className="size-3" />
-              {calendar === "jalali" ? "شمسی" : "میلادی"}
-            </button>
-          )}
-        </div>
-      )}
       {calendar === "gregorian" ? (
-        <GregorianDatePicker value={value} onChange={onChange} />
+        <GregorianDatePicker value={value} onChange={onChange} placeholder={label} />
       ) : (
-        <JalaliDatePicker value={value} onChange={onChange} />
+        <JalaliDatePicker value={value} onChange={onChange} placeholder={label} />
       )}
-      {oppositeCaption && (
-        <p dir="ltr" className="mt-1.5 text-left text-xs text-foreground/40">
-          {oppositeCaption}
-        </p>
-      )}
+      {/* Toggle sits directly under the field, flush to its right edge (first
+          in DOM = right-most in this RTL layout). min-h-11 is reserved even
+          when hideToggle hides the button, so a hideToggle sibling (e.g. the
+          "تا" half of a از/تا pair) keeps the same total field height as the
+          one showing the toggle — otherwise paired fields drift out of
+          alignment. Real (uncancelled) height, not negative-margin — it sits
+          below the field now, so an invisible oversized hit area here would
+          overlap whatever comes after this field instead of the field itself. */}
+      <div className="mt-1.5 flex items-start justify-between gap-2">
+        {hideToggle ? (
+          <span aria-hidden className="min-h-11 shrink-0" />
+        ) : (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={calendar === "jalali"}
+            onClick={() => setCalendar(calendar === "jalali" ? "gregorian" : "jalali")}
+            aria-label={`تقویم ${calendar === "jalali" ? "شمسی" : "میلادی"} — برای تغییر کلیک کنید`}
+            title="تغییر تقویم"
+            className="inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-full px-2 text-[11px] font-medium text-foreground/40 transition-colors hover:text-accent-400"
+          >
+            <ArrowLeftRight className="size-3" />
+            {calendar === "jalali" ? "شمسی" : "میلادی"}
+          </button>
+        )}
+        {oppositeCaption && (
+          <p dir="ltr" className="pt-2.5 text-left text-xs text-foreground/40">
+            {oppositeCaption}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

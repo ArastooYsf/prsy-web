@@ -306,6 +306,13 @@ model ProductCategory {
   parent    ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   children  ProductCategory[] @relation("CategoryTree")
   order     Int      @default(0)
+  // Which admin-product-form spec template (src/lib/product-spec-templates.ts)
+  // applies to products under this root category — set on the root only,
+  // read by walking up from a product's own category. Deliberately NOT
+  // derived from `slug`: slug is regenerated from `name` on every category
+  // edit (see the categories PATCH route), so it can't be trusted as a
+  // stable key. Null means "use the general default template".
+  specTemplateKey String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

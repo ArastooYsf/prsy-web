@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Plus, X } from "lucide-react";
@@ -10,11 +10,12 @@ import { slugify } from "@/lib/slugify";
 import { useToast } from "@/components/ToastProvider";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import type { ProductSpec } from "@/lib/product-json";
+import { resolveSpecTemplate } from "@/lib/product-spec-templates";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
-type CategoryOption = { id: string; name: string; parentId: string | null };
+type CategoryOption = { id: string; name: string; parentId: string | null; specTemplateKey: string | null };
 type BrandOption = { id: string; name: string };
 
 type ProductFormProps = {
@@ -46,8 +47,26 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
   const [description, setDescription] = useState(product?.description ?? "");
   const [images, setImages] = useState<string[]>(product?.images ?? []);
-  const [specs, setSpecs] = useState<ProductSpec[]>(product?.specs ?? []);
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
+  // "مشخصات فنی" is split into two pieces: `templateValues` holds one entry
+  // per label in the current category's template (so its rows always render
+  // with a fixed, locked label and only the value is editable), and
+  // `customSpecs` holds admin-added label+value pairs that don't belong to
+  // any template — either freeform additions, or a template row inherited
+  // from a previous category that no longer fits the new one (see
+  // handleCategoryChange). Existing specs are partitioned against the
+  // initial category's template once, on mount.
+  const [templateValues, setTemplateValues] = useState<Record<string, string>>(() => {
+    const initialTemplate = resolveSpecTemplate(product?.categoryId ?? null, categories);
+    const existing = new Map((product?.specs ?? []).map((s) => [s.label, s.value]));
+    const values: Record<string, string> = {};
+    for (const label of initialTemplate) values[label] = existing.get(label) ?? "";
+    return values;
+  });
+  const [customSpecs, setCustomSpecs] = useState<ProductSpec[]>(() => {
+    const initialTemplate = resolveSpecTemplate(product?.categoryId ?? null, categories);
+    return (product?.specs ?? []).filter((s) => !initialTemplate.includes(s.label));
+  });
   const [brandId, setBrandId] = useState(product?.brandId ?? "");
   const [availability, setAvailability] = useState(product?.availability ?? "IN_STOCK");
   const [showPrice, setShowPrice] = useState(product?.showPrice ?? false);
@@ -63,11 +82,33 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
     if (!slugTouched) setSlug(slugify(value));
   };
 
-  const updateSpec = (index: number, patch: Partial<ProductSpec>) => {
-    setSpecs((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
+  const template = useMemo(() => resolveSpecTemplate(categoryId, categories), [categoryId, categories]);
+
+  // Switching category swaps in that category's template without ever
+  // discarding data: everything currently on screen (template rows + custom
+  // rows) is flattened, then re-split against the NEW template — a label
+  // that still fits becomes a template row again, anything that doesn't
+  // (including a now-orphaned label from the old template, as long as it has
+  // a value) survives as a custom row instead of disappearing.
+  const handleCategoryChange = (nextCategoryId: string) => {
+    const currentFlat: ProductSpec[] = [
+      ...template.map((label) => ({ label, value: templateValues[label] ?? "" })),
+      ...customSpecs,
+    ];
+    const nextTemplate = resolveSpecTemplate(nextCategoryId, categories);
+    const flatMap = new Map(currentFlat.map((s) => [s.label, s.value]));
+    const nextTemplateValues: Record<string, string> = {};
+    for (const label of nextTemplate) nextTemplateValues[label] = flatMap.get(label) ?? "";
+    setCategoryId(nextCategoryId);
+    setTemplateValues(nextTemplateValues);
+    setCustomSpecs(currentFlat.filter((s) => !nextTemplate.includes(s.label) && s.value.trim()));
   };
-  const addSpec = () => setSpecs((prev) => [...prev, { label: "", value: "" }]);
-  const removeSpec = (index: number) => setSpecs((prev) => prev.filter((_, i) => i !== index));
+
+  const updateCustomSpec = (index: number, patch: Partial<ProductSpec>) => {
+    setCustomSpecs((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));
+  };
+  const addCustomSpec = () => setCustomSpecs((prev) => [...prev, { label: "", value: "" }]);
+  const removeCustomSpec = (index: number) => setCustomSpecs((prev) => prev.filter((_, i) => i !== index));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,12 +117,16 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
       return;
     }
     setSaving(true);
+    const specs: ProductSpec[] = [
+      ...template.map((label) => ({ label, value: (templateValues[label] ?? "").trim() })),
+      ...customSpecs.map((s) => ({ label: s.label.trim(), value: s.value.trim() })),
+    ].filter((s) => s.label && s.value);
     const payload = {
       name,
       slug,
       description: description && description !== "<p></p>" ? description : null,
       images,
-      specs: specs.filter((s) => s.label.trim() && s.value.trim()),
+      specs,
       categoryId: categoryId || null,
       brandId: brandId || null,
       availability,
@@ -149,7 +194,7 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-foreground/80">دسته‌بندی</label>
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className={inputClass}>
+          <select value={categoryId} onChange={(e) => handleCategoryChange(e.target.value)} className={inputClass}>
             <option value="">بدون دسته</option>
             {roots.map((root) => (
               <optgroup key={root.id} label={root.name}>
@@ -221,44 +266,65 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
       </div>
 
       <div>
-        <div className="mb-2 flex items-center justify-between">
-          <label className="block text-sm font-medium text-foreground/80">مشخصات فنی</label>
-          <button
-            type="button"
-            onClick={addSpec}
-            className="inline-flex items-center gap-1 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-          >
-            <Plus className="size-3.5" />
-            افزودن ردیف
-          </button>
-        </div>
+        <label className="mb-1.5 block text-sm font-medium text-foreground/80">مشخصات فنی</label>
+        <p className="mb-2 text-xs text-foreground/40">
+          فیلدهای زیر بر اساس دسته‌بندی انتخاب‌شده پیشنهاد می‌شن؛ هرکدوم که برای این محصول کاربرد نداره رو خالی بذارید.
+        </p>
         <div className="space-y-2">
-          {specs.map((spec, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                value={spec.label}
-                onChange={(e) => updateSpec(index, { label: e.target.value })}
-                className={inputClass}
-                placeholder="عنوان (مثلاً توان)"
-              />
-              <input
-                value={spec.value}
-                onChange={(e) => updateSpec(index, { value: e.target.value })}
-                className={inputClass}
-                placeholder="مقدار (مثلاً ۵۰۰ کیلووات)"
-              />
-              <button
-                type="button"
-                onClick={() => removeSpec(index)}
-                aria-label="حذف ردیف"
-                className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10"
+          {template.map((label) => (
+            <div key={label} className="flex gap-2">
+              <div
+                className={`${inputClass} flex select-none items-center bg-foreground/10 font-medium text-foreground/70`}
               >
-                <X className="size-4" />
-              </button>
+                {label}
+              </div>
+              <input
+                value={templateValues[label] ?? ""}
+                onChange={(e) => setTemplateValues((prev) => ({ ...prev, [label]: e.target.value }))}
+                className={inputClass}
+                placeholder="مقدار (اختیاری)"
+              />
             </div>
           ))}
-          {specs.length === 0 && <p className="text-xs text-foreground/40">هنوز مشخصه‌ای اضافه نشده است.</p>}
         </div>
+
+        {customSpecs.length > 0 && (
+          <div className="mt-2 space-y-2">
+            {customSpecs.map((spec, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  value={spec.label}
+                  onChange={(e) => updateCustomSpec(index, { label: e.target.value })}
+                  className={inputClass}
+                  placeholder="عنوان (مثلاً توان)"
+                />
+                <input
+                  value={spec.value}
+                  onChange={(e) => updateCustomSpec(index, { value: e.target.value })}
+                  className={inputClass}
+                  placeholder="مقدار (مثلاً ۵۰۰ کیلووات)"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeCustomSpec(index)}
+                  aria-label="حذف ردیف"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={addCustomSpec}
+          className="mt-2 inline-flex items-center gap-1 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+        >
+          <Plus className="size-3.5" />
+          افزودن مشخصه‌ی دیگر
+        </button>
       </div>
     </form>
   );

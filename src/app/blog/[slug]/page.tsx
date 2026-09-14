@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizeRichText } from "@/lib/sanitize";
+import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import BlogViewTracker from "@/components/BlogViewTracker";
 import ThemedProse from "@/components/ui/ThemedProse";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
@@ -45,7 +46,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const session = await getServerSession(authOptions);
   const canEdit = session?.user?.role === "ADMIN";
 
-  const safeContent = sanitizeRichText(post.content);
+  const safeContent = linkifyKnownPhrases(sanitizeRichText(post.content));
 
   return (
     <article className="relative pb-20 pt-14 sm:pb-28 sm:pt-20">

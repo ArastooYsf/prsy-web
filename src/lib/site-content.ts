@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sanitizeRichText } from "@/lib/sanitize";
+import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import {
   DEFAULT_HERO_SLIDES,
   DEFAULT_FOOTER_CONTACT,
@@ -49,7 +50,7 @@ function parseJsonArray<T>(raw: string | undefined, fallback: T[]): T[] {
 export async function getHeroSlides(): Promise<HeroSlideContent[]> {
   const map = await getSiteContentMap();
   const slides = parseJsonArray<HeroSlideContent>(map[HERO_SLIDES_KEY], DEFAULT_HERO_SLIDES);
-  return slides.map((slide) => ({ ...slide, description: sanitizeRichText(slide.description) }));
+  return slides.map((slide) => ({ ...slide, description: linkifyKnownPhrases(sanitizeRichText(slide.description)) }));
 }
 
 function parseJsonObject<T extends object>(raw: string | undefined, fallback: T): T {

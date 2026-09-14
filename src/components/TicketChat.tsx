@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { LifeBuoy, User, MoreVertical, ListChecks, Trash2, X } from "lucide-react";
+import { X as PhosphorX, Check, Paperclip, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import { cn } from "@/lib/utils";
@@ -118,26 +119,17 @@ function formatFileSize(bytes: number) {
 }
 
 function SeenTicks({ seen, onGradient }: { seen: boolean; onGradient: boolean }) {
-  return (
-    <svg
-      width="15"
-      height="9"
-      viewBox="0 0 20 12"
-      fill="none"
-      className={
-        onGradient
-          ? seen
-            ? "text-primary-foreground"
-            : "text-primary-foreground/60"
-          : seen
-            ? "text-accent-300"
-            : "text-current opacity-60"
-      }
-    >
-      <path d="M1 6l3.5 3.5L11 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      {seen && <path d="M8 6l3.5 3.5L18 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />}
-    </svg>
-  );
+  const className = onGradient
+    ? seen
+      ? "text-primary-foreground"
+      : "text-primary-foreground/60"
+    : seen
+      ? "text-accent-300"
+      : "text-current opacity-60";
+  // Single tick = sent, double tick = seen — same WhatsApp-style convention
+  // as before, just via Phosphor's two ready-made icons instead of
+  // conditionally drawing a second path inside one hand-rolled svg.
+  return seen ? <Checks size={15} weight="bold" className={className} /> : <Check size={15} weight="bold" className={className} />;
 }
 
 // Small circular avatar shown next to the other party's messages, collapsed
@@ -852,9 +844,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                     : "border-foreground/20 bg-transparent text-transparent hover:border-foreground/40",
                 )}
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Check size={12} weight="bold" />
               </button>
             ) : null;
 
@@ -929,15 +919,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
               aria-label="پیوست فایل"
               className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M17.5 8.5l-7 7a2.5 2.5 0 003.5 3.5l7-7a4 4 0 00-5.5-5.5l-7 7a5.5 5.5 0 007.5 7.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <Paperclip size={18} />
             </button>
           </div>
 
@@ -965,9 +947,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                               aria-label="حذف تصویر"
                               className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-white hover:bg-red-500"
                             >
-                              <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
-                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                              </svg>
+                              <PhosphorX size={9} weight="bold" />
                             </button>
                           </div>
                         ))}
@@ -987,9 +967,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                               aria-label="حذف پیوست"
                               className="shrink-0 rounded-full p-1 text-foreground/40 hover:bg-foreground/10 hover:text-red-400"
                             >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                              </svg>
+                              <PhosphorX size={12} weight="bold" />
                             </button>
                           </div>
                         ))}
@@ -1022,15 +1000,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 {sending ? (
                   <Spinner className="size-4 text-primary-foreground" />
                 ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M21 3L11 13M21 3l-6.5 18-4-8-8-4L21 3z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <PaperPlaneTilt size={16} weight="bold" />
                 )}
               </motion.button>
             </div>

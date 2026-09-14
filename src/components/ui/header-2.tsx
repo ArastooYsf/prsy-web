@@ -485,21 +485,25 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 							</Link>
 						</div>
 					))}
-					{/* This trio isn't part of the shared sliding indicator above, so
-						unlike those wrappers it doesn't need to sit edge-to-edge with
-						its neighbors — it needs its own breathing room instead. Grouped
-						in one wrapper with a real gap, plus a margin off the last nav
-						link, so they don't touch. These carry their own button styling
-						(fill / outline / icon) and deliberately get no hover platform —
-						that indicator belongs only to the plain nav links above. */}
-					<div className="mr-1 flex items-center gap-2">
-						<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
-							<Link href="/contact">تماس با ما</Link>
-						</Button>
-						<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
-						<AuthNavLink variant="icon" />
-						<ThemeToggleButton />
-					</div>
+				</div>
+				{/* A separate top-level flex item — sibling of the nav-links group
+					above, not nested inside it. With exactly three real children on
+					this row (logo, nav-links group, this trio), the nav's own
+					`justify-between` centers the nav-links group in the space between
+					the other two for free, instead of the two groups sitting glued
+					together as one block flush against the logo. This trio isn't
+					part of the shared sliding indicator above, so unlike those
+					wrappers it doesn't need to sit edge-to-edge with its neighbor —
+					these carry their own button styling (fill/outline/icon) and
+					deliberately get no hover platform, that indicator belongs only to
+					the plain nav links. */}
+				<div className="hidden items-center gap-2 lg:flex">
+					<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
+						<Link href="/contact">تماس با ما</Link>
+					</Button>
+					<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
+					<AuthNavLink variant="icon" />
+					<ThemeToggleButton />
 				</div>
 				<Button
 					ref={toggleButtonRef}

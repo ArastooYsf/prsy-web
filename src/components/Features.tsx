@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Cube, PencilLine, ShieldCheck } from "@phosphor-icons/react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 
 const FEATURES = [
@@ -9,69 +10,21 @@ const FEATURES = [
     title: "طراحی و مهندسی دقیق",
     description:
       "تیم مهندسی ما با بهره‌گیری از استانداردهای بین‌المللی، طراحی مفهومی تا تفصیلی پروژه‌های صنعتی را با بالاترین دقت انجام می‌دهد.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M12 3v9m0 0l8-4.5M12 12L4 7.5M12 12v9"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <Cube size={26} />,
   },
   {
     index: "۰۲",
     title: "اجرا و مدیریت پیمان",
     description:
       "با تیمی مجرب و تجهیزات به‌روز، پروژه‌ها را طبق زمان‌بندی و بودجه مصوب و با بالاترین استانداردهای ایمنی اجرا می‌کنیم.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M14.5 6.5L17.5 9.5M4 20l4.5-1.2 9-9-3.3-3.3-9 9L4 20z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M17 4l3 3-1.5 1.5L15.5 5.5 17 4z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <PencilLine size={26} />,
   },
   {
     index: "۰۳",
     title: "بازرسی و تضمین کیفیت",
     description:
       "پایش مستمر کیفیت در تمامی مراحل پروژه، از تأمین مواد اولیه تا راه‌اندازی نهایی، تضمین‌کننده دوام و ایمنی زیرساخت شماست.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 3l7 3v5.5c0 4.5-3 7.5-7 9.5-4-2-7-5-7-9.5V6l7-3z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9 12l2 2 4-4"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <ShieldCheck size={26} />,
   },
 ];
 

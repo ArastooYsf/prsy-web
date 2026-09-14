@@ -4,6 +4,7 @@ import { ImageOff } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { formatNumber } from "@/lib/format-number";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
+import StatusBadge from "@/components/ui/StatusBadge";
 import type { ProductViewMode } from "@/lib/product-view-mode";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -51,9 +52,7 @@ export default function ProductCard({ product, variant = "large" }: { product: C
       {variant !== "small" && product.brand && (
         <span className="rounded-md bg-foreground/5 px-2 py-0.5 text-[11px] text-foreground/60">{product.brand.name}</span>
       )}
-      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${availability.className}`}>
-        {availability.label}
-      </span>
+      <StatusBadge status={availability} className="px-2 py-0.5" />
     </div>
   );
 

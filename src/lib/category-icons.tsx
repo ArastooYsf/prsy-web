@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Package, Gear as GearIcon, Wrench } from "@phosphor-icons/react/ssr";
 
 export const CATEGORY_ICON_KEYS = [
   "generator",
@@ -72,37 +73,7 @@ export const CATEGORY_ICONS: Record<CategoryIconKey, ReactNode> = {
       />
     </svg>
   ),
-  service: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M14.7 6.3a4 4 0 00-5.4 5.4L3.5 17.5l3 3 5.8-5.8a4 4 0 005.4-5.4l-2.8 2.8-2-2 2.8-2.8z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  ),
-  box: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M3.5 8.5L12 4l8.5 4.5V16L12 20.5 3.5 16V8.5z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path d="M3.5 8.5L12 13l8.5-4.5M12 13v7.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
-  ),
-  gear: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
+  service: <Wrench size={24} />,
+  box: <Package size={24} />,
+  gear: <GearIcon size={24} />,
 };

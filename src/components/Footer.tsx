@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import type { FooterContactContent } from "@/lib/site-content";
 import { toPersianDigits } from "@/lib/format-number";
+import { SOCIAL_ICONS } from "@/lib/social-icons";
 
 const QUICK_LINKS = [
   { label: "خانه", href: "/" },
@@ -28,35 +29,8 @@ const SERVICES = [
 
 // Icons stay hardcoded per platform; only the destination URL is admin-editable
 // (see FooterContactContent) — a platform with no URL set just isn't rendered.
-const SOCIAL_ICONS = {
-  instagramUrl: {
-    name: "اینستاگرام",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
-      </svg>
-    ),
-  },
-  linkedinUrl: {
-    name: "لینکدین",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M7.5 10.5V17M7.5 7.5V7.51M11.5 17V10.5M11.5 13c0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5V17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  telegramUrl: {
-    name: "تلگرام",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M21 4L3 11.5l6 2m12-9.5l-3.5 16-8.5-6.5m12-9.5L9 13.5m0 0v5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-} as const;
+// The icon set itself lives in src/lib/social-icons.tsx (shared with the
+// /contact page, which renders the same platforms against the same URLs).
 
 export default function Footer({ contact }: { contact: FooterContactContent }) {
   const pathname = usePathname();

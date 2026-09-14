@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import dynamic from "next/dynamic";
+import { Smiley } from "@phosphor-icons/react";
 
 // @emoji-mart/react and its dataset are large and only ever needed once the
 // user actually opens the picker — statically importing them made every page
@@ -30,12 +31,7 @@ export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) =>
           aria-label="افزودن ایموجی"
           className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
-            <path d="M8.5 14c.8 1.2 2 2 3.5 2s2.7-.8 3.5-2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            <circle cx="9" cy="10" r="1" fill="currentColor" />
-            <circle cx="15" cy="10" r="1" fill="currentColor" />
-          </svg>
+          <Smiley size={18} />
         </button>
       </Popover.Trigger>
 

@@ -8,6 +8,7 @@ import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import DateRangeDisplay from "@/components/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -63,11 +64,7 @@ export default async function AccountContractsPage() {
                       رو به پایان ({formatNumber(daysLeft)} روز)
                     </span>
                   )}
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CONTRACT_STATUS[contract.status].className}`}
-                  >
-                    {CONTRACT_STATUS[contract.status].label}
-                  </span>
+                  <StatusBadge status={CONTRACT_STATUS[contract.status]} />
                   {contract.fileUrl && (
                     <a
                       href={getMediaUrl(contract.fileUrl)}

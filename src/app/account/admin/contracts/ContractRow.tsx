@@ -5,6 +5,7 @@ import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type ContractWithUser = Prisma.ContractGetPayload<{ include: { user: true } }>;
 
@@ -16,11 +17,7 @@ export function ContractCardMobile({ contract, isAdmin }: Props) {
       <div className="flex items-start justify-between gap-3">
         {contract ? <p className="font-medium">{contract.title}</p> : <Skeleton width="60%" height={15} />}
         {contract ? (
-          <span
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CONTRACT_STATUS[contract.status].className}`}
-          >
-            {CONTRACT_STATUS[contract.status].label}
-          </span>
+          <StatusBadge status={CONTRACT_STATUS[contract.status]} className="shrink-0" />
         ) : (
           <Skeleton width={62} height={23} borderRadius={9999} containerClassName="shrink-0" />
         )}
@@ -85,11 +82,7 @@ export function ContractRowDesktop({ contract, isAdmin }: Props) {
       <td className="px-4 py-3 text-foreground/70">{contract ? contract.type : <Skeleton width={70} height={13} />}</td>
       <td className="px-4 py-3">
         {contract ? (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CONTRACT_STATUS[contract.status].className}`}
-          >
-            {CONTRACT_STATUS[contract.status].label}
-          </span>
+          <StatusBadge status={CONTRACT_STATUS[contract.status]} />
         ) : (
           <Skeleton width={62} height={22} borderRadius={9999} />
         )}

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import OrderProgress from "@/components/OrderProgress";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -27,11 +28,7 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
         <h2 dir="ltr" className="text-lg font-bold">
           {order.orderNumber}
         </h2>
-        <span
-          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}
-        >
-          {ORDER_STATUS[order.status].label}
-        </span>
+        <StatusBadge status={ORDER_STATUS[order.status]} />
       </div>
 
       <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">

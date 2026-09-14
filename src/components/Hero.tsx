@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
@@ -94,21 +95,11 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
             />
             <span className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-primary/90 group-focus-within:ring-2 group-focus-within:ring-white group-focus-within:ring-offset-2 group-focus-within:ring-offset-black/50 sm:text-base">
               {slide.ctaLabel}
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
+              <ArrowLeft
+                size={18}
+                weight="bold"
                 className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
-              >
-                <path
-                  d="M19 12H5M5 12L11 6M5 12L11 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              />
             </span>
           </motion.div>
         </AnimatePresence>

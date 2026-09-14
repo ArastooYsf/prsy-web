@@ -5,10 +5,10 @@ import Features from "@/components/Features";
 import SocialProof from "@/components/SocialProof";
 import FAQ from "@/components/FAQ";
 import ConsultationSection from "@/components/ConsultationSection";
-import { getHeroSlides } from "@/lib/site-content";
+import { getHeroSlides, getFaqItems } from "@/lib/site-content";
 
 export default async function Home() {
-  const heroSlides = await getHeroSlides();
+  const [heroSlides, faqItems] = await Promise.all([getHeroSlides(), getFaqItems()]);
 
   return (
     <>
@@ -17,7 +17,7 @@ export default async function Home() {
       <Customers />
       <Features />
       <SocialProof />
-      <FAQ />
+      <FAQ items={faqItems} />
       <ConsultationSection />
     </>
   );

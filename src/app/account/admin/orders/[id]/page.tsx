@@ -7,6 +7,7 @@ import { formatNumber } from "@/lib/format-number";
 import OrderProgress from "@/components/OrderProgress";
 import OrderForm from "@/components/admin/OrderForm";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -30,11 +31,7 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
           <h2 dir="ltr" className="text-lg font-bold">
             {order.orderNumber}
           </h2>
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}
-          >
-            {ORDER_STATUS[order.status].label}
-          </span>
+          <StatusBadge status={ORDER_STATUS[order.status]} />
         </div>
         <p className="text-sm text-foreground/70">مشتری: {order.user.name || order.user.email}</p>
         <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">

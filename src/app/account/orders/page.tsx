@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -49,11 +50,7 @@ export default async function AccountOrdersPage() {
                   {order.createdAt.toLocaleDateString("fa-IR")}
                 </p>
               </div>
-              <span
-                className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}
-              >
-                {ORDER_STATUS[order.status].label}
-              </span>
+              <StatusBadge status={ORDER_STATUS[order.status]} />
             </Link>
           ))}
         </div>

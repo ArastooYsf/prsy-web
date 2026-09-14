@@ -14,6 +14,7 @@ import ProductBuyBox from "@/components/products/ProductBuyBox";
 import ProductTabs, { type ProductTabSection } from "@/components/products/ProductTabs";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import ThemedProse from "@/components/ui/ThemedProse";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { safeDecode } from "@/lib/slug-param";
 
 export const dynamic = "force-dynamic";
@@ -123,9 +124,7 @@ export default async function ProductDetailPage({
                 {product.brand.name}
               </span>
             )}
-            <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${availability.className}`}>
-              {availability.label}
-            </span>
+            <StatusBadge status={availability} className="px-2.5 py-1 text-xs" />
           </div>
 
           {keyFeatures.length > 0 && (
@@ -143,8 +142,7 @@ export default async function ProductDetailPage({
         <ProductBuyBox
           showPrice={product.showPrice}
           price={product.price}
-          availabilityLabel={availability.label}
-          availabilityClassName={availability.className}
+          availability={availability}
           ctaHref={requestPriceHref}
           ctaLabel={ctaLabel}
         />

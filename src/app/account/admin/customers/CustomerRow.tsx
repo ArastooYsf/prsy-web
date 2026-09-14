@@ -3,6 +3,7 @@ import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type Customer = Prisma.UserGetPayload<object>;
 
@@ -37,16 +38,8 @@ export function CustomerCardMobile({ customer, isAdmin }: Props) {
                 {ROLE_LABEL[customer.role]}
               </span>
             )}
-            <span
-              className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
-            >
-              {CUSTOMER_TYPE[customer.customerType].label}
-            </span>
-            <span
-              className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
-            >
-              {APPROVAL_STATUS[customer.approvalStatus].label}
-            </span>
+            <StatusBadge status={CUSTOMER_TYPE[customer.customerType]} />
+            <StatusBadge status={APPROVAL_STATUS[customer.approvalStatus]} />
           </>
         ) : (
           <>
@@ -99,22 +92,14 @@ export function CustomerRowDesktop({ customer, isAdmin }: Props) {
       </td>
       <td className="px-4 py-3">
         {customer ? (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CUSTOMER_TYPE[customer.customerType].className}`}
-          >
-            {CUSTOMER_TYPE[customer.customerType].label}
-          </span>
+          <StatusBadge status={CUSTOMER_TYPE[customer.customerType]} />
         ) : (
           <Skeleton width={64} height={22} borderRadius={9999} />
         )}
       </td>
       <td className="px-4 py-3">
         {customer ? (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${APPROVAL_STATUS[customer.approvalStatus].className}`}
-          >
-            {APPROVAL_STATUS[customer.approvalStatus].label}
-          </span>
+          <StatusBadge status={APPROVAL_STATUS[customer.approvalStatus]} />
         ) : (
           <Skeleton width={64} height={22} borderRadius={9999} />
         )}

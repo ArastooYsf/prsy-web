@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
 import TicketChat, { type ChatMessage } from "@/components/TicketChat";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -58,11 +59,7 @@ export default async function AccountTicketDetailPage({ params }: { params: { id
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-bold">{ticket.subject}</h2>
-        <span
-          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${TICKET_STATUS[ticket.status].className}`}
-        >
-          {TICKET_STATUS[ticket.status].label}
-        </span>
+        <StatusBadge status={TICKET_STATUS[ticket.status]} />
       </div>
 
       <TicketChat

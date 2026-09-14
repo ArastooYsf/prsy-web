@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Star, Tag, Truck } from "@phosphor-icons/react";
 import Counter from "@/components/Counter";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 
@@ -8,43 +9,17 @@ const PRINCIPLES = [
   {
     title: "بهترین کیفیت",
     description: "تأمین محصولات اورجینال و باکیفیت",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 2.5l2.9 5.9 6.5 1-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-1 2.9-5.9z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <Star size={22} />,
   },
   {
     title: "بهترین قیمت",
     description: "رقابتی‌ترین قیمت ممکن در بازار",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <circle cx="7.5" cy="7.5" r="2" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="16.5" cy="16.5" r="2" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: <Tag size={22} />,
   },
   {
     title: "سریع‌ترین تحویل",
     description: "ارسال به‌موقع و بدون تأخیر",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M3 7h10v8H3zM13 10h4l3 3v2h-7z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <circle cx="7" cy="18.5" r="1.6" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="17" cy="18.5" r="1.6" stroke="currentColor" strokeWidth="1.6" />
-      </svg>
-    ),
+    icon: <Truck size={22} />,
   },
 ];
 
@@ -137,14 +112,7 @@ export default function About({ title, body }: AboutProps) {
 
             <div className="mt-8 flex items-start gap-4 rounded-xl border border-accent-500/30 bg-accent-500/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400 shadow-md shadow-accent-500/10">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 2.5l2.9 5.9 6.5 1-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-1 2.9-5.9z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Star size={22} />
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">

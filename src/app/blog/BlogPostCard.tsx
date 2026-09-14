@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
+import { Image as ImageIcon } from "@phosphor-icons/react/ssr";
 import { getMediaUrl } from "@/lib/media";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -23,10 +24,7 @@ export function BlogPostCard({ post }: { post: BlogPost | null }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-foreground/20">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.6" />
-                <path d="M3 16l5-5 4 4 4-4 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <ImageIcon size={32} />
             </div>
           )
         ) : (

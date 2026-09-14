@@ -6,6 +6,7 @@ import { formatNumber } from "@/lib/format-number";
 import { getMediaUrl } from "@/lib/media";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type ProductListItem = Prisma.ProductGetPayload<{ include: { category: true; brand: true } }>;
 
@@ -15,7 +16,7 @@ function firstImage(images: Prisma.JsonValue): string | null {
 
 function AvailabilityPill({ value }: { value: string }) {
   const s = PRODUCT_AVAILABILITY[value] ?? PRODUCT_AVAILABILITY.IN_STOCK;
-  return <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${s.className}`}>{s.label}</span>;
+  return <StatusBadge status={s} />;
 }
 
 function priceLabel(showPrice: boolean, price: number | null): string {

@@ -6,6 +6,7 @@ import { formatJalali } from "@/lib/jalali";
 import { formatNumber } from "@/lib/format-number";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type OrderWithItems = Prisma.OrderGetPayload<{ include: { user: true; items: true } }>;
 
@@ -23,11 +24,7 @@ export function OrderCardMobile({ order, isAdmin }: Props) {
           <Skeleton width={100} height={15} />
         )}
         {order ? (
-          <span
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}
-          >
-            {ORDER_STATUS[order.status].label}
-          </span>
+          <StatusBadge status={ORDER_STATUS[order.status]} className="shrink-0" />
         ) : (
           <Skeleton width={62} height={23} borderRadius={9999} containerClassName="shrink-0" />
         )}
@@ -86,11 +83,7 @@ export function OrderRowDesktop({ order, isAdmin }: Props) {
       </td>
       <td className="px-4 py-3">
         {order ? (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${ORDER_STATUS[order.status].className}`}
-          >
-            {ORDER_STATUS[order.status].label}
-          </span>
+          <StatusBadge status={ORDER_STATUS[order.status]} />
         ) : (
           <Skeleton width={62} height={22} borderRadius={9999} />
         )}

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
+import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import { SITE_URL } from "@/lib/site-url";
@@ -99,7 +100,7 @@ export default async function ProductDetailPage({
       label: "توضیحات",
       content: (
         <ThemedProse
-          html={sanitizeRichText(product.description)}
+          html={linkifyKnownPhrases(sanitizeRichText(product.description))}
           className="prose prose-sm max-w-none leading-8 [&_a]:text-accent-400"
         />
       ),

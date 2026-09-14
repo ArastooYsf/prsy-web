@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { X, Check, Trash } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import { toPersianDigits } from "@/lib/format-number";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -208,9 +209,7 @@ export default function MediaPickerModal({
             aria-label="بستن"
             className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <X size={16} weight="bold" />
           </button>
         </div>
 
@@ -271,15 +270,7 @@ export default function MediaPickerModal({
                         )}
                         {selected && (
                           <span className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-500 text-primary-foreground">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                              <path
-                                d="M5 13l4 4L19 7"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            <Check size={12} weight="bold" />
                           </span>
                         )}
                       </button>
@@ -294,15 +285,7 @@ export default function MediaPickerModal({
                           aria-label="حذف از مخزن"
                           className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity hover:bg-red-500 group-hover:opacity-100"
                         >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                            <path
-                              d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v12a1 1 0 001 1h6a1 1 0 001-1V7"
-                              stroke="currentColor"
-                              strokeWidth="1.6"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <Trash size={12} />
                         </button>
                       )}
                     </div>

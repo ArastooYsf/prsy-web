@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import { ListBullets, X } from "@phosphor-icons/react";
 
 type CannedResponse = {
   id: string;
@@ -63,14 +64,7 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
           aria-label="پیام‌های آماده"
           className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/60 transition-colors hover:bg-foreground/10 hover:text-foreground"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M4 5.5h16M4 10.5h16M4 15.5h10"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          </svg>
+          <ListBullets size={18} />
         </button>
       </Popover.Trigger>
 
@@ -151,9 +145,7 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
                     aria-label="حذف"
                     className="shrink-0 text-foreground/30 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
+                    <X size={14} weight="bold" />
                   </button>
                 </div>
               ))

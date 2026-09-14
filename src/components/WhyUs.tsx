@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Package, Medal, Wrench, Buildings } from "@phosphor-icons/react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 
 const ADVANTAGES = [
@@ -8,49 +9,19 @@ const ADVANTAGES = [
     title: "تنوع و موجودی بالا",
     description:
       "توانایی تأمین انواع مدل‌های دیزل ژنراتور، قطعات یدکی و تمامی محصولات موجود در دسته‌بندی‌های ما — ژنراتور، موتور برق، قطعات یدکی، دینام و غیره. تقریباً هر مدل و برندی که نیاز داشته باشید را می‌توانید از ما تهیه کنید.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M3 9.5L12 4l9 5.5v9.5a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1V9.5Z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <path d="M3 9.5 12 15l9-5.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: <Package size={26} />,
   },
   {
     title: "رزومه و سابقه همکاری معتبر",
     description:
       "افتخار همکاری با شرکت‌های بزرگ و شناخته‌شده صنعت نفت و حفاری کشور را داریم؛ سابقه‌ای که اعتماد کارفرمایان صنعتی را برای ما به همراه آورده است.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 3l2.2 4.46 4.93.72-3.57 3.48.84 4.91L12 14.14l-4.4 2.43.84-4.91-3.57-3.48 4.93-.72L12 3Z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinejoin="round"
-        />
-        <path d="M8 19.5h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: <Medal size={26} />,
   },
   {
     title: "تیم فنی نصب و راه‌اندازی مجرب",
     description:
       "تیم فنی باتجربه و متخصص ما، نصب و راه‌اندازی دستگاه‌ها را در محل شما با بالاترین استاندارد ایمنی و کیفیت انجام می‌دهد.",
-    icon: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M14.7 6.3a3.5 3.5 0 0 1-4.6 4.6L4 17l3 3 6.1-6.1a3.5 3.5 0 0 1 4.6-4.6l-2.3 2.3-2-2 2.3-2.3Z"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <Wrench size={26} />,
   },
 ];
 
@@ -125,15 +96,7 @@ export default function WhyUs() {
                   key={partner}
                   className="flex items-center gap-2 rounded-full border border-accent-500/25 bg-background/60 px-5 py-2.5 text-sm font-semibold text-foreground/90"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent-400">
-                    <path
-                      d="M3 21V9l9-6 9 6v12M9 21v-6h6v6"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <Buildings size={16} className="shrink-0 text-accent-400" />
                   {partner}
                 </span>
               ))}

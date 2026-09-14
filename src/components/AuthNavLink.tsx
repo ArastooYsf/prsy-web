@@ -3,23 +3,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { User, SquaresFour } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 
-const UserIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
-    <path d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-  </svg>
-);
+const UserIcon = () => <User size={18} />;
 
-const PanelIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-    <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-    <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-    <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-  </svg>
-);
+const PanelIcon = () => <SquaresFour size={18} />;
 
 function IconNavButton({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
   return (

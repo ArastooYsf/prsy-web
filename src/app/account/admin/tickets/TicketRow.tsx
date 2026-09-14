@@ -4,6 +4,7 @@ import { TICKET_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type TicketWithUser = Prisma.TicketGetPayload<{ include: { user: true } }>;
 
@@ -25,11 +26,7 @@ export function TicketCardMobile({ ticket }: { ticket: TicketWithUser | null }) 
           <Skeleton width="55%" height={15} />
         )}
         {ticket ? (
-          <span
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${TICKET_STATUS[ticket.status].className}`}
-          >
-            {TICKET_STATUS[ticket.status].label}
-          </span>
+          <StatusBadge status={TICKET_STATUS[ticket.status]} className="shrink-0" />
         ) : (
           <Skeleton width={62} height={23} borderRadius={9999} containerClassName="shrink-0" />
         )}
@@ -76,11 +73,7 @@ export function TicketRowDesktop({ ticket }: { ticket: TicketWithUser | null }) 
       <td className="px-4 py-3 text-foreground/70">{ticket ? ticket.user.name || ticket.user.email : <Skeleton width={100} height={13} />}</td>
       <td className="px-4 py-3">
         {ticket ? (
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${TICKET_STATUS[ticket.status].className}`}
-          >
-            {TICKET_STATUS[ticket.status].label}
-          </span>
+          <StatusBadge status={TICKET_STATUS[ticket.status]} />
         ) : (
           <Skeleton width={62} height={22} borderRadius={9999} />
         )}

@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { TextB, ListBullets } from "@phosphor-icons/react";
 import { useSiteTheme } from "@/components/RouteThemeScope";
 import { cn } from "@/lib/utils";
 
@@ -63,21 +64,14 @@ export default function SimpleRichTextEditor({ value, onChange }: SimpleRichText
     <div className="rounded-lg border border-foreground/10 bg-foreground/5">
       <div className="flex items-center gap-1 border-b border-foreground/10 p-1.5">
         <ToolbarButton label="بولد" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M7 5h6a3.5 3.5 0 010 7H7V5zM7 12h7a3.5 3.5 0 010 7H7v-7z" />
-          </svg>
+          <TextB size={14} weight="bold" />
         </ToolbarButton>
         <ToolbarButton
           label="لیست نقطه‌ای"
           active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none" />
-            <circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none" />
-            <circle cx="5" cy="18" r="1.2" fill="currentColor" stroke="none" />
-            <path stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" d="M9 6h10M9 12h10M9 18h10" />
-          </svg>
+          <ListBullets size={14} weight="bold" />
         </ToolbarButton>
       </div>
       <EditorContent editor={editor} dir="rtl" />

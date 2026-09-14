@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { formatNumber } from "@/lib/format-number";
+import StatusBadge from "@/components/ui/StatusBadge";
+import type { StatusInfo } from "@/lib/status-labels";
 
 export type ProductBuyBoxProps = {
   showPrice: boolean;
   price: number | null;
-  availabilityLabel: string;
-  availabilityClassName: string;
+  availability: StatusInfo;
   ctaHref: string;
   ctaLabel: string;
 };
@@ -27,17 +28,14 @@ function PriceLine({ showPrice, price }: { showPrice: boolean; price: number | n
 export default function ProductBuyBox({
   showPrice,
   price,
-  availabilityLabel,
-  availabilityClassName,
+  availability,
   ctaHref,
   ctaLabel,
 }: ProductBuyBoxProps) {
   return (
     <div>
       <div className="hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 lg:sticky lg:top-24 lg:block lg:self-start">
-        <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${availabilityClassName}`}>
-          {availabilityLabel}
-        </span>
+        <StatusBadge status={availability} className="px-2.5 py-1 text-xs" />
 
         <div className="mt-4">
           <PriceLine showPrice={showPrice} price={price} />
@@ -53,11 +51,7 @@ export default function ProductBuyBox({
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-foreground/10 bg-background/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
         <div className="min-w-0">
-          <span
-            className={`mb-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold ${availabilityClassName}`}
-          >
-            {availabilityLabel}
-          </span>
+          <StatusBadge status={availability} className="mb-1 px-2 py-0.5" />
           <PriceLine showPrice={showPrice} price={price} />
         </div>
 

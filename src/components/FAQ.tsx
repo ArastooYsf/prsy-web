@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
-import { FAQS } from "@/data/faqs";
+import type { FaqItemContent } from "@/lib/site-content";
 
 const PREVIEW_COUNT = 4;
 
@@ -29,9 +30,9 @@ function ToggleIcon({ isOpen }: { isOpen: boolean }) {
   );
 }
 
-export default function FAQ({ full = false }: { full?: boolean }) {
+export default function FAQ({ items: allItems, full = false }: { items: FaqItemContent[]; full?: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const items = full ? FAQS : FAQS.slice(0, PREVIEW_COUNT);
+  const items = full ? allItems : allItems.slice(0, PREVIEW_COUNT);
 
   return (
     <section id="faq" className="section-padding relative border-t border-foreground/10">
@@ -74,7 +75,7 @@ export default function FAQ({ full = false }: { full?: boolean }) {
           {items.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <motion.div key={faq.question} variants={fadeInUp}>
+              <motion.div key={faq.id} variants={fadeInUp}>
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : index)}
@@ -123,21 +124,11 @@ export default function FAQ({ full = false }: { full?: boolean }) {
               className="group inline-flex items-center gap-2 text-sm font-semibold text-accent-400 underline-offset-4 transition-colors duration-300 hover:text-foreground"
             >
               مشاهده همه سوالات متداول
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
+              <ArrowLeft
+                size={16}
+                weight="bold"
                 className="transition-transform duration-300 group-hover:-translate-x-1"
-              >
-                <path
-                  d="M19 12H5M5 12L11 6M5 12L11 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              />
             </Link>
           </motion.div>
         )}

@@ -29,6 +29,24 @@
         ],
         "createdAt": "2026-08-23T19:17:58.386Z",
         "reason": "pre-existing Enamad trust-seal placeholder caption inside a fixed 64x64px box, not part of today's task — micro size is a deliberate fit-to-box exception, not a drifted default"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "files": [
+          "src/components/MediaPickerModal.tsx"
+        ],
+        "createdAt": "2026-09-14T18:48:31.390Z",
+        "reason": "pre-existing text-[10px] file-name label unrelated to this icon-migration task, not introduced by this change"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "10px",
+        "files": [
+          "src/components/TicketChat.tsx"
+        ],
+        "createdAt": "2026-09-14T18:49:41.539Z",
+        "reason": "pre-existing literal font size unrelated to this icon-migration task, not introduced by this change"
       }
     ]
   }

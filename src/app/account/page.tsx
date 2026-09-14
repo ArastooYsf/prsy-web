@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS, CONTRACT_STATUS, ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -96,11 +97,7 @@ export default async function AccountOverviewPage() {
               >
                 <span>{item.title}</span>
                 <span className="flex shrink-0 items-center gap-3">
-                  <span
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${item.badge.className}`}
-                  >
-                    {item.badge.label}
-                  </span>
+                  <StatusBadge status={item.badge} />
                   <span dir="ltr" className="text-foreground/50">
                     {dateFmt(item.updatedAt)}
                   </span>

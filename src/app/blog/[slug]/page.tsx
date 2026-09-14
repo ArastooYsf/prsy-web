@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
+import { PencilSimple } from "@phosphor-icons/react/ssr";
 import BlogViewTracker from "@/components/BlogViewTracker";
 import ThemedProse from "@/components/ui/ThemedProse";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
@@ -63,14 +64,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 href={`/account/admin/blog/${post.id}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-4 py-1.5 text-xs font-semibold text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M4 20h4l10.5-10.5a2 2 0 000-2.8l-1.2-1.2a2 2 0 00-2.8 0L4 16v4z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <PencilSimple size={14} />
                 ویرایش پست
               </Link>
             )}

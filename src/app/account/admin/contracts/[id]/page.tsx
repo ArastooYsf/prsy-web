@@ -8,6 +8,7 @@ import ContractForm from "@/components/admin/ContractForm";
 import DateRangeDisplay from "@/components/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +30,7 @@ export default async function AdminContractDetailPage({ params }: { params: { id
       <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">{contract.title}</h2>
-          <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${CONTRACT_STATUS[contract.status].className}`}
-          >
-            {CONTRACT_STATUS[contract.status].label}
-          </span>
+          <StatusBadge status={CONTRACT_STATUS[contract.status]} />
         </div>
         <p className="text-sm text-foreground/70">مشتری: {contract.user.name || contract.user.email}</p>
         <p className="text-sm text-foreground/70">نوع: {contract.type}</p>

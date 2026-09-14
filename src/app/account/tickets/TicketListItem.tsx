@@ -2,6 +2,7 @@ import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { TICKET_STATUS } from "@/lib/status-labels";
 import type { Prisma } from "@/generated/prisma/client";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export type Ticket = Prisma.TicketGetPayload<object>;
 
@@ -17,11 +18,7 @@ export function TicketListItem({ ticket }: { ticket: Ticket | null }) {
         </p>
       </div>
       {ticket ? (
-        <span
-          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${TICKET_STATUS[ticket.status].className}`}
-        >
-          {TICKET_STATUS[ticket.status].label}
-        </span>
+        <StatusBadge status={TICKET_STATUS[ticket.status]} />
       ) : (
         <Skeleton width={72} height={22} borderRadius={9999} />
       )}

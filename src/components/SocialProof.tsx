@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Quotes } from "@phosphor-icons/react";
 import Counter from "@/components/Counter";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 
@@ -99,18 +100,7 @@ export default function SocialProof() {
               variants={fadeInUp}
               className="flex flex-col rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-7"
             >
-              <svg
-                width="28"
-                height="22"
-                viewBox="0 0 28 22"
-                fill="none"
-                className="mb-4 text-accent-400/50"
-              >
-                <path
-                  d="M0 22V13.75C0 6.16 4.62 1.32 11.55 0L13.09 3.19C9.24 4.51 7.04 7.15 7.04 10.34V11H13.09V22H0ZM14.91 22V13.75C14.91 6.16 19.53 1.32 26.46 0L28 3.19C24.15 4.51 21.95 7.15 21.95 10.34V11H28V22H14.91Z"
-                  fill="currentColor"
-                />
-              </svg>
+              <Quotes size={28} weight="fill" className="mb-4 text-accent-400/50" />
               <p className="flex-1 leading-7 text-foreground/70">
                 {testimonial.quote}
               </p>

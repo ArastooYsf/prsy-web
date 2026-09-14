@@ -8,6 +8,7 @@ import UploadWidget from "@/components/admin/UploadWidget";
 import { SiteViewsCard } from "@/components/admin/DashboardCharts";
 import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardChartsLazy";
 import { StatCard } from "./StatCard";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 async function getAdminStats() {
   try {
@@ -47,6 +48,8 @@ async function getChartData() {
 }
 
 export default async function AdminDashboardPage() {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const charts = await getChartData();
 

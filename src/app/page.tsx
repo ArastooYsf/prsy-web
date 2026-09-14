@@ -6,8 +6,11 @@ import SocialProof from "@/components/SocialProof";
 import FAQ from "@/components/FAQ";
 import ConsultationSection from "@/components/ConsultationSection";
 import { getHeroSlides, getFaqItems } from "@/lib/site-content";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export default async function Home() {
+  await debugSlowLoad();
+
   const [heroSlides, faqItems] = await Promise.all([getHeroSlides(), getFaqItems()]);
 
   return (

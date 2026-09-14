@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 import TicketChat, { type ChatMessage } from "@/components/TicketChat";
 import TicketStatusSelect from "@/components/admin/TicketStatusSelect";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTicketDetailPage({ params }: { params: { id: string } }) {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const viewerId = session!.user.id;
 

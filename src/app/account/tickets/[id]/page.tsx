@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { TICKET_STATUS } from "@/lib/status-labels";
 import TicketChat, { type ChatMessage } from "@/components/TicketChat";
 import StatusBadge from "@/components/ui/StatusBadge";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountTicketDetailPage({ params }: { params: { id: string } }) {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const userId = session!.user.id;
 

@@ -55,6 +55,7 @@ model User {
   orders          Order[]
   cannedResponses CannedResponse[]
   notifications   Notification[]
+  productComments ProductComment[]
 
   @@map("users")
 }
@@ -341,8 +342,27 @@ model Product {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 
+  comments ProductComment[]
+
   @@index([categoryId])
   @@index([brandId])
   @@index([deletedAt])
   @@map("products")
+}
+
+model ProductComment {
+  id        String         @id @default(cuid())
+  productId String
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  text      String         @db.Text
+  rating    Int?
+  status    ApprovalStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([productId])
+  @@index([productId, status])
+  @@map("product_comments")
 }

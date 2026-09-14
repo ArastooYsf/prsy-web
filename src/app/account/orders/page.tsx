@@ -7,10 +7,13 @@ import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import StatusBadge from "@/components/ui/StatusBadge";
+import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountOrdersPage() {
+  await debugSlowLoad();
+
   const session = await getServerSession(authOptions);
   const userId = session!.user.id;
 

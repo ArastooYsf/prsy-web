@@ -52,7 +52,7 @@ export default function Loading() {
       {/* Mobile/tablet: card list */}
       <div className="space-y-3 md:hidden">
         {PLACEHOLDER_ROWS.map((_, i) => (
-          <ContractCardMobile key={i} contract={null} isAdmin />
+          <ContractCardMobile key={i} contract={null} />
         ))}
       </div>
 
@@ -84,7 +84,7 @@ export default function Loading() {
           </thead>
           <tbody>
             {PLACEHOLDER_ROWS.map((_, i) => (
-              <ContractRowDesktop key={i} contract={null} isAdmin />
+              <ContractRowDesktop key={i} contract={null} />
             ))}
           </tbody>
         </table>

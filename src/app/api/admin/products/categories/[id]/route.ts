@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { Prisma } from "@/generated/prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
@@ -8,6 +9,7 @@ import { sanitizePlainText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
 import { CATEGORY_ICON_KEYS } from "@/lib/category-icons";
 import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
+import { normalizePreviewSpecKeys } from "@/lib/product-spec-templates";
 
 function normalizeIcon(input: unknown): string | null {
   return typeof input === "string" && (CATEGORY_ICON_KEYS as readonly string[]).includes(input) ? input : null;
@@ -50,6 +52,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     parentId = parent.id;
   }
 
+  // Only meaningful on a root category.
+  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, existing.specTemplateKey);
+
   const slug = await ensureUniqueSlug(slugify(name), async (s) => {
     const clash = await prisma.productCategory.findFirst({ where: { slug: s, NOT: { id: existing.id } } });
     return clash !== null;
@@ -57,7 +62,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   const category = await prisma.productCategory.update({
     where: { id: existing.id },
-    data: { name, slug, icon, order, parentId },
+    data: { name, slug, icon, order, parentId, previewSpecKeys: previewSpecKeys ?? Prisma.JsonNull },
   });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);

@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OrderForm from "@/components/admin/OrderForm";
 
@@ -13,11 +10,6 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function NewOrderPage() {
-  const session = await getServerSession(authOptions);
-  if (session!.user.role !== "ADMIN") {
-    redirect("/account/admin/orders");
-  }
-
   const customers = await prisma.user.findMany({
     where: { role: "CUSTOMER", deletedAt: null },
     orderBy: { createdAt: "desc" },

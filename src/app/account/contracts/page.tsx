@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { FileText } from "lucide-react";
+import { FileText, Plus, Ban } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -14,6 +15,18 @@ import { debugSlowLoad } from "@/lib/debug-slow-load";
 export const dynamic = "force-dynamic";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+function newContractTicketHref() {
+  const subject = "درخواست قرارداد جدید";
+  const message = "با سلام،\nدرخواست عقد یک قرارداد جدید را دارم. لطفاً برای هماهنگی جزئیات با من تماس بگیرید.";
+  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+}
+
+function cancelContractTicketHref(contract: { title: string; type: string }) {
+  const subject = "درخواست لغو قرارداد";
+  const message = `با سلام،\nدرخواست لغو قرارداد «${contract.title}» (نوع: ${contract.type}) را دارم. لطفاً بررسی و پیگیری کنید.`;
+  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+}
 
 export default async function AccountContractsPage() {
   await debugSlowLoad();
@@ -30,10 +43,19 @@ export default async function AccountContractsPage() {
 
   return (
     <div>
-      <h2 className="mb-6 flex items-center gap-2 text-lg font-bold">
-        <FileText className="size-5 text-accent-400" />
-        قراردادها
-      </h2>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <FileText className="size-5 text-accent-400" />
+          قراردادها
+        </h2>
+        <Link
+          href={newContractTicketHref()}
+          className="flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+        >
+          <Plus className="size-4" />
+          درخواست قرارداد جدید
+        </Link>
+      </div>
 
       {contracts.length === 0 ? (
         <EmptyState
@@ -78,6 +100,15 @@ export default async function AccountContractsPage() {
                       <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
                       دانلود پیوست
                     </a>
+                  )}
+                  {(contract.status === "ACTIVE" || contract.status === "RENEWING") && (
+                    <Link
+                      href={cancelContractTicketHref(contract)}
+                      className="flex min-h-11 items-center gap-1.5 rounded-full border border-red-500/30 px-4 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                    >
+                      <Ban className="size-3.5" />
+                      لغو قرارداد
+                    </Link>
                   )}
                 </div>
               </div>

@@ -181,6 +181,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         kind="image"
         scope="SITE_CONTENT"
         multiple
+        hint="عرض توصیه‌شده حدود ۱۲۰۰ پیکسل (به‌اندازه‌ی عرض متن پست) — تصویر عریض‌تر فقط حجم صفحه را زیاد می‌کند. JPG یا WEBP، حداکثر ۸ مگابایت."
         onConfirm={(assets) => {
           assets.forEach((asset) => {
             const src = getMediaUrl(asset.url);

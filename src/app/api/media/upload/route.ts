@@ -5,51 +5,22 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { validateUploadedFile } from "@/lib/uploads";
 
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
-const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
-const MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024; // 15MB (PDF and DOCX)
 const UPLOAD_SUBDIR = "uploads";
 const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"] as const;
 type MediaScope = (typeof VALID_SCOPES)[number];
 
-// SITE_CONTENT and CONTRACT_FILE are only ever populated through admin-only UI
-// (the site-content/blog editor's image picker, the contract form's file
-// field) — without this gate any authenticated user, including a CUSTOMER,
-// could tag an upload with either scope directly via the API and have it
-// show up in the shared admin gallery. TICKET_ATTACHMENT and PROFILE_AVATAR
-// are legitimately uploaded by every role (a customer attaching a file to
-// their own ticket, anyone setting their own avatar).
-const ADMIN_ONLY_SCOPES: readonly MediaScope[] = ["SITE_CONTENT", "CONTRACT_FILE"];
-
-// Verify actual file bytes, not just the client-supplied name/Content-Type,
-// which are trivial to spoof (e.g. a renamed .php file claiming image/jpeg).
-function matchesImageSignature(bytes: Buffer, mimeType: string): boolean {
-  if (mimeType === "image/jpeg") {
-    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  }
-  if (mimeType === "image/png") {
-    return bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
-  }
-  if (mimeType === "image/webp") {
-    return (
-      bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WEBP"
-    );
-  }
-  return false;
-}
-
-function isPdf(bytes: Buffer): boolean {
-  return bytes.subarray(0, 5).toString("ascii") === "%PDF-";
-}
-
-// .docx files are ZIP archives (OOXML); a real ZIP local-file-header signature
-// is a reasonable, cheap authenticity check without parsing the archive.
-function isZipContainer(bytes: Buffer): boolean {
-  return bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
-}
+// SITE_CONTENT is only ever populated through the admin-only site-content/blog
+// editor's image picker — without this gate any authenticated user, including
+// a CUSTOMER, could tag an upload with this scope directly via the API and
+// have it show up in the shared admin gallery. CONTRACT_FILE is the contract
+// form's file field, which ADMIN and SUPPORT both manage (see contracts
+// API routes), so it's gated to staff rather than ADMIN alone. TICKET_ATTACHMENT
+// and PROFILE_AVATAR are legitimately uploaded by every role (a customer
+// attaching a file to their own ticket, anyone setting their own avatar).
+const ADMIN_ONLY_SCOPES: readonly MediaScope[] = ["SITE_CONTENT"];
+const STAFF_ONLY_SCOPES: readonly MediaScope[] = ["CONTRACT_FILE"];
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -63,7 +34,11 @@ export async function POST(request: Request) {
   const scopeInput = formData.get("scope");
   const scope: MediaScope = VALID_SCOPES.includes(scopeInput as MediaScope) ? (scopeInput as MediaScope) : "SITE_CONTENT";
 
+  const isStaff = session.user.role === "ADMIN" || session.user.role === "SUPPORT";
   if (ADMIN_ONLY_SCOPES.includes(scope) && session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
+  }
+  if (STAFF_ONLY_SCOPES.includes(scope) && !isStaff) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
   }
 
@@ -71,31 +46,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "فایلی ارسال نشده است." }, { status: 400 });
   }
 
-  const extension = path.extname(file.name).toLowerCase();
-  const isImageCandidate = ALLOWED_IMAGE_TYPES.includes(file.type) && ALLOWED_IMAGE_EXTENSIONS.includes(extension);
-  const isPdfCandidate = file.type === "application/pdf" && extension === ".pdf";
-  const isDocxCandidate = file.type === DOCX_MIME_TYPE && extension === ".docx";
-
-  if (!isImageCandidate && !isPdfCandidate && !isDocxCandidate) {
-    return NextResponse.json({ error: "فرمت فایل مجاز نیست." }, { status: 400 });
+  const validation = await validateUploadedFile(file);
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
   }
-
-  const maxSize = isImageCandidate ? MAX_IMAGE_SIZE_BYTES : MAX_DOCUMENT_SIZE_BYTES;
-  if (file.size > maxSize) {
-    return NextResponse.json({ error: "حجم فایل بیش از حد مجاز است." }, { status: 400 });
-  }
-
-  const bytes = Buffer.from(await file.arrayBuffer());
-
-  if (isImageCandidate && !matchesImageSignature(bytes, file.type)) {
-    return NextResponse.json({ error: "محتوای فایل با نوع تصویر مطابقت ندارد." }, { status: 400 });
-  }
-  if (isPdfCandidate && !isPdf(bytes)) {
-    return NextResponse.json({ error: "محتوای فایل با نوع PDF مطابقت ندارد." }, { status: 400 });
-  }
-  if (isDocxCandidate && !isZipContainer(bytes)) {
-    return NextResponse.json({ error: "محتوای فایل با نوع DOCX مطابقت ندارد." }, { status: 400 });
-  }
+  const { bytes, extension } = validation.result;
 
   const filename = `${randomUUID()}${extension}`;
   const uploadDir = path.join(process.cwd(), "public", "media", UPLOAD_SUBDIR);

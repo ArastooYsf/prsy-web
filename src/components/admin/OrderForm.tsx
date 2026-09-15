@@ -4,12 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
+import ProductPicker from "@/components/admin/ProductPicker";
+import type { AdminProductSearchResult } from "@/lib/admin-product-search";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 type Customer = { id: string; label: string };
-type Item = { productName: string; quantity: number | "" };
+// productId is null for a manual/custom line item (free-text name, no
+// catalog link) — set once a row is linked via ProductPicker. price is a
+// snapshot the admin can always override, prefilled from the product's
+// catalog price on selection but left blank ("") for a fresh manual row.
+type Item = { productId: string | null; productName: string; quantity: number | ""; price: number | "" };
 
 type OrderFormProps = {
   mode: "create" | "edit";
@@ -38,21 +44,12 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
   const [userId, setUserId] = useState(order?.userId ?? customers[0]?.id ?? "");
   const [status, setStatus] = useState(order?.status ?? "PENDING");
   const [items, setItems] = useState<Item[]>(
-    order?.items && order.items.length > 0 ? order.items : [{ productName: "", quantity: 1 }],
+    order?.items && order.items.length > 0 ? order.items : [{ productId: null, productName: "", quantity: 1, price: "" }],
   );
   const [saving, setSaving] = useState(false);
   const [invalidIndexes, setInvalidIndexes] = useState<Set<number>>(new Set());
 
-  const updateItem = (index: number, field: keyof Item, value: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => {
-        if (i !== index) return item;
-        if (field === "quantity") {
-          return { ...item, quantity: value === "" ? "" : Number(value) };
-        }
-        return { ...item, productName: value };
-      }),
-    );
+  const clearInvalid = (index: number) => {
     setInvalidIndexes((prev) => {
       if (!prev.has(index)) return prev;
       const next = new Set(prev);
@@ -61,7 +58,36 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
     });
   };
 
-  const addItem = () => setItems((prev) => [...prev, { productName: "", quantity: 1 }]);
+  const updateItem = (index: number, field: "quantity" | "price", value: string) => {
+    setItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value === "" ? "" : Number(value) } : item)),
+    );
+    clearInvalid(index);
+  };
+
+  const updateManualName = (index: number, name: string) => {
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, productName: name } : item)));
+    clearInvalid(index);
+  };
+
+  const selectProduct = (index: number, product: AdminProductSearchResult) => {
+    setItems((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, productId: product.id, productName: product.name, price: product.price ?? "" } : item,
+      ),
+    );
+    clearInvalid(index);
+  };
+
+  // Unlinking keeps the name/price as-is (now freely editable) rather than
+  // wiping them — the admin is converting a catalog row into a custom one,
+  // not starting the row over.
+  const clearProduct = (index: number) => {
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, productId: null } : item)));
+  };
+
+  const addItem = () =>
+    setItems((prev) => [...prev, { productId: null, productName: "", quantity: 1, price: "" }]);
   const removeItem = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,14 +98,15 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
       return;
     }
 
-    // Every row must be fully filled in — a row with only one of the two
-    // fields set is never silently dropped, since that would submit an
-    // order missing an item the user thought they'd added.
+    // Every row must be fully filled in — a row missing any of the three
+    // fields is never silently dropped, since that would submit an order
+    // missing an item the user thought they'd added.
     const bad = new Set<number>();
     items.forEach((item, i) => {
       const hasName = !!item.productName.trim();
       const hasQuantity = typeof item.quantity === "number" && item.quantity >= 1;
-      if (!hasName || !hasQuantity) bad.add(i);
+      const hasPrice = typeof item.price === "number" && item.price >= 0;
+      if (!hasName || !hasQuantity || !hasPrice) bad.add(i);
     });
 
     if (items.length === 0 || bad.size === items.length) {
@@ -90,12 +117,12 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
     if (bad.size > 0) {
       setInvalidIndexes(bad);
-      showToast("نام و تعداد همه‌ی اقلام سفارش را تکمیل کنید یا ردیف‌های ناقص را حذف کنید.", "error");
+      showToast("نام، قیمت و تعداد همه‌ی اقلام سفارش را تکمیل کنید یا ردیف‌های ناقص را حذف کنید.", "error");
       return;
     }
 
     setInvalidIndexes(new Set());
-    const validItems = items as { productName: string; quantity: number }[];
+    const validItems = items as { productId: string | null; productName: string; quantity: number; price: number }[];
 
     setSaving(true);
 
@@ -157,39 +184,67 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">اقلام سفارش</label>
+        <p className="mb-2 text-xs text-foreground/40">
+          یا از کاتالوگ محصولات جست‌وجو و انتخاب کنید، یا نام را برای یک قلم سفارشی/دستی تایپ کنید — در هر دو حالت قیمت قابل ویرایش است.
+        </p>
         <div className="space-y-3">
           {items.map((item, index) => {
             const invalid = invalidIndexes.has(index);
+            const nameInvalid = invalid && !item.productName.trim();
+            const quantityInvalid = invalid && !(typeof item.quantity === "number" && item.quantity >= 1);
+            const priceInvalid = invalid && !(typeof item.price === "number" && item.price >= 0);
             return (
-            <div key={index} className="flex items-center gap-2">
-              <input
-                value={item.productName}
-                onChange={(e) => updateItem(index, "productName", e.target.value)}
-                className={invalid && !item.productName.trim() ? `${inputClass} border-red-500/50` : inputClass}
-                placeholder="نام محصول"
-              />
-              <input
-                type="number"
-                min={1}
-                value={item.quantity}
-                onChange={(e) => updateItem(index, "quantity", e.target.value)}
-                className={
-                  invalid && !(typeof item.quantity === "number" && item.quantity >= 1)
-                    ? `${inputClass} w-24 border-red-500/50`
-                    : `${inputClass} w-24`
-                }
-              />
-              {items.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeItem(index)}
-                  className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-foreground/10 px-3.5 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
-                >
-                  <Trash2 className="size-3.5" />
-                  حذف
-                </button>
-              )}
-            </div>
+              <div key={index} className="flex flex-wrap items-center gap-2">
+                <div className="min-w-0 basis-full sm:flex-1 sm:basis-auto">
+                  <ProductPicker
+                    productId={item.productId}
+                    productName={item.productName}
+                    onManualNameChange={(name) => updateManualName(index, name)}
+                    onSelectProduct={(product) => selectProduct(index, product)}
+                    onClearProduct={() => clearProduct(index)}
+                    invalid={nameInvalid}
+                  />
+                </div>
+                {/* Fixed width lives on the wrapper, not the input itself —
+                    inputClass already carries w-full, and combining that with
+                    a narrower w-* directly on the same element is an
+                    unreliable same-specificity Tailwind conflict (same
+                    wrapper-div technique ListFilterBar uses for its date
+                    inputs). */}
+                <div className="w-20 shrink-0">
+                  <input
+                    type="number"
+                    min={1}
+                    value={item.quantity}
+                    onChange={(e) => updateItem(index, "quantity", e.target.value)}
+                    placeholder="تعداد"
+                    aria-label="تعداد"
+                    className={`${inputClass} ${quantityInvalid ? "border-red-500/50" : ""}`}
+                  />
+                </div>
+                <div className="w-36 shrink-0">
+                  <input
+                    type="number"
+                    min={0}
+                    dir="ltr"
+                    value={item.price}
+                    onChange={(e) => updateItem(index, "price", e.target.value)}
+                    placeholder="قیمت واحد (تومان)"
+                    aria-label="قیمت واحد (تومان)"
+                    className={`${inputClass} ${priceInvalid ? "border-red-500/50" : ""}`}
+                  />
+                </div>
+                {items.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeItem(index)}
+                    className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-foreground/10 px-3.5 text-xs text-foreground/60 transition-colors hover:border-red-500/40 hover:text-red-400"
+                  >
+                    <Trash2 className="size-3.5" />
+                    حذف
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>

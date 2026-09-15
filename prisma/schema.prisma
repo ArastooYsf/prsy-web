@@ -47,15 +47,17 @@ model User {
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
 
-  posts           BlogPost[]
-  mediaAssets     MediaAsset[]
-  tickets         Ticket[]
-  ticketReplies   TicketReply[]
-  contracts       Contract[]
-  orders          Order[]
-  cannedResponses CannedResponse[]
-  notifications   Notification[]
-  productComments ProductComment[]
+  posts                 BlogPost[]
+  mediaAssets           MediaAsset[]
+  tickets               Ticket[]
+  ticketReplies         TicketReply[]
+  contracts             Contract[]
+  orders                Order[]
+  cannedResponses       CannedResponse[]
+  notifications         Notification[]
+  productComments       ProductComment[]
+  customerFiles         CustomerFile[]   @relation("CustomerFiles")
+  uploadedCustomerFiles CustomerFile[]   @relation("UploadedCustomerFiles")
 
   @@map("users")
 }
@@ -206,13 +208,24 @@ model Order {
 }
 
 model OrderItem {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   orderId     String
-  order       Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // Nullable: a custom/manual line item (not tied to a catalog product) has
+  // no productId. When set, onDelete: SetNull keeps the historical order line
+  // intact (with its own snapshot name/price) even if the product is later
+  // removed from the catalog.
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productName String
   quantity    Int
+  // Snapshot of the unit price at order time (catalog default or manually
+  // entered) — nullable only so existing pre-price orders don't need a
+  // migration backfill; every new item submitted through the form requires it.
+  price       Int?
 
   @@index([orderId])
+  @@index([productId])
   @@map("order_items")
 }
 
@@ -277,6 +290,23 @@ model MediaAsset {
   @@map("media_assets")
 }
 
+model CustomerFile {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("CustomerFiles", fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  url          String
+  filename     String
+  mimeType     String
+  size         Int
+  uploadedById String
+  uploadedBy   User     @relation("UploadedCustomerFiles", fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@map("customer_files")
+}
+
 enum ProductAvailability {
   IN_STOCK
   OUT_OF_STOCK
@@ -314,6 +344,11 @@ model ProductCategory {
   // edit (see the categories PATCH route), so it can't be trusted as a
   // stable key. Null means "use the general default template".
   specTemplateKey String?
+  // Ordered subset of that template's labels to show in the product card's
+  // quick-preview popover on the catalog listing — same root-only convention
+  // as specTemplateKey. Null/empty means "use the default fallback" (the
+  // product's first few specs, see ProductCard.tsx).
+  previewSpecKeys Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -342,7 +377,8 @@ model Product {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 
-  comments ProductComment[]
+  comments   ProductComment[]
+  orderItems OrderItem[]
 
   @@index([categoryId])
   @@index([brandId])

@@ -115,7 +115,7 @@ export const authOptions: AuthOptions = {
           return null;
         }
 
-        if (user.role === "ADMIN" && user.twoFactorEnabled && user.twoFactorSecret) {
+        if ((user.role === "ADMIN" || user.role === "SUPPORT") && user.twoFactorEnabled && user.twoFactorSecret) {
           if (!credentials.totpCode) {
             throw new Error("TOTP_REQUIRED");
           }

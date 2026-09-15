@@ -34,7 +34,10 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
   const approvalStatus = param(searchParams, "approvalStatus");
   const q = param(searchParams, "q");
   const { field, dir } = sortParams(searchParams, SORT_FIELDS, "createdAt");
-  const roleWhere = !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
+  // SUPPORT can only ever browse customer accounts — the ADMIN/SUPPORT roster
+  // itself (name, email, phone, notes of other staff) is an ADMIN-only view,
+  // regardless of what ?role= the URL asks for.
+  const roleWhere = !isAdmin ? "CUSTOMER" : !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
 
   const [customers, pendingCount] = await Promise.all([
     prisma.user.findMany({
@@ -90,17 +93,24 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
       <ListFilterBar
         searchPlaceholder="جست‌وجوی نام، ایمیل یا تلفن..."
         selects={[
-          {
-            key: "role",
-            label: "نقش",
-            allLabel: "نقش: مشتریان (پیش‌فرض)",
-            options: [
-              { value: "ALL", label: "همه نقش‌ها" },
-              { value: "CUSTOMER", label: "مشتری" },
-              { value: "SUPPORT", label: "پشتیبان" },
-              { value: "ADMIN", label: "مدیر" },
-            ],
-          },
+          // Browsing/filtering to ADMIN or SUPPORT accounts is an ADMIN-only
+          // view of the staff roster — SUPPORT never sees this selector, and
+          // the query above ignores ?role= for them regardless.
+          ...(isAdmin
+            ? [
+                {
+                  key: "role",
+                  label: "نقش",
+                  allLabel: "نقش: مشتریان (پیش‌فرض)",
+                  options: [
+                    { value: "ALL", label: "همه نقش‌ها" },
+                    { value: "CUSTOMER", label: "مشتری" },
+                    { value: "SUPPORT", label: "پشتیبان" },
+                    { value: "ADMIN", label: "مدیر" },
+                  ],
+                },
+              ]
+            : []),
           {
             key: "customerType",
             label: "نوع",

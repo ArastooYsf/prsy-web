@@ -97,29 +97,26 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
       ))}
 
       {dateRanges.map((d, i) => (
-        <div key={d.fromKey} className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium text-foreground/50">{d.label}</span>
-          <div className="flex items-start gap-2">
-            <div className="w-36">
-              <DateInput
-                label="از"
-                value={searchParams.get(d.fromKey) ?? ""}
-                onChange={(v) => updateParam(d.fromKey, v || null)}
-                calendar={calendar}
-                onCalendarChange={setCalendar}
-                hideToggle={i > 0}
-              />
-            </div>
-            <div className="w-36">
-              <DateInput
-                label="تا"
-                value={searchParams.get(d.toKey) ?? ""}
-                onChange={(v) => updateParam(d.toKey, v || null)}
-                calendar={calendar}
-                onCalendarChange={setCalendar}
-                hideToggle
-              />
-            </div>
+        <div key={d.fromKey} className="flex items-start gap-2">
+          <div className="w-36">
+            <DateInput
+              label={`از ${d.label}`}
+              value={searchParams.get(d.fromKey) ?? ""}
+              onChange={(v) => updateParam(d.fromKey, v || null)}
+              calendar={calendar}
+              onCalendarChange={setCalendar}
+              hideToggle={i > 0}
+            />
+          </div>
+          <div className="w-36">
+            <DateInput
+              label={`تا ${d.label}`}
+              value={searchParams.get(d.toKey) ?? ""}
+              onChange={(v) => updateParam(d.toKey, v || null)}
+              calendar={calendar}
+              onCalendarChange={setCalendar}
+              hideToggle
+            />
           </div>
         </div>
       ))}

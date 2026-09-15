@@ -42,7 +42,7 @@ export default function Loading() {
       {/* Mobile/tablet: card list */}
       <div className="space-y-3 md:hidden">
         {PLACEHOLDER_ROWS.map((_, i) => (
-          <OrderCardMobile key={i} order={null} isAdmin />
+          <OrderCardMobile key={i} order={null} />
         ))}
       </div>
 
@@ -71,7 +71,7 @@ export default function Loading() {
           </thead>
           <tbody>
             {PLACEHOLDER_ROWS.map((_, i) => (
-              <OrderRowDesktop key={i} order={null} isAdmin />
+              <OrderRowDesktop key={i} order={null} />
             ))}
           </tbody>
         </table>

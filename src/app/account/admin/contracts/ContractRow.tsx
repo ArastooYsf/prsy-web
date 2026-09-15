@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eye, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
@@ -9,9 +9,9 @@ import StatusBadge from "@/components/ui/StatusBadge";
 
 export type ContractWithUser = Prisma.ContractGetPayload<{ include: { user: true } }>;
 
-type Props = { contract: ContractWithUser | null; isAdmin: boolean };
+type Props = { contract: ContractWithUser | null };
 
-export function ContractCardMobile({ contract, isAdmin }: Props) {
+export function ContractCardMobile({ contract }: Props) {
   return (
     <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="flex items-start justify-between gap-3">
@@ -52,13 +52,13 @@ export function ContractCardMobile({ contract, isAdmin }: Props) {
             href={`/account/admin/contracts/${contract.id}`}
             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
-            {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
-            {isAdmin ? "ویرایش" : "مشاهده"}
+            <Pencil className="size-3.5" />
+            ویرایش
           </Link>
         ) : (
           <Skeleton width={78} height={40} borderRadius={9999} />
         )}
-        {isAdmin && (contract ? (
+        {contract ? (
           <DeleteEntityButton
             endpoint={`/api/admin/contracts/${contract.id}`}
             title="حذف قرارداد"
@@ -66,13 +66,13 @@ export function ContractCardMobile({ contract, isAdmin }: Props) {
           />
         ) : (
           <Skeleton width={40} height={40} borderRadius={9999} />
-        ))}
+        )}
       </div>
     </div>
   );
 }
 
-export function ContractRowDesktop({ contract, isAdmin }: Props) {
+export function ContractRowDesktop({ contract }: Props) {
   return (
     <tr className="border-t border-foreground/10">
       <td className="px-4 py-3 font-medium">{contract ? contract.title : <Skeleton width="80%" height={13} />}</td>
@@ -100,13 +100,13 @@ export function ContractRowDesktop({ contract, isAdmin }: Props) {
               href={`/account/admin/contracts/${contract.id}`}
               className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
             >
-              {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
-              {isAdmin ? "ویرایش" : "مشاهده"}
+              <Pencil className="size-3.5" />
+              ویرایش
             </Link>
           ) : (
             <Skeleton width={78} height={32} borderRadius={9999} />
           )}
-          {isAdmin && (contract ? (
+          {contract ? (
             <DeleteEntityButton
               endpoint={`/api/admin/contracts/${contract.id}`}
               title="حذف قرارداد"
@@ -114,7 +114,7 @@ export function ContractRowDesktop({ contract, isAdmin }: Props) {
             />
           ) : (
             <Skeleton width={32} height={32} borderRadius={9999} />
-          ))}
+          )}
         </div>
       </td>
     </tr>

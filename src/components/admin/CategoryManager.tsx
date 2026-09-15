@@ -7,12 +7,24 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS, type CategoryIconKey } from "@/lib/category-icons";
+import { SPEC_TEMPLATES, resolvedSpecTemplateKey } from "@/lib/product-spec-templates";
 import type { ProductCategory } from "@/generated/prisma/client";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
-type Draft = { name: string; icon: string; order: string; parentId: string | null };
+type Draft = {
+  name: string;
+  icon: string;
+  order: string;
+  parentId: string | null;
+  previewSpecKeys: string[];
+  specTemplateKey: string | null;
+};
+
+function parsePreviewSpecKeys(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}
 
 function CategoryIcon({ icon }: { icon: string | null }) {
   if (!icon || !(CATEGORY_ICON_KEYS as readonly string[]).includes(icon)) {
@@ -40,10 +52,36 @@ export default function CategoryManager({ categories }: { categories: ProductCat
   const [deleting, setDeleting] = useState(false);
 
   const openCreate = (parentId: string | null) =>
-    setForm({ mode: "create", draft: { name: "", icon: "", order: "0", parentId } });
+    setForm({
+      mode: "create",
+      draft: { name: "", icon: "", order: "0", parentId, previewSpecKeys: [], specTemplateKey: null },
+    });
   const openEdit = (c: ProductCategory) =>
-    setForm({ mode: "edit", id: c.id, draft: { name: c.name, icon: c.icon ?? "", order: String(c.order), parentId: c.parentId } });
+    setForm({
+      mode: "edit",
+      id: c.id,
+      draft: {
+        name: c.name,
+        icon: c.icon ?? "",
+        order: String(c.order),
+        parentId: c.parentId,
+        previewSpecKeys: parsePreviewSpecKeys(c.previewSpecKeys),
+        specTemplateKey: c.specTemplateKey,
+      },
+    });
   const close = () => setForm(null);
+
+  const togglePreviewSpecKey = (label: string) => {
+    // Functional update: several chips toggled in quick succession can land
+    // in the same React batch, where each closure would otherwise see the
+    // same stale `form` and only the last click would stick.
+    setForm((prev) => {
+      if (!prev) return prev;
+      const current = prev.draft.previewSpecKeys;
+      const next = current.includes(label) ? current.filter((l) => l !== label) : [...current, label];
+      return { ...prev, draft: { ...prev.draft, previewSpecKeys: next } };
+    });
+  };
 
   const save = async () => {
     if (!form) return;
@@ -57,6 +95,7 @@ export default function CategoryManager({ categories }: { categories: ProductCat
       icon: form.draft.icon || null,
       order: Number(form.draft.order) || 0,
       parentId: form.draft.parentId,
+      previewSpecKeys: form.draft.previewSpecKeys,
     };
     const url = form.mode === "create" ? "/api/admin/products/categories" : `/api/admin/products/categories/${form.id}`;
     const res = await fetch(url, {
@@ -131,6 +170,42 @@ export default function CategoryManager({ categories }: { categories: ProductCat
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">ترتیب</label>
             <input type="number" dir="ltr" value={form.draft.order} onChange={(e) => setForm({ ...form, draft: { ...form.draft, order: e.target.value } })} className={inputClass} />
           </div>
+
+          {/* Only a root category carries its own spec template (see specTemplateKey
+              in schema.prisma) — a subcategory always inherits its root's, so picking
+              preview fields only makes sense here. */}
+          {!form.draft.parentId && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground/80">
+                فیلدهای پیش‌نمایش سریع (در کارت محصول)
+              </label>
+              <p className="mb-2 text-xs text-foreground/50">
+                این فیلدها در پاپ‌آپ پیش‌نمایش سریع روی کارت محصول (صفحه‌ی لیست محصولات) نمایش داده می‌شوند. اگر
+                چیزی انتخاب نشود، چند مشخصه‌ی اول محصول به‌صورت پیش‌فرض نمایش داده می‌شود.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {SPEC_TEMPLATES[resolvedSpecTemplateKey(form.draft.specTemplateKey)].map((label) => {
+                  const checked = form.draft.previewSpecKeys.includes(label);
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => togglePreviewSpecKey(label)}
+                      aria-pressed={checked}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        checked
+                          ? "border-accent-500/40 bg-accent-500/10 text-accent-400"
+                          : "border-foreground/10 text-foreground/60 hover:border-foreground/30"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <button type="button" onClick={save} disabled={saving} className="inline-flex min-h-11 items-center rounded-full bg-accent-500 px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-accent-600 disabled:opacity-60">
               {saving ? "در حال ذخیره..." : "ذخیره"}

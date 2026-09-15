@@ -6,7 +6,7 @@ import { verifyTwoFactorCode } from "@/lib/twofactor";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 

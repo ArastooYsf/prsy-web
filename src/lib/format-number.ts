@@ -24,3 +24,10 @@ export function toPersianDigits(input: string | number): string {
 export function formatNumber(value: number): string {
   return value.toLocaleString("fa-IR");
 }
+
+// Shared by every file-size display (ticket attachments, customer files, …).
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return toPersianDigits(`${bytes} B`);
+  if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} KB`);
+  return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} MB`);
+}

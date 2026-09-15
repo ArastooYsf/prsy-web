@@ -1,20 +1,11 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ORDER_STATUS } from "@/lib/status-labels";
-import { formatNumber } from "@/lib/format-number";
-import OrderProgress from "@/components/OrderProgress";
 import OrderForm from "@/components/admin/OrderForm";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
-import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  const isAdmin = session!.user.role === "ADMIN";
-
   const order = await prisma.order.findFirst({
     where: { id: params.id, deletedAt: null },
     include: { user: true, items: true },
@@ -22,41 +13,6 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
 
   if (!order) {
     notFound();
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="mx-auto max-w-xl space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 dir="ltr" className="text-lg font-bold">
-            {order.orderNumber}
-          </h2>
-          <StatusBadge status={ORDER_STATUS[order.status]} />
-        </div>
-        <p className="text-sm text-foreground/70">مشتری: {order.user.name || order.user.email}</p>
-        <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
-          <OrderProgress status={order.status} />
-        </div>
-        <div className="overflow-x-auto rounded-2xl border border-foreground/10">
-          <table className="w-full min-w-[320px] text-sm">
-            <thead className="text-foreground/60">
-              <tr>
-                <th className="sticky top-14 z-10 rounded-tr-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">نام محصول</th>
-                <th className="sticky top-14 z-10 rounded-tl-2xl bg-background px-4 py-3 text-right font-medium lg:top-12">تعداد</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.items.map((item) => (
-                <tr key={item.id} className="border-t border-foreground/10">
-                  <td className="px-4 py-3 font-medium">{item.productName}</td>
-                  <td className="px-4 py-3 text-foreground/70">{formatNumber(item.quantity)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
   }
 
   const customers = await prisma.user.findMany({
@@ -84,7 +40,12 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             userId: order.userId,
             orderNumber: order.orderNumber,
             status: order.status,
-            items: order.items.map((i) => ({ productName: i.productName, quantity: i.quantity })),
+            items: order.items.map((i) => ({
+              productId: i.productId,
+              productName: i.productName,
+              quantity: i.quantity,
+              price: i.price ?? "",
+            })),
           }}
         />
       </div>

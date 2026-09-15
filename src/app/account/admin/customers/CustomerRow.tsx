@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Skeleton from "react-loading-skeleton";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
@@ -17,7 +18,9 @@ export function CustomerCardMobile({ customer, isAdmin }: Props) {
       <div className="min-w-0">
         {customer ? (
           <>
-            <p className="font-medium">{customer.name || "—"}</p>
+            <Link href={`/account/admin/customers/${customer.id}`} className="font-medium hover:text-accent-400">
+              {customer.name || "—"}
+            </Link>
             {customer.companyName && <p className="text-xs text-foreground/40">{customer.companyName}</p>}
             <p dir="ltr" className="mt-0.5 truncate text-xs text-foreground/60">
               {customer.email}
@@ -77,7 +80,9 @@ export function CustomerRowDesktop({ customer, isAdmin }: Props) {
       <td className="px-4 py-3 font-medium">
         {customer ? (
           <>
-            {customer.name || "—"}
+            <Link href={`/account/admin/customers/${customer.id}`} className="hover:text-accent-400">
+              {customer.name || "—"}
+            </Link>
             {customer.role !== "CUSTOMER" && (
               <span className="mr-1.5 text-xs text-brand-300">[{ROLE_LABEL[customer.role]}]</span>
             )}

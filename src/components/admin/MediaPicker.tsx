@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { ImagePlus, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
@@ -11,9 +11,11 @@ type MediaPickerProps = {
   value: string[];
   onChange: (paths: string[]) => void;
   multiple?: boolean;
+  /** Format/dimension/quality guidance tailored to this specific field — shown under the trigger button and inside the upload dialog. */
+  hint?: ReactNode;
 };
 
-export default function MediaPicker({ label, value, onChange, multiple = true }: MediaPickerProps) {
+export default function MediaPicker({ label, value, onChange, multiple = true, hint }: MediaPickerProps) {
   const [open, setOpen] = useState(false);
 
   const removeSelected = (path: string) => {
@@ -56,6 +58,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
         <ImagePlus className="size-4" />
         {value.length > 0 ? "تغییر تصویر" : "انتخاب تصویر"}
       </button>
+      {hint && <p className="mt-1.5 text-xs text-foreground/50">{hint}</p>}
 
       <MediaPickerModal
         open={open}
@@ -65,6 +68,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true }:
         scope="SITE_CONTENT"
         multiple={multiple}
         initialSelected={value}
+        hint={hint}
       />
     </div>
   );

@@ -11,7 +11,7 @@ import { X as PhosphorX, Check, Paperclip, PaperPlaneTilt, Checks } from "@phosp
 import { getMediaUrl } from "@/lib/media";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import { cn } from "@/lib/utils";
-import { toPersianDigits, formatNumber } from "@/lib/format-number";
+import { formatNumber, formatFileSize } from "@/lib/format-number";
 import EmojiPicker from "@/components/EmojiPicker";
 import { useToast } from "@/components/ToastProvider";
 import InlineErrorState from "@/components/ui/InlineErrorState";
@@ -110,12 +110,6 @@ const JUSTIFY_CLASS: Record<"left" | "right", string> = {
 
 function isImageMime(mimeType: string) {
   return mimeType.startsWith("image/");
-}
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024) return toPersianDigits(`${bytes} B`);
-  if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} KB`);
-  return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} MB`);
 }
 
 function SeenTicks({ seen, onGradient }: { seen: boolean; onGradient: boolean }) {

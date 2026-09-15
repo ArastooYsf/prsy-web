@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eye, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatJalali } from "@/lib/jalali";
@@ -10,9 +10,9 @@ import StatusBadge from "@/components/ui/StatusBadge";
 
 export type OrderWithItems = Prisma.OrderGetPayload<{ include: { user: true; items: true } }>;
 
-type Props = { order: OrderWithItems | null; isAdmin: boolean };
+type Props = { order: OrderWithItems | null };
 
-export function OrderCardMobile({ order, isAdmin }: Props) {
+export function OrderCardMobile({ order }: Props) {
   return (
     <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="flex items-start justify-between gap-3">
@@ -53,25 +53,25 @@ export function OrderCardMobile({ order, isAdmin }: Props) {
             href={`/account/admin/orders/${order.id}`}
             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
-            {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
-            {isAdmin ? "ویرایش" : "مشاهده"}
+            <Pencil className="size-3.5" />
+            ویرایش
           </Link>
         ) : (
           <Skeleton width={78} height={40} borderRadius={9999} />
         )}
-        {isAdmin && (order ? (
+        {order ? (
           <DeleteEntityButton
             endpoint={`/api/admin/orders/${order.id}`}
             title="حذف سفارش"
             message={`مطمئنید می‌خواهید سفارش «${order.orderNumber}» را حذف کنید؟`}
           />
-        ) : null)}
+        ) : null}
       </div>
     </div>
   );
 }
 
-export function OrderRowDesktop({ order, isAdmin }: Props) {
+export function OrderRowDesktop({ order }: Props) {
   return (
     <tr className="border-t border-foreground/10">
       <td dir="ltr" className="px-4 py-3 text-right font-medium">
@@ -98,19 +98,19 @@ export function OrderRowDesktop({ order, isAdmin }: Props) {
               href={`/account/admin/orders/${order.id}`}
               className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
             >
-              {isAdmin ? <Pencil className="size-3.5" /> : <Eye className="size-3.5" />}
-              {isAdmin ? "ویرایش" : "مشاهده"}
+              <Pencil className="size-3.5" />
+              ویرایش
             </Link>
           ) : (
             <Skeleton width={78} height={32} borderRadius={9999} />
           )}
-          {isAdmin && (order ? (
+          {order ? (
             <DeleteEntityButton
               endpoint={`/api/admin/orders/${order.id}`}
               title="حذف سفارش"
               message={`مطمئنید می‌خواهید سفارش «${order.orderNumber}» را حذف کنید؟`}
             />
-          ) : null)}
+          ) : null}
         </div>
       </td>
     </tr>

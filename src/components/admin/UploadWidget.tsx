@@ -68,7 +68,10 @@ export default function UploadWidget() {
         <span className="text-sm font-medium text-foreground/80">
           {uploading ? "در حال آپلود..." : "برای انتخاب تصویر کلیک کنید"}
         </span>
-        <span className="text-xs text-foreground/50">تصویر (PNG/JPG/WEBP) یا PDF — به مخزن سایت اضافه می‌شود</span>
+        <span className="text-xs text-foreground/50">
+          تصویر (PNG/JPG/WEBP) تا ۸ مگابایت یا PDF تا ۱۵ مگابایت — به مخزن سایت اضافه می‌شود. ابعاد و کیفیت را
+          متناسب با محل استفاده‌ی نهایی (محصول، وبلاگ، هیرو و...) تنظیم کنید.
+        </span>
       </label>
 
       {uploaded.length > 0 && (

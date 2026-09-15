@@ -8,7 +8,7 @@ import { createTwoFactorSecret, twoFactorQrCodeDataUrl } from "@/lib/twofactor";
 // from it, so a setup that's started and abandoned never locks anything in.
 export async function POST() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 

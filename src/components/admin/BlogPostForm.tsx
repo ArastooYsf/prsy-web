@@ -160,6 +160,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
               multiple={false}
               value={coverImage ? [coverImage] : []}
               onChange={(paths) => setCoverImage(paths[0] ?? "")}
+              hint="نسبت افقی ۱۶:۹ (مثلاً ۱۲۰۰×۶۷۵ یا بزرگ‌تر) — همین تصویر هم بالای پست و هم روی کارت لیست وبلاگ نمایش داده می‌شود. JPG یا WEBP با کیفیت حدود ۸۰٪، حداکثر ۸ مگابایت."
             />
 
             <div>

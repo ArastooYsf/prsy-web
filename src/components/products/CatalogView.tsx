@@ -12,6 +12,7 @@ import ViewModeToggle from "@/components/products/ViewModeToggle";
 import CatalogPagination from "@/components/products/CatalogPagination";
 import CatalogSortSelect from "@/components/products/CatalogSortSelect";
 import CatalogFilterPanel, { type FacetOption } from "@/components/products/CatalogFilterPanel";
+import CatalogQuickFilters from "@/components/products/CatalogQuickFilters";
 import { catalogProductInclude } from "@/components/products/ProductCard";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -134,6 +135,8 @@ export default async function CatalogView({ category, basePath, searchParams }: 
       <Breadcrumb items={crumbs} />
 
       <h1 className="mt-4 text-2xl font-bold sm:text-3xl">{category ? category.name : "همه‌ی محصولات"}</h1>
+
+      <CatalogQuickFilters basePath={basePath} brandOptions={brandOptions} />
 
       <div className="mt-6 lg:grid lg:grid-cols-[16rem_1fr] lg:gap-8">
         <aside className="lg:sticky lg:top-24 lg:self-start">

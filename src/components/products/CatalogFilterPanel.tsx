@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { formatNumber } from "@/lib/format-number";
+import { useCatalogFilters } from "@/hooks/useCatalogFilters";
+import PriceRangeFilter from "@/components/products/PriceRangeFilter";
 
 export type FacetOption = { label: string; slug: string };
 
@@ -15,67 +15,21 @@ type Props = {
   priceBounds: { min: number; max: number } | null;
 };
 
-function splitParam(v: string | null): string[] {
-  return v ? v.split(",").map((s) => s.trim()).filter(Boolean) : [];
-}
-
 export default function CatalogFilterPanel({ basePath, subLabel, subOptions, brandOptions, priceBounds }: Props) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [openMobile, setOpenMobile] = useState(false);
+  const { searchParams, subs, brands, stockOnly, pushParams, toggleList, toggleStock, hasActive, clearAll } =
+    useCatalogFilters(basePath);
 
-  const subs = splitParam(searchParams.get("sub"));
-  const brands = splitParam(searchParams.get("brand"));
-  const stockOnly = searchParams.get("stock") === "1";
-
-  const pushParams = (mutate: (p: URLSearchParams) => void) => {
-    const params = new URLSearchParams(searchParams.toString());
-    mutate(params);
-    params.delete("page");
-    const qs = params.toString();
-    router.push(qs ? `${basePath}?${qs}` : basePath, { scroll: false });
-  };
-
-  const toggleList = (key: "sub" | "brand", slug: string) => {
-    pushParams((p) => {
-      const cur = splitParam(p.get(key));
-      const next = cur.includes(slug) ? cur.filter((s) => s !== slug) : [...cur, slug];
-      if (next.length) p.set(key, next.join(","));
-      else p.delete(key);
-    });
-  };
-
-  const toggleStock = () => pushParams((p) => (stockOnly ? p.delete("stock") : p.set("stock", "1")));
-
-  const hasActive =
-    subs.length > 0 || brands.length > 0 || stockOnly || searchParams.has("priceMin") || searchParams.has("priceMax");
-
-  const clearAll = () => router.push(basePath, { scroll: false });
-
-  // --- price slider (debounced) ---
-  const [priceMin, setPriceMin] = useState<number | null>(null);
-  const [priceMax, setPriceMax] = useState<number | null>(null);
-  const priceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!priceBounds) return;
-    const qpMin = searchParams.get("priceMin");
-    const qpMax = searchParams.get("priceMax");
-    setPriceMin(qpMin !== null ? Number(qpMin) : priceBounds.min);
-    setPriceMax(qpMax !== null ? Number(qpMax) : priceBounds.max);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, priceBounds?.min, priceBounds?.max]);
+  const priceMin = priceBounds ? Number(searchParams.get("priceMin") ?? priceBounds.min) : null;
+  const priceMax = priceBounds ? Number(searchParams.get("priceMax") ?? priceBounds.max) : null;
 
   const commitPrice = (min: number, max: number) => {
-    if (priceTimer.current) clearTimeout(priceTimer.current);
-    priceTimer.current = setTimeout(() => {
-      pushParams((p) => {
-        if (priceBounds && min > priceBounds.min) p.set("priceMin", String(Math.round(min)));
-        else p.delete("priceMin");
-        if (priceBounds && max < priceBounds.max) p.set("priceMax", String(Math.round(max)));
-        else p.delete("priceMax");
-      });
-    }, 320);
+    pushParams((p) => {
+      if (priceBounds && min > priceBounds.min) p.set("priceMin", String(Math.round(min)));
+      else p.delete("priceMin");
+      if (priceBounds && max < priceBounds.max) p.set("priceMax", String(Math.round(max)));
+      else p.delete("priceMax");
+    });
   };
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -138,38 +92,7 @@ export default function CatalogFilterPanel({ basePath, subLabel, subOptions, bra
 
       {priceBounds && priceMin !== null && priceMax !== null && (
         <Section title="بازه‌ی قیمت (تومان)">
-          <div className="flex items-center justify-between text-xs text-foreground/60" dir="ltr">
-            <span>{formatNumber(priceMin)}</span>
-            <span>{formatNumber(priceMax)}</span>
-          </div>
-          <div className="mt-2 space-y-2" dir="ltr">
-            <input
-              type="range"
-              min={priceBounds.min}
-              max={priceBounds.max}
-              value={priceMin}
-              onChange={(e) => {
-                const v = Math.min(Number(e.target.value), priceMax);
-                setPriceMin(v);
-                commitPrice(v, priceMax);
-              }}
-              className="w-full accent-accent-500"
-              aria-label="کمترین قیمت"
-            />
-            <input
-              type="range"
-              min={priceBounds.min}
-              max={priceBounds.max}
-              value={priceMax}
-              onChange={(e) => {
-                const v = Math.max(Number(e.target.value), priceMin);
-                setPriceMax(v);
-                commitPrice(priceMin, v);
-              }}
-              className="w-full accent-accent-500"
-              aria-label="بیشترین قیمت"
-            />
-          </div>
+          <PriceRangeFilter bounds={priceBounds} min={priceMin} max={priceMax} onCommit={commitPrice} />
         </Section>
       )}
     </div>

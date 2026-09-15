@@ -12,6 +12,7 @@ import {
   MessageCircle,
   FileText,
   Package,
+  Download,
   User,
   Settings,
   LogOut,
@@ -36,6 +37,7 @@ const PERSONAL_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/account/tickets", label: "تیکت‌ها", icon: MessageSquare },
   { href: "/account/contracts", label: "قراردادها", icon: FileText },
   { href: "/account/orders", label: "سفارش‌ها", icon: Package },
+  { href: "/account/files", label: "دانلود فایل‌ها", icon: Download },
   { href: "/account/profile", label: "پروفایل", icon: User },
 ];
 

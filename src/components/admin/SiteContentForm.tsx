@@ -114,6 +114,7 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
                   multiple={false}
                   value={slide.image ? [slide.image] : []}
                   onChange={(paths) => updateSlide(i, { image: paths[0] ?? "" })}
+                  hint="تصویر افقی و بزرگ، حداقل ۱۹۲۰×۱۰۸۰ پیکسل — چون پس‌زمینه‌ی تمام‌صفحه‌ی هیرو است و روی مانیتورهای بزرگ کشیده می‌شود. یک لایه‌ی تیره به‌صورت خودکار روی آن اعمال می‌شود، پس نیازی به تیره‌کردن دستی نیست. JPG یا WEBP، حداکثر ۸ مگابایت."
                 />
               </div>
             </div>

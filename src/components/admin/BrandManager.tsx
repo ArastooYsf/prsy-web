@@ -117,7 +117,13 @@ export default function BrandManager({ brands }: { brands: Brand[] }) {
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">توضیح کوتاه</label>
             <textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={2} className={inputClass} />
           </div>
-          <MediaPicker label="لوگو" multiple={false} value={draft.logo ? [draft.logo] : []} onChange={(p) => setDraft({ ...draft, logo: p[0] ?? "" })} />
+          <MediaPicker
+            label="لوگو"
+            multiple={false}
+            value={draft.logo ? [draft.logo] : []}
+            onChange={(p) => setDraft({ ...draft, logo: p[0] ?? "" })}
+            hint="ترجیحاً PNG با پس‌زمینه‌ی شفاف، تصویر مربعی یا افقی حداقل ۴۰۰×۴۰۰ پیکسل — چون در اندازه‌های کوچک نمایش داده می‌شود. حداکثر ۸ مگابایت."
+          />
           <div className="max-w-[8rem]">
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">ترتیب</label>
             <input type="number" value={draft.order} onChange={(e) => setDraft({ ...draft, order: e.target.value })} className={inputClass} dir="ltr" />

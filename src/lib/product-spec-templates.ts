@@ -44,6 +44,11 @@ function isSpecTemplateKey(value: string | null | undefined): value is SpecTempl
   return !!value && value in SPEC_TEMPLATES;
 }
 
+/** The template key that actually applies for a given root category's own `specTemplateKey` value. */
+export function resolvedSpecTemplateKey(specTemplateKey: string | null | undefined): SpecTemplateKey {
+  return isSpecTemplateKey(specTemplateKey) ? specTemplateKey : DEFAULT_SPEC_TEMPLATE;
+}
+
 export type CategoryForTemplate = { id: string; parentId: string | null; specTemplateKey: string | null };
 
 // Categories are enforced (server-side, see the categories API routes) to be
@@ -58,6 +63,16 @@ function findRootCategory<T extends CategoryForTemplate>(categoryId: string, cat
 /** The ordered list of spec labels to pre-fill for a given category (or the general-default set when categoryId is empty/unmatched). */
 export function resolveSpecTemplate(categoryId: string | null | undefined, categories: CategoryForTemplate[]): readonly string[] {
   const root = categoryId ? findRootCategory(categoryId, categories) : undefined;
-  const key = isSpecTemplateKey(root?.specTemplateKey) ? root.specTemplateKey : DEFAULT_SPEC_TEMPLATE;
-  return SPEC_TEMPLATES[key];
+  return SPEC_TEMPLATES[resolvedSpecTemplateKey(root?.specTemplateKey)];
+}
+
+// Only labels that are actually part of the category's own spec template can
+// be picked as quick-preview fields — same trust boundary as specTemplateKey.
+// Shared by both categories API routes (create and update) so the allow-list
+// rule only has one place to change.
+export function normalizePreviewSpecKeys(input: unknown, specTemplateKey: string | null): string[] | null {
+  if (!Array.isArray(input)) return null;
+  const allowed = new Set<string>(SPEC_TEMPLATES[resolvedSpecTemplateKey(specTemplateKey)]);
+  const out = [...new Set(input.filter((v): v is string => typeof v === "string" && allowed.has(v)))];
+  return out.length > 0 ? out : null;
 }

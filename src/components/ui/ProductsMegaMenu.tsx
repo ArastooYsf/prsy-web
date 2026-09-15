@@ -29,7 +29,7 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave }: Produ
     return (
       <div className="flex h-full items-center px-0.5">
         <Link
-          href="/products/all"
+          href="/products"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm", className: "px-2.5" }),
             "hover:bg-transparent hover:text-foreground",
@@ -70,7 +70,8 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave }: Produ
       onBlur={handleLeave}
     >
       <Link
-        href="/products/all"
+        href="/products"
+        onClick={() => setOpen(false)}
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 px-2.5" }),
           "hover:bg-transparent hover:text-foreground",

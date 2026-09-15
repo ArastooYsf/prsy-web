@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { Package } from "lucide-react";
+import { Package, Plus, Ban } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,6 +10,18 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";
+
+function newOrderTicketHref() {
+  const subject = "ثبت سفارش جدید";
+  const message = "با سلام،\nمایل به ثبت یک سفارش جدید هستم. لطفاً برای هماهنگی جزئیات با من تماس بگیرید.";
+  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+}
+
+function cancelOrderTicketHref(order: { orderNumber: string }) {
+  const subject = "درخواست لغو سفارش";
+  const message = `با سلام،\nدرخواست لغو سفارش شماره «${order.orderNumber}» را دارم. لطفاً بررسی و پیگیری کنید.`;
+  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+}
 
 export default async function AccountOrdersPage() {
   await debugSlowLoad();
@@ -25,10 +37,19 @@ export default async function AccountOrdersPage() {
 
   return (
     <div>
-      <h2 className="mb-6 flex items-center gap-2 text-lg font-bold">
-        <Package className="size-5 text-accent-400" />
-        سفارش‌ها
-      </h2>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <Package className="size-5 text-accent-400" />
+          سفارش‌ها
+        </h2>
+        <Link
+          href={newOrderTicketHref()}
+          className="flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+        >
+          <Plus className="size-4" />
+          ثبت سفارش جدید
+        </Link>
+      </div>
 
       {orders.length === 0 ? (
         <EmptyState
@@ -39,12 +60,11 @@ export default async function AccountOrdersPage() {
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
-            <Link
+            <div
               key={order.id}
-              href={`/account/orders/${order.id}`}
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-colors hover:border-accent-500/30"
             >
-              <div>
+              <Link href={`/account/orders/${order.id}`} className="min-w-0 flex-1">
                 <p dir="ltr" className="text-right font-semibold">
                   {order.orderNumber}
                 </p>
@@ -52,9 +72,20 @@ export default async function AccountOrdersPage() {
                 <p dir="ltr" className="mt-1 text-right text-xs text-foreground/50">
                   {order.createdAt.toLocaleDateString("fa-IR")}
                 </p>
+              </Link>
+              <div className="flex items-center gap-2">
+                <StatusBadge status={ORDER_STATUS[order.status]} />
+                {(order.status === "PENDING" || order.status === "PROCESSING") && (
+                  <Link
+                    href={cancelOrderTicketHref(order)}
+                    className="flex min-h-11 items-center gap-1.5 rounded-full border border-red-500/30 px-4 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                  >
+                    <Ban className="size-3.5" />
+                    لغو سفارش
+                  </Link>
+                )}
               </div>
-              <StatusBadge status={ORDER_STATUS[order.status]} />
-            </Link>
+            </div>
           ))}
         </div>
       )}

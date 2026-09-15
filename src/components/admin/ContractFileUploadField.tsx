@@ -9,6 +9,8 @@ type ContractFileUploadFieldProps = {
   onChange: (relativePath: string) => void;
 };
 
+const CONTRACT_FILE_UPLOAD_HINT = "ترجیحاً PDF برای حفظ قالب‌بندی قرارداد — حداکثر ۱۵ مگابایت (تصویر تا ۸ مگابایت).";
+
 export default function ContractFileUploadField({ value, onChange }: ContractFileUploadFieldProps) {
   const [open, setOpen] = useState(false);
   const [pickedName, setPickedName] = useState<string | null>(null);
@@ -33,6 +35,7 @@ export default function ContractFileUploadField({ value, onChange }: ContractFil
           {value ? "تغییر فایل" : "انتخاب یا آپلود فایل (PDF، عکس یا DOCX)"}
         </button>
       </div>
+      <p className="mt-1.5 text-xs text-foreground/50">{CONTRACT_FILE_UPLOAD_HINT}</p>
 
       <MediaPickerModal
         open={open}
@@ -41,6 +44,7 @@ export default function ContractFileUploadField({ value, onChange }: ContractFil
         scope="CONTRACT_FILE"
         multiple={false}
         initialSelected={value ? [value] : []}
+        hint={CONTRACT_FILE_UPLOAD_HINT}
         onConfirm={(assets) => {
           if (assets[0]) {
             onChange(assets[0].url);

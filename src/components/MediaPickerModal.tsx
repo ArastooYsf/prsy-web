@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { X, Check, Trash } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
@@ -33,6 +33,8 @@ type MediaPickerModalProps = {
   scope?: MediaScope;
   multiple?: boolean;
   initialSelected?: string[];
+  /** Overrides the generic format/size hint with guidance tailored to this specific field (dimensions, aspect ratio, recommended quality). */
+  hint?: ReactNode;
 };
 
 const KIND_LABEL: Record<MediaKind, string> = {
@@ -72,6 +74,7 @@ export default function MediaPickerModal({
   scope = "SITE_CONTENT",
   multiple = true,
   initialSelected = [],
+  hint,
 }: MediaPickerModalProps) {
   const { showToast } = useToast();
   const [tab, setTab] = useState<"gallery" | "upload">("gallery");
@@ -307,7 +310,7 @@ export default function MediaPickerModal({
               <span className="text-sm font-medium text-foreground/80">
                 {uploading ? "در حال آپلود..." : "برای انتخاب فایل کلیک کنید"}
               </span>
-              <span className="text-xs text-foreground/50">{KIND_HINT[kind]}</span>
+              <span className="text-xs text-foreground/50">{hint ?? KIND_HINT[kind]}</span>
             </label>
           )}
 

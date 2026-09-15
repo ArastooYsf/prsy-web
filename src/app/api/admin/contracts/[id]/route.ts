@@ -8,7 +8,7 @@ import { actorFromSession, logEvent } from "@/lib/logger";
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
@@ -58,7 +58,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 

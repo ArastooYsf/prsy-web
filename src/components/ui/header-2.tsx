@@ -12,6 +12,7 @@ import {
 } from 'framer-motion';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ShoppingCart } from 'lucide-react';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
@@ -502,6 +503,11 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 						<Link href="/contact">تماس با ما</Link>
 					</Button>
 					<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
+					<Button size="icon" variant="outline" className="h-9 w-9" asChild>
+						<Link href="/cart" aria-label="سبد خرید">
+							<ShoppingCart className="size-[18px]" />
+						</Link>
+					</Button>
 					<AuthNavLink variant="icon" />
 					<ThemeToggleButton />
 				</div>
@@ -572,6 +578,12 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 							className="hover:shadow-lg hover:shadow-accent-500/30"
 							onNavigate={() => setOpen(false)}
 						/>
+						<Button variant="outline" className="w-full" asChild>
+							<Link href="/cart" onClick={() => setOpen(false)}>
+								<ShoppingCart className="size-4" />
+								سبد خرید
+							</Link>
+						</Button>
 						<AuthNavLink variant="block" onNavigate={() => setOpen(false)} />
 						<ThemeToggleButton fullWidth />
 					</div>

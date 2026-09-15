@@ -12,6 +12,8 @@ type AvatarUploaderProps = {
   nameForAlt: string;
 };
 
+const AVATAR_UPLOAD_HINT = "مربعی، حداقل ۲۰۰×۲۰۰ پیکسل — چون به‌صورت دایره‌ای برش می‌خورد. JPG، PNG یا WEBP، حداکثر ۸ مگابایت.";
+
 export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUploaderProps) {
   const [open, setOpen] = useState(false);
 
@@ -34,6 +36,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
           <Camera className="size-4" />
         </button>
       </div>
+      <p className="max-w-52 text-center text-xs text-foreground/50">{AVATAR_UPLOAD_HINT}</p>
 
       <MediaPickerModal
         open={open}
@@ -43,6 +46,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
         scope="PROFILE_AVATAR"
         multiple={false}
         initialSelected={value ? [value] : []}
+        hint={AVATAR_UPLOAD_HINT}
       />
     </div>
   );

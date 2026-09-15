@@ -189,7 +189,13 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
         />
       </div>
 
-      <MediaPicker label="تصاویر محصول" multiple value={images} onChange={setImages} />
+      <MediaPicker
+        label="تصاویر محصول"
+        multiple
+        value={images}
+        onChange={setImages}
+        hint="مربعی (نسبت ۱:۱)، حداقل ۸۰۰×۸۰۰ پیکسل با پس‌زمینه‌ی یک‌دست — چون هم در کارت محصول برش می‌خورد و هم در گالری با زوم دیده می‌شود. JPG، PNG یا WEBP، حداکثر ۸ مگابایت."
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>

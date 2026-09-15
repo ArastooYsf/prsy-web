@@ -1,21 +1,11 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMediaUrl } from "@/lib/media";
-import { CONTRACT_STATUS } from "@/lib/status-labels";
 import ContractForm from "@/components/admin/ContractForm";
-import DateRangeDisplay from "@/components/DateRangeDisplay";
-import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
-import StatusBadge from "@/components/ui/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminContractDetailPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  const isAdmin = session!.user.role === "ADMIN";
-
   const contract = await prisma.contract.findFirst({
     where: { id: params.id, deletedAt: null },
     include: { user: true },
@@ -23,35 +13,6 @@ export default async function AdminContractDetailPage({ params }: { params: { id
 
   if (!contract) {
     notFound();
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">{contract.title}</h2>
-          <StatusBadge status={CONTRACT_STATUS[contract.status]} />
-        </div>
-        <p className="text-sm text-foreground/70">مشتری: {contract.user.name || contract.user.email}</p>
-        <p className="text-sm text-foreground/70">نوع: {contract.type}</p>
-        <DateRangeDisplay
-          start={contract.startDate.toISOString()}
-          end={contract.endDate.toISOString()}
-          className="text-sm text-foreground/70"
-        />
-        {contract.fileUrl && (
-          <a
-            href={getMediaUrl(contract.fileUrl)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-          >
-            <FileTypeIcon kind={fileKindFromName(contract.fileUrl)} />
-            دانلود پیوست
-          </a>
-        )}
-      </div>
-    );
   }
 
   const customers = await prisma.user.findMany({

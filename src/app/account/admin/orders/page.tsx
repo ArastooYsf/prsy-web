@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { FileSpreadsheet, PackagePlus, PackageSearch } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { dateRangeWhere, filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
@@ -25,9 +23,6 @@ function buildOrderBy(field: (typeof SORT_FIELDS)[number], dir: "asc" | "desc"):
 
 export default async function AdminOrdersPage({ searchParams }: { searchParams: ListSearchParams }) {
   await debugSlowLoad();
-
-  const session = await getServerSession(authOptions);
-  const isAdmin = session!.user.role === "ADMIN";
 
   const status = param(searchParams, "status");
   const q = param(searchParams, "q");
@@ -68,15 +63,13 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
             <FileSpreadsheet className="size-4" />
             دانلود اکسل
           </a>
-          {isAdmin && (
-            <Link
-              href="/account/admin/orders/new"
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
-            >
-              <PackagePlus className="size-4" />
-              ثبت سفارش جدید
-            </Link>
-          )}
+          <Link
+            href="/account/admin/orders/new"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+          >
+            <PackagePlus className="size-4" />
+            ثبت سفارش جدید
+          </Link>
         </div>
       </div>
 
@@ -99,7 +92,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
           {/* Mobile/tablet: card list */}
           <div className="space-y-3 md:hidden">
             {orders.map((order) => (
-              <OrderCardMobile key={order.id} order={order} isAdmin={isAdmin} />
+              <OrderCardMobile key={order.id} order={order} />
             ))}
           </div>
 
@@ -128,7 +121,7 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <OrderRowDesktop key={order.id} order={order} isAdmin={isAdmin} />
+                  <OrderRowDesktop key={order.id} order={order} />
                 ))}
               </tbody>
             </table>

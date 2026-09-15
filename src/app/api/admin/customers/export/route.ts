@@ -24,12 +24,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
   }
 
+  const isAdmin = session.user.role === "ADMIN";
   const searchParams = Object.fromEntries(new URL(request.url).searchParams);
   const roleFilter = param(searchParams, "role");
   const customerType = param(searchParams, "customerType");
   const approvalStatus = param(searchParams, "approvalStatus");
   const q = param(searchParams, "q");
-  const roleWhere = !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
+  // Same restriction as the customers list page: SUPPORT can only ever export
+  // customer accounts, never the ADMIN/SUPPORT roster.
+  const roleWhere = !isAdmin ? "CUSTOMER" : !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
 
   const customers = await prisma.user.findMany({
     where: {

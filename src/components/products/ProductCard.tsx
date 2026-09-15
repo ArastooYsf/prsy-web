@@ -4,7 +4,9 @@ import { ImageOff } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { formatNumber } from "@/lib/format-number";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
+import { parseProductSpecs, type ProductSpec } from "@/lib/product-json";
 import StatusBadge from "@/components/ui/StatusBadge";
+import ProductQuickPreview from "@/components/products/ProductQuickPreview";
 import type { ProductViewMode } from "@/lib/product-view-mode";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -15,6 +17,11 @@ export const catalogProductInclude = {
 
 export type CatalogProduct = Prisma.ProductGetPayload<{ include: typeof catalogProductInclude }>;
 
+// How many of the product's own specs to fall back to in the quick-preview
+// popover when its category hasn't curated a preview field set — same count
+// as the "key features" shown on the product detail page.
+const QUICK_PREVIEW_FALLBACK_COUNT = 4;
+
 function firstImage(images: Prisma.JsonValue): string | null {
   return Array.isArray(images) && typeof images[0] === "string" ? images[0] : null;
 }
@@ -24,12 +31,25 @@ function detailHref(product: CatalogProduct): string | null {
   return rootSlug ? `/products/${rootSlug}/${product.slug}` : null;
 }
 
+function quickPreviewSpecs(product: CatalogProduct): ProductSpec[] {
+  const allSpecs = parseProductSpecs(product.specs);
+  const root = product.category?.parent ?? product.category ?? null;
+  const previewKeys = Array.isArray(root?.previewSpecKeys)
+    ? root.previewSpecKeys.filter((k): k is string => typeof k === "string")
+    : [];
+
+  if (previewKeys.length === 0) return allSpecs.slice(0, QUICK_PREVIEW_FALLBACK_COUNT);
+
+  const byLabel = new Map(allSpecs.map((spec) => [spec.label, spec]));
+  return previewKeys.map((key) => byLabel.get(key)).filter((spec): spec is ProductSpec => !!spec);
+}
+
 // Reuses the same three modes as the catalog's view-mode toggle — a card
 // always renders in whatever layout the grid around it is currently using.
 export type ProductCardVariant = ProductViewMode;
 
 const CTA_CLASS =
-  "inline-flex min-h-11 items-center rounded-full border border-accent-500/40 px-4 text-xs font-semibold text-accent-500 transition-colors hover:bg-accent-500/10";
+  "relative z-10 inline-flex min-h-11 items-center rounded-full border border-accent-500/40 px-4 text-xs font-semibold text-accent-500 transition-colors hover:bg-accent-500/10";
 
 const priceOrCta = (product: CatalogProduct) =>
   product.showPrice && product.price != null ? (
@@ -60,17 +80,29 @@ export default function ProductCard({ product, variant = "large" }: { product: C
   // rest of the row, instead of a stacked card — a different shape entirely,
   // not just a resized "large"/"small" card.
   if (variant === "list") {
+    const listThumb = (
+      <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-xl bg-foreground/5 sm:w-32">
+        {img ? (
+          <Image src={getMediaUrl(img)} alt={product.name} fill sizes="(min-width: 640px) 128px, 96px" className="object-cover" />
+        ) : (
+          <span className="flex h-full items-center justify-center text-foreground/25">
+            <ImageOff className="size-6" />
+          </span>
+        )}
+        {href && <Link href={href} aria-label={product.name} className="absolute inset-0" />}
+      </div>
+    );
+
     return (
-      <div className="group flex gap-4 overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3 transition-colors hover:border-accent-500/40 sm:p-4">
-        <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-xl bg-foreground/5 sm:w-32">
-          {img ? (
-            <Image src={getMediaUrl(img)} alt={product.name} fill sizes="(min-width: 640px) 128px, 96px" className="object-cover" />
-          ) : (
-            <span className="flex h-full items-center justify-center text-foreground/25">
-              <ImageOff className="size-6" />
-            </span>
-          )}
-        </div>
+      <div className="group relative flex gap-4 overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3 transition-colors hover:border-accent-500/40 sm:p-4">
+        {href && <Link href={href} aria-hidden tabIndex={-1} className="absolute inset-0 z-0" />}
+        {href ? (
+          <ProductQuickPreview specs={quickPreviewSpecs(product)} detailHref={href} productName={product.name}>
+            {listThumb}
+          </ProductQuickPreview>
+        ) : (
+          listThumb
+        )}
         <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 py-0.5">
           <div>
             {href ? (
@@ -105,6 +137,7 @@ export default function ProductCard({ product, variant = "large" }: { product: C
           <ImageOff className={compact ? "size-6" : "size-8"} />
         </span>
       )}
+      {href && <Link href={href} aria-label={product.name} className="absolute inset-0" />}
     </div>
   );
 
@@ -113,11 +146,12 @@ export default function ProductCard({ product, variant = "large" }: { product: C
   );
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.02] transition-colors hover:border-accent-500/40">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.02] transition-colors hover:border-accent-500/40">
+      {href && <Link href={href} aria-hidden tabIndex={-1} className="absolute inset-0 z-0" />}
       {href ? (
-        <Link href={href} className="contents" aria-label={product.name}>
+        <ProductQuickPreview specs={quickPreviewSpecs(product)} detailHref={href} productName={product.name}>
           {media}
-        </Link>
+        </ProductQuickPreview>
       ) : (
         media
       )}

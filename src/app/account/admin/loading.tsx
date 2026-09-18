@@ -1,6 +1,6 @@
 import { ImageIcon, LayoutTemplate, Newspaper, type LucideIcon } from "lucide-react";
-import Skeleton from "react-loading-skeleton";
 import { SiteViewsCard } from "@/components/admin/DashboardCharts";
+import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardChartsLazy";
 import { StatCard } from "./StatCard";
 
 // Which 3 cards show depends on role (ADMIN vs SUPPORT), which needs a
@@ -24,11 +24,11 @@ export default function Loading() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
+          <TrendChart initialData={[]} initialRange="30d" />
         </div>
-        <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
+        <TicketStatusChart data={[]} />
         <div className="lg:col-span-3">
-          <Skeleton height={320} borderRadius={16} className="border border-foreground/10" />
+          <OrderStatusChart data={[]} />
         </div>
       </div>
     </div>

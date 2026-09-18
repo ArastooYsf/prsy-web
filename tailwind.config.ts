@@ -110,6 +110,24 @@ const config: Config = {
         "grid-pattern-dark":
           "linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px)",
       },
+      // Drives Radix Accordion.Content's open/close (see ProductTabs' mobile
+      // accordion) — height can't be animated with a fixed keyframe value
+      // since content height varies per section, so this reads Radix's own
+      // exposed --radix-accordion-content-height custom property instead.
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

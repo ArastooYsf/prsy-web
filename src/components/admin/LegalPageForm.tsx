@@ -3,19 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
-import SimpleRichTextEditor from "@/components/admin/SimpleRichTextEditor";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { useToast } from "@/components/ToastProvider";
 import type { LegalPageKey } from "@/lib/site-content";
+import type { LegalPageHeadingContent } from "@/lib/site-content-defaults";
+
+const inputClass =
+  "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
 type LegalPageFormProps = {
   page: LegalPageKey;
   initialHtml: string;
+  /** Only terms/privacy/warranty have their own hero heading — contact-intro's hero belongs to /contact, edited there. */
+  initialHeading?: LegalPageHeadingContent;
 };
 
-export default function LegalPageForm({ page, initialHtml }: LegalPageFormProps) {
+export default function LegalPageForm({ page, initialHtml, initialHeading }: LegalPageFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [html, setHtml] = useState(initialHtml);
+  const [heading, setHeading] = useState(initialHeading);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +32,7 @@ export default function LegalPageForm({ page, initialHtml }: LegalPageFormProps)
     const res = await fetch("/api/admin/site-content/legal", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ page, html }),
+      body: JSON.stringify({ page, html, heading }),
     });
 
     setSaving(false);
@@ -42,7 +49,27 @@ export default function LegalPageForm({ page, initialHtml }: LegalPageFormProps)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <SimpleRichTextEditor value={html} onChange={setHtml} />
+      {heading && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-foreground/80">چشم انداز (بالای عنوان)</label>
+            <input
+              value={heading.eyebrow}
+              onChange={(e) => setHeading((prev) => prev && { ...prev, eyebrow: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-foreground/80">عنوان صفحه</label>
+            <input
+              value={heading.heading}
+              onChange={(e) => setHeading((prev) => prev && { ...prev, heading: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      )}
+      <RichTextEditor value={html} onChange={setHtml} />
       <button
         type="submit"
         disabled={saving}

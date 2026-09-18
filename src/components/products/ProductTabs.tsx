@@ -54,7 +54,7 @@ export default function ProductTabs({ sections }: { sections: ProductTabSection[
                 />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="border-t border-foreground/10 px-4 py-4">
+            <Accordion.Content className="overflow-hidden border-t border-foreground/10 px-4 py-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
               {section.content}
             </Accordion.Content>
           </Accordion.Item>

@@ -93,7 +93,7 @@ export default function BlogPostForm({ mode, post }: BlogPostFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex h-dvh flex-col">
+    <form onSubmit={handleSubmit} className="flex h-screen flex-col [@supports(height:100dvh)]:h-dvh">
       <header className="flex shrink-0 flex-wrap items-center gap-3 border-b border-foreground/10 px-4 py-3 sm:px-6">
         <Link
           href="/account/admin/blog"

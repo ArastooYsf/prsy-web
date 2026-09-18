@@ -9,7 +9,7 @@ import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import { toPersianDigits } from "@/lib/format-number";
-import { SITE_URL } from "@/lib/site-url";
+import { SITE_URL, toAbsoluteUrl } from "@/lib/site-url";
 import Breadcrumb, { type Crumb } from "@/components/products/Breadcrumb";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductSpecsTable from "@/components/products/ProductSpecsTable";
@@ -44,10 +44,12 @@ export async function generateMetadata({
     ? sanitizePlainText(product.description).slice(0, 160)
     : `${product.name} — مشاهده مشخصات فنی و استعلام قیمت.`;
   const images = parseProductImages(product.images);
+  const rootSlug = product.category?.parent?.slug ?? product.category?.slug;
 
   return {
     title: product.name,
     description: plainDescription,
+    alternates: rootSlug ? { canonical: `${SITE_URL}/products/${rootSlug}/${product.slug}` } : undefined,
     openGraph: {
       title: product.name,
       description: plainDescription,
@@ -55,6 +57,11 @@ export async function generateMetadata({
     },
   };
 }
+
+const AVAILABILITY_SCHEMA_MAP: Record<string, string> = {
+  IN_STOCK: "https://schema.org/InStock",
+  OUT_OF_STOCK: "https://schema.org/OutOfStock",
+};
 
 export default async function ProductDetailPage({
   params,
@@ -77,20 +84,35 @@ export default async function ProductDetailPage({
   const keyFeatures = specs.slice(0, KEY_FEATURE_COUNT);
   const availability = PRODUCT_AVAILABILITY[product.availability] ?? PRODUCT_AVAILABILITY.IN_STOCK;
 
-  const [session, approvedComments] = await Promise.all([
-    getServerSession(authOptions),
-    prisma.productComment.findMany({
-      where: { productId: product.id, status: "APPROVED" },
-      orderBy: { createdAt: "desc" },
-      include: { user: { select: { name: true, email: true } } },
-    }),
-  ]);
-  const comments: ProductCommentItem[] = approvedComments.map((comment) => ({
+  const session = await getServerSession(authOptions);
+  // Everyone else's comments only show once approved — but the viewer's OWN
+  // comment (any status) must stay visible to them the whole time, or a
+  // freshly-submitted PENDING comment would vanish the instant they refresh,
+  // with no way to see/edit/delete the thing they just wrote.
+  const commentRows = await prisma.productComment.findMany({
+    where: {
+      productId: product.id,
+      deletedAt: null,
+      OR: [{ status: "APPROVED" }, ...(session?.user ? [{ userId: session.user.id }] : [])],
+    },
+    orderBy: { createdAt: "desc" },
+    include: { user: { select: { name: true, email: true } }, images: true },
+  });
+  const comments: ProductCommentItem[] = commentRows.map((comment) => ({
     id: comment.id,
     text: comment.text,
     rating: comment.rating,
     createdAt: comment.createdAt.toISOString(),
+    editedAt: comment.editedAt?.toISOString() ?? null,
+    authorId: comment.userId,
     authorName: comment.user.name || comment.user.email,
+    status: comment.status,
+    images: comment.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      filename: img.filename,
+      mimeType: img.mimeType,
+    })),
   }));
 
   const crumbs: Crumb[] = [{ label: "همه‌ی محصولات", href: "/products/all" }];
@@ -110,6 +132,36 @@ export default async function ProductDetailPage({
     `استعلام قیمت: ${product.name}`
   )}&message=${encodeURIComponent(`درخواست قیمت برای محصول: ${product.name}\n${canonicalUrl}`)}`;
   const ctaLabel = product.showPrice && product.price != null ? "سفارش این محصول" : "درخواست قیمت";
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ label: "خانه", href: "/" }, ...crumbs].map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.label,
+      ...(crumb.href ? { item: `${SITE_URL}${crumb.href}` } : {}),
+    })),
+  };
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.slug,
+    ...(product.brand ? { brand: { "@type": "Brand", name: product.brand.name } } : {}),
+    ...(images[0] ? { image: [toAbsoluteUrl(getMediaUrl(images[0]))] } : {}),
+    ...(product.description ? { description: sanitizePlainText(product.description).slice(0, 500) } : {}),
+    offers: {
+      "@type": "Offer",
+      url: canonicalUrl,
+      priceCurrency: "IRT",
+      ...(product.showPrice && product.price != null ? { price: product.price } : {}),
+      ...(AVAILABILITY_SCHEMA_MAP[product.availability]
+        ? { availability: AVAILABILITY_SCHEMA_MAP[product.availability] }
+        : {}),
+    },
+  };
 
   const tabSections: ProductTabSection[] = [];
   if (specs.length > 0) {
@@ -131,11 +183,26 @@ export default async function ProductDetailPage({
   tabSections.push({
     id: "comments",
     label: `دیدگاه‌ها (${toPersianDigits(comments.length)})`,
-    content: <ProductComments productId={product.id} comments={comments} isLoggedIn={!!session?.user} />,
+    content: (
+      <ProductComments
+        productId={product.id}
+        comments={comments}
+        isLoggedIn={!!session?.user}
+        viewerId={session?.user?.id ?? null}
+      />
+    ),
   });
 
   return (
     <section className="container pb-24 pt-8 lg:pb-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Breadcrumb items={crumbs} />
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,32rem)_1fr_20rem]">

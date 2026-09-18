@@ -3,8 +3,11 @@
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import ConsultationForm from "@/components/ConsultationForm";
+import { DEFAULT_CONSULTATION } from "@/lib/site-content-defaults";
+import type { ConsultationContent } from "@/lib/site-content";
 
-export default function ConsultationSection() {
+export default function ConsultationSection({ content = DEFAULT_CONSULTATION }: { content?: ConsultationContent }) {
+  const { eyebrow, heading, subheading } = content;
   return (
     <section id="consultation" className="section-padding relative border-t border-foreground/10">
       <div className="container">
@@ -19,20 +22,19 @@ export default function ConsultationSection() {
             variants={fadeInUp}
             className="text-sm font-semibold text-accent-400"
           >
-            درخواست مشاوره
+            {eyebrow}
           </motion.span>
           <motion.h2
             variants={fadeInUp}
             className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
           >
-            یک قدم تا شروع همکاری
+            {heading}
           </motion.h2>
           <motion.p
             variants={fadeInUp}
             className="mt-4 text-balance leading-7 text-foreground/70"
           >
-            فرم زیر را پر کنید تا کارشناسان ما ظرف ۴۸ ساعت کاری با شما تماس
-            بگیرند.
+            {subheading}
           </motion.p>
         </motion.div>
 

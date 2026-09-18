@@ -69,3 +69,8 @@ export const PRODUCT_AVAILABILITY: Record<string, StatusInfo> = {
 };
 
 export const PRODUCT_AVAILABILITIES = Object.keys(PRODUCT_AVAILABILITY);
+
+export const CONNECTION_STATUS: Record<string, StatusInfo> = {
+  CONNECTED: { label: "متصل", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400", icon: <CheckCircle size={11} weight="fill" /> },
+  NOT_CONFIGURED: { label: "پیکربندی نشده", className: "border-red-500/30 bg-red-500/10 text-red-400", icon: <XCircle size={11} weight="fill" /> },
+};

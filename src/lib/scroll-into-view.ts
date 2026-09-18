@@ -32,6 +32,57 @@ function centerField(el: HTMLElement): void {
   }
 }
 
+// Same "walk up to the nearest ancestor that actually overflows" logic as
+// centerField above, factored out so scrollIntoViewIfNeeded can reuse it —
+// this app's admin/account dashboard shell scrolls an inner flex container
+// (AccountShell), not the document, so native el.scrollIntoView() can't be
+// trusted to pick the right scroll box (see the file-level comment above).
+function findScrollableAncestor(el: HTMLElement): HTMLElement | null {
+  let container: HTMLElement | null = el.parentElement;
+  while (
+    container &&
+    (container.scrollHeight <= container.clientHeight || getComputedStyle(container).overflowY === "visible")
+  ) {
+    container = container.parentElement;
+  }
+  return container;
+}
+
+// Small gap kept between the element and the edge it's scrolled to, so it
+// doesn't end up flush against the very top/bottom of its container.
+const VIEWPORT_EDGE_PADDING = 16;
+
+/**
+ * Smoothly scrolls just enough — inside `el`'s nearest real scrollable
+ * ancestor if it has one, the window otherwise — to bring `el` fully into
+ * view. A no-op if `el` is already fully visible, so it's safe to call
+ * unconditionally whenever a new list row mounts or a popover/modal opens,
+ * rather than only when the caller has already worked out it's needed.
+ */
+export function scrollIntoViewIfNeeded(el: HTMLElement): void {
+  const container = findScrollableAncestor(el);
+  const elRect = el.getBoundingClientRect();
+
+  if (container) {
+    const containerRect = container.getBoundingClientRect();
+    let delta = 0;
+    if (elRect.bottom > containerRect.bottom - VIEWPORT_EDGE_PADDING) {
+      delta = elRect.bottom - (containerRect.bottom - VIEWPORT_EDGE_PADDING);
+    } else if (elRect.top < containerRect.top + VIEWPORT_EDGE_PADDING) {
+      delta = elRect.top - (containerRect.top + VIEWPORT_EDGE_PADDING);
+    }
+    if (delta !== 0) container.scrollBy({ top: delta, behavior: "smooth" });
+  } else {
+    let delta = 0;
+    if (elRect.bottom > window.innerHeight - VIEWPORT_EDGE_PADDING) {
+      delta = elRect.bottom - (window.innerHeight - VIEWPORT_EDGE_PADDING);
+    } else if (elRect.top < VIEWPORT_EDGE_PADDING) {
+      delta = elRect.top - VIEWPORT_EDGE_PADDING;
+    }
+    if (delta !== 0) window.scrollBy({ top: delta, behavior: "smooth" });
+  }
+}
+
 export function scrollFieldAboveKeyboard(el: HTMLElement): void {
   // visualViewport.resize fires exactly when the on-screen keyboard finishes
   // opening — precise, unlike guessing a fixed delay. Not supported by every

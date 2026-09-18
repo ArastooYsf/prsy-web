@@ -5,6 +5,10 @@ import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Loader2, Search, X } from "lucide-react";
 import { scrollFieldAboveKeyboard } from "@/lib/scroll-into-view";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 type SearchGroup<T> = { items: T[]; hasMore: boolean };
 
@@ -61,6 +65,12 @@ export default function AdminSearchBox() {
   }, [query]);
 
   const showDropdown = open && query.trim().length >= 2;
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(showDropdown);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   return (
     <Popover.Root open={showDropdown} onOpenChange={(v) => setOpen(v)}>
@@ -96,11 +106,16 @@ export default function AdminSearchBox() {
 
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           onOpenAutoFocus={(e) => e.preventDefault()}
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-background shadow-2xl"
+          className={cn(
+            "z-50 max-h-[70vh] w-[var(--radix-popover-trigger-width)] overflow-y-auto overscroll-contain rounded-2xl border border-foreground/10 bg-background shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2 p-6 text-sm text-foreground/50">

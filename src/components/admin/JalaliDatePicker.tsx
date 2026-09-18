@@ -5,6 +5,10 @@ import * as Popover from "@radix-ui/react-popover";
 import { toGregorian } from "jalaali-js";
 import { CaretLeft, CaretRight, Calendar } from "@phosphor-icons/react";
 import { JALALI_MONTHS, currentJalaliYear, daysInJalaliMonth, formatJalali, isoToJalali, jalaliToIso } from "@/lib/jalali";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const WEEKDAYS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 
@@ -28,6 +32,12 @@ const YEARS_PER_PAGE = 12;
 
 export default function JalaliDatePicker({ value, onChange, placeholder }: JalaliDatePickerProps) {
   const [open, setOpen] = useState(false);
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(open);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
   const thisYear = currentJalaliYear();
   const parsed = isoToJalali(value);
   const [viewYear, setViewYear] = useState(parsed?.jy ?? thisYear);
@@ -91,10 +101,15 @@ export default function JalaliDatePicker({ value, onChange, placeholder }: Jalal
 
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-30 w-72 max-w-[90vw] rounded-2xl border border-foreground/10 bg-background p-3 shadow-2xl"
+          className={cn(
+            "z-30 w-72 max-w-[90vw] rounded-2xl border border-foreground/10 bg-background p-3 shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           {pickerView === "days" && (
             <>

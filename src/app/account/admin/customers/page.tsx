@@ -10,6 +10,7 @@ import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { CustomerCardMobile, CustomerRowDesktop } from "./CustomerRow";
+import { LEGAL_CUSTOMER_NEEDS_REVIEW_WHERE } from "@/lib/national-id-verification";
 import type { Prisma } from "@/generated/prisma/client";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
@@ -39,7 +40,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
   // regardless of what ?role= the URL asks for.
   const roleWhere = !isAdmin ? "CUSTOMER" : !roleFilter ? "CUSTOMER" : roleFilter === "ALL" ? undefined : (roleFilter as never);
 
-  const [customers, pendingCount] = await Promise.all([
+  const [customers, needsReviewCount] = await Promise.all([
     prisma.user.findMany({
       where: {
         deletedAt: null,
@@ -50,7 +51,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
       },
       orderBy: buildOrderBy(field, dir),
     }),
-    prisma.user.count({ where: { role: "CUSTOMER", approvalStatus: "PENDING", deletedAt: null } }),
+    prisma.user.count({ where: LEGAL_CUSTOMER_NEEDS_REVIEW_WHERE }),
   ]);
 
   return (
@@ -73,10 +74,10 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
             className="relative inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
           >
             <UserCheck className="size-4" />
-            درخواست‌های تأیید مشتری حقوقی
-            {pendingCount > 0 && (
+            اشخاص حقوقی نیازمند بررسی دستی
+            {needsReviewCount > 0 && (
               <span className="mr-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                {pendingCount}
+                {needsReviewCount}
               </span>
             )}
           </Link>

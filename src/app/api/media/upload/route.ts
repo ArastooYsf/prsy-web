@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { validateUploadedFile } from "@/lib/uploads";
 
 const UPLOAD_SUBDIR = "uploads";
-const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"] as const;
+const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE", "PRODUCT_COMMENT"] as const;
 type MediaScope = (typeof VALID_SCOPES)[number];
 
 // SITE_CONTENT is only ever populated through the admin-only site-content/blog

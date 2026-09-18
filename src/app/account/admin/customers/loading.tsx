@@ -22,7 +22,7 @@ export default function Loading() {
           </span>
           <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70">
             <UserCheck className="size-4" />
-            درخواست‌های تأیید مشتری حقوقی
+            اشخاص حقوقی نیازمند بررسی دستی
           </span>
           <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70">
             <Import className="size-4" />

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MapPin, Phone as PhoneIcon, EnvelopeSimple } from "@phosphor-icons/react/ssr";
-import { getFooterContact, getLegalPageHtml } from "@/lib/site-content";
+import { getFooterContact, getLegalPageHtml, getContactHeroContent } from "@/lib/site-content";
 import { SOCIAL_ICONS } from "@/lib/social-icons";
 import { toPersianDigits } from "@/lib/format-number";
 import ThemedMapFrame from "@/components/ui/ThemedMapFrame";
@@ -18,7 +18,11 @@ const PHONE_ICON = <PhoneIcon size={22} />;
 const EMAIL_ICON = <EnvelopeSimple size={22} />;
 
 export default async function ContactPage() {
-  const [contact, introHtml] = await Promise.all([getFooterContact(), getLegalPageHtml("contact-intro")]);
+  const [contact, introHtml, hero] = await Promise.all([
+    getFooterContact(),
+    getLegalPageHtml("contact-intro"),
+    getContactHeroContent(),
+  ]);
 
   type ContactItem = { label: string; value: string; href?: string; icon: React.ReactNode };
   const rawContactItems: (ContactItem | null)[] = [
@@ -41,11 +45,9 @@ export default async function ContactPage() {
         <div className="container relative text-center">
           <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
-            تماس با ما
+            {hero.badge}
           </span>
-          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-5xl">
-            راه‌های <span className="text-accent-soft">ارتباط با ما</span>
-          </h1>
+          <h1 className="mx-auto max-w-3xl text-balance text-3xl font-bold leading-tight sm:text-5xl">{hero.heading}</h1>
           <ThemedProse
             html={introHtml}
             className="prose prose-sm mx-auto mt-5 max-w-2xl text-balance leading-7 [&_a]:text-accent-400 [&_p]:text-foreground/70"
@@ -84,7 +86,7 @@ export default async function ContactPage() {
 
           <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-foreground/10">
             <ThemedMapFrame
-              title="نقشه موقعیت ما"
+              title={hero.mapLabel}
               src={`https://www.google.com/maps?q=${encodeURIComponent(contact.address)}&output=embed`}
               className="h-72 w-full sm:h-80"
             />

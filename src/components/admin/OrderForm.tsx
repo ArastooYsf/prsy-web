@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
+import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
 import ProductPicker from "@/components/admin/ProductPicker";
 import type { AdminProductSearchResult } from "@/lib/admin-product-search";
 
@@ -48,6 +49,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
   );
   const [saving, setSaving] = useState(false);
   const [invalidIndexes, setInvalidIndexes] = useState<Set<number>>(new Set());
+  const newestItemRef = useScrollNewestIntoView<HTMLDivElement>(items.length);
 
   const clearInvalid = (index: number) => {
     setInvalidIndexes((prev) => {
@@ -194,7 +196,11 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
             const quantityInvalid = invalid && !(typeof item.quantity === "number" && item.quantity >= 1);
             const priceInvalid = invalid && !(typeof item.price === "number" && item.price >= 0);
             return (
-              <div key={index} className="flex flex-wrap items-center gap-2">
+              <div
+                key={index}
+                ref={index === items.length - 1 ? newestItemRef : undefined}
+                className="flex flex-wrap items-center gap-2"
+              >
                 <div className="min-w-0 basis-full sm:flex-1 sm:basis-auto">
                   <ProductPicker
                     productId={item.productId}

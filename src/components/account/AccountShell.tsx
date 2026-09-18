@@ -31,14 +31,33 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
   const canSearch = role === "ADMIN" || role === "SUPPORT";
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden lg:flex-row">
+    <div className="flex h-screen flex-col overflow-hidden [@supports(height:100dvh)]:h-dvh lg:flex-row">
       <AccountSidebar role={role} />
-      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+      {/* The account/admin panels have no footer, so on any page whose
+          content overflows the viewport, the last element would otherwise
+          sit flush against the bottom edge. `min-h-0` below (removed here)
+          is what let that happen: it tells a flex item it may render
+          SMALLER than its own content ("phantom overflow" — the content
+          paints past the item's box without growing it), which is exactly
+          what a flex item needs to become its own internal scroll region,
+          but it also makes this outer scroll container's own scrollHeight —
+          and any padding-bottom on it — stop reliably accounting for that
+          overflowing content once nesting/content gets deep enough
+          (verified empirically: worked for shallow pages, silently failed
+          for the profile page's several stacked sections). Dropping
+          min-h-0 here makes flex size each item to its real content instead
+          (content-based auto min-height), so this container's own
+          pb-16/sm:pb-24 is always correctly included. TicketChat (the one
+          view that genuinely needs to stretch-and-scroll internally) has
+          its own `min-h-[420px]` + independent overflow-y-auto message
+          list and already falls back to whichever ancestor really
+          overflows, so it isn't relying on this specific min-h-0. */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-24">
         <section
           className={
             isAdmin
-              ? "mx-auto flex min-h-0 w-full max-w-[1680px] flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12 lg:px-10"
-              : "container flex min-h-0 flex-1 flex-col py-6 sm:py-12"
+              ? "mx-auto flex w-full max-w-[1680px] flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12 lg:px-10"
+              : "container flex flex-1 flex-col py-6 sm:py-12"
           }
         >
           <div className="mb-8 flex flex-col gap-4 border-b border-foreground/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -54,7 +73,7 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
               <ThemeToggleButton />
             </div>
           </div>
-          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          <div className="flex flex-1 flex-col">{children}</div>
         </section>
       </div>
     </div>

@@ -6,8 +6,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
-import { sanitizeRichText } from "@/lib/sanitize";
+import { sanitizeRichText, sanitizePlainText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
+import { SITE_URL, toAbsoluteUrl } from "@/lib/site-url";
 import { PencilSimple } from "@phosphor-icons/react/ssr";
 import BlogViewTracker from "@/components/BlogViewTracker";
 import ThemedProse from "@/components/ui/ThemedProse";
@@ -18,7 +19,10 @@ export const revalidate = 60;
 async function getPost(rawSlug: string) {
   const slug = decodeURIComponent(rawSlug);
   try {
-    return await prisma.blogPost.findFirst({ where: { slug, published: true } });
+    return await prisma.blogPost.findFirst({
+      where: { slug, published: true },
+      include: { author: { select: { name: true } } },
+    });
   } catch {
     return null;
   }
@@ -31,6 +35,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
+    alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
@@ -49,8 +54,21 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   const safeContent = linkifyKnownPhrases(sanitizeRichText(post.content));
 
+  const blogPostingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    ...(post.excerpt ? { description: post.excerpt } : {}),
+    ...(post.coverImage ? { image: [toAbsoluteUrl(getMediaUrl(post.coverImage))] } : {}),
+    ...(post.publishedAt ? { datePublished: post.publishedAt.toISOString() } : {}),
+    dateModified: post.updatedAt.toISOString(),
+    author: { "@type": "Person", name: post.author.name || "پویش راه صنعت یاشار" },
+    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+  };
+
   return (
     <article className="relative pb-20 pt-14 sm:pb-28 sm:pt-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <ThemedGridBackdrop />
       <BlogViewTracker postId={post.id} />
       <div className="container relative">

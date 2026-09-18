@@ -1,38 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Tag, Truck } from "@phosphor-icons/react";
+import { Star } from "@phosphor-icons/react";
 import Counter from "@/components/Counter";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
+import { DEFAULT_ABOUT, getIconByKey } from "@/lib/site-content-defaults";
+import type { AboutContent } from "@/lib/site-content";
 
-const PRINCIPLES = [
-  {
-    title: "بهترین کیفیت",
-    description: "تأمین محصولات اورجینال و باکیفیت",
-    icon: <Star size={22} />,
-  },
-  {
-    title: "بهترین قیمت",
-    description: "رقابتی‌ترین قیمت ممکن در بازار",
-    icon: <Tag size={22} />,
-  },
-  {
-    title: "سریع‌ترین تحویل",
-    description: "ارسال به‌موقع و بدون تأخیر",
-    icon: <Truck size={22} />,
-  },
-];
+export default function About({ content = DEFAULT_ABOUT }: { content?: AboutContent }) {
+  const { title, body, principles, yearsValue, registrationNumber, registrationLabel, trustBadgeTitle, trustBadgeText } = content;
 
-const DEFAULT_TITLE = "شریک مطمئن شما در تأمین دیزل ژنراتور";
-const DEFAULT_BODY =
-  "پویش راه صنعت یاشار (شماره ثبت ۴۷۶۰۶) از سال ۱۳۹۶ فعالیت خود را با هدف تأمین باکیفیت‌ترین دیزل ژنراتورها و قطعات مرتبط آغاز کرد. از همان روز نخست، محور کار ما بر سه اصل استوار بوده است:";
-
-type AboutProps = {
-  title?: string;
-  body?: string;
-};
-
-export default function About({ title, body }: AboutProps) {
   return (
     <section id="about" className="section-padding relative border-t border-foreground/10">
       <div className="container">
@@ -53,36 +30,37 @@ export default function About({ title, body }: AboutProps) {
               variants={fadeInUp}
               className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
             >
-              {title || DEFAULT_TITLE}
+              {title}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className="mt-5 text-balance leading-8 text-foreground/70"
             >
-              {body || DEFAULT_BODY}
+              {body}
             </motion.p>
 
             <motion.ul
               variants={staggerContainer(0.08)}
               className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3"
             >
-              {PRINCIPLES.map((principle) => (
-                <motion.li
-                  key={principle.title}
-                  variants={fadeInUp}
-                  whileHover={{ y: -4 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="rounded-xl border border-transparent bg-foreground/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10">
-                    {principle.icon}
-                  </div>
-                  <p className="mt-3 text-sm font-bold">{principle.title}</p>
-                  <p className="mt-1 text-xs leading-5 text-foreground/70">
-                    {principle.description}
-                  </p>
-                </motion.li>
-              ))}
+              {principles.map((principle, i) => {
+                const PrincipleIcon = getIconByKey(principle.icon);
+                return (
+                  <motion.li
+                    key={i}
+                    variants={fadeInUp}
+                    whileHover={{ y: -4 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="rounded-xl border border-transparent bg-foreground/[0.03] p-4 transition-colors duration-300 hover:border-accent-500/30"
+                  >
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 shadow-sm shadow-accent-500/10">
+                      <PrincipleIcon size={22} />
+                    </div>
+                    <p className="mt-3 text-sm font-bold">{principle.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-foreground/70">{principle.description}</p>
+                  </motion.li>
+                );
+              })}
             </motion.ul>
           </motion.div>
 
@@ -96,17 +74,15 @@ export default function About({ title, body }: AboutProps) {
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-accent-soft sm:text-5xl">
-                  <Counter value={9} suffix="+" />
+                  <Counter value={yearsValue} suffix="+" />
                 </div>
                 <p className="mt-2 text-sm text-foreground/70">
                   سال سابقه فعالیت
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold sm:text-5xl">۴۷۶۰۶</div>
-                <p className="mt-2 text-sm text-foreground/70">
-                  شماره ثبت رسمی
-                </p>
+                <div className="text-4xl font-bold sm:text-5xl">{registrationNumber}</div>
+                <p className="mt-2 text-sm text-foreground/70">{registrationLabel}</p>
               </div>
             </div>
 
@@ -115,13 +91,8 @@ export default function About({ title, body }: AboutProps) {
                 <Star size={22} />
               </div>
               <div>
-                <p className="text-sm font-bold text-foreground">
-                  نشان اعتماد B2B
-                </p>
-                <p className="mt-1 text-sm leading-6 text-foreground">
-                  افتخار همکاری با شرکت‌های بزرگ، از جمله شرکت‌های حفاری، را
-                  داشته‌ایم.
-                </p>
+                <p className="text-sm font-bold text-foreground">{trustBadgeTitle}</p>
+                <p className="mt-1 text-sm leading-6 text-foreground">{trustBadgeText}</p>
               </div>
             </div>
           </motion.div>

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import ContractForm from "@/components/admin/ContractForm";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
@@ -24,12 +26,24 @@ export default async function AdminContractDetailPage({ params }: { params: { id
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-lg font-bold">ویرایش قرارداد</h2>
-        <DeleteEntityButton
-          endpoint={`/api/admin/contracts/${contract.id}`}
-          title="حذف قرارداد"
-          message={`مطمئنید می‌خواهید قرارداد «${contract.title}» را حذف کنید؟`}
-          redirectTo="/account/admin/contracts"
-        />
+        <div className="flex items-center gap-2">
+          {contract.status !== "PENDING_APPROVAL" && (
+            <Link
+              href={`/documents/contracts/${contract.id}`}
+              target="_blank"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            >
+              <FileText className="size-3.5" />
+              سند رسمی / دانلود PDF
+            </Link>
+          )}
+          <DeleteEntityButton
+            endpoint={`/api/admin/contracts/${contract.id}`}
+            title="حذف قرارداد"
+            message={`مطمئنید می‌خواهید قرارداد «${contract.title}» را حذف کنید؟`}
+            redirectTo="/account/admin/contracts"
+          />
+        </div>
       </div>
       <div className="mx-auto max-w-xl">
         <ContractForm

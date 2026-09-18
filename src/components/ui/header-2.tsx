@@ -24,6 +24,8 @@ import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import type { MenuCategory } from '@/lib/menu-taxonomy';
+import { DEFAULT_HEADER_NAV_LABELS } from '@/lib/site-content-defaults';
+import type { HeaderNavLabelsContent } from '@/lib/site-content';
 
 // How far (in px) the user needs to scroll before the header's ambient glow
 // reaches full intensity. Matches GLOW_MAX_SHADOW below.
@@ -106,7 +108,13 @@ function buildTrapezoidPath(cx: number, halfW: number, navWidth: number) {
 	return roundedPolygonPath(points, PLATFORM_CORNER_RADIUS);
 }
 
-export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[] }) {
+export function Header({
+	menuCategories = [],
+	navLabels = DEFAULT_HEADER_NAV_LABELS,
+}: {
+	menuCategories?: MenuCategory[];
+	navLabels?: HeaderNavLabelsContent;
+}) {
 	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
 	const isAccountArea = pathname?.startsWith('/account');
@@ -168,6 +176,15 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 
 	// Nav hover "speed bump" indicator — see buildTrapezoidPath above.
 	const navRowRef = React.useRef<HTMLDivElement>(null);
+	// The two `lg:flex-1` side tracks flanking the centered links group (see
+	// the comment on the logo wrapper below) — their box size, not just
+	// nav's own, is what actually moves a hovered item: nav's outer width
+	// can hold steady while these two still redistribute internally (e.g.
+	// the logo text collapsing on scroll doesn't change nav's own width at
+	// all, only how much of it each side keeps). Watched by the same
+	// ResizeObserver as nav itself, below.
+	const logoSideRef = React.useRef<HTMLDivElement>(null);
+	const trioSideRef = React.useRef<HTMLDivElement>(null);
 	const hasPositionedBump = React.useRef(false);
 	const bumpTargetX = useMotionValue(0);
 	const bumpTargetHalfW = useMotionValue(0);
@@ -190,9 +207,33 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 	// re-measured on every single hover, same pattern SpotlightCursor.tsx
 	// uses for its own container rect.
 	const navRowRectRef = React.useRef<DOMRect | null>(null);
+	// The element currently under the cursor, so a resize/scroll mid-hover
+	// (below) can re-measure the same real target instead of trusting the
+	// x/width it captured before the layout moved.
+	const activeHoverItemRef = React.useRef<HTMLElement | null>(null);
+	// Re-measures the actively-hovered item and pushes fresh coordinates into
+	// the springs. A no-op while nothing is hovered. Scroll toggles the
+	// header's `scrolled` padding swap and resize can change every item's
+	// position outright — without this, the platform kept animating toward
+	// whatever x/width it last captured before the layout moved, so it would
+	// visibly detach from the button it's supposed to be sitting under.
+	const recomputeActiveHoverBump = React.useCallback(() => {
+		const item = activeHoverItemRef.current;
+		const container = navRowRef.current;
+		if (!item || !container || !item.isConnected) return;
+		const containerRect = container.getBoundingClientRect();
+		navRowRectRef.current = containerRect;
+		const itemRect = item.getBoundingClientRect();
+		navWidthRef.current = containerRect.width;
+		const centerX = itemRect.left + itemRect.width / 2 - containerRect.left;
+		const halfW = itemRect.width / 2;
+		bumpTargetX.set(centerX);
+		bumpTargetHalfW.set(halfW);
+	}, [bumpTargetX, bumpTargetHalfW]);
 	React.useEffect(() => {
 		const invalidate = () => {
 			navRowRectRef.current = null;
+			recomputeActiveHoverBump();
 		};
 		window.addEventListener('resize', invalidate);
 		window.addEventListener('scroll', invalidate, { passive: true });
@@ -200,7 +241,46 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 			window.removeEventListener('resize', invalidate);
 			window.removeEventListener('scroll', invalidate);
 		};
-	}, []);
+	}, [recomputeActiveHoverBump]);
+	// The `scroll`/`resize` listeners above fire once, synchronously, the
+	// instant the header starts reacting — but the header's own width/inset
+	// change on `scrolled` (the `lg:max-w-6xl` -> `lg:max-w-5xl` swap) and the
+	// logo text's collapse are both animated `duration-300` CSS transitions,
+	// not an instant snap. A single recompute at the scroll event's own
+	// moment captures the layout before any of that has moved, so the
+	// platform stayed correctly positioned for the OLD layout while it
+	// animated out from under it over the next 300ms. A ResizeObserver
+	// fires on every frame any of these three boxes actually changes size —
+	// nav's own outer width, and the two `lg:flex-1` side tracks whose
+	// internal redistribution moves a hovered item even when nav's own
+	// width hasn't changed — so the platform tracks the whole reflow live.
+	React.useEffect(() => {
+		const nav = navRowRef.current;
+		const logoSide = logoSideRef.current;
+		const trioSide = trioSideRef.current;
+		if (!nav) return;
+		const observer = new ResizeObserver(() => {
+			navRowRectRef.current = null;
+			recomputeActiveHoverBump();
+		});
+		observer.observe(nav);
+		if (logoSide) observer.observe(logoSide);
+		if (trioSide) observer.observe(trioSide);
+		return () => observer.disconnect();
+	}, [recomputeActiveHoverBump]);
+	// Safety net for the observers above: a ResizeObserver's last callback
+	// during a fast multi-property transition isn't guaranteed to land
+	// exactly on the transition's final frame, which can leave the target
+	// one frame stale. `transitionend` (bubbles up from nav's own, the logo
+	// text's, or the header's transition, whichever finishes last) forces
+	// one definitely-final recompute once everything has actually settled.
+	React.useEffect(() => {
+		const header = headerRef.current;
+		if (!header) return;
+		const onTransitionEnd = () => recomputeActiveHoverBump();
+		header.addEventListener('transitionend', onTransitionEnd);
+		return () => header.removeEventListener('transitionend', onTransitionEnd);
+	}, [recomputeActiveHoverBump]);
 
 	// Bound directly to each nav item's own real element (its `onMouseEnter`/
 	// `onMouseLeave` below — see the JSX), not a padded wrapper around it and
@@ -216,6 +296,7 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 	const handleItemEnter = (item: HTMLElement) => {
 		const container = navRowRef.current;
 		if (!container) return;
+		activeHoverItemRef.current = item;
 		const containerRect = navRowRectRef.current ?? (navRowRectRef.current = container.getBoundingClientRect());
 		const itemRect = item.getBoundingClientRect();
 		navWidthRef.current = containerRect.width;
@@ -243,8 +324,26 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 	// the explicit trade-off for the platform never lingering past the
 	// button's real edge.
 	const handleItemLeave = () => {
+		activeHoverItemRef.current = null;
 		bumpTargetOpacity.set(0);
 	};
+
+	// Client-side navigation can change `scrolled` (the new page mounts
+	// scrolled to the top) without the mouse ever leaving the hovered link —
+	// Header lives in the root layout, so it isn't remounted by a normal
+	// route change, only unmounted outright on `/account` routes (see
+	// `isAccountArea` below), which would otherwise leave the platform
+	// sitting at full opacity at whatever position it last had. Hiding it
+	// outright on every pathname change is simpler and safer than trying to
+	// recompute through both cases: reset the "first hover" flag too, so the
+	// next hover on the new page jumps straight to position (invisible,
+	// since opacity is already 0) instead of visibly sliding in from the
+	// old page's coordinates.
+	React.useEffect(() => {
+		activeHoverItemRef.current = null;
+		hasPositionedBump.current = false;
+		bumpTargetOpacity.set(0);
+	}, [pathname, bumpTargetOpacity]);
 
 	// Spread onto every nav item's own trigger element (plain links and the
 	// mega-menu's inner trigger alike) so the four call sites below don't
@@ -253,23 +352,23 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 
 	const links = [
 		{
-			label: 'خانه',
+			label: navLabels.home,
 			href: '/',
 		},
 		{
-			label: 'درباره ما',
+			label: navLabels.about,
 			href: '/about',
 		},
 		{
-			label: 'مشتریان',
+			label: navLabels.clients,
 			href: '/#clients',
 		},
 		{
-			label: 'وبلاگ',
+			label: navLabels.blog,
 			href: '/blog',
 		},
 		{
-			label: 'سوالات متداول',
+			label: navLabels.faq,
 			href: '/faq',
 		},
 	];
@@ -398,7 +497,13 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 				siblings happen to already be `position`ed. */}
 			<SpotlightCursor className="z-[1] rounded-[inherit]" />
 
-			<div className="relative z-10 w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
+			{/* z-30, not z-10: this row's own stacking context must outrank the
+				<nav> row below (also z-10, but a later sibling — with equal
+				z-index, later DOM order wins) or the search dropdown's absolutely-
+				positioned card — even though it's z-40/z-50 *inside* this row —
+				gets painted underneath the whole nav row (logo/links/buttons show
+				through on top of it) once it expands past this row's own height. */}
+			<div className="relative z-30 w-full border-b border-foreground/5 px-4 py-2.5 lg:border-foreground/10 lg:py-2">
 				<HeaderSearch />
 			</div>
 
@@ -436,18 +541,57 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 					<motion.path d={bumpPath} style={{ opacity: bumpOpacity }} className="fill-[rgb(var(--accent))]" />
 				</svg>
 
-				<Link
-					href="/"
-					className="group flex shrink-0 items-center gap-2 text-base font-bold transition-transform duration-300 hover:scale-[1.03]"
-				>
-					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
-						یا
-					</span>
-					<span className={cn('hidden whitespace-nowrap sm:inline', scrolled && 'lg:hidden')}>
-						پویش راه صنعت<span className="text-accent-400"> یاشار</span>
-					</span>
-				</Link>
-				<div className="hidden items-stretch lg:flex">
+				{/* `justify-between` alone (the old layout) only puts the nav-links
+					group's visual center on the nav's true center when this side and
+					the button trio on the other side happen to weigh exactly the
+					same — they don't (the trio is a lot wider), so the group sat
+					off-center toward it. `lg:flex-1` makes this wrapper and the
+					trio's own wrapper below grow to fill an EQUAL share of whatever
+					space is left over after the links group and both sides' own
+					content take what they need — so as long as there's enough room,
+					both sides end up the same width and the middle group lands dead
+					center, no matter how unevenly the logo and trio content are
+					themselves sized. On a narrow `lg` window there's a floor to this:
+					flex items never shrink below their own content's width, so if the
+					trio's content alone needs more than an equal half-share, its side
+					simply keeps that width instead of shrinking further — the group
+					drifts slightly off-true-center rather than centering exactly, but
+					crucially the two never overlap (an earlier `position:absolute`
+					version of this fix centered exactly always, but had no such
+					floor, so on an in-between `lg` width it could genuinely overlap
+					the trio — see the removed version in git history). */}
+				<div ref={logoSideRef} className="flex items-center lg:flex-1 lg:items-stretch">
+					<Link
+						href="/"
+						className="group flex shrink-0 items-center gap-2 text-base font-bold transition-transform duration-300 hover:scale-[1.03]"
+					>
+						<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
+							یا
+						</span>
+						{/* Collapses via max-width + opacity, not a `hidden` display toggle:
+							display:none can't be transitioned, so the old on/off switch made
+							this text's width disappear in a single frame — which yanked
+							every sibling that depends on this box's width (the nav-links
+							group, the button trio) into their new positions with it, since
+							nothing about a hard width change can be smoothed. Shrinking to
+							max-width:0 instead lets `lg:transition-all` on the header/nav
+							animate the whole reflow together. */}
+						<span
+							className={cn(
+								'hidden overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-300 ease-in-out sm:inline-block',
+								scrolled ? 'lg:max-w-0 lg:opacity-0' : 'lg:max-w-[220px] lg:opacity-100',
+							)}
+						>
+							پویش راه صنعت<span className="text-accent-400"> یاشار</span>
+						</span>
+					</Link>
+				</div>
+				{/* lg:ml-4: fixed breathing room against the button trio to its left —
+					without it the gap there could shrink to just a couple of px once
+					the trio's own `lg:flex-1` track is pinned at its content's min
+					width (e.g. once "تماس با ما" shows at `xl:`), since that track has
+					no leftover space left to keep the two apart on its own. */}
+				<div className="hidden items-stretch lg:ml-4 lg:flex">
 					{/* This wrapper is layout only (vertical centering within the
 						full-row-height flex parent) — the platform's hit area binds to
 						the Link itself below (onMouseEnter/onMouseLeave), not to this
@@ -487,18 +631,11 @@ export function Header({ menuCategories = [] }: { menuCategories?: MenuCategory[
 						</div>
 					))}
 				</div>
-				{/* A separate top-level flex item — sibling of the nav-links group
-					above, not nested inside it. With exactly three real children on
-					this row (logo, nav-links group, this trio), the nav's own
-					`justify-between` centers the nav-links group in the space between
-					the other two for free, instead of the two groups sitting glued
-					together as one block flush against the logo. This trio isn't
-					part of the shared sliding indicator above, so unlike those
-					wrappers it doesn't need to sit edge-to-edge with its neighbor —
-					these carry their own button styling (fill/outline/icon) and
-					deliberately get no hover platform, that indicator belongs only to
-					the plain nav links. */}
-				<div className="hidden items-center gap-2 lg:flex">
+				{/* Mirrors the logo wrapper's `lg:flex-1` above (see that comment) —
+					`lg:justify-end` keeps this side's own content pinned to the nav's
+					outer edge as its track grows, instead of the content drifting
+					toward the middle as empty space is added around it. */}
+				<div ref={trioSideRef} className="hidden items-center gap-2 lg:flex lg:flex-1 lg:justify-end">
 					<Button variant="outline" size="sm" className="hidden xl:inline-flex" asChild>
 						<Link href="/contact">تماس با ما</Link>
 					</Button>

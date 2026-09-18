@@ -21,6 +21,12 @@ export function useToast() {
 
 const DEFAULT_DURATION = 4000;
 
+// Caps how many toasts are ever on screen at once — anything beyond this
+// waits in a FIFO queue (queueRef below) and only starts its own display
+// timer once a slot actually frees up, instead of every toast piling on
+// screen simultaneously the moment it's requested.
+const MAX_VISIBLE_TOASTS = 2;
+
 const TYPE_STYLES: Record<ToastType, { border: string; text: string; shadow: string; bar: string; Icon: typeof CheckCircle2 }> = {
   success: {
     border: "border-accent-500/30",
@@ -70,6 +76,20 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
   const [pausedIds, setPausedIds] = useState<Set<number>>(new Set());
   const idRef = useRef(0);
   const timersRef = useRef<Map<number, TimerEntry>>(new Map());
+  // Toasts requested while MAX_VISIBLE_TOASTS are already showing — FIFO,
+  // drained one at a time as slots free up in dismiss() below. A plain ref
+  // (not state) since nothing here renders the queue itself, only how many
+  // are currently visible.
+  const queueRef = useRef<ToastItem[]>([]);
+  // Mirrors `toasts.length` synchronously (state updates are batched/async,
+  // so several showToast() calls in the same tick can't rely on re-reading
+  // `toasts` to know how many slots are already spoken for).
+  const visibleCountRef = useRef(0);
+  // dismiss() and startTimer() each need to call the other (a dismissed
+  // slot promotes the next queued toast, whose own auto-dismiss calls back
+  // in) — routing that through a ref instead of a direct useCallback
+  // dependency avoids the two recreating each other every render.
+  const dismissRef = useRef<(id: number) => void>(() => {});
 
   const removeFromPaused = useCallback((id: number) => {
     setPausedIds((prev) => {
@@ -78,6 +98,16 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
       next.delete(id);
       return next;
     });
+  }, []);
+
+  // Actually puts a toast on screen and starts its display countdown — used
+  // both for a fresh toast with a free slot and for promoting the next
+  // queued one once a slot opens up.
+  const startTimer = useCallback((toast: ToastItem) => {
+    visibleCountRef.current += 1;
+    setToasts((prev) => [...prev, toast]);
+    const timeoutId = setTimeout(() => dismissRef.current(toast.id), DEFAULT_DURATION);
+    timersRef.current.set(toast.id, { timeoutId, startedAt: Date.now(), remaining: DEFAULT_DURATION, pauseReasons: new Set() });
   }, []);
 
   const dismiss = useCallback(
@@ -89,18 +119,28 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
       }
       setToasts((prev) => prev.filter((t) => t.id !== id));
       removeFromPaused(id);
+      visibleCountRef.current = Math.max(0, visibleCountRef.current - 1);
+      const next = queueRef.current.shift();
+      if (next) startTimer(next);
     },
-    [removeFromPaused],
+    [removeFromPaused, startTimer],
   );
+
+  useEffect(() => {
+    dismissRef.current = dismiss;
+  }, [dismiss]);
 
   const showToast = useCallback(
     (message: string, type: ToastType = "success") => {
       const id = ++idRef.current;
-      setToasts((prev) => [...prev, { id, message, type }]);
-      const timeoutId = setTimeout(() => dismiss(id), DEFAULT_DURATION);
-      timersRef.current.set(id, { timeoutId, startedAt: Date.now(), remaining: DEFAULT_DURATION, pauseReasons: new Set() });
+      const toast: ToastItem = { id, message, type };
+      if (visibleCountRef.current < MAX_VISIBLE_TOASTS) {
+        startTimer(toast);
+      } else {
+        queueRef.current.push(toast);
+      }
     },
-    [dismiss],
+    [startTimer],
   );
 
   // Pause: drop the pending dismiss and bank whatever time was left, so a

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Shabnam FD', 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
+    color: #0f172a;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  table { width: 100%; border-collapse: collapse; }
+
+  /* Header */
+  .header { width: 100%; border-bottom: 2px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 22px; }
+  .header td { border: none; padding: 0; vertical-align: top; }
+  .brand-mark {
+    display: inline-block; width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #eff6ff; font-weight: bold; font-size: 13px; text-align: center; line-height: 34px;
+  }
+  .brand-name { font-size: 16px; font-weight: bold; margin-right: 10px; }
+  .brand-name .accent { color: #1d4ed8; }
+  .company-meta { color: #64748b; font-size: 11px; margin-top: 6px; }
+  .doc-title { font-size: 20px; font-weight: bold; text-align: left; }
+  .doc-meta { color: #64748b; font-size: 11px; text-align: left; margin-top: 6px; }
+
+  /* Info grid */
+  .info-grid { width: 100%; margin-bottom: 20px; }
+  .info-grid td { border: none; padding: 0; vertical-align: top; width: 50%; }
+  .info-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+  .info-box + .info-box { margin-right: 14px; }
+  .info-box h3 { font-size: 12px; color: #1d4ed8; margin: 0 0 10px; }
+  .info-row { display: block; margin-bottom: 5px; font-size: 12px; }
+  .info-row .label { color: #64748b; }
+
+  .status-badge {
+    display: inline-block; border-radius: 999px; padding: 3px 12px; font-size: 11px; font-weight: bold;
+  }
+
+  .body-text { font-size: 13px; line-height: 2.1; margin: 22px 0; padding: 16px 18px; background: #f8fafc; border-radius: 8px; }
+
+  .sign-grid { width: 100%; margin-top: 46px; }
+  .sign-grid td { border: none; padding: 0; width: 50%; text-align: center; }
+  .sign-line { margin-top: 46px; border-top: 1px solid #94a3b8; padding-top: 8px; font-size: 11px; color: #64748b; }
+
+  .footer { margin-top: 34px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+
+  <table class="header">
+    <tr>
+      <td style="width:60%;">
+        <span class="brand-mark">یا</span>
+        <span class="brand-name">{d.company.name:print(' '):replace(' پویش راه صنعت',' پویش راه صنعت')}</span>
+      </td>
+      <td style="width:40%;">
+        <div class="doc-title">قرارداد رسمی</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="company-meta">
+          شماره ثبت: {d.company.registrationNumber} &nbsp;|&nbsp; {d.company.address}<br/>
+          {d.company.phone} &nbsp;|&nbsp; {d.company.email}
+        </div>
+      </td>
+      <td>
+        <div class="doc-meta">
+          شماره سند: {d.contract.id}<br/>
+          تاریخ صدور: {d.issuedAtJalali}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table class="info-grid">
+    <tr>
+      <td>
+        <div class="info-box">
+          <h3>مشخصات طرف قرارداد (مشتری)</h3>
+          <span class="info-row"><span class="label">نام: </span>{d.customer.name}</span>
+          <span class="info-row"><span class="label">تلفن: </span>{d.customer.phone}</span>
+          <span class="info-row" style="{d.customer.companyName:ifEM():show('display:none;')}"><span class="label">شرکت: </span>{d.customer.companyName}</span>
+          <span class="info-row" style="{d.customer.nationalId:ifEM():show('display:none;')}"><span class="label">شناسه ملی: </span>{d.customer.nationalId}</span>
+          <span class="info-row" style="{d.customer.address:ifEM():show('display:none;')}"><span class="label">آدرس: </span>{d.customer.address}</span>
+        </div>
+      </td>
+      <td>
+        <div class="info-box">
+          <h3>مشخصات قرارداد</h3>
+          <span class="info-row"><span class="label">موضوع: </span>{d.contract.title}</span>
+          <span class="info-row"><span class="label">نوع قرارداد: </span>{d.contract.type}</span>
+          <span class="info-row"><span class="label">تاریخ شروع: </span>{d.contract.startDateJalali}</span>
+          <span class="info-row"><span class="label">تاریخ پایان: </span>{d.contract.endDateJalali}</span>
+          <span class="info-row">
+            <span class="label">وضعیت: </span>
+            <span class="status-badge" style="background:{d.contract.statusColorBg};color:{d.contract.statusColorText};">{d.contract.statusLabel}</span>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="body-text">
+    این سند گواهی می‌کند که قراردادی با موضوع «{d.contract.title}» از نوع «{d.contract.type}»، فی‌مابین شرکت {d.company.name} (شماره ثبت {d.company.registrationNumber}) به‌عنوان طرف اول، و {d.customer.name} به‌عنوان طرف دوم (مشتری)، منعقد گردیده است. مدت اعتبار این قرارداد از تاریخ {d.contract.startDateJalali} تا تاریخ {d.contract.endDateJalali} می‌باشد و طرفین متعهد به رعایت کامل مفاد آن هستند.
+  </div>
+
+  <table class="sign-grid">
+    <tr>
+      <td>
+        <div class="sign-line">امضا و مهر شرکت ({d.company.name})</div>
+      </td>
+      <td>
+        <div class="sign-line">امضای مشتری ({d.customer.name})</div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    این سند به‌صورت خودکار در تاریخ {d.issuedAtJalali} توسط سامانه {d.company.name} تولید شده است.
+  </div>
+
+</body>
+</html>

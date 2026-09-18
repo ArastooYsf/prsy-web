@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { ListBullets, X } from "@phosphor-icons/react";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 type CannedResponse = {
   id: string;
@@ -12,6 +16,12 @@ type CannedResponse = {
 
 export default function CannedResponsePicker({ onSelect }: { onSelect: (body: string) => void }) {
   const [open, setOpen] = useState(false);
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(open);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
   const [responses, setResponses] = useState<CannedResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -70,11 +80,16 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
 
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           side="top"
           align="start"
           sideOffset={8}
           collisionPadding={8}
-          className="z-20 flex max-h-96 w-80 max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
+          className={cn(
+            "z-20 flex max-h-96 w-80 max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
             <p className="text-sm font-semibold">پیام‌های آماده</p>

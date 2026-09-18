@@ -4,35 +4,45 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
-import type { FooterContactContent } from "@/lib/site-content";
+import type { FooterContactContent, FooterEditableContent } from "@/lib/site-content";
+import { DEFAULT_FOOTER_CONTENT } from "@/lib/site-content-defaults";
 import { toPersianDigits } from "@/lib/format-number";
 import { SOCIAL_ICONS } from "@/lib/social-icons";
 
-const QUICK_LINKS = [
-  { label: "خانه", href: "/" },
-  { label: "محصولات", href: "/products" },
-  { label: "ویژگی‌ها", href: "/#features" },
-  { label: "درباره ما", href: "/about" },
-  { label: "مشتریان", href: "/#clients" },
-  { label: "سوالات متداول", href: "/faq" },
-  { label: "درخواست مشاوره", href: "/consultation" },
-  { label: "تماس با ما", href: "/contact" },
-];
+// href for each link stays fixed here, keyed by the same `id` the admin
+// panel's label editor uses — a typo in the panel can only ever change
+// visible text, never point a link somewhere unintended.
+const QUICK_LINK_HREFS: Record<string, string> = {
+  home: "/",
+  products: "/products",
+  features: "/#features",
+  about: "/about",
+  clients: "/#clients",
+  faq: "/faq",
+  consultation: "/consultation",
+  contact: "/contact",
+};
 
-const SERVICES = [
-  { label: "دیزل ژنراتور", href: "/products/diesel-generator" },
-  { label: "موتور برق", href: "/products/power-engine" },
-  { label: "قطعات یدکی", href: "/products/spare-parts" },
-  { label: "دینام و آلترناتور", href: "/products/alternator" },
-  { label: "اورهال و تعمیرات", href: "/contact" },
-];
+const SERVICE_HREFS: Record<string, string> = {
+  "diesel-generator": "/products/diesel-generator",
+  "power-engine": "/products/power-engine",
+  "spare-parts": "/products/spare-parts",
+  alternator: "/products/alternator",
+  overhaul: "/contact",
+};
 
 // Icons stay hardcoded per platform; only the destination URL is admin-editable
 // (see FooterContactContent) — a platform with no URL set just isn't rendered.
 // The icon set itself lives in src/lib/social-icons.tsx (shared with the
 // /contact page, which renders the same platforms against the same URLs).
 
-export default function Footer({ contact }: { contact: FooterContactContent }) {
+export default function Footer({
+  contact,
+  content = DEFAULT_FOOTER_CONTENT,
+}: {
+  contact: FooterContactContent;
+  content?: FooterEditableContent;
+}) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
 
@@ -66,11 +76,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
               پویش راه صنعت
               <span className="text-accent-400"> یاشار</span>
             </Link>
-            <p className="mt-4 max-w-sm leading-7 text-foreground/60">
-              تأمین‌کننده دیزل ژنراتور، موتور برق و قطعات یدکی با برندهای
-              معتبر جهانی؛ به‌صورت نو و دست‌دوم، با بهترین قیمت و سریع‌ترین
-              تحویل.
-            </p>
+            <p className="mt-4 max-w-sm leading-7 text-foreground/60">{content.tagline}</p>
             {socials.length > 0 && (
               <div className="mt-6 flex items-center gap-3">
                 {socials.map((social) => (
@@ -104,10 +110,10 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
               لینک‌های سریع
             </h3>
             <ul className="mt-5 space-y-3">
-              {QUICK_LINKS.map((link) => (
-                <li key={link.href}>
+              {content.quickLinks.map((link) => (
+                <li key={link.id}>
                   <Link
-                    href={link.href}
+                    href={QUICK_LINK_HREFS[link.id] ?? "/"}
                     className="inline-block text-sm text-foreground/60 transition-all duration-200 hover:-translate-x-1 hover:text-accent-400"
                   >
                     {link.label}
@@ -120,10 +126,10 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-semibold text-foreground">محصولات</h3>
             <ul className="mt-5 space-y-3">
-              {SERVICES.map((service) => (
-                <li key={service.label}>
+              {content.services.map((service) => (
+                <li key={service.id}>
                   <Link
-                    href={service.href}
+                    href={SERVICE_HREFS[service.id] ?? "/contact"}
                     className="inline-block text-sm text-foreground/60 transition-all duration-200 hover:-translate-x-1 hover:text-accent-400"
                   >
                     {service.label}
@@ -166,8 +172,7 @@ export default function Footer({ contact }: { contact: FooterContactContent }) {
           className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-foreground/10 pt-8 text-sm text-foreground/50 sm:flex-row-reverse"
         >
           <p>
-            © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه
-            صنعت یاشار. تمامی حقوق محفوظ است.
+            © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه صنعت یاشار. {content.copyrightSuffix}
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="transition-colors hover:text-foreground">

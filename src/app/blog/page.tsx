@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { BlogPostCard } from "./BlogPostCard";
+import { BlogPostGrid } from "./BlogPostGrid";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
@@ -49,11 +49,7 @@ export default async function BlogPage() {
               هنوز مقاله‌ای منتشر نشده است. به‌زودی مطالب جدید اضافه خواهد شد.
             </p>
           ) : (
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
-                <BlogPostCard key={post.id} post={post} />
-              ))}
-            </div>
+            <BlogPostGrid posts={posts} />
           )}
         </div>
       </section>

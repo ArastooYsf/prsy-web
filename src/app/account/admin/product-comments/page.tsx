@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { MessageSquare } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { prisma } from "@/lib/prisma";
 import { formatJalali } from "@/lib/jalali";
 import { APPROVAL_STATUS } from "@/lib/status-labels";
 import { cn } from "@/lib/utils";
+import { getMediaUrl } from "@/lib/media";
 import ProductCommentActions from "@/components/admin/ProductCommentActions";
 
 export const metadata: Metadata = {
@@ -30,12 +32,16 @@ export default async function AdminProductCommentsPage({
 
   const [comments, pendingCount] = await Promise.all([
     prisma.productComment.findMany({
-      where: status === "ALL" ? {} : { status },
+      where: { deletedAt: null, ...(status === "ALL" ? {} : { status }) },
       orderBy: { createdAt: "desc" },
-      include: { product: { select: { name: true, slug: true } }, user: { select: { name: true, email: true } } },
+      include: {
+        product: { select: { name: true, slug: true } },
+        user: { select: { name: true, email: true } },
+        images: true,
+      },
       take: 200,
     }),
-    prisma.productComment.count({ where: { status: "PENDING" } }),
+    prisma.productComment.count({ where: { status: "PENDING", deletedAt: null } }),
   ]);
 
   return (
@@ -101,6 +107,21 @@ export default async function AdminProductCommentsPage({
                       <p className="mt-1 text-xs text-foreground/50">امتیاز: {comment.rating} از ۵</p>
                     )}
                     <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground/75">{comment.text}</p>
+                    {comment.images.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {comment.images.map((img) => (
+                          <a
+                            key={img.id}
+                            href={getMediaUrl(img.url)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative block h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-foreground/10"
+                          >
+                            <Image src={getMediaUrl(img.url)} alt={img.filename} fill sizes="64px" className="object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
                     <p className="mt-2 text-xs text-foreground/40">{formatJalali(comment.createdAt)}</p>
                   </div>
                   <ProductCommentActions commentId={comment.id} commentLabel={authorLabel} status={comment.status} />

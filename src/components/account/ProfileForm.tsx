@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
+import NationalIdInquiryField, { type InquiredCompany } from "@/components/NationalIdInquiryField";
 import { useToast } from "@/components/ToastProvider";
 import FormErrorBanner from "@/components/ui/FormErrorBanner";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
@@ -20,7 +21,7 @@ type ProfileFormProps = {
   initialAddress: string;
   initialAvatarUrl: string;
   initialCompanyName: string;
-  initialEconomicCode: string;
+  initialNationalId: string;
 };
 
 export default function ProfileForm({
@@ -33,7 +34,7 @@ export default function ProfileForm({
   initialAddress,
   initialAvatarUrl,
   initialCompanyName,
-  initialEconomicCode,
+  initialNationalId,
 }: ProfileFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
@@ -44,7 +45,7 @@ export default function ProfileForm({
   const [address, setAddress] = useState(initialAddress);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [companyName, setCompanyName] = useState(initialCompanyName);
-  const [economicCode, setEconomicCode] = useState(initialEconomicCode);
+  const [nationalId, setNationalId] = useState(initialNationalId);
   const [saving, setSaving] = useState(false);
   // Field-level problems (invalid email/phone, checked before the request
   // even goes out) stay on the toast below — this is only for the request
@@ -54,6 +55,16 @@ export default function ProfileForm({
 
   const isCustomer = role === "CUSTOMER";
   const isLegalCustomer = isCustomer && customerType === "LEGAL";
+
+  // Convenience only, never overwrites what the customer already typed —
+  // if `address` is already non-empty this is a no-op. Built from
+  // province+city+address since the registry keeps them as separate
+  // fields but this form has just one free-text address box.
+  const fillAddressFromRegistry = (company: InquiredCompany) => {
+    if (address.trim()) return;
+    const parts = [company.province, company.city, company.address].filter(Boolean);
+    if (parts.length > 0) setAddress(parts.join("، "));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +90,7 @@ export default function ProfileForm({
       res = await fetch("/api/account/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, alternatePhone, address, avatarUrl, companyName, economicCode }),
+        body: JSON.stringify({ name, phone, email, alternatePhone, address, avatarUrl, companyName, nationalId }),
       });
     } catch {
       setSaving(false);
@@ -166,15 +177,7 @@ export default function ProfileForm({
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام شرکت</label>
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={inputClass} />
           </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground/80">کد اقتصادی</label>
-            <input
-              dir="ltr"
-              value={economicCode}
-              onChange={(e) => setEconomicCode(e.target.value)}
-              className={inputClass}
-            />
-          </div>
+          <NationalIdInquiryField value={nationalId} onChange={setNationalId} onVerified={fillAddressFromRegistry} />
         </div>
       )}
 

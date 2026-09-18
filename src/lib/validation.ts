@@ -4,6 +4,15 @@ export function isValidEmail(email: string): boolean {
   return EMAIL_RE.test(email);
 }
 
+// Optional handle (register step 2) — kept ASCII-only (Latin letters/digits/
+// underscore) since it's not displayed anywhere yet and may later back a
+// URL-safe profile slug; a bare/empty string is valid (the field is optional).
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,30}$/;
+
+export function isValidUsername(username: string): boolean {
+  return username === "" || USERNAME_RE.test(username);
+}
+
 const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
 const ARABIC_INDIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
 

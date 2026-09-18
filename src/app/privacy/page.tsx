@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLegalPageHtml } from "@/lib/site-content";
+import { getLegalPageMeta } from "@/lib/site-content";
+import { formatJalaliMonthYear } from "@/lib/jalali";
 import ThemedProse from "@/components/ui/ThemedProse";
 
 export const metadata: Metadata = {
@@ -9,21 +10,17 @@ export const metadata: Metadata = {
 };
 
 export default async function PrivacyPage() {
-  const html = await getLegalPageHtml("privacy");
+  const { html, heading, updatedAt } = await getLegalPageMeta("privacy");
 
   return (
     <section className="relative pb-20 pt-24 sm:pb-28 sm:pt-28">
       <div className="container">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="text-sm font-semibold text-accent-400">
-            حریم خصوصی
-          </span>
-          <h1 className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl">
-            سیاست حریم خصوصی
-          </h1>
-          <p className="mt-4 leading-7 text-foreground/70">
-            آخرین به‌روزرسانی: ۱۳ مرداد ۱۴۰۵
-          </p>
+          <span className="text-sm font-semibold text-accent-400">{heading.eyebrow}</span>
+          <h1 className="mt-3 text-balance text-3xl font-bold leading-tight sm:text-4xl">{heading.heading}</h1>
+          {updatedAt && (
+            <p className="mt-4 leading-7 text-foreground/70">آخرین به‌روزرسانی: {formatJalaliMonthYear(updatedAt)}</p>
+          )}
         </div>
 
         <ThemedProse

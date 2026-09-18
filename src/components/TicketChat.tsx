@@ -20,6 +20,8 @@ import CannedResponsePicker from "@/components/admin/CannedResponsePicker";
 import MediaPickerModal from "@/components/MediaPickerModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
 
 export type ChatAttachment = {
   id: string;
@@ -223,6 +225,11 @@ function MessageMenu({
   forceVisible: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  // DropdownMenu.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen} dir="rtl">
@@ -244,7 +251,11 @@ function MessageMenu({
           align="start"
           sideOffset={4}
           collisionPadding={8}
-          className="z-50 w-36 overflow-hidden rounded-xl border border-foreground/10 bg-background p-1 shadow-2xl"
+          className={cn(
+            "z-50 w-36 overflow-hidden rounded-xl border border-foreground/10 bg-background p-1 shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           {onDownload && (
             <DropdownMenu.Item

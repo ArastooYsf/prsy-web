@@ -12,16 +12,11 @@ import { CATEGORY_META, CategoryBadge } from "@/components/admin/log-category-me
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import type { LogFileSummary } from "@/lib/logger";
-import { ALL_LOG_CATEGORIES, type LogCategory } from "@/lib/log-types";
+import { ALL_LOG_CATEGORIES, PERMANENTLY_LOCKED_CATEGORIES, type LogCategory } from "@/lib/log-types";
 
 type LogsExplorerProps = {
   files: LogFileSummary[];
 };
-
-// "این دسته همیشه از لحظه‌ی ساخت قفل است" — shown in the unlock-confirm
-// dialog for these two, since opening their lock removes a guarantee the
-// system gave them automatically, not one an admin set by hand.
-const ALWAYS_LOCKED_BY_DEFAULT: readonly LogCategory[] = ["crash", "security"];
 
 // A busy-state key that can never collide with a real filename (all real
 // ones end in ".log"), so one `downloading` atom can track either a
@@ -135,9 +130,15 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
   };
 
   // Locking is safe and reversible — do it immediately. Unlocking removes a
-  // protection (for crash/security, one the system set automatically), so
-  // it goes through a confirm dialog first instead of firing on one click.
+  // protection, so it goes through a confirm dialog first instead of firing
+  // on one click. crash/access/security can't be unlocked at all — the
+  // button for those is rendered disabled (see the lock-button JSX below),
+  // but this guard exists too since it's the actual click handler: even a
+  // stray call here (e.g. a keyboard event bypassing the disabled attribute)
+  // can't open the dialog for a permanently-locked file. The real,
+  // unbypassable rejection is still src/lib/logger.ts's setLogFileLocked.
   const handleLockClick = (f: LogFileSummary) => {
+    if (PERMANENTLY_LOCKED_CATEGORIES.includes(f.category)) return;
     if (f.locked) {
       setUnlockTarget(f);
     } else {
@@ -300,12 +301,18 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
                     <DownloadButton filename={f.filename} downloading={downloading === f.filename} onDownload={downloadFile} />
                     <button
                       type="button"
-                      disabled={togglingLock === f.filename}
+                      disabled={togglingLock === f.filename || PERMANENTLY_LOCKED_CATEGORIES.includes(f.category)}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLockClick(f);
                       }}
-                      aria-label={f.locked ? "باز کردن قفل فایل" : "قفل کردن فایل"}
+                      aria-label={
+                        PERMANENTLY_LOCKED_CATEGORIES.includes(f.category)
+                          ? "این فایل همیشه قفل است و قابل باز شدن نیست"
+                          : f.locked
+                            ? "باز کردن قفل فایل"
+                            : "قفل کردن فایل"
+                      }
                       className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                         f.locked
                           ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
@@ -360,9 +367,15 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
                         type="button"
-                        disabled={togglingLock === f.filename}
+                        disabled={togglingLock === f.filename || PERMANENTLY_LOCKED_CATEGORIES.includes(f.category)}
                         onClick={() => handleLockClick(f)}
-                        aria-label={f.locked ? "باز کردن قفل فایل" : "قفل کردن فایل"}
+                        aria-label={
+                          PERMANENTLY_LOCKED_CATEGORIES.includes(f.category)
+                            ? "این فایل همیشه قفل است و قابل باز شدن نیست"
+                            : f.locked
+                              ? "باز کردن قفل فایل"
+                              : "قفل کردن فایل"
+                        }
                         className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                           f.locked
                             ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
@@ -389,11 +402,10 @@ export default function LogsExplorer({ files }: LogsExplorerProps) {
         title="باز کردن قفل فایل؟"
         message={
           unlockTarget
-            ? `فایل «${formatFileDateTime(dateTimeKeyFromFilename(unlockTarget.filename, unlockTarget.category))}» (${CATEGORY_META[unlockTarget.category].label}) پس از باز شدن قفل، در صورت پر شدن حجم دایرکتوری لاگ‌ها ممکن است به‌صورت خودکار حذف شود.${
-                ALWAYS_LOCKED_BY_DEFAULT.includes(unlockTarget.category)
-                  ? " این فایل جزو دسته‌هایی است که همیشه از لحظه‌ی ساخت به‌صورت خودکار قفل می‌شوند — باز کردن دستی این محافظت را برای همین فایل برمی‌دارد."
-                  : ""
-              }`
+            ? // Only reachable for general/important/notification — crash/access/security
+              // never reach setUnlockTarget in the first place (see handleLockClick and
+              // the disabled lock button above), so this message never needs to cover them.
+              `فایل «${formatFileDateTime(dateTimeKeyFromFilename(unlockTarget.filename, unlockTarget.category))}» (${CATEGORY_META[unlockTarget.category].label}) پس از باز شدن قفل، در صورت پر شدن حجم دایرکتوری لاگ‌ها ممکن است به‌صورت خودکار حذف شود.`
             : ""
         }
         confirmLabel="باز کردن قفل"

@@ -14,6 +14,12 @@ export function formatGregorian(date: string | Date): string {
   return gregorianFormatter.format(new Date(date));
 }
 
+/** "مرداد ۱۴۰۵" — month name + year, no day. Used for a page's "last updated" line, where the exact day is noise. */
+export function formatJalaliMonthYear(date: string | Date): string {
+  const { jy, jm } = toJalaali(new Date(date));
+  return `${JALALI_MONTHS[jm - 1]} ${toPersianDigits(String(jy))}`;
+}
+
 export const JALALI_MONTHS = [
   "فروردین",
   "اردیبهشت",

@@ -11,6 +11,15 @@ export type LogCategory = (typeof DAILY_CATEGORIES)[number] | (typeof EVENT_CATE
 
 export const ALL_LOG_CATEGORIES: readonly LogCategory[] = [...DAILY_CATEGORIES, ...EVENT_CATEGORIES];
 
+// Categories that are ALWAYS locked from the moment their file is created
+// and can never be unlocked afterward — by an admin through the UI, through
+// a direct API call, or through any future code path. This is the actual
+// security boundary (enforced in logger.ts: setLogFileLocked refuses to
+// remove the lock for these, and enforceRetention refuses to delete them
+// regardless of what the mutable lock sidecar file says) — not a UI default
+// that a confirm dialog can talk someone past.
+export const PERMANENTLY_LOCKED_CATEGORIES: readonly LogCategory[] = ["crash", "access", "security"];
+
 export type LogAction =
   | "create"
   | "update"
@@ -22,7 +31,12 @@ export type LogAction =
   | "unauthorized_access"
   | "crash"
   | "notification_sent"
-  | "notification_failed";
+  | "notification_failed"
+  | "national_id_inquiry_success"
+  | "national_id_inquiry_failed"
+  | "integration_run_success"
+  | "integration_run_failed"
+  | "integration_test_connection";
 
 export type LogActor = {
   id: string;
@@ -74,4 +88,9 @@ export const ACTION_LABELS_FA: Record<LogAction, string> = {
   crash: "با خطای سیستمی مواجه شد",
   notification_sent: "اعلان ارسال کرد",
   notification_failed: "ارسال اعلان ناموفق بود",
+  national_id_inquiry_success: "استعلام شناسه ملی موفق بود",
+  national_id_inquiry_failed: "استعلام شناسه ملی ناموفق بود",
+  integration_run_success: "سرویس یکپارچه‌سازی را اجرا کرد",
+  integration_run_failed: "اجرای سرویس یکپارچه‌سازی ناموفق بود",
+  integration_test_connection: "اتصال یکپارچه‌سازی را تست کرد",
 };

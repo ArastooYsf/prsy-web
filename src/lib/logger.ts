@@ -1,4 +1,4 @@
-import { appendFile, mkdir, readdir, readFile, rm, stat, writeFile } from "fs/promises";
+import { appendFile, mkdir, readdir, readFile, rm, stat, statfs, writeFile } from "fs/promises";
 import os from "os";
 import path from "path";
 import { toJalaali } from "jalaali-js";
@@ -8,6 +8,7 @@ import {
   CATEGORY_LABELS_FA,
   DAILY_CATEGORIES,
   EVENT_CATEGORIES,
+  PERMANENTLY_LOCKED_CATEGORIES,
   type LogAction,
   type LogActor,
   type LogCategory,
@@ -18,7 +19,7 @@ import {
 // Re-exported so existing server-side imports from "@/lib/logger" keep
 // working unchanged — see log-types.ts for why these live in their own
 // Node-free module in the first place.
-export { ACTION_LABELS_FA, DAILY_CATEGORIES, EVENT_CATEGORIES };
+export { ACTION_LABELS_FA, DAILY_CATEGORIES, EVENT_CATEGORIES, PERMANENTLY_LOCKED_CATEGORIES };
 export type { LogAction, LogActor, LogCategory, LogEntry, LogTarget };
 
 // Deliberately OUTSIDE the app's own checked-out directory (process.cwd()):
@@ -77,6 +78,10 @@ function isEventCategory(category: LogCategory): boolean {
   return (EVENT_CATEGORIES as readonly string[]).includes(category);
 }
 
+function isPermanentlyLockedCategory(category: LogCategory): boolean {
+  return (PERMANENTLY_LOCKED_CATEGORIES as readonly string[]).includes(category);
+}
+
 // How close together (by the target file's last-write time) two crash/security
 // events have to be to share one file instead of each getting its own.
 const EVENT_GROUPING_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
@@ -93,6 +98,11 @@ const ACTION_DEFAULT_CATEGORY: Partial<Record<LogAction, LogCategory>> = {
   crash: "crash",
   notification_sent: "notification",
   notification_failed: "notification",
+  national_id_inquiry_success: "general",
+  national_id_inquiry_failed: "general",
+  integration_run_success: "general",
+  integration_run_failed: "general",
+  integration_test_connection: "general",
 };
 
 export function actorFromSession(session: {
@@ -198,11 +208,15 @@ export async function logEvent(
 
     await appendFile(path.join(LOG_DIR, filename), `${JSON.stringify(full)}\n`, "utf8");
 
-    // crash/security files are ALWAYS locked, unconditionally — not just
-    // "locked unless told otherwise". Re-locking an already-locked file is
-    // a harmless no-op (rewrites the same sidecar), so this line alone is
+    // crash/access/security files are ALWAYS locked, unconditionally — not
+    // just "locked unless told otherwise". Re-locking an already-locked file
+    // is a harmless no-op (rewrites the same sidecar), so this line alone is
     // the whole guarantee, independent of whatever `options.locked` says.
-    if (eventDriven || options?.locked) {
+    // (eventDriven is kept as its own check even though it's now a subset of
+    // isPermanentlyLockedCategory, since it's what decides the *filename*
+    // strategy above and the two concepts should stay readable as separate
+    // decisions even where they currently overlap.)
+    if (eventDriven || isPermanentlyLockedCategory(category) || options?.locked) {
       await setLogFileLocked(filename, true);
     }
 
@@ -221,8 +235,24 @@ export async function isLogFileLocked(filename: string): Promise<boolean> {
   }
 }
 
+// THE enforcement point for "crash/access/security can never be unlocked":
+// every caller that wants to open a lock — the admin API route today, and
+// anything else in the future — goes through this one function, and this is
+// the only place in the module that ever removes a `.lock.json` sidecar. A
+// category check here (derived from the filename itself, not from any
+// caller-supplied or previously-stored flag) is therefore the whole
+// guarantee: there is no other code path left that could unlock one of
+// these files, on purpose or by a future bug.
 export async function setLogFileLocked(filename: string, locked: boolean): Promise<void> {
   if (!isValidLogFilename(filename)) throw new Error("invalid log filename");
+
+  if (!locked) {
+    const category = categoryFromFilename(filename);
+    if (category && isPermanentlyLockedCategory(category)) {
+      throw new Error(`فایل‌های دسته‌ی «${CATEGORY_LABELS_FA[category]}» همیشه قفل هستند و قابل باز شدن نیستند.`);
+    }
+  }
+
   await mkdir(LOG_DIR, { recursive: true });
   const lockPath = lockFilePath(filename);
   if (locked) {
@@ -249,35 +279,117 @@ async function statAllLogFiles(): Promise<RawFileStat[]> {
 }
 
 /**
+ * Locks any existing file in a permanently-locked category (crash/access/
+ * security) that isn't locked yet — e.g. an access-*.log file written
+ * before this guarantee existed, or one whose `.lock.json` sidecar was lost
+ * some other way. Self-heals on every call rather than being a one-time
+ * migration script, so the guarantee holds for old data too, not just files
+ * created after this code shipped. Called from enforceRetention (i.e. after
+ * every logEvent write) before that function's deletion pass runs, so a
+ * newly-unlocked-on-disk file can never be caught mid-window between "should
+ * be locked" and "actually is."
+ */
+async function backfillPermanentLocks(files: RawFileStat[]): Promise<void> {
+  await Promise.all(
+    files
+      .filter((f) => {
+        if (f.locked) return false;
+        const category = categoryFromFilename(f.filename);
+        return category !== null && isPermanentlyLockedCategory(category);
+      })
+      .map((f) => setLogFileLocked(f.filename, true)),
+  );
+}
+
+/**
  * If the log directory exceeds LOG_DIR_SIZE_CAP_BYTES, deletes the oldest
- * *unlocked* files (by real last-write time — filenames no longer share one
- * sortable shape now that each category has its own prefix) until back
- * under the cap.
+ * *unlocked, non-permanently-locked-category* files (by real last-write
+ * time — filenames no longer share one sortable shape now that each
+ * category has its own prefix) until back under the cap.
  *
- * Locked files (including the always-locked crash/security ones) are never
- * deleted, full stop — this is the one and only place this module deletes a
- * log file, and every deletion here re-checks `f.locked` immediately before
- * the `rm` call, so there is no code path, automatic or manual, that can
- * remove a locked file. If only locked files remain, the cap can stay
- * exceeded indefinitely — that is the intended trade-off, not a bug.
+ * This is the one and only place this module deletes a log file, and every
+ * deletion here re-checks two independent things immediately before the
+ * `rm` call: the mutable `f.locked` flag, AND the file's category against
+ * PERMANENTLY_LOCKED_CATEGORIES (crash/access/security) — derived straight
+ * from the filename, not from any flag that could be missing, stale, or
+ * tampered with. Either one being true skips the file. So even in a
+ * hypothetical where the `.lock.json` sidecar was lost (disk corruption, a
+ * bug, manual filesystem tampering outside this app entirely), a
+ * crash/access/security file is *still* never deleted here — the category
+ * check alone is a complete, independent guarantee, not just a backstop for
+ * the lock flag. If only protected files remain, the cap can stay exceeded
+ * indefinitely — that is the intended trade-off, not a bug.
  */
 export async function enforceRetention(capBytes: number = LOG_DIR_SIZE_CAP_BYTES): Promise<string[]> {
   const files = await statAllLogFiles();
+  await backfillPermanentLocks(files);
+
   let total = files.reduce((sum, f) => sum + f.size, 0);
   if (total <= capBytes) return [];
 
+  // No need to re-stat after backfillPermanentLocks: the deletion loop below
+  // independently re-derives each file's category from its filename and
+  // skips permanently-locked categories regardless of `f.locked`, so a
+  // stale `locked: false` from before the backfill can never cause a wrongful
+  // delete — the category check alone already covers it.
   const oldestFirst = [...files].sort((a, b) => a.mtime.localeCompare(b.mtime));
   const deleted: string[] = [];
 
   for (const f of oldestFirst) {
     if (total <= capBytes) break;
     if (f.locked) continue;
+    const category = categoryFromFilename(f.filename);
+    if (category && isPermanentlyLockedCategory(category)) continue;
     await rm(path.join(LOG_DIR, f.filename), { force: true });
     total -= f.size;
     deleted.push(f.filename);
   }
 
   return deleted;
+}
+
+export type LogStorageUsage = {
+  /** Total bytes across every log file (all categories combined). */
+  logDirBytes: number;
+  /**
+   * Bytes actually used on the volume LOG_DIR lives on, and that volume's
+   * total capacity — from `fs.statfs`, i.e. the real disk/quota the log
+   * directory shares with everything else on that filesystem (which, per
+   * LOG_DIR's own placement outside the app's checked-out tree, is meant to
+   * be the site's persistent-data volume, not some unrelated system disk).
+   * `null` when statfs isn't available on this platform/filesystem — the
+   * caller falls back to LOG_DIR_SIZE_CAP_BYTES as the denominator instead.
+   */
+  diskTotalBytes: number | null;
+  diskUsedBytes: number | null;
+  /** logDirBytes / diskTotalBytes, as a 0-100 percentage; null if diskTotalBytes is null. */
+  percentOfDisk: number | null;
+  /** logDirBytes / LOG_DIR_SIZE_CAP_BYTES, as a 0-100 percentage — always available, used as the fallback denominator when statfs isn't. */
+  percentOfLogCap: number;
+};
+
+/**
+ * Powers the storage bar at the top of the admin logs page. Reads real disk
+ * usage via statfs when the platform supports it; degrades to "% of the
+ * log system's own configured cap" otherwise, rather than failing outright —
+ * this is a dashboard number, not a safety mechanism (retention/lock
+ * enforcement above never depends on this).
+ */
+export async function getLogStorageUsage(): Promise<LogStorageUsage> {
+  const files = await statAllLogFiles();
+  const logDirBytes = files.reduce((sum, f) => sum + f.size, 0);
+  const percentOfLogCap = Math.min(100, (logDirBytes / LOG_DIR_SIZE_CAP_BYTES) * 100);
+
+  try {
+    const fsStats = await statfs(LOG_DIR);
+    const diskTotalBytes = fsStats.blocks * fsStats.bsize;
+    const diskFreeBytes = fsStats.bfree * fsStats.bsize;
+    const diskUsedBytes = diskTotalBytes - diskFreeBytes;
+    const percentOfDisk = diskTotalBytes > 0 ? Math.min(100, (logDirBytes / diskTotalBytes) * 100) : null;
+    return { logDirBytes, diskTotalBytes, diskUsedBytes, percentOfDisk, percentOfLogCap };
+  } catch {
+    return { logDirBytes, diskTotalBytes: null, diskUsedBytes: null, percentOfDisk: null, percentOfLogCap };
+  }
 }
 
 export async function readLogEntries(filename: string): Promise<LogEntry[]> {

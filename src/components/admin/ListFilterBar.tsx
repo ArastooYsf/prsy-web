@@ -122,7 +122,7 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
       ))}
 
       {dates.map((d, i) => (
-        <div key={d.key} className="w-36">
+        <div key={d.key} className="w-full sm:w-36">
           <DateInput
             label={d.label}
             value={searchParams.get(d.key) ?? ""}

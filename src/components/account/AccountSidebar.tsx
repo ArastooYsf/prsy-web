@@ -28,6 +28,7 @@ import {
   LayoutTemplate,
   History,
   Home,
+  Plug,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,6 +56,7 @@ const ADMIN_LINKS: { href: string; label: string; icon: LucideIcon; roles: strin
   { href: "/account/admin/blog", label: "وبلاگ", icon: Newspaper, roles: ["ADMIN"] },
   { href: "/account/admin/content", label: "محتوای سایت", icon: LayoutTemplate, roles: ["ADMIN"] },
   { href: "/account/admin/logs", label: "گزارش رویدادها", icon: History, roles: ["ADMIN"] },
+  { href: "/account/admin/integrations", label: "یکپارچه‌سازی‌ها", icon: Plug, roles: ["ADMIN"] },
 ];
 
 const EXACT_MATCH_HREFS = new Set(["/account", "/account/admin"]);
@@ -159,10 +161,10 @@ function SidebarContents({
           onNavigate={onNavigate}
         />
         <NavItem
-          href="/account/profile"
+          href="/account/settings"
           label="تنظیمات"
           Icon={Settings}
-          active={false}
+          active={isLinkActive(pathname, "/account/settings")}
           collapsed={collapsed}
           onNavigate={onNavigate}
         />

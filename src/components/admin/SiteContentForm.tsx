@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import MediaPicker from "@/components/admin/MediaPicker";
-import SimpleRichTextEditor from "@/components/admin/SimpleRichTextEditor";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
+import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
 import type { HeroSlideContent } from "@/lib/site-content-defaults";
 
 const inputClass =
@@ -28,6 +29,7 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
   const router = useRouter();
   const { showToast } = useToast();
   const [heroSlides, setHeroSlides] = useState<HeroSlideContent[]>(initialHeroSlides);
+  const newestSlideRef = useScrollNewestIntoView<HTMLDivElement>(heroSlides.length);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ index: number } | null>(null);
 
@@ -79,7 +81,11 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
         </div>
         <div className="space-y-6">
           {heroSlides.map((slide, i) => (
-            <div key={slide.id} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
+            <div
+              key={slide.id}
+              ref={i === heroSlides.length - 1 ? newestSlideRef : undefined}
+              className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5"
+            >
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-semibold">اسلاید {i + 1}</p>
                 <button
@@ -97,7 +103,7 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
                 </div>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-foreground/80">توضیحات</label>
-                  <SimpleRichTextEditor value={slide.description} onChange={(html) => updateSlide(i, { description: html })} />
+                  <RichTextEditor value={slide.description} onChange={(html) => updateSlide(i, { description: html })} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>

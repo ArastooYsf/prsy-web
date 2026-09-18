@@ -51,6 +51,49 @@ async function trySendSms(to: string, message: string, purpose: string): Promise
 type TicketRef = { id: string; subject: string };
 type UserRef = { id: string; email: string; phone?: string | null; name?: string | null };
 
+// Per-user notification preferences (src/app/account/settings) — fetched
+// fresh here rather than threaded through every call site's UserRef, since
+// notify* calls aren't a hot path and callers (ticket reply route, order
+// status route, contract-expiry cron) would otherwise all need to carry
+// these six fields around just to pass them through. In-app is deliberately
+// NOT gated by any of these — it always fires; only email/SMS are opt-out.
+type NotifyPrefs = {
+  notifyEmail: boolean;
+  notifySms: boolean;
+  notifyTicketReply: boolean;
+  notifyOrderStatus: boolean;
+  notifyContractExpiry: boolean;
+  notifyStaffNewMessage: boolean;
+};
+
+async function getNotifyPrefs(userId: string): Promise<NotifyPrefs> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      notifyEmail: true,
+      notifySms: true,
+      notifyTicketReply: true,
+      notifyOrderStatus: true,
+      notifyContractExpiry: true,
+      notifyStaffNewMessage: true,
+    },
+  });
+  // A deleted/missing user (race with account deletion) falls back to "on"
+  // — the send will fail harmlessly against a stale email/phone anyway, and
+  // silently dropping a notification because of a lookup miss is the wrong
+  // failure mode here.
+  return (
+    user ?? {
+      notifyEmail: true,
+      notifySms: true,
+      notifyTicketReply: true,
+      notifyOrderStatus: true,
+      notifyContractExpiry: true,
+      notifyStaffNewMessage: true,
+    }
+  );
+}
+
 /** Staff replied to a customer's ticket — notify the customer by email + (if a phone is on file) SMS, plus an in-app bell entry. */
 export async function notifyTicketReply({
   ticket,
@@ -67,9 +110,13 @@ export async function notifyTicketReply({
 
   await createNotification({ userId: customer.id, title, message: summary, link }).catch(() => {});
 
-  await trySendEmail(customer.email, title, ticketReplyEmail({ subject: ticket.subject, summary, link }), "پاسخ تیکت");
+  const prefs = await getNotifyPrefs(customer.id);
 
-  if (customer.phone) {
+  if (prefs.notifyEmail && prefs.notifyTicketReply) {
+    await trySendEmail(customer.email, title, ticketReplyEmail({ subject: ticket.subject, summary, link }), "پاسخ تیکت");
+  }
+
+  if (customer.phone && prefs.notifySms && prefs.notifyTicketReply) {
     const shortSubject = ticket.subject.length > SMS_SUBJECT_MAX ? `${ticket.subject.slice(0, SMS_SUBJECT_MAX)}…` : ticket.subject;
     await trySendSms(customer.phone, `یاشار: به تیکت «${shortSubject}» پاسخ داده شد.\n${link}`, "پاسخ تیکت");
   }
@@ -79,7 +126,7 @@ export async function notifyTicketReply({
 export async function notifyStaffNewCustomerMessage({ ticket, customer }: { ticket: TicketRef; customer: UserRef }): Promise<void> {
   const staff = await prisma.user.findMany({
     where: { role: { in: ["ADMIN", "SUPPORT"] }, deletedAt: null },
-    select: { id: true, email: true },
+    select: { id: true, email: true, notifyEmail: true, notifyStaffNewMessage: true },
   });
   if (staff.length === 0) return;
 
@@ -91,7 +138,9 @@ export async function notifyStaffNewCustomerMessage({ ticket, customer }: { tick
   await Promise.all(
     staff.map(async (member) => {
       await createNotification({ userId: member.id, title, message, link }).catch(() => {});
-      await trySendEmail(member.email, title, staffNewMessageEmail({ subject: ticket.subject, customerName, link }), "پیام جدید مشتری");
+      if (member.notifyEmail && member.notifyStaffNewMessage) {
+        await trySendEmail(member.email, title, staffNewMessageEmail({ subject: ticket.subject, customerName, link }), "پیام جدید مشتری");
+      }
     }),
   );
 }
@@ -112,7 +161,10 @@ export async function notifyOrderStatusChange({
   const message = `وضعیت جدید: ${statusLabel}`;
 
   await createNotification({ userId: customer.id, title, message, link }).catch(() => {});
-  await trySendEmail(customer.email, title, orderStatusEmail({ orderNumber: order.orderNumber, statusLabel, link }), "تغییر وضعیت سفارش");
+  const prefs = await getNotifyPrefs(customer.id);
+  if (prefs.notifyEmail && prefs.notifyOrderStatus) {
+    await trySendEmail(customer.email, title, orderStatusEmail({ orderNumber: order.orderNumber, statusLabel, link }), "تغییر وضعیت سفارش");
+  }
 }
 
 /** A contract is within 7 days of its end date — notify the customer by email + in-app (no SMS, per spec). Caller is responsible for the once-only `expiryReminderSentAt` guard. */
@@ -129,5 +181,8 @@ export async function notifyContractExpiry({
   const message = `این قرارداد در تاریخ ${endDateLabel} به پایان می‌رسد.`;
 
   await createNotification({ userId: customer.id, title, message, link }).catch(() => {});
-  await trySendEmail(customer.email, title, contractExpiryEmail({ title: contract.title, endDateLabel, link }), "یادآوری انقضای قرارداد");
+  const prefs = await getNotifyPrefs(customer.id);
+  if (prefs.notifyEmail && prefs.notifyContractExpiry) {
+    await trySendEmail(customer.email, title, contractExpiryEmail({ title: contract.title, endDateLabel, link }), "یادآوری انقضای قرارداد");
+  }
 }

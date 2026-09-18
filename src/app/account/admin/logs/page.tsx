@@ -3,13 +3,14 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { History } from "lucide-react";
 import { authOptions } from "@/lib/auth";
-import { listLogFiles } from "@/lib/logger";
+import { listLogFiles, getLogStorageUsage } from "@/lib/logger";
 import { getLogEventTrend, summarizeCategoryTrend } from "@/lib/log-stats";
 import { getUptimeStats, getUptimeSegments } from "@/lib/uptime";
 import { getLighthouseHistory } from "@/lib/lighthouse";
 import { ALL_LOG_CATEGORIES } from "@/lib/log-types";
 import LogsExplorer from "@/components/admin/LogsExplorer";
 import LogsDashboard from "@/components/admin/LogsDashboard";
+import LogsStorageBar from "@/components/admin/LogsStorageBar";
 
 export const metadata: Metadata = {
   title: "گزارش رویدادها",
@@ -27,11 +28,12 @@ export default async function AdminLogsPage() {
   // Only the stats/trend calls actually need `files` — kick that off
   // alongside the independent reads (uptime, uptime segments, lighthouse
   // history) instead of serializing everything behind it.
-  const [files, uptime, uptimeSegmentsResult, lighthouseHistory] = await Promise.all([
+  const [files, uptime, uptimeSegmentsResult, lighthouseHistory, storageUsage] = await Promise.all([
     listLogFiles(),
     getUptimeStats(),
     getUptimeSegments(),
     getLighthouseHistory(),
+    getLogStorageUsage(),
   ]);
   // One read+bucket pass across every category (getLogEventTrend), not
   // three overlapping ones — crash/important/security files would otherwise
@@ -49,10 +51,13 @@ export default async function AdminLogsPage() {
         گزارش رویدادها
       </h2>
       <p className="mb-6 text-sm text-foreground/50">
-        رویدادهای عمومی، مهم، دسترسی و اعلان هرکدام در یک فایل روزانه جداگانه (بر اساس تاریخ شمسی) ثبت می‌شوند. فایل‌های
-        امنیتی و کرش زمان‌بندی روزانه ندارند — فقط وقتی رویدادی واقعاً رخ بدهد ساخته می‌شوند، از همان لحظه قفل هستند و
-        هیچ فایل قفل‌شده‌ای — نه دستی و نه خودکار — حذف نمی‌شود. برای مشاهده‌ی جزئیات رویدادهای هر فایل، روی آن کلیک کنید.
+        رویدادهای عمومی، مهم و اعلان هرکدام در یک فایل روزانه جداگانه (بر اساس تاریخ شمسی) ثبت می‌شوند. فایل‌های
+        دسترسی، امنیتی و کرش از همان لحظه‌ی ساخت همیشه قفل‌اند — نه از طریق این پنل، نه با تماس مستقیم با API، و نه در
+        صورت پر شدن فضای دایرکتوری لاگ‌ها، هیچ‌کدام تحت هیچ شرایطی باز یا حذف نمی‌شوند؛ این تضمین در کد enforce شده، نه
+        فقط در همین رابط کاربری. برای مشاهده‌ی جزئیات رویدادهای هر فایل، روی آن کلیک کنید.
       </p>
+
+      <LogsStorageBar usage={storageUsage} />
 
       <LogsDashboard
         uptime={uptime}

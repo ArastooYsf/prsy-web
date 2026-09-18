@@ -3,29 +3,53 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
+import NationalIdInquiryField from "@/components/NationalIdInquiryField";
 import { isValidEmail, isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
+type ExistingCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  alternatePhone: string;
+  address: string;
+  customerType: "INDIVIDUAL" | "LEGAL";
+  companyName: string;
+  nationalId: string;
+  notes: string;
+};
+
 type CustomerFormProps = {
   submitLabel: string;
   notesLabel: string;
   notesPlaceholder: string;
+  mode?: "create" | "edit";
+  customer?: ExistingCustomer;
 };
 
-export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder }: CustomerFormProps) {
+export default function CustomerForm({
+  submitLabel,
+  notesLabel,
+  notesPlaceholder,
+  mode = "create",
+  customer,
+}: CustomerFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState(customer?.name ?? "");
+  const [email, setEmail] = useState(customer?.email ?? "");
+  const [phone, setPhone] = useState(customer?.phone ?? "");
+  const [alternatePhone, setAlternatePhone] = useState(customer?.alternatePhone ?? "");
+  const [address, setAddress] = useState(customer?.address ?? "");
   const [password, setPassword] = useState("");
-  const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">("INDIVIDUAL");
-  const [companyName, setCompanyName] = useState("");
-  const [economicCode, setEconomicCode] = useState("");
-  const [notes, setNotes] = useState("");
+  const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">(customer?.customerType ?? "INDIVIDUAL");
+  const [companyName, setCompanyName] = useState(customer?.companyName ?? "");
+  const [nationalId, setNationalId] = useState(customer?.nationalId ?? "");
+  const [notes, setNotes] = useState(customer?.notes ?? "");
   const [saving, setSaving] = useState(false);
 
   const generatePassword = () => {
@@ -35,7 +59,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidEmail(email) || password.length < 8) {
+    if (mode === "create" && (!isValidEmail(email) || password.length < 8)) {
       showToast("ایمیل معتبر الزامی و رمز عبور باید حداقل ۸ کاراکتر باشد.", "error");
       return;
     }
@@ -43,35 +67,59 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
       showToast("شماره تلفن معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
     }
-    if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
-      showToast("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.", "error");
+    if (alternatePhone.trim() && !isValidIranPhone(alternatePhone)) {
+      showToast("شماره تماس جایگزین معتبر نیست.", "error");
+      return;
+    }
+    if (customerType === "LEGAL" && (!companyName.trim() || !nationalId.trim())) {
+      showToast("نام شرکت و شناسه ملی برای مشتری حقوقی الزامی است.", "error");
       return;
     }
 
     setSaving(true);
 
-    const res = await fetch("/api/admin/customers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, password, customerType, companyName, economicCode, notes }),
-    });
+    const res = await fetch(
+      mode === "create" ? "/api/admin/customers" : `/api/admin/customers/${customer!.id}`,
+      {
+        method: mode === "create" ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          alternatePhone,
+          address,
+          password,
+          customerType,
+          companyName,
+          nationalId,
+          notes,
+        }),
+      },
+    );
 
     setSaving(false);
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      showToast(body?.error || "خطا در ثبت مشتری.", "error");
+      showToast(body?.error || (mode === "create" ? "خطا در ثبت مشتری." : "خطا در ذخیره تغییرات."), "error");
       return;
     }
 
-    showToast("مشتری با موفقیت ثبت شد.");
-    setName("");
-    setEmail("");
-    setPhone("");
-    setPassword("");
-    setCompanyName("");
-    setEconomicCode("");
-    setNotes("");
+    if (mode === "create") {
+      showToast("مشتری با موفقیت ثبت شد.");
+      setName("");
+      setEmail("");
+      setPhone("");
+      setAlternatePhone("");
+      setAddress("");
+      setPassword("");
+      setCompanyName("");
+      setNationalId("");
+      setNotes("");
+    } else {
+      showToast("تغییرات مشتری ذخیره شد.");
+    }
     router.refresh();
   };
 
@@ -88,31 +136,53 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
         </div>
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">ایمیل</label>
-        <input dir="ltr" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">تلفن جایگزین</label>
+          <input dir="ltr" value={alternatePhone} onChange={(e) => setAlternatePhone(e.target.value)} className={inputClass} />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">آدرس</label>
+          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
+        </div>
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-foreground/80">رمز عبور اولیه</label>
-        <div className="flex gap-2">
-          <input
-            dir="ltr"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-            placeholder="حداقل ۸ کاراکتر"
-          />
-          <button
-            type="button"
-            onClick={generatePassword}
-            className="shrink-0 rounded-lg border border-foreground/10 px-4 py-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
-          >
-            تولید خودکار
-          </button>
-        </div>
-        <p className="mt-1.5 text-xs text-foreground/40">این رمز را باید خودتان به مشتری اطلاع دهید.</p>
+        <label className="mb-1.5 block text-sm font-medium text-foreground/80">ایمیل</label>
+        {mode === "edit" ? (
+          <>
+            <p dir="ltr" className={`${inputClass} cursor-not-allowed text-foreground/50`}>
+              {email}
+            </p>
+            <p className="mt-1.5 text-xs text-foreground/40">ایمیل از این فرم قابل ویرایش نیست.</p>
+          </>
+        ) : (
+          <input dir="ltr" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+        )}
       </div>
+
+      {mode === "create" && (
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">رمز عبور اولیه</label>
+          <div className="flex gap-2">
+            <input
+              dir="ltr"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+              placeholder="حداقل ۸ کاراکتر"
+            />
+            <button
+              type="button"
+              onClick={generatePassword}
+              className="shrink-0 rounded-lg border border-foreground/10 px-4 py-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            >
+              تولید خودکار
+            </button>
+          </div>
+          <p className="mt-1.5 text-xs text-foreground/40">این رمز را باید خودتان به مشتری اطلاع دهید.</p>
+        </div>
+      )}
 
       <div>
         <p className="mb-1.5 block text-sm font-medium text-foreground/80">نوع مشتری</p>
@@ -148,10 +218,7 @@ export default function CustomerForm({ submitLabel, notesLabel, notesPlaceholder
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام شرکت</label>
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={inputClass} />
           </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground/80">کد اقتصادی / شناسه ملی</label>
-            <input dir="ltr" value={economicCode} onChange={(e) => setEconomicCode(e.target.value)} className={inputClass} />
-          </div>
+          <NationalIdInquiryField value={nationalId} onChange={setNationalId} />
         </div>
       )}
 

@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Trash } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import { toPersianDigits } from "@/lib/format-number";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
 import { useToast } from "@/components/ToastProvider";
+import { scaleIn } from "@/lib/motion";
 import Skeleton from "react-loading-skeleton";
 
 export type MediaAsset = {
@@ -23,7 +25,7 @@ type MediaKind = "image" | "file" | "all";
 
 // Which bucket this picker instance reads/writes — keeps the admin site-content
 // gallery from being polluted by customer ticket attachments (and vice versa).
-export type MediaScope = "SITE_CONTENT" | "TICKET_ATTACHMENT" | "PROFILE_AVATAR" | "CONTRACT_FILE";
+export type MediaScope = "SITE_CONTENT" | "TICKET_ATTACHMENT" | "PROFILE_AVATAR" | "CONTRACT_FILE" | "PRODUCT_COMMENT";
 
 type MediaPickerModalProps = {
   open: boolean;
@@ -193,17 +195,25 @@ export default function MediaPickerModal({
     onClose();
   };
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={onClose}
+        >
+          <motion.div
+            variants={scaleIn}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
+            onClick={(e) => e.stopPropagation()}
+            className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
+          >
         <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
           <h3 className="text-base font-bold">{KIND_LABEL[kind]}</h3>
           <button
@@ -336,24 +346,26 @@ export default function MediaPickerModal({
             </button>
           </div>
         </div>
-      </div>
+          </motion.div>
 
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="حذف از مخزن سایت"
-        message={
-          usageLoading
-            ? "در حال بررسی محل استفاده..."
-            : `مطمئنید می‌خواهید «${deleteTarget?.filename ?? ""}» (${
-                deleteTarget ? formatSize(deleteTarget.size) : ""
-              }) را برای همیشه حذف کنید؟${usageMessage ? `\n\n${usageMessage}` : ""}`
-        }
-        confirmLabel="حذف کن"
-        danger
-        loading={deleting}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
-    </div>
+          <ConfirmDialog
+            open={!!deleteTarget}
+            title="حذف از مخزن سایت"
+            message={
+              usageLoading
+                ? "در حال بررسی محل استفاده..."
+                : `مطمئنید می‌خواهید «${deleteTarget?.filename ?? ""}» (${
+                    deleteTarget ? formatSize(deleteTarget.size) : ""
+                  }) را برای همیشه حذف کنید؟${usageMessage ? `\n\n${usageMessage}` : ""}`
+            }
+            confirmLabel="حذف کن"
+            danger
+            loading={deleting}
+            onConfirm={confirmDelete}
+            onCancel={() => setDeleteTarget(null)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

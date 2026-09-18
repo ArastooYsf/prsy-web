@@ -25,27 +25,57 @@ enum ApprovalStatus {
 }
 
 model User {
-  id                  String         @id @default(cuid())
-  email               String         @unique
-  password            String
-  name                String?
-  phone               String?
-  alternatePhone      String?
-  address             String?
-  avatarUrl           String?
-  role                Role           @default(CUSTOMER)
-  customerType        CustomerType   @default(INDIVIDUAL)
-  companyName         String?
-  economicCode        String?
-  approvalStatus      ApprovalStatus @default(APPROVED)
-  notes               String?        @db.Text
-  failedLoginAttempts Int            @default(0)
-  lockedUntil         DateTime?
-  twoFactorSecret     String?
-  twoFactorEnabled    Boolean        @default(false)
-  deletedAt           DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id                     String         @id @default(cuid())
+  email                  String         @unique
+  password               String
+  name                   String?
+  // Optional handle collected at signup (register step 2) — not used for
+  // login (email still is) or displayed anywhere yet; a unique nullable
+  // column lets multiple users leave it blank without colliding on NULL.
+  username               String?        @unique
+  phone                  String?
+  alternatePhone         String?
+  address                String?
+  avatarUrl              String?
+  role                   Role           @default(CUSTOMER)
+  customerType           CustomerType   @default(INDIVIDUAL)
+  companyName            String?
+  // شناسه ملی (11-digit legal-entity national ID) — renamed from
+  // economicCode, which conflated two distinct Iranian identifiers. This is
+  // the value sent to api.ir's CompanyInfo inquiry (src/lib/integrations/api-ir.ts).
+  nationalId             String?
+  // Result of the LAST server-side api.ir inquiry for nationalId — never
+  // trusted from client input, always re-verified server-side at
+  // registration/profile-save time (see src/app/api/auth/register/route.ts
+  // and src/app/api/account/profile/route.ts). false/null means "not
+  // verified yet or the last attempt failed", not "rejected" — a LEGAL
+  // account is never blocked by this, only flagged for admins to see.
+  nationalIdVerified     Boolean        @default(false)
+  nationalIdOfficialName String?
+  nationalIdActive       Boolean?
+  nationalIdCheckedAt    DateTime?
+  approvalStatus         ApprovalStatus @default(APPROVED)
+  notes                  String?        @db.Text
+  failedLoginAttempts    Int            @default(0)
+  lockedUntil            DateTime?
+  twoFactorSecret        String?
+  twoFactorEnabled       Boolean        @default(false)
+  // Notification preferences (src/app/account/settings, enforced in
+  // src/lib/notifications/events.ts). Two channel-level switches plus one
+  // per-event switch; in-app (the bell/Notification row) is intentionally
+  // not gate-able here — it always fires, these only gate email/SMS sending.
+  // notifyStaffNewMessage only applies to ADMIN/SUPPORT accounts; the
+  // customer-facing three only apply to CUSTOMER accounts — harmless no-ops
+  // either way since each is only ever read on the role it applies to.
+  notifyEmail            Boolean        @default(true)
+  notifySms              Boolean        @default(true)
+  notifyTicketReply      Boolean        @default(true)
+  notifyOrderStatus      Boolean        @default(true)
+  notifyContractExpiry   Boolean        @default(true)
+  notifyStaffNewMessage  Boolean        @default(true)
+  deletedAt              DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
 
   posts                 BlogPost[]
   mediaAssets           MediaAsset[]
@@ -272,6 +302,7 @@ enum MediaScope {
   TICKET_ATTACHMENT
   PROFILE_AVATAR
   CONTRACT_FILE
+  PRODUCT_COMMENT
 }
 
 model MediaAsset {
@@ -314,14 +345,14 @@ enum ProductAvailability {
 }
 
 model Brand {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
   logo        String?
-  description String?   @db.Text
-  order       Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  description String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   products Product[]
 
@@ -329,14 +360,14 @@ model Brand {
 }
 
 model ProductCategory {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  icon      String?
-  parentId  String?
-  parent    ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
-  children  ProductCategory[] @relation("CategoryTree")
-  order     Int      @default(0)
+  id              String            @id @default(cuid())
+  name            String
+  slug            String            @unique
+  icon            String?
+  parentId        String?
+  parent          ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  children        ProductCategory[] @relation("CategoryTree")
+  order           Int               @default(0)
   // Which admin-product-form spec template (src/lib/product-spec-templates.ts)
   // applies to products under this root category — set on the root only,
   // read by walking up from a product's own category. Deliberately NOT
@@ -349,8 +380,8 @@ model ProductCategory {
   // as specTemplateKey. Null/empty means "use the default fallback" (the
   // product's first few specs, see ProductCard.tsx).
   previewSpecKeys Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   products Product[]
 
@@ -387,18 +418,44 @@ model Product {
 }
 
 model ProductComment {
-  id        String         @id @default(cuid())
+  id        String                @id @default(cuid())
   productId String
-  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    String
-  user      User           @relation(fields: [userId], references: [id])
-  text      String         @db.Text
+  user      User                  @relation(fields: [userId], references: [id])
+  text      String                @db.Text
   rating    Int?
-  status    ApprovalStatus @default(PENDING)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  status    ApprovalStatus        @default(PENDING)
+  images    ProductCommentImage[]
+  // Set when the author edits their own comment — re-flips `status` back to
+  // PENDING too (see the edit route), since the moderated text just changed.
+  editedAt  DateTime?
+  // Soft delete, same convention as TicketReply: keeps the row (and any
+  // admin audit trail referencing it) instead of removing it outright, and
+  // lets the UI show "این دیدگاه حذف شد" rather than the item vanishing.
+  deletedAt DateTime?
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
 
   @@index([productId])
   @@index([productId, status])
   @@map("product_comments")
+}
+
+// Denormalized copy of the picked MediaAsset's own fields, same pattern as
+// TicketAttachment — a comment's image set is fixed at whatever it was when
+// posted/last edited, independent of anything happening later to the
+// underlying MediaAsset row it was picked from.
+model ProductCommentImage {
+  id        String         @id @default(cuid())
+  commentId String
+  comment   ProductComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  url       String
+  filename  String
+  mimeType  String
+  size      Int
+  createdAt DateTime       @default(now())
+
+  @@index([commentId])
+  @@map("product_comment_images")
 }

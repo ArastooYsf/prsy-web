@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
+import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
 import type { FaqItemContent } from "@/lib/site-content";
 
 const inputClass =
@@ -33,6 +35,7 @@ export default function FaqManagerForm({ initialItems }: { initialItems: FaqItem
   const router = useRouter();
   const { showToast } = useToast();
   const [items, setItems] = useState<FaqItemContent[]>(initialItems);
+  const newestItemRef = useScrollNewestIntoView<HTMLDivElement>(items.length);
   const [saving, setSaving] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
@@ -89,7 +92,11 @@ export default function FaqManagerForm({ initialItems }: { initialItems: FaqItem
 
       <div className="space-y-4">
         {items.map((item, i) => (
-          <div key={item.id} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
+          <div
+            key={item.id}
+            ref={i === items.length - 1 ? newestItemRef : undefined}
+            className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5"
+          >
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-sm font-semibold">سوال {i + 1}</p>
               <div className="flex items-center gap-1">
@@ -127,12 +134,7 @@ export default function FaqManagerForm({ initialItems }: { initialItems: FaqItem
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground/80">پاسخ</label>
-                <textarea
-                  value={item.answer}
-                  onChange={(e) => updateItem(i, { answer: e.target.value })}
-                  rows={3}
-                  className={`${inputClass} resize-y`}
-                />
+                <RichTextEditor value={item.answer} onChange={(html) => updateItem(i, { answer: html })} />
               </div>
             </div>
           </div>

@@ -9,7 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        // Hover-lift (translate + growing shadow) is scoped to this variant
+        // only — DESIGN.md reserves it for cards and the primary CTA button,
+        // matching the hand-styled treatment every other primary CTA on the
+        // site already has (e.g. ConsultationForm's submit button).
+        default:
+          "bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import dynamic from "next/dynamic";
 import { Smiley } from "@phosphor-icons/react";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 // @emoji-mart/react and its dataset are large and only ever needed once the
 // user actually opens the picker — statically importing them made every page
@@ -17,6 +21,12 @@ const Picker = dynamic(() => import("@emoji-mart/react"), { ssr: false });
 export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void }) {
   const [open, setOpen] = useState(false);
   const [emojiData, setEmojiData] = useState<unknown>(null);
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(open);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   useEffect(() => {
     if (!open || emojiData) return;
@@ -36,12 +46,19 @@ export default function EmojiPicker({ onSelect }: { onSelect: (emoji: string) =>
       </Popover.Trigger>
 
       <Popover.Portal>
-        <Popover.Content side="top" align="start" sideOffset={8} collisionPadding={8} className="z-20">
+        <Popover.Content
+          ref={contentRef}
+          side="top"
+          align="start"
+          sideOffset={8}
+          collisionPadding={8}
+          className={cn("z-20", isLightTheme && "theme-white-blue", popoverAnimation)}
+        >
           {emojiData ? (
             <Picker
               data={emojiData}
               set="twemoji"
-              theme="dark"
+              theme={isLightTheme ? "light" : "dark"}
               locale="fa"
               previewPosition="none"
               skinTonePosition="search"

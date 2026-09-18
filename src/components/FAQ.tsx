@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import type { FaqItemContent } from "@/lib/site-content";
+import ThemedProse from "@/components/ui/ThemedProse";
 
 const PREVIEW_COUNT = 4;
 
@@ -100,9 +101,10 @@ export default function FAQ({ items: allItems, full = false }: { items: FaqItemC
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="pb-6 leading-7 text-foreground/70">
-                        {faq.answer}
-                      </p>
+                      <ThemedProse
+                        html={faq.answer}
+                        className="prose prose-sm max-w-none pb-6 leading-7 text-foreground/70 [&_a]:text-accent-400 [&_p]:m-0"
+                      />
                     </motion.div>
                   )}
                 </AnimatePresence>

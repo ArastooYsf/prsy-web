@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FAQ from "@/components/FAQ";
 import { getFaqItems } from "@/lib/site-content";
+import { sanitizePlainText } from "@/lib/sanitize";
 
 export const metadata: Metadata = {
   title: "سوالات متداول",
@@ -10,5 +11,21 @@ export const metadata: Metadata = {
 
 export default async function FAQPage() {
   const faqItems = await getFaqItems();
-  return <FAQ items={faqItems} full />;
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: sanitizePlainText(item.answer) },
+    })),
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <FAQ items={faqItems} full />
+    </>
+  );
 }

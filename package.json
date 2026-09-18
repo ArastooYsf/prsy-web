@@ -36,6 +36,7 @@
     "@tiptap/react": "^3.29.2",
     "@tiptap/starter-kit": "^3.29.2",
     "bcryptjs": "^3.0.3",
+    "carbone": "^3.8.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "emoji-mart": "^5.6.0",
@@ -66,6 +67,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/sanitize-html": "^2.16.1",
+    "autoprefixer": "^10.6.1",
     "dotenv": "^17.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
@@ -73,5 +75,17 @@
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.5",
     "typescript": "^5"
-  }
+  },
+  "browserslist": [
+    "chrome 64",
+    "edge 79",
+    "firefox 67",
+    "opera 51",
+    "safari 12",
+    "ios_saf 12",
+    "samsung 9.2",
+    "and_chr 64",
+    "and_uc 12",
+    "kaios 2.5"
+  ]
 }

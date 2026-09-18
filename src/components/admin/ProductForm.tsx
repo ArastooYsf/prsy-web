@@ -8,6 +8,7 @@ import MediaPicker from "@/components/admin/MediaPicker";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { slugify } from "@/lib/slugify";
 import { useToast } from "@/components/ToastProvider";
+import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import type { ProductSpec } from "@/lib/product-json";
 import { resolveSpecTemplate } from "@/lib/product-spec-templates";
@@ -73,6 +74,7 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
   const [saving, setSaving] = useState(false);
+  const newestSpecRef = useScrollNewestIntoView<HTMLDivElement>(customSpecs.length);
 
   const roots = categories.filter((c) => !c.parentId);
   const childrenOf = (parentId: string) => categories.filter((c) => c.parentId === parentId);
@@ -297,7 +299,11 @@ export default function ProductForm({ mode, categories, brands, product }: Produ
         {customSpecs.length > 0 && (
           <div className="mt-2 space-y-2">
             {customSpecs.map((spec, index) => (
-              <div key={index} className="flex gap-2">
+              <div
+                key={index}
+                ref={index === customSpecs.length - 1 ? newestSpecRef : undefined}
+                className="flex gap-2"
+              >
                 <input
                   value={spec.label}
                   onChange={(e) => updateCustomSpec(index, { label: e.target.value })}

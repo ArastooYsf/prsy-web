@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, ImageOff, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
+import { dialogOverlayAnimation } from "@/lib/motion";
 
 export type ProductGalleryProps = {
   images: string[];
@@ -253,9 +254,9 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
 
       <Dialog.Root open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/85" />
+          <Dialog.Overlay className={`fixed inset-0 z-50 bg-black/85 ${dialogOverlayAnimation}`} />
           <Dialog.Content
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${dialogOverlayAnimation}`}
             aria-describedby={undefined}
           >
             <Dialog.Title className="sr-only">{alt}</Dialog.Title>

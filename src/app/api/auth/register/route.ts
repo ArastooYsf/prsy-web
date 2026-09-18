@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { verifyTurnstileToken } from "@/lib/turnstile";
-import { isValidEmail } from "@/lib/validation";
+import { isValidEmail, isValidUsername } from "@/lib/validation";
+import { verifyNationalId, summarizeOutcome } from "@/lib/national-id-verification";
+import { logEvent } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -16,14 +18,16 @@ export async function POST(request: Request) {
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
   const name = typeof body?.name === "string" ? sanitizePlainText(body.name).slice(0, 100) : null;
+  const rawUsername = typeof body?.username === "string" ? body.username.trim() : "";
+  const username = rawUsername ? sanitizePlainText(rawUsername).slice(0, 30) : null;
   const customerType = body?.customerType === "LEGAL" ? "LEGAL" : "INDIVIDUAL";
   const companyName =
     customerType === "LEGAL" && typeof body?.companyName === "string"
       ? sanitizePlainText(body.companyName).slice(0, 150)
       : null;
-  const economicCode =
-    customerType === "LEGAL" && typeof body?.economicCode === "string"
-      ? sanitizePlainText(body.economicCode).slice(0, 50)
+  const nationalId =
+    customerType === "LEGAL" && typeof body?.nationalId === "string"
+      ? sanitizePlainText(body.nationalId).slice(0, 50)
       : null;
 
   if (!isValidEmail(email)) {
@@ -32,8 +36,11 @@ export async function POST(request: Request) {
   if (password.length < 8) {
     return NextResponse.json({ error: "رمز عبور باید حداقل ۸ کاراکتر باشد." }, { status: 400 });
   }
-  if (customerType === "LEGAL" && (!companyName?.trim() || !economicCode?.trim())) {
-    return NextResponse.json({ error: "نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است." }, { status: 400 });
+  if (username !== null && !isValidUsername(username)) {
+    return NextResponse.json({ error: "نام کاربری باید ۳ تا ۳۰ کاراکتر و شامل حروف انگلیسی، عدد یا _ باشد." }, { status: 400 });
+  }
+  if (customerType === "LEGAL" && (!companyName?.trim() || !nationalId?.trim())) {
+    return NextResponse.json({ error: "نام شرکت و شناسه ملی برای مشتری حقوقی الزامی است." }, { status: 400 });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -41,23 +48,51 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "کاربری با این ایمیل قبلاً ثبت‌نام کرده است." }, { status: 409 });
   }
 
+  if (username !== null) {
+    const existingUsername = await prisma.user.findUnique({ where: { username } });
+    if (existingUsername) {
+      return NextResponse.json({ error: "این نام کاربری قبلاً استفاده شده است." }, { status: 409 });
+    }
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
+
+  // Authoritative, server-side re-check — never trust whatever the client's
+  // own "استعلام" preview call (NationalIdInquiryField, POST
+  // /api/legal-entity/inquire) reported, since that's just a UI convenience
+  // a client could fake. A failed/unreachable/dissolved-company inquiry
+  // never blocks registration — it only leaves nationalIdVerified=false (or
+  // nationalIdActive=false for a found-but-dissolved company) so admins can
+  // spot it later (see src/app/account/admin/customers/pending/page.tsx,
+  // now an advisory list rather than a login-blocking approval queue).
+  const { outcome, fields } = await verifyNationalId(nationalId);
 
   // Role is always CUSTOMER here — admin/support access is granted separately
   // (via the seed script / admin panel), never through public self-registration.
-  // Legal (corporate) accounts start PENDING and can't log in until staff
-  // reviews and approves them; individual accounts are active immediately.
+  // Both individual and legal accounts are active immediately now — legal
+  // identity is verified automatically (see above), not by a manual staff
+  // gate that used to block login until someone reviewed it.
   const user = await prisma.user.create({
     data: {
       email,
       password: passwordHash,
       name,
+      username,
       customerType,
       companyName,
-      economicCode,
-      approvalStatus: customerType === "LEGAL" ? "PENDING" : "APPROVED",
+      ...fields,
+      approvalStatus: "APPROVED",
     },
   });
 
-  return NextResponse.json({ ok: true, pendingApproval: user.approvalStatus === "PENDING" });
+  if (outcome) {
+    await logEvent({
+      actor: { id: user.id, name: user.name, email: user.email, role: user.role },
+      action: outcome.verified ? "national_id_inquiry_success" : "national_id_inquiry_failed",
+      target: { type: "user", id: user.id, label: `ثبت‌نام «${companyName ?? user.email}»` },
+      summary: summarizeOutcome(outcome),
+    });
+  }
+
+  return NextResponse.json({ ok: true });
 }

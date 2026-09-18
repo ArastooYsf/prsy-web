@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Shabnam FD', 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
+    color: #0f172a;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  table { width: 100%; border-collapse: collapse; }
+
+  .header { width: 100%; border-bottom: 2px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 22px; }
+  .header td { border: none; padding: 0; vertical-align: top; }
+  .brand-mark {
+    display: inline-block; width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #eff6ff; font-weight: bold; font-size: 13px; text-align: center; line-height: 34px;
+  }
+  .brand-name { font-size: 16px; font-weight: bold; margin-right: 10px; }
+  .company-meta { color: #64748b; font-size: 11px; margin-top: 6px; }
+  .doc-title { font-size: 20px; font-weight: bold; text-align: left; }
+  .doc-meta { color: #64748b; font-size: 11px; text-align: left; margin-top: 6px; }
+
+  .info-grid { width: 100%; margin-bottom: 20px; }
+  .info-grid td { border: none; padding: 0; vertical-align: top; width: 50%; }
+  .info-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+  .info-box + .info-box { margin-right: 14px; }
+  .info-box h3 { font-size: 12px; color: #1d4ed8; margin: 0 0 10px; }
+  .info-row { display: block; margin-bottom: 5px; font-size: 12px; }
+  .info-row .label { color: #64748b; }
+
+  .status-badge { display: inline-block; border-radius: 999px; padding: 3px 12px; font-size: 11px; font-weight: bold; }
+
+  .items-table { margin-top: 4px; }
+  .items-table th {
+    background: #f1f5f9; border: 1px solid #e2e8f0; padding: 9px 10px; font-size: 11px; color: #334155; text-align: right;
+  }
+  .items-table td { border: 1px solid #e2e8f0; padding: 9px 10px; font-size: 12px; }
+  .items-table .num { text-align: left; direction: ltr; }
+  .catalog-tag { display:inline-block; margin-right:6px; font-size:9px; color:#1d4ed8; border:1px solid #bfdbfe; background:#eff6ff; border-radius:4px; padding:1px 5px; }
+
+  .totals { width: 100%; margin-top: 4px; }
+  .totals td { border: none; padding: 4px 0; font-size: 12px; }
+  .totals .grand-total td { border-top: 2px solid #1d4ed8; padding-top: 10px; font-size: 15px; font-weight: bold; }
+
+  .footer { margin-top: 34px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+
+  <table class="header">
+    <tr>
+      <td style="width:60%;">
+        <span class="brand-mark">یا</span>
+        <span class="brand-name">{d.company.name}</span>
+      </td>
+      <td style="width:40%;">
+        <div class="doc-title">فاکتور سفارش</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="company-meta">
+          شماره ثبت: {d.company.registrationNumber} &nbsp;|&nbsp; {d.company.address}<br/>
+          {d.company.phone} &nbsp;|&nbsp; {d.company.email}
+        </div>
+      </td>
+      <td>
+        <div class="doc-meta">
+          شماره سفارش: {d.order.orderNumber}<br/>
+          تاریخ ثبت: {d.order.createdAtJalali}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table class="info-grid">
+    <tr>
+      <td>
+        <div class="info-box">
+          <h3>مشخصات مشتری</h3>
+          <span class="info-row"><span class="label">نام: </span>{d.customer.name}</span>
+          <span class="info-row"><span class="label">تلفن: </span>{d.customer.phone}</span>
+          <span class="info-row" style="{d.customer.companyName:ifEM():show('display:none;')}"><span class="label">شرکت: </span>{d.customer.companyName}</span>
+          <span class="info-row" style="{d.customer.address:ifEM():show('display:none;')}"><span class="label">آدرس: </span>{d.customer.address}</span>
+        </div>
+      </td>
+      <td>
+        <div class="info-box">
+          <h3>مشخصات سفارش</h3>
+          <span class="info-row"><span class="label">شماره سفارش: </span>{d.order.orderNumber}</span>
+          <span class="info-row"><span class="label">تعداد اقلام: </span>{d.order.itemCount}</span>
+          <span class="info-row">
+            <span class="label">وضعیت: </span>
+            <span class="status-badge" style="background:{d.order.statusColorBg};color:{d.order.statusColorText};">{d.order.statusLabel}</span>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table class="items-table">
+    <tr>
+      <th style="width:6%;">ردیف</th>
+      <th>شرح کالا / خدمات</th>
+      <th style="width:12%;">تعداد</th>
+      <th style="width:18%;">قیمت واحد (تومان)</th>
+      <th style="width:18%;">قیمت کل (تومان)</th>
+    </tr>
+    <tr>
+      <td class="num">{d.items[i].row}</td>
+      <td>
+        {d.items[i].name}
+        <span class="catalog-tag" style="{d.items[i].isCatalog:ifEQ(false):show('display:none;')}">کاتالوگ</span>
+      </td>
+      <td class="num">{d.items[i].quantity}</td>
+      <td class="num">{d.items[i].unitPriceFormatted}</td>
+      <td class="num">{d.items[i].lineTotalFormatted}</td>
+    </tr>
+    <tr><td>{d.items[i+1]}</td></tr>
+  </table>
+
+  <table class="totals">
+    <tr class="grand-total">
+      <td style="text-align:left;">جمع کل: {d.order.grandTotalFormatted} تومان</td>
+      <td></td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    این سند به‌صورت خودکار در تاریخ {d.issuedAtJalali} توسط سامانه {d.company.name} تولید شده است و به‌منزله‌ی فاکتور رسمی می‌باشد.
+  </div>
+
+</body>
+</html>

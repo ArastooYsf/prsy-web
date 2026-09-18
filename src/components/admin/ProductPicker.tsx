@@ -5,6 +5,10 @@ import * as Popover from "@radix-ui/react-popover";
 import { Package, Search, X } from "lucide-react";
 import { formatNumber } from "@/lib/format-number";
 import { ADMIN_PRODUCT_SEARCH_MIN_QUERY_LENGTH, type AdminProductSearchResult } from "@/lib/admin-product-search";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -73,6 +77,12 @@ export default function ProductPicker({
   }, [trimmed, linked]);
 
   const showDropdown = focused && !linked && trimmed.length >= ADMIN_PRODUCT_SEARCH_MIN_QUERY_LENGTH;
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(showDropdown);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   return (
     <Popover.Root open={showDropdown} onOpenChange={(o) => !o && setFocused(false)}>
@@ -109,10 +119,15 @@ export default function ProductPicker({
 
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           onOpenAutoFocus={(e) => e.preventDefault()}
           align="start"
           sideOffset={4}
-          className="z-50 max-h-64 w-[var(--radix-popover-trigger-width)] overflow-y-auto rounded-xl border border-foreground/10 bg-background p-1.5 shadow-2xl"
+          className={cn(
+            "z-50 max-h-64 w-[var(--radix-popover-trigger-width)] overflow-y-auto rounded-xl border border-foreground/10 bg-background p-1.5 shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           {loading && !results ? (
             <div className="space-y-1.5 p-1.5">

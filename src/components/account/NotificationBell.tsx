@@ -6,6 +6,10 @@ import * as Popover from "@radix-ui/react-popover";
 import { Bell, Check } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
+import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
+import { useSiteTheme } from "@/components/RouteThemeScope";
+import { popoverAnimation } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 const POLL_MS = 45000;
 
@@ -85,6 +89,12 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[] | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
+  const contentRef = useScrollIntoViewOnOpen<HTMLDivElement>(open);
+  // Popover.Portal renders into document.body, outside RouteThemeScope's
+  // wrapper div — CSS variables only inherit through real DOM ancestry, so
+  // the theme class must be reapplied here (see HeaderSearch.tsx).
+  const siteTheme = useSiteTheme();
+  const isLightTheme = siteTheme?.theme !== "dark";
 
   useEffect(() => {
     let cancelled = false;
@@ -145,10 +155,15 @@ export default function NotificationBell() {
 
       <Popover.Portal>
         <Popover.Content
+          ref={contentRef}
           align="end"
           sideOffset={8}
           collisionPadding={12}
-          className="z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl"
+          className={cn(
+            "z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl",
+            isLightTheme && "theme-white-blue",
+            popoverAnimation,
+          )}
         >
           <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
             <p className="text-sm font-bold">اعلان‌ها</p>

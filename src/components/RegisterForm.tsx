@@ -4,34 +4,60 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { Building2, User as UserIcon } from "lucide-react";
 import TurnstileWidget from "@/components/TurnstileWidget";
+import RegisterStepper from "@/components/RegisterStepper";
+import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
+import NationalIdInquiryField from "@/components/NationalIdInquiryField";
 import { useToast } from "@/components/ToastProvider";
-import { isValidEmail } from "@/lib/validation";
+import { isValidEmail, isValidUsername } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
+const inputErrorClass = "border-red-500/60 focus:border-red-500/60";
+
+type CustomerType = "INDIVIDUAL" | "LEGAL";
+type FieldErrors = Record<string, string>;
+
+// Small helper so every field renders the same way: the normal label, or —
+// in its place — the validation error in red, per the "error text above the
+// field" spec. Never both at once, so a failed field doesn't grow taller
+// than a valid one and shove the rest of the step down.
+function FieldLabel({ htmlFor, label, error }: { htmlFor: string; label: string; error?: string }) {
+  return (
+    <label htmlFor={htmlFor} className={`mb-1.5 block text-sm font-medium ${error ? "text-red-400" : "text-foreground/80"}`}>
+      {error || label}
+    </label>
+  );
+}
 
 export default function RegisterForm() {
   const router = useRouter();
   const { showToast } = useToast();
 
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  // Step 1
+  const [customerType, setCustomerType] = useState<CustomerType>("INDIVIDUAL");
+
+  // Step 2
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [nationalId, setNationalId] = useState("");
+
+  // Step 3
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [customerType, setCustomerType] = useState<"INDIVIDUAL" | "LEGAL">("INDIVIDUAL");
-  const [companyName, setCompanyName] = useState("");
-  const [economicCode, setEconomicCode] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
+
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
-  const [pendingApprovalMessage, setPendingApprovalMessage] = useState(false);
   const freshTokenResolveRef = useRef<((token: string) => void) | null>(null);
 
-  // Turnstile tokens are single-use — the register POST already consumed
-  // the one on screen, so the follow-up auto-login needs its own. Remounting
-  // the widget triggers a new (near-instant, usually invisible) solve.
   function getFreshTurnstileToken(): Promise<string> {
     return new Promise((resolve) => {
       freshTokenResolveRef.current = resolve;
@@ -40,40 +66,64 @@ export default function RegisterForm() {
     });
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const selectCustomerType = (type: CustomerType) => {
+    setCustomerType(type);
+    setStep(2);
+  };
+
+  const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidEmail(email)) {
-      showToast("ایمیل معتبر نیست.", "error");
-      return;
+    const errors: FieldErrors = {};
+    if (!name.trim()) errors.name = "نام و نام خانوادگی الزامی است.";
+    if (username.trim() && !isValidUsername(username.trim())) {
+      errors.username = "نام کاربری باید ۳ تا ۳۰ کاراکتر انگلیسی/عدد/_ باشد.";
     }
-    if (!turnstileToken) {
-      showToast("لطفاً تأیید کنید که ربات نیستید.", "error");
-      return;
+    if (customerType === "LEGAL") {
+      if (!companyName.trim()) errors.companyName = "نام شرکت الزامی است.";
+      if (!nationalId.trim()) errors.nationalId = "شناسه ملی الزامی است.";
     }
-    if (password.length < 8) {
-      showToast("رمز عبور باید حداقل ۸ کاراکتر باشد.", "error");
-      return;
-    }
-    if (password !== confirmPassword) {
-      showToast("رمز عبور و تکرار آن یکسان نیستند.", "error");
-      return;
-    }
-    if (customerType === "LEGAL" && (!companyName.trim() || !economicCode.trim())) {
-      showToast("نام شرکت و کد اقتصادی برای مشتری حقوقی الزامی است.", "error");
-      return;
-    }
-    if (!acceptedTerms) {
-      showToast("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.", "error");
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
+    setFieldErrors({});
+    setStep(3);
+  };
+
+  const handleFinalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const errors: FieldErrors = {};
+    if (!isValidEmail(email)) errors.email = "ایمیل معتبر نیست.";
+    if (password.length < 8) errors.password = "رمز عبور باید حداقل ۸ کاراکتر باشد.";
+    else if (password !== confirmPassword) errors.confirmPassword = "رمز عبور و تکرار آن یکسان نیستند.";
+    if (!acceptedTerms) errors.terms = "برای ثبت‌نام باید قوانین و مقررات را بپذیرید.";
+    if (!turnstileToken) errors.turnstile = "لطفاً تأیید کنید که ربات نیستید.";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
     setLoading(true);
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, customerType, companyName, economicCode, turnstileToken }),
+      body: JSON.stringify({
+        name,
+        username: username.trim() || undefined,
+        email,
+        password,
+        customerType,
+        companyName,
+        nationalId,
+        turnstileToken,
+      }),
     });
 
     if (!res.ok) {
@@ -82,14 +132,6 @@ export default function RegisterForm() {
       setLoading(false);
       setTurnstileToken("");
       setTurnstileKey((k) => k + 1);
-      return;
-    }
-
-    const data = await res.json().catch(() => null);
-
-    if (data?.pendingApproval) {
-      setLoading(false);
-      setPendingApprovalMessage(true);
       return;
     }
 
@@ -107,188 +149,215 @@ export default function RegisterForm() {
     router.refresh();
   };
 
-  if (pendingApprovalMessage) {
-    return (
-      <div className="rounded-lg border border-accent-500/30 bg-accent-500/10 px-4 py-4 text-sm leading-7 text-foreground/80">
-        ثبت‌نام حساب حقوقی شما با موفقیت انجام شد. حساب شما پس از بررسی و تأیید توسط تیم پشتیبانی فعال خواهد شد و
-        می‌توانید پس از آن وارد شوید.
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-foreground/80">
-          نام
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={inputClass}
-          placeholder="نام شما"
-        />
-      </div>
+    <div>
+      <RegisterStepper currentStep={step} />
 
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-foreground/80">
-          ایمیل
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          dir="ltr"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={inputClass}
-          placeholder="you@example.com"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-foreground/80">
-          رمز عبور
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          dir="ltr"
-          required
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={inputClass}
-          placeholder="حداقل ۸ کاراکتر"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-foreground/80">
-          تکرار رمز عبور
-        </label>
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          dir="ltr"
-          required
-          autoComplete="new-password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className={inputClass}
-          placeholder="••••••••"
-        />
-      </div>
-
-      <div>
-        <p className="mb-1.5 block text-sm font-medium text-foreground/80">نوع مشتری</p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setCustomerType("INDIVIDUAL")}
-            className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
-              customerType === "INDIVIDUAL"
-                ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
-            }`}
-          >
-            حقیقی
-          </button>
-          <button
-            type="button"
-            onClick={() => setCustomerType("LEGAL")}
-            className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
-              customerType === "LEGAL"
-                ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
-                : "border-foreground/10 text-foreground/60 hover:border-foreground/20"
-            }`}
-          >
-            حقوقی
-          </button>
+      {step === 1 && (
+        <div>
+          <p className="mb-3 text-sm font-medium text-foreground/80">نوع حساب کاربری خود را انتخاب کنید</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => selectCustomerType("INDIVIDUAL")}
+              className={`flex flex-col items-center gap-2.5 rounded-xl border px-4 py-6 transition-colors ${
+                customerType === "INDIVIDUAL"
+                  ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
+                  : "border-foreground/10 text-foreground/70 hover:border-accent-500/30"
+              }`}
+            >
+              <UserIcon className="size-7" />
+              <span className="text-sm font-semibold">حقیقی</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => selectCustomerType("LEGAL")}
+              className={`flex flex-col items-center gap-2.5 rounded-xl border px-4 py-6 transition-colors ${
+                customerType === "LEGAL"
+                  ? "border-accent-500/50 bg-accent-500/10 text-accent-400"
+                  : "border-foreground/10 text-foreground/70 hover:border-accent-500/30"
+              }`}
+            >
+              <Building2 className="size-7" />
+              <span className="text-sm font-semibold">حقوقی</span>
+            </button>
+          </div>
         </div>
-      </div>
-
-      {customerType === "LEGAL" && (
-        <>
-          <div>
-            <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-foreground/80">
-              نام شرکت
-            </label>
-            <input
-              id="companyName"
-              name="companyName"
-              type="text"
-              required
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className={inputClass}
-              placeholder="نام ثبت‌شده شرکت"
-            />
-          </div>
-          <div>
-            <label htmlFor="economicCode" className="mb-1.5 block text-sm font-medium text-foreground/80">
-              کد اقتصادی / شناسه ملی
-            </label>
-            <input
-              id="economicCode"
-              name="economicCode"
-              type="text"
-              dir="ltr"
-              required
-              value={economicCode}
-              onChange={(e) => setEconomicCode(e.target.value)}
-              className={inputClass}
-              placeholder="مثلاً 14005678901"
-            />
-          </div>
-          <p className="rounded-lg border border-accent-500/20 bg-accent-500/5 px-4 py-2.5 text-xs leading-6 text-foreground/60">
-            حساب‌های حقوقی پس از ثبت‌نام، قبل از فعال شدن باید توسط تیم پشتیبانی بررسی و تأیید شوند.
-          </p>
-        </>
       )}
 
-      <label className="flex items-start gap-2.5 text-sm text-foreground/70">
-        <input
-          type="checkbox"
-          checked={acceptedTerms}
-          onChange={(e) => setAcceptedTerms(e.target.checked)}
-          className="mt-0.5 size-4 shrink-0 rounded border-foreground/20 bg-foreground/5"
-          style={{ accentColor: "#f97316" }}
-          required
-        />
-        <span>
-          <Link href="/terms" target="_blank" className="font-medium text-accent-400 transition-colors hover:text-foreground">
-            قوانین و مقررات
-          </Link>{" "}
-          را می‌پذیرم
-        </span>
-      </label>
+      {step === 2 && (
+        <form onSubmit={handleStep2Submit} noValidate className="space-y-4">
+          <div>
+            <FieldLabel htmlFor="name" label="نام و نام خانوادگی" error={fieldErrors.name} />
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={`${inputClass} ${fieldErrors.name ? inputErrorClass : ""}`}
+              placeholder="نام شما"
+            />
+          </div>
 
-      <TurnstileWidget
-        key={turnstileKey}
-        onVerify={(token) => {
-          setTurnstileToken(token);
-          freshTokenResolveRef.current?.(token);
-          freshTokenResolveRef.current = null;
-        }}
-        onExpire={() => setTurnstileToken("")}
-      />
+          <div>
+            <FieldLabel htmlFor="username" label="نام کاربری (اختیاری)" error={fieldErrors.username} />
+            <input
+              id="username"
+              name="username"
+              type="text"
+              dir="ltr"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={`${inputClass} ${fieldErrors.username ? inputErrorClass : ""}`}
+              placeholder="username"
+            />
+          </div>
 
-      <button
-        type="submit"
-        disabled={loading || !turnstileToken || !acceptedTerms}
-        className="mt-2 w-full rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
-      </button>
-    </form>
+          {customerType === "LEGAL" && (
+            <>
+              <div>
+                <FieldLabel htmlFor="companyName" label="نام شرکت" error={fieldErrors.companyName} />
+                <input
+                  id="companyName"
+                  name="companyName"
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className={`${inputClass} ${fieldErrors.companyName ? inputErrorClass : ""}`}
+                  placeholder="نام ثبت‌شده شرکت"
+                />
+              </div>
+              <NationalIdInquiryField
+                value={nationalId}
+                onChange={setNationalId}
+                error={fieldErrors.nationalId}
+              />
+              <p className="rounded-lg border border-accent-500/20 bg-accent-500/5 px-4 py-2.5 text-xs leading-6 text-foreground/60">
+                شناسه ملی به‌صورت خودکار استعلام می‌شود. اگر استعلام موفق نبود هم می‌توانید ثبت‌نام را ادامه دهید — در
+                صورت نیاز، بعداً بررسی خواهد شد.
+              </p>
+            </>
+          )}
+
+          <div className="flex gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="rounded-full border border-foreground/10 px-5 py-3 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground/20"
+            >
+              بازگشت
+            </button>
+            <button
+              type="submit"
+              className="flex-1 rounded-full bg-accent-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600"
+            >
+              بعدی
+            </button>
+          </div>
+        </form>
+      )}
+
+      {step === 3 && (
+        <form onSubmit={handleFinalSubmit} noValidate className="space-y-4">
+          <div>
+            <FieldLabel htmlFor="email" label="ایمیل" error={fieldErrors.email} />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              dir="ltr"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`${inputClass} ${fieldErrors.email ? inputErrorClass : ""}`}
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <FieldLabel htmlFor="password" label="رمز عبور" error={fieldErrors.password} />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              dir="ltr"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`${inputClass} ${fieldErrors.password ? inputErrorClass : ""}`}
+              placeholder="حداقل ۸ کاراکتر"
+            />
+            <PasswordStrengthMeter password={password} />
+          </div>
+
+          <div>
+            <FieldLabel htmlFor="confirmPassword" label="تکرار رمز عبور" error={fieldErrors.confirmPassword} />
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              dir="ltr"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`${inputClass} ${fieldErrors.confirmPassword ? inputErrorClass : ""}`}
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label className="flex items-start gap-2.5 text-sm text-foreground/70">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 rounded border-foreground/20 bg-foreground/5"
+                style={{ accentColor: "#f97316" }}
+              />
+              <span>
+                <Link href="/terms" target="_blank" className="font-medium text-accent-400 transition-colors hover:text-foreground">
+                  قوانین و مقررات
+                </Link>{" "}
+                را می‌پذیرم
+              </span>
+            </label>
+            {fieldErrors.terms && <p className="mt-1.5 text-xs font-semibold text-red-400">{fieldErrors.terms}</p>}
+          </div>
+
+          <div>
+            <TurnstileWidget
+              key={turnstileKey}
+              onVerify={(token) => {
+                setTurnstileToken(token);
+                freshTokenResolveRef.current?.(token);
+                freshTokenResolveRef.current = null;
+              }}
+              onExpire={() => setTurnstileToken("")}
+            />
+            {fieldErrors.turnstile && <p className="mt-1.5 text-xs font-semibold text-red-400">{fieldErrors.turnstile}</p>}
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="rounded-full border border-foreground/10 px-5 py-3 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground/20"
+            >
+              بازگشت
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 rounded-full bg-accent-500 px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-accent-500/25 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "در حال ثبت‌نام..." : "ثبت‌نام"}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }

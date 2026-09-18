@@ -21,6 +21,8 @@ export type CatalogQuery = {
   take: number;
   sort: CatalogSort;
   activePriceRange: { min?: number; max?: number } | null;
+  /** The free-text `q` param, if present — same field the header search box's "پرطرفدار" links and the `/api/search` dropdown use. */
+  searchQuery: string | null;
 };
 
 function parseIntParam(raw: string | undefined): number | undefined {
@@ -58,6 +60,17 @@ export function buildCatalogQuery(input: CatalogQueryInput): CatalogQuery {
     .filter((v): v is string => Boolean(v));
   if (brandIds.length > 0) where.brandId = { in: brandIds };
 
+  // Free-text search — same OR shape as /api/search's header-dropdown query,
+  // so a term that matched there (e.g. a "پرطرفدار" pill) matches again here.
+  const searchQuery = param(searchParams, "q")?.trim() || null;
+  if (searchQuery) {
+    where.OR = [
+      { name: { contains: searchQuery } },
+      { brand: { name: { contains: searchQuery } } },
+      { description: { contains: searchQuery } },
+    ];
+  }
+
   // Availability.
   if (param(searchParams, "stock") === "1") where.availability = "IN_STOCK";
 
@@ -92,5 +105,6 @@ export function buildCatalogQuery(input: CatalogQueryInput): CatalogQuery {
     take: CATALOG_PAGE_SIZE,
     sort,
     activePriceRange,
+    searchQuery,
   };
 }

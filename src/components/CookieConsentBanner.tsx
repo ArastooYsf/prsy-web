@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
-const CONSENT_KEY = "yashar_cookie_consent";
+import { COOKIE_CONSENT_EVENT, COOKIE_CONSENT_KEY } from "@/lib/cookie-consent";
 
 export default function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem(CONSENT_KEY)) {
+    if (!localStorage.getItem(COOKIE_CONSENT_KEY)) {
       setVisible(true);
     }
   }, []);
 
   function accept() {
-    localStorage.setItem(CONSENT_KEY, "accepted");
+    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setVisible(false);
   }
 
@@ -25,7 +25,7 @@ export default function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="رضایت کوکی"
-      className="fixed inset-x-4 bottom-4 z-50 flex flex-col gap-3 rounded-2xl border border-foreground/10 bg-background/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center"
+      className="fixed inset-x-4 bottom-20 z-50 flex flex-col gap-3 rounded-2xl border border-foreground/10 bg-background/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center lg:bottom-4 [@media(max-height:500px)]:!top-4 [@media(max-height:500px)]:!bottom-auto"
     >
       <p className="flex-1 text-xs leading-6 text-foreground/70">
         این سایت برای بهبود تجربه‌ی کاربری از کوکی استفاده می‌کند. با ادامه استفاده از سایت، با{" "}

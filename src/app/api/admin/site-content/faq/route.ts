@@ -3,11 +3,11 @@ import { getServerSession } from "next-auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { sanitizePlainText } from "@/lib/sanitize";
+import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, FAQ_ITEMS_KEY, type FaqItemContent } from "@/lib/site-content";
 
 const MAX_QUESTION_LENGTH = 300;
-const MAX_ANSWER_LENGTH = 2000;
+const MAX_ANSWER_LENGTH = 4000;
 
 function cleanFaqItem(raw: unknown): FaqItemContent | null {
   if (!raw || typeof raw !== "object") return null;
@@ -15,7 +15,9 @@ function cleanFaqItem(raw: unknown): FaqItemContent | null {
   if (typeof r.id !== "string" || !r.id) return null;
 
   const question = sanitizePlainText(typeof r.question === "string" ? r.question : "").slice(0, MAX_QUESTION_LENGTH);
-  const answer = sanitizePlainText(typeof r.answer === "string" ? r.answer : "").slice(0, MAX_ANSWER_LENGTH);
+  // Answer is rich HTML now (RichTextEditor, same as blog posts) — sanitize
+  // as HTML, not plain text, or every tag the editor produces gets stripped.
+  const answer = sanitizeRichText(typeof r.answer === "string" ? r.answer : "").slice(0, MAX_ANSWER_LENGTH);
   if (!question || !answer) return null;
 
   return { id: r.id, question, answer };

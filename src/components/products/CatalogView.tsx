@@ -134,7 +134,9 @@ export default async function CatalogView({ category, basePath, searchParams }: 
     <section className="container py-8">
       <Breadcrumb items={crumbs} />
 
-      <h1 className="mt-4 text-2xl font-bold sm:text-3xl">{category ? category.name : "همه‌ی محصولات"}</h1>
+      <h1 className="mt-4 text-2xl font-bold sm:text-3xl">
+        {q.searchQuery ? `نتایج جست‌وجو برای «${q.searchQuery}»` : category ? category.name : "همه‌ی محصولات"}
+      </h1>
 
       <CatalogQuickFilters basePath={basePath} brandOptions={brandOptions} />
 

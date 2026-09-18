@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import localFont from "next/font/local";
-import Script from "next/script";
 import { Header } from "@/components/ui/header-2";
+import AnalyticsScripts from "@/components/AnalyticsScripts";
 import Footer from "@/components/Footer";
 import PageLoader from "@/components/PageLoader";
 import PageViewTracker from "@/components/PageViewTracker";
@@ -11,7 +11,7 @@ import CookieConsentBanner from "@/components/CookieConsentBanner";
 import OfflineBanner from "@/components/OfflineBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
-import { getFooterContact } from "@/lib/site-content";
+import { getFooterContact, getFooterEditableContent, getHeaderNavLabels } from "@/lib/site-content";
 import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
 import RouteThemeScope from "@/components/RouteThemeScope";
 import { SkeletonTheme } from "react-loading-skeleton";
@@ -68,6 +68,32 @@ export const metadata: Metadata = {
     locale: "fa_IR",
     type: "website",
   },
+  twitter: {
+    card: "summary",
+    title: "پویش راه صنعت یاشار",
+    description:
+      "تأمین‌کننده دیزل ژنراتور، موتور برق، قطعات یدکی و خدمات اورهال؛ نو و دست‌دوم.",
+  },
+};
+
+// Only facts confirmed real in PRODUCT.md (registration number, founding
+// year, name/url) — the placeholder phone number, stats, and testimonials
+// noted there must never be promoted into structured data search engines
+// treat as verified fact.
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "پویش راه صنعت یاشار",
+  alternateName: "Yashar Industrial Route Development",
+  url: "https://yasharindustry.com",
+  description:
+    "پویش راه صنعت یاشار، تأمین‌کننده دیزل ژنراتور، موتور برق، قطعات یدکی و خدمات اورهال با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم.",
+  foundingDate: "2017",
+  identifier: {
+    "@type": "PropertyValue",
+    name: "شماره ثبت شرکت",
+    value: "47606",
+  },
 };
 
 export const viewport: Viewport = {
@@ -81,7 +107,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [footerContact, menuTaxonomy] = await Promise.all([getFooterContact(), getMenuTaxonomy()]);
+  const [footerContact, menuTaxonomy, footerContent, headerNavLabels] = await Promise.all([
+    getFooterContact(),
+    getMenuTaxonomy(),
+    getFooterEditableContent(),
+    getHeaderNavLabels(),
+  ]);
 
   return (
     <html lang="fa" dir="rtl" className={`${shabnamFD.variable} ${vazirmatn.variable}`} suppressHydrationWarning>
@@ -109,26 +140,16 @@ export default async function RootLayout({
             `,
           }}
         />
+        <script
+          id="organization-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <RouteThemeScope>
           <ScrollProgress />
-          {GA_MEASUREMENT_ID && (
-            <>
-              <Script
-                src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-                strategy="afterInteractive"
-              />
-              <Script id="ga4-init" strategy="afterInteractive">
-                {`
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${GA_MEASUREMENT_ID}');
-                `}
-              </Script>
-            </>
-          )}
+          {GA_MEASUREMENT_ID && <AnalyticsScripts measurementId={GA_MEASUREMENT_ID} />}
           <SessionProviderWrapper>
             <ToastProvider>
               <SkeletonTheme
@@ -140,9 +161,9 @@ export default async function RootLayout({
               >
                 <PageViewTracker />
                 <PageLoader />
-                <Header menuCategories={menuTaxonomy.categories} />
+                <Header menuCategories={menuTaxonomy.categories} navLabels={headerNavLabels} />
                 <main>{children}</main>
-                <Footer contact={footerContact} />
+                <Footer contact={footerContact} content={footerContent} />
               </SkeletonTheme>
             </ToastProvider>
           </SessionProviderWrapper>

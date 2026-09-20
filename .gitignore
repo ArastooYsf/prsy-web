@@ -58,3 +58,7 @@ next-env.d.ts
 
 # logs
 *.log
+
+# dev tooling — generated/installed locally, not part of the deployed app
+/graphify-out
+/.claude/skills

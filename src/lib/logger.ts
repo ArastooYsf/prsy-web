@@ -98,6 +98,7 @@ const ACTION_DEFAULT_CATEGORY: Partial<Record<LogAction, LogCategory>> = {
   crash: "crash",
   notification_sent: "notification",
   notification_failed: "notification",
+  consultation_request: "general",
   national_id_inquiry_success: "general",
   national_id_inquiry_failed: "general",
   integration_run_success: "general",

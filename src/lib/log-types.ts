@@ -32,6 +32,7 @@ export type LogAction =
   | "crash"
   | "notification_sent"
   | "notification_failed"
+  | "consultation_request"
   | "national_id_inquiry_success"
   | "national_id_inquiry_failed"
   | "integration_run_success"
@@ -88,6 +89,7 @@ export const ACTION_LABELS_FA: Record<LogAction, string> = {
   crash: "با خطای سیستمی مواجه شد",
   notification_sent: "اعلان ارسال کرد",
   notification_failed: "ارسال اعلان ناموفق بود",
+  consultation_request: "درخواست مشاوره ثبت شد",
   national_id_inquiry_success: "استعلام شناسه ملی موفق بود",
   national_id_inquiry_failed: "استعلام شناسه ملی ناموفق بود",
   integration_run_success: "سرویس یکپارچه‌سازی را اجرا کرد",

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
-import { sanitizeRichText, sanitizePlainText } from "@/lib/sanitize";
+import { sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import { SITE_URL, toAbsoluteUrl } from "@/lib/site-url";
 import { PencilSimple } from "@phosphor-icons/react/ssr";

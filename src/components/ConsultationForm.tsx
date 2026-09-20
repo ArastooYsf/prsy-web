@@ -12,6 +12,7 @@ type FormState = {
   email: string;
   topic: string;
   message: string;
+  website: string;
 };
 
 const TOPICS = [
@@ -28,6 +29,7 @@ const initialState: FormState = {
   email: "",
   topic: TOPICS[0],
   message: "",
+  website: "",
 };
 
 const inputClass =
@@ -37,6 +39,7 @@ export default function ConsultationForm() {
   const { showToast } = useToast();
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -44,7 +47,7 @@ export default function ConsultationForm() {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       showToast("لطفاً نام و شماره تماس خود را وارد کنید.", "error");
@@ -58,7 +61,24 @@ export default function ConsultationForm() {
       showToast("ایمیل معتبر نیست.", "error");
       return;
     }
-    setSubmitted(true);
+    setSending(true);
+    try {
+      const res = await fetch("/api/consultation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => null);
+        showToast(data?.error ?? "ثبت درخواست ناموفق بود، دوباره تلاش کنید.", "error");
+      }
+    } catch {
+      showToast("ارتباط با سرور برقرار نشد، دوباره تلاش کنید.", "error");
+    } finally {
+      setSending(false);
+    }
   };
 
   if (submitted) {
@@ -93,7 +113,7 @@ export default function ConsultationForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-xl rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8"
+      className="relative mx-auto max-w-xl overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8"
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
@@ -177,11 +197,23 @@ export default function ConsultationForm() {
         </div>
       </div>
 
+      <input
+        type="text"
+        name="website"
+        value={form.website}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+
       <button
         type="submit"
-        className="mt-6 w-full rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-accent-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto sm:text-base"
+        disabled={sending}
+        className="mt-6 w-full disabled:cursor-not-allowed disabled:opacity-60 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-accent-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto sm:text-base"
       >
-        ارسال درخواست
+        {sending ? "در حال ارسال..." : "ارسال درخواست"}
       </button>
     </form>
   );

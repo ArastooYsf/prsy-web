@@ -95,6 +95,34 @@ export function staffNewMessageEmail({ subject, customerName, link }: { subject:
   });
 }
 
+export function consultationRequestEmail({
+  name,
+  phone,
+  email,
+  topic,
+  message,
+}: {
+  name: string;
+  phone: string;
+  email: string;
+  topic: string;
+  message: string;
+}): string {
+  const row = (label: string, value: string) =>
+    `<p style="margin:0 0 4px;color:${MUTED};">${label}: <span style="color:${TEXT};">${escapeHtml(value)}</span></p>`;
+  return emailLayout({
+    title: "درخواست مشاوره جدید",
+    bodyHtml: `
+      <p style="margin:0 0 8px;color:${TEXT};font-weight:bold;">درخواست مشاوره جدید از فرم سایت</p>
+      ${row("نام", name)}
+      ${row("تلفن", phone)}
+      ${email ? row("ایمیل", email) : ""}
+      ${row("موضوع", topic)}
+      ${message ? `<p style="margin:8px 0 0;color:${TEXT};white-space:pre-wrap;">${escapeHtml(message)}</p>` : ""}
+    `,
+  });
+}
+
 export function orderStatusEmail({
   orderNumber,
   statusLabel,

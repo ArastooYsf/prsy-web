@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site-url";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
 import { createNotification } from "./inapp";
-import { ticketReplyEmail, staffNewMessageEmail, orderStatusEmail, contractExpiryEmail } from "./templates";
+import { ticketReplyEmail, staffNewMessageEmail, consultationRequestEmail, orderStatusEmail, contractExpiryEmail } from "./templates";
 
 // Every notify* function below is safe to call without awaiting: internal
 // errors are always caught and logged, never thrown, so a failed email/SMS
@@ -143,6 +143,43 @@ export async function notifyStaffNewCustomerMessage({ ticket, customer }: { tick
       }
     }),
   );
+}
+
+export type ConsultationRequest = { name: string; phone: string; email: string; topic: string; message: string };
+
+/**
+ * A visitor submitted the public consultation form — notify every ADMIN/SUPPORT
+ * user in-app (always, full details, so the lead is stored even if email fails)
+ * and by email (respecting their email opt-out). Returns how many staff were
+ * notified so the caller can refuse to claim success when nobody could receive it.
+ */
+export async function notifyStaffConsultationRequest(request: ConsultationRequest): Promise<number> {
+  const staff = await prisma.user.findMany({
+    where: { role: { in: ["ADMIN", "SUPPORT"] }, deletedAt: null },
+    select: { id: true, email: true, notifyEmail: true },
+  });
+
+  const title = `درخواست مشاوره جدید: ${request.name}`;
+  const message = [
+    `نام: ${request.name}`,
+    `تلفن: ${request.phone}`,
+    request.email && `ایمیل: ${request.email}`,
+    `موضوع: ${request.topic}`,
+    request.message && `پیام: ${request.message}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const results = await Promise.all(
+    staff.map(async (member) => {
+      const stored = await createNotification({ userId: member.id, title, message }).then(() => true, () => false);
+      if (member.notifyEmail) {
+        await trySendEmail(member.email, title, consultationRequestEmail(request), "درخواست مشاوره");
+      }
+      return stored;
+    }),
+  );
+  return results.filter(Boolean).length;
 }
 
 /** An order's status changed — notify the customer by email + in-app (no SMS, per spec). */

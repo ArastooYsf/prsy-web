@@ -6,6 +6,12 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { isValidEmail, isValidUsername } from "@/lib/validation";
 import { verifyNationalId, summarizeOutcome } from "@/lib/national-id-verification";
 import { logEvent } from "@/lib/logger";
+import {
+  CODE_TTL_MS,
+  generateVerificationCode,
+  hashVerificationCode,
+  sendVerificationCodeEmail,
+} from "@/lib/email-verification";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -92,6 +98,24 @@ export async function POST(request: Request) {
       target: { type: "user", id: user.id, label: `ثبت‌نام «${companyName ?? user.email}»` },
       summary: summarizeOutcome(outcome),
     });
+  }
+
+  // Best-effort: a hiccup here shouldn't block account creation — the new
+  // account just lands on the "please verify" banner and can request a
+  // fresh code from there.
+  try {
+    const code = generateVerificationCode();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerificationCodeHash: hashVerificationCode(code),
+        emailVerificationCodeExpires: new Date(Date.now() + CODE_TTL_MS),
+        emailVerificationAttempts: 0,
+      },
+    });
+    await sendVerificationCodeEmail(user.email, code, false);
+  } catch {
+    // Swallowed on purpose — see comment above.
   }
 
   return NextResponse.json({ ok: true });

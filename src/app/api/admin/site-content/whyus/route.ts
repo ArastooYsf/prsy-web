@@ -59,6 +59,7 @@ export async function POST(request: Request) {
     advantages,
     partnersLabel: cleanText(body.partnersLabel),
     partnersSubtext: cleanText(body.partnersSubtext, MAX_DESCRIPTION),
+    partnersIcon: (typeof body.partnersIcon === "string" && VALID_ICON_KEYS.has(body.partnersIcon) ? body.partnersIcon : "buildings") as IconCardContent["icon"],
     partners,
   };
 

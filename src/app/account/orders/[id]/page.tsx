@@ -6,6 +6,7 @@ import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import OrderProgress from "@/components/OrderProgress";
 import StatusBadge from "@/components/ui/StatusBadge";
+import OrderItemRemoveButton from "@/components/account/OrderItemRemoveButton";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +37,14 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-foreground/10">
-        <table className="w-full min-w-[320px] text-sm">
+        <table className="w-full min-w-[420px] text-sm">
           <thead className="bg-foreground/[0.03] text-foreground/60">
             <tr>
               <th className="px-4 py-3 text-right font-medium">نام محصول</th>
               <th className="px-4 py-3 text-right font-medium">تعداد</th>
+              <th className="px-4 py-3 text-right font-medium">قیمت واحد</th>
+              <th className="px-4 py-3 text-right font-medium">جمع</th>
+              {order.status === "PENDING" && <th className="px-4 py-3 text-right font-medium" />}
             </tr>
           </thead>
           <tbody>
@@ -48,6 +52,17 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
               <tr key={item.id} className="border-t border-foreground/10">
                 <td className="px-4 py-3 font-medium">{item.productName}</td>
                 <td className="px-4 py-3 text-foreground/70">{formatNumber(item.quantity)}</td>
+                <td dir="ltr" className="px-4 py-3 text-right text-foreground/70">
+                  {item.price != null ? `${formatNumber(item.price)} تومان` : "—"}
+                </td>
+                <td dir="ltr" className="px-4 py-3 text-right font-medium">
+                  {item.price != null ? `${formatNumber(item.price * item.quantity)} تومان` : "—"}
+                </td>
+                {order.status === "PENDING" && (
+                  <td className="px-4 py-3 text-left">
+                    <OrderItemRemoveButton orderId={order.id} itemId={item.id} itemLabel={item.productName} />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

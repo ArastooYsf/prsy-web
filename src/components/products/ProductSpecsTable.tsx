@@ -1,4 +1,4 @@
-import type { ProductSpec } from "@/lib/product-json";
+import { formatSpecValue, type ProductSpec } from "@/lib/product-json";
 
 export default function ProductSpecsTable({ specs }: { specs: ProductSpec[] }) {
   if (specs.length === 0) return null;
@@ -15,7 +15,7 @@ export default function ProductSpecsTable({ specs }: { specs: ProductSpec[] }) {
               >
                 {spec.label}
               </th>
-              <td className="px-4 py-3 text-foreground/90">{spec.value}</td>
+              <td className="px-4 py-3 text-foreground/90">{formatSpecValue(spec)}</td>
             </tr>
           ))}
         </tbody>

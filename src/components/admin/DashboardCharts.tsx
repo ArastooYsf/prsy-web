@@ -53,6 +53,81 @@ export const tooltipStyle = {
 export const tooltipLabelStyle = { color: "rgb(var(--popover-foreground))" };
 export const axisTick = { fill: "rgb(var(--foreground) / 0.5)", fontSize: 11 };
 
+type LegendEntry = { value?: unknown; color?: string; dataKey?: unknown };
+
+// Replaces recharts' built-in <Legend> markup, which lays entries out as
+// fixed inline-blocks (swatch overlapping the next label under our RTL text,
+// no wrapping on narrow cards). Plain flex-wrap: entries reflow onto extra
+// lines on mobile, and recharts measures this element, so the plot shrinks to
+// make room instead of the legend overlapping it. Text stays in ink colour —
+// the swatch alone carries the series colour. Passing `onToggle` turns the
+// entries into show/hide buttons (the logs chart).
+export function ChartLegend({
+  payload,
+  hidden,
+  onToggle,
+}: {
+  payload?: readonly LegendEntry[];
+  hidden?: ReadonlySet<string>;
+  onToggle?: (dataKey: string) => void;
+}) {
+  return (
+    <ul dir="rtl" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-foreground/70">
+      {(payload ?? []).map((entry, i) => {
+        const key = String(entry.dataKey ?? entry.value ?? i);
+        const off = hidden?.has(key);
+        const body = (
+          <>
+            <span aria-hidden className="size-2.5 shrink-0 rounded-sm" style={{ backgroundColor: entry.color, opacity: off ? 0.35 : 1 }} />
+            <span className={off ? "opacity-40" : undefined}>{String(entry.value ?? "")}</span>
+          </>
+        );
+        return (
+          <li key={key}>
+            {onToggle ? (
+              <button type="button" onClick={() => onToggle(key)} aria-pressed={!off} className="inline-flex items-center gap-1.5 rounded px-1 py-1">
+                {body}
+              </button>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 py-1">{body}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+// Percent label centred in the donut ring (not outside it, where it landed
+// on the dark card background in default text colour). Rendered by recharts
+// after every sector, so it always paints above them. Slices under
+// MIN_LABEL_PERCENT are too thin to hold text without spilling onto a
+// neighbour — their exact value is in the tooltip instead.
+const MIN_LABEL_PERCENT = 0.06;
+function renderRingLabel(props: { cx?: number; cy?: number; midAngle?: number; innerRadius?: number; outerRadius?: number; percent?: number }) {
+  const { cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadius = 0, percent = 0 } = props;
+  if (percent < MIN_LABEL_PERCENT) return null;
+  const r = (innerRadius + outerRadius) / 2;
+  const rad = (-midAngle * Math.PI) / 180;
+  return (
+    <text
+      x={cx + r * Math.cos(rad)}
+      y={cy + r * Math.sin(rad)}
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={11}
+      fontWeight={700}
+      fill="#fff"
+      stroke="rgba(0,0,0,0.55)"
+      strokeWidth={3}
+      paintOrder="stroke"
+      pointerEvents="none"
+    >
+      {toPersianDigits(`${Math.round(percent * 100)}%`)}
+    </text>
+  );
+}
+
 // `height` defaults to this file's own cards (h-64); LogsDashboardCharts.tsx
 // passes a smaller value for its denser card grid.
 export function ChartCard({
@@ -154,7 +229,7 @@ export function TrendChart({ initialData, initialRange }: { initialData: TrendPo
             cursor={{ fill: "rgb(var(--foreground) / 0.05)" }}
             formatter={(value) => toPersianDigits(String(value ?? ""))}
           />
-          <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
+          <Legend content={(p) => <ChartLegend payload={p.payload} />} />
           <Bar dataKey="contracts" name="قراردادها" fill={CONTRACT_COLOR} radius={[4, 4, 0, 0]} />
           <Bar dataKey="orders" name="سفارش‌ها" fill={ORDER_COLOR} radius={[4, 4, 0, 0]} />
         </BarChart>
@@ -230,6 +305,9 @@ export function OrderStatusChart({ data }: { data: StatusCount[] }) {
 
 export function TicketStatusChart({ data }: { data: StatusCount[] }) {
   const total = data.reduce((sum, d) => sum + d.count, 0);
+  // A 0-count status would still claim a padding gap (and a legend row) for
+  // a slice with nothing in it.
+  const slices = data.filter((d) => d.count > 0);
 
   return (
     <ChartCard title="توزیع تیکت‌ها بر اساس وضعیت">
@@ -239,16 +317,16 @@ export function TicketStatusChart({ data }: { data: StatusCount[] }) {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={slices}
               dataKey="count"
               nameKey="label"
-              innerRadius={55}
-              outerRadius={85}
-              paddingAngle={2}
-              label={({ percent }) => toPersianDigits(`${Math.round((percent ?? 0) * 100)}%`)}
+              innerRadius="55%"
+              outerRadius="85%"
+              paddingAngle={slices.length > 1 ? 2 : 0}
+              label={renderRingLabel}
               labelLine={false}
             >
-              {data.map((entry) => (
+              {slices.map((entry) => (
                 <Cell key={entry.status} fill={TICKET_STATUS_COLORS[entry.status] ?? "#71717a"} />
               ))}
             </Pie>
@@ -257,7 +335,7 @@ export function TicketStatusChart({ data }: { data: StatusCount[] }) {
               labelStyle={tooltipLabelStyle}
               formatter={(value) => toPersianDigits(String(value ?? ""))}
             />
-            <Legend wrapperStyle={{ fontSize: 12, direction: "rtl" }} />
+            <Legend content={(p) => <ChartLegend payload={p.payload} />} />
           </PieChart>
         </ResponsiveContainer>
       )}

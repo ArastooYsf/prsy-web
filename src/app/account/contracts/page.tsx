@@ -11,21 +11,24 @@ import DateRangeDisplay from "@/components/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
+import { buildTicketHref } from "@/lib/ticket-href";
 
 export const dynamic = "force-dynamic";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function newContractTicketHref() {
-  const subject = "درخواست قرارداد جدید";
-  const message = "با سلام،\nدرخواست عقد یک قرارداد جدید را دارم. لطفاً برای هماهنگی جزئیات با من تماس بگیرید.";
-  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+  return buildTicketHref(
+    "درخواست قرارداد جدید",
+    "با سلام،\nدرخواست عقد یک قرارداد جدید را دارم. لطفاً برای هماهنگی جزئیات با من تماس بگیرید.",
+  );
 }
 
 function cancelContractTicketHref(contract: { title: string; type: string }) {
-  const subject = "درخواست لغو قرارداد";
-  const message = `با سلام،\nدرخواست لغو قرارداد «${contract.title}» (نوع: ${contract.type}) را دارم. لطفاً بررسی و پیگیری کنید.`;
-  return `/account/tickets/new?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+  return buildTicketHref(
+    "درخواست لغو قرارداد",
+    `با سلام،\nدرخواست لغو قرارداد «${contract.title}» (نوع: ${contract.type}) را دارم. لطفاً بررسی و پیگیری کنید.`,
+  );
 }
 
 export default async function AccountContractsPage() {

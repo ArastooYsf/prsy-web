@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 import { scoreTierHex } from "@/lib/score-tier";
-import { axisTick, ChartCard, RangeFilter, tooltipLabelStyle, tooltipStyle } from "@/components/admin/DashboardCharts";
+import { axisTick, ChartCard, ChartLegend, RangeFilter, tooltipLabelStyle, tooltipStyle } from "@/components/admin/DashboardCharts";
 import { CATEGORY_META } from "@/components/admin/log-category-meta";
 import { jalaliDayLabel, type StatsRange } from "@/lib/stats-range";
 import { ALL_LOG_CATEGORIES, CATEGORY_LABELS_FA, type LogCategory } from "@/lib/log-types";
@@ -75,10 +75,8 @@ export function LogEventsTrendChart({ initialData, initialRange }: { initialData
               formatter={(value, name) => [toPersianDigits(String(value ?? "")), name]}
             />
             <Legend
-              wrapperStyle={{ fontSize: 12, direction: "rtl", cursor: "pointer" }}
-              onClick={(o) => toggleCategory(o.dataKey as LogCategory)}
-              formatter={(value, entry) => (
-                <span style={{ color: hidden.has(entry.dataKey as LogCategory) ? "rgb(var(--foreground) / 0.35)" : undefined }}>{value}</span>
+              content={(p) => (
+                <ChartLegend payload={p.payload} hidden={hidden} onToggle={(key) => toggleCategory(key as LogCategory)} />
               )}
             />
             {ALL_LOG_CATEGORIES.map((category) => (

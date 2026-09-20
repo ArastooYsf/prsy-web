@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ToastProvider";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -53,9 +54,8 @@ export default function PasswordForm() {
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">رمز عبور فعلی</label>
-        <input
+        <PasswordInput
           dir="ltr"
-          type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
           className={inputClass}
@@ -64,9 +64,8 @@ export default function PasswordForm() {
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">رمز عبور جدید</label>
-        <input
+        <PasswordInput
           dir="ltr"
-          type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           className={inputClass}
@@ -76,9 +75,8 @@ export default function PasswordForm() {
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-foreground/80">تکرار رمز عبور جدید</label>
-        <input
+        <PasswordInput
           dir="ltr"
-          type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           className={inputClass}

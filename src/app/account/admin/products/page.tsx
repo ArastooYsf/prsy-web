@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { Boxes, Plus, FolderTree, Tag } from "lucide-react";
+import { Boxes, Plus, FolderTree, Tag, ListChecks } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
@@ -66,6 +66,13 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
           >
             <FolderTree className="size-4" />
             دسته‌بندی‌ها
+          </Link>
+          <Link
+            href="/account/admin/products/spec-templates"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          >
+            <ListChecks className="size-4" />
+            مشخصات پیش‌فرض
           </Link>
           <Link
             href="/account/admin/products/brands"

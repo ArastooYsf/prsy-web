@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import TurnstileWidget from "@/components/TurnstileWidget";
 import { useToast } from "@/components/ToastProvider";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -187,10 +188,9 @@ export default function LoginForm() {
         <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-foreground/80">
           رمز عبور
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           dir="ltr"
           required
           autoComplete="current-password"

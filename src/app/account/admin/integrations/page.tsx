@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { ChevronLeft, Plug } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { INTEGRATIONS_REGISTRY, isProviderConnected } from "@/lib/integrations/registry";
+import { toPersianDigits } from "@/lib/format-number";
 import { CONNECTION_STATUS } from "@/lib/status-labels";
 import StatusBadge from "@/components/ui/StatusBadge";
 
@@ -56,7 +57,7 @@ export default async function IntegrationsHubPage() {
               </div>
               <p className="text-xs leading-6 text-foreground/55">{provider.description}</p>
               <div className="mt-auto flex items-center justify-between pt-1 text-xs text-foreground/40">
-                <span>{provider.services.length > 0 ? `${provider.services.length} سرویس` : "بدون سرویس اجرایی"}</span>
+                <span>{provider.services.length > 0 ? `${toPersianDigits(provider.services.length)} سرویس` : "بدون سرویس اجرایی"}</span>
                 <ChevronLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
               </div>
             </Link>

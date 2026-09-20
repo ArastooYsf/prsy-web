@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
 import NationalIdInquiryField, { type InquiredCompany } from "@/components/NationalIdInquiryField";
+import EmailChangeSection from "@/components/account/EmailChangeSection";
 import { useToast } from "@/components/ToastProvider";
 import FormErrorBanner from "@/components/ui/FormErrorBanner";
-import { isValidEmail, isValidIranPhone } from "@/lib/validation";
+import { isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -17,6 +18,8 @@ type ProfileFormProps = {
   initialName: string;
   initialPhone: string;
   initialEmail: string;
+  initialEmailVerified: boolean;
+  initialPendingEmail: string | null;
   initialAlternatePhone: string;
   initialAddress: string;
   initialAvatarUrl: string;
@@ -30,6 +33,8 @@ export default function ProfileForm({
   initialName,
   initialPhone,
   initialEmail,
+  initialEmailVerified,
+  initialPendingEmail,
   initialAlternatePhone,
   initialAddress,
   initialAvatarUrl,
@@ -40,7 +45,6 @@ export default function ProfileForm({
   const { showToast } = useToast();
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone);
-  const [email, setEmail] = useState(initialEmail);
   const [alternatePhone, setAlternatePhone] = useState(initialAlternatePhone);
   const [address, setAddress] = useState(initialAddress);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
@@ -69,10 +73,6 @@ export default function ProfileForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidEmail(email)) {
-      showToast("ایمیل معتبر نیست.", "error");
-      return;
-    }
     if (phone && !isValidIranPhone(phone)) {
       showToast("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
       return;
@@ -90,7 +90,7 @@ export default function ProfileForm({
       res = await fetch("/api/account/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, alternatePhone, address, avatarUrl, companyName, nationalId }),
+        body: JSON.stringify({ name, phone, alternatePhone, address, avatarUrl, companyName, nationalId }),
       });
     } catch {
       setSaving(false);
@@ -114,7 +114,7 @@ export default function ProfileForm({
     <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
       <h3 className="text-base font-bold">اطلاعات شخصی</h3>
 
-      <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} nameForAlt={name || email} />
+      <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} nameForAlt={name || initialEmail} />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
@@ -134,13 +134,10 @@ export default function ProfileForm({
         </div>
 
         <div className={isCustomer ? "" : "sm:col-span-2"}>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">ایمیل</label>
-          <input
-            dir="ltr"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
+          <EmailChangeSection
+            currentEmail={initialEmail}
+            emailVerified={initialEmailVerified}
+            pendingEmail={initialPendingEmail}
           />
         </div>
 

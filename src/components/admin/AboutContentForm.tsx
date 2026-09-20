@@ -164,6 +164,12 @@ export default function AboutContentForm({ initialContent }: { initialContent: A
               className={`${inputClass} resize-y`}
             />
           </div>
+          <div className="sm:col-span-2">
+            <IconPicker
+              label="آیکون نشان اعتماد"
+              value={content.trustBadgeIcon}
+              onChange={(icon) => setContent((p) => ({ ...p, trustBadgeIcon: icon }))}
+            /></div>
         </div>
       </div>
 

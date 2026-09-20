@@ -101,7 +101,7 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <StatCard key={card.label} label={card.label} value={card.value} icon={card.icon} />
+          <StatCard key={card.label} label={card.label} value={formatNumber(card.value)} icon={card.icon} />
         ))}
         <SiteViewsCard initialCount={charts.pageViews} initialRange="30d" />
       </div>

@@ -25,41 +25,63 @@ enum ApprovalStatus {
 }
 
 model User {
-  id                     String         @id @default(cuid())
-  email                  String         @unique
-  password               String
-  name                   String?
+  id                           String         @id @default(cuid())
+  email                        String         @unique
+  // null = never verified (a fresh registration, or an in-progress email
+  // change awaiting its code). Set to the moment the address was last
+  // confirmed — either at signup or via a change. Existing accounts from
+  // before this feature shipped are backfilled to their createdAt (see the
+  // migration) so verification is only ever demanded of genuinely new
+  // signups, not retroactively of everyone already using the app.
+  emailVerified                DateTime?
+  // The new address an in-progress email change is waiting to be confirmed
+  // for — null the rest of the time. `email` itself is only overwritten once
+  // the code below is verified.
+  pendingEmail                 String?
+  // SHA-256 of the current one-time code (never stored in plain text), the
+  // address it applies to being whichever of pendingEmail/email is
+  // meaningful at the time — see src/lib/email-verification.ts. Shared by
+  // both the initial-signup and email-change flows since they're the same
+  // "prove you control this inbox" action.
+  emailVerificationCodeHash    String?
+  emailVerificationCodeExpires DateTime?
+  // Wrong-code guesses against the current code — reset to 0 whenever a new
+  // code is issued, checked against MAX_ATTEMPTS before comparing so a
+  // spent-out code can't keep being guessed at.
+  emailVerificationAttempts    Int            @default(0)
+  password                     String
+  name                         String?
   // Optional handle collected at signup (register step 2) — not used for
   // login (email still is) or displayed anywhere yet; a unique nullable
   // column lets multiple users leave it blank without colliding on NULL.
-  username               String?        @unique
-  phone                  String?
-  alternatePhone         String?
-  address                String?
-  avatarUrl              String?
-  role                   Role           @default(CUSTOMER)
-  customerType           CustomerType   @default(INDIVIDUAL)
-  companyName            String?
+  username                     String?        @unique
+  phone                        String?
+  alternatePhone               String?
+  address                      String?
+  avatarUrl                    String?
+  role                         Role           @default(CUSTOMER)
+  customerType                 CustomerType   @default(INDIVIDUAL)
+  companyName                  String?
   // شناسه ملی (11-digit legal-entity national ID) — renamed from
   // economicCode, which conflated two distinct Iranian identifiers. This is
   // the value sent to api.ir's CompanyInfo inquiry (src/lib/integrations/api-ir.ts).
-  nationalId             String?
+  nationalId                   String?
   // Result of the LAST server-side api.ir inquiry for nationalId — never
   // trusted from client input, always re-verified server-side at
   // registration/profile-save time (see src/app/api/auth/register/route.ts
   // and src/app/api/account/profile/route.ts). false/null means "not
   // verified yet or the last attempt failed", not "rejected" — a LEGAL
   // account is never blocked by this, only flagged for admins to see.
-  nationalIdVerified     Boolean        @default(false)
-  nationalIdOfficialName String?
-  nationalIdActive       Boolean?
-  nationalIdCheckedAt    DateTime?
-  approvalStatus         ApprovalStatus @default(APPROVED)
-  notes                  String?        @db.Text
-  failedLoginAttempts    Int            @default(0)
-  lockedUntil            DateTime?
-  twoFactorSecret        String?
-  twoFactorEnabled       Boolean        @default(false)
+  nationalIdVerified           Boolean        @default(false)
+  nationalIdOfficialName       String?
+  nationalIdActive             Boolean?
+  nationalIdCheckedAt          DateTime?
+  approvalStatus               ApprovalStatus @default(APPROVED)
+  notes                        String?        @db.Text
+  failedLoginAttempts          Int            @default(0)
+  lockedUntil                  DateTime?
+  twoFactorSecret              String?
+  twoFactorEnabled             Boolean        @default(false)
   // Notification preferences (src/app/account/settings, enforced in
   // src/lib/notifications/events.ts). Two channel-level switches plus one
   // per-event switch; in-app (the bell/Notification row) is intentionally
@@ -67,15 +89,19 @@ model User {
   // notifyStaffNewMessage only applies to ADMIN/SUPPORT accounts; the
   // customer-facing three only apply to CUSTOMER accounts — harmless no-ops
   // either way since each is only ever read on the role it applies to.
-  notifyEmail            Boolean        @default(true)
-  notifySms              Boolean        @default(true)
-  notifyTicketReply      Boolean        @default(true)
-  notifyOrderStatus      Boolean        @default(true)
-  notifyContractExpiry   Boolean        @default(true)
-  notifyStaffNewMessage  Boolean        @default(true)
-  deletedAt              DateTime?
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
+  notifyEmail                  Boolean        @default(true)
+  notifySms                    Boolean        @default(true)
+  notifyTicketReply            Boolean        @default(true)
+  notifyOrderStatus            Boolean        @default(true)
+  notifyContractExpiry         Boolean        @default(true)
+  notifyStaffNewMessage        Boolean        @default(true)
+  // Manually-chosen site theme, synced across every device for this account
+  // (src/components/RouteThemeScope.tsx). null = never toggled yet — follow
+  // the browser's prefers-color-scheme instead of a stored choice.
+  themeLight                   Boolean?
+  deletedAt                    DateTime?
+  createdAt                    DateTime       @default(now())
+  updatedAt                    DateTime       @updatedAt
 
   posts                 BlogPost[]
   mediaAssets           MediaAsset[]

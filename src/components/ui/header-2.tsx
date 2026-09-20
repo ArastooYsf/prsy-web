@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -16,12 +17,17 @@ import { ShoppingCart } from 'lucide-react';
 import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 import { HeaderSearch } from '@/components/ui/HeaderSearch';
 import { ProductsMegaMenu } from '@/components/ui/ProductsMegaMenu';
+import CartMenu from '@/components/ui/CartMenu';
+import { useCart } from '@/components/CartProvider';
+import { formatNumber } from '@/lib/format-number';
+import { getMediaUrl } from '@/lib/media';
 import { MobileProductsAccordion } from '@/components/ui/MobileProductsAccordion';
 import { ConsultationCtaButton } from '@/components/ui/ConsultationCtaButton';
 import { ThemeToggleButton } from '@/components/ui/ThemeToggleButton';
 import SpotlightCursor from '@/components/ui/SpotlightCursor';
 import AuthNavLink from '@/components/AuthNavLink';
 import { useSiteTheme } from '@/components/RouteThemeScope';
+import { useExclusiveOverlay } from '@/components/OverlayCoordinator';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import type { MenuCategory } from '@/lib/menu-taxonomy';
 import { DEFAULT_HEADER_NAV_LABELS } from '@/lib/site-content-defaults';
@@ -111,16 +117,24 @@ function buildTrapezoidPath(cx: number, halfW: number, navWidth: number) {
 export function Header({
 	menuCategories = [],
 	navLabels = DEFAULT_HEADER_NAV_LABELS,
+	logo = '',
 }: {
 	menuCategories?: MenuCategory[];
 	navLabels?: HeaderNavLabelsContent;
+	/** Admin-set logo image (media path); empty = the built-in "یا" monogram. */
+	logo?: string;
 }) {
 	const pathname = usePathname();
 	const [open, setOpen] = React.useState(false);
+	// Closes this drawer if some other top-level panel (search, cart, the
+	// products mega-menu, a gallery lightbox, ...) opens while it's open, and
+	// vice versa — see OverlayCoordinator.
+	useExclusiveOverlay('mobile-nav-drawer', open, () => setOpen(false));
 	const isAccountArea = pathname?.startsWith('/account');
 	const siteTheme = useSiteTheme();
 	const isLightTheme = siteTheme?.theme !== 'dark';
 	const isOffline = useOnlineStatus();
+	const { totalCount: cartCount } = useCart();
 
 	// The mobile drawer is `position:fixed`, so its `top` offset has to match
 	// the header's actual rendered height in px — not a hardcoded Tailwind
@@ -565,9 +579,15 @@ export function Header({
 						href="/"
 						className="group flex shrink-0 items-center gap-2 text-base font-bold transition-transform duration-300 hover:scale-[1.03]"
 					>
-						<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
-							یا
-						</span>
+						{logo ? (
+							<span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg">
+								<Image src={getMediaUrl(logo)} alt="" fill sizes="32px" className="object-contain" />
+							</span>
+						) : (
+							<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-xs font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
+								یا
+							</span>
+						)}
 						{/* Collapses via max-width + opacity, not a `hidden` display toggle:
 							display:none can't be transitioned, so the old on/off switch made
 							this text's width disappear in a single frame — which yanked
@@ -640,11 +660,7 @@ export function Header({
 						<Link href="/contact">تماس با ما</Link>
 					</Button>
 					<ConsultationCtaButton size="sm" className="hover:shadow-lg hover:shadow-accent-500/30" />
-					<Button size="icon" variant="outline" className="h-9 w-9" asChild>
-						<Link href="/cart" aria-label="سبد خرید">
-							<ShoppingCart className="size-[18px]" />
-						</Link>
-					</Button>
+					<CartMenu />
 					<AuthNavLink variant="icon" />
 					<ThemeToggleButton />
 				</div>
@@ -719,6 +735,11 @@ export function Header({
 							<Link href="/cart" onClick={() => setOpen(false)}>
 								<ShoppingCart className="size-4" />
 								سبد خرید
+								{cartCount > 0 && (
+									<span className="mr-1 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+										{formatNumber(cartCount)}
+									</span>
+								)}
 							</Link>
 						</Button>
 						<AuthNavLink variant="block" onNavigate={() => setOpen(false)} />

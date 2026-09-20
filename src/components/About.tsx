@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star } from "@phosphor-icons/react";
 import Counter from "@/components/Counter";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { DEFAULT_ABOUT, getIconByKey } from "@/lib/site-content-defaults";
 import type { AboutContent } from "@/lib/site-content";
 
 export default function About({ content = DEFAULT_ABOUT }: { content?: AboutContent }) {
-  const { title, body, principles, yearsValue, registrationNumber, registrationLabel, trustBadgeTitle, trustBadgeText } = content;
+  const { title, body, principles, yearsValue, registrationNumber, registrationLabel, trustBadgeTitle, trustBadgeText, trustBadgeIcon } = content;
+  const TrustBadgeIcon = getIconByKey(trustBadgeIcon);
 
   return (
     <section id="about" className="section-padding relative border-t border-foreground/10">
@@ -88,7 +88,7 @@ export default function About({ content = DEFAULT_ABOUT }: { content?: AboutCont
 
             <div className="mt-8 flex items-start gap-4 rounded-xl border border-accent-500/30 bg-accent-500/10 p-5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-500/20 text-accent-400 shadow-md shadow-accent-500/10">
-                <Star size={22} />
+                <TrustBadgeIcon size={22} />
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">{trustBadgeTitle}</p>

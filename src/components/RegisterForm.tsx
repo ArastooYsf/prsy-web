@@ -11,6 +11,7 @@ import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 import NationalIdInquiryField from "@/components/NationalIdInquiryField";
 import { useToast } from "@/components/ToastProvider";
 import { isValidEmail, isValidUsername } from "@/lib/validation";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -279,10 +280,9 @@ export default function RegisterForm() {
 
           <div>
             <FieldLabel htmlFor="password" label="رمز عبور" error={fieldErrors.password} />
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               dir="ltr"
               autoComplete="new-password"
               value={password}
@@ -295,10 +295,9 @@ export default function RegisterForm() {
 
           <div>
             <FieldLabel htmlFor="confirmPassword" label="تکرار رمز عبور" error={fieldErrors.confirmPassword} />
-            <input
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
               dir="ltr"
               autoComplete="new-password"
               value={confirmPassword}

@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, ImageOff, X } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
+import { useExclusiveOverlay } from "@/components/OverlayCoordinator";
 import { dialogOverlayAnimation } from "@/lib/motion";
 
 export type ProductGalleryProps = {
@@ -29,6 +30,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(1);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  useExclusiveOverlay("product-gallery-lightbox", lightboxOpen, () => setLightboxOpen(false));
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const mobileTrackRef = useRef<HTMLDivElement>(null);

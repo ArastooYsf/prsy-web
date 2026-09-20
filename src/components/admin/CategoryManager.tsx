@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, FolderTree, CornerDownLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, FolderTree, CornerDownLeft, X } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ToastProvider";
+import IconPicker, { type IconPickerOption } from "@/components/admin/IconPicker";
 import { CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS, type CategoryIconKey } from "@/lib/category-icons";
-import { SPEC_TEMPLATES, resolvedSpecTemplateKey } from "@/lib/product-spec-templates";
+import { resolvedSpecTemplateKey, type SpecTemplates } from "@/lib/product-spec-templates";
 import type { ProductCategory } from "@/generated/prisma/client";
 
 const inputClass =
@@ -26,6 +27,17 @@ function parsePreviewSpecKeys(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
 
+// Same closed grid the content cards use (IconPicker), fed with the
+// category-specific icon set; "" = no icon.
+const CATEGORY_ICON_PICKER_OPTIONS: IconPickerOption<string>[] = [
+  { key: "", label: "بدون آیکون", icon: <X className="size-[18px]" /> },
+  ...CATEGORY_ICON_KEYS.map((key) => ({
+    key: key as string,
+    label: CATEGORY_ICON_LABELS[key],
+    icon: <span className="[&_svg]:size-[18px]">{CATEGORY_ICONS[key]}</span>,
+  })),
+];
+
 function CategoryIcon({ icon }: { icon: string | null }) {
   if (!icon || !(CATEGORY_ICON_KEYS as readonly string[]).includes(icon)) {
     return <FolderTree className="size-4 text-foreground/40" />;
@@ -33,7 +45,7 @@ function CategoryIcon({ icon }: { icon: string | null }) {
   return <span className="[&_svg]:size-5 text-foreground/60">{CATEGORY_ICONS[icon as CategoryIconKey]}</span>;
 }
 
-export default function CategoryManager({ categories }: { categories: ProductCategory[] }) {
+export default function CategoryManager({ categories, specTemplates }: { categories: ProductCategory[]; specTemplates: SpecTemplates }) {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -155,16 +167,13 @@ export default function CategoryManager({ categories }: { categories: ProductCat
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام</label>
             <input value={form.draft.name} onChange={(e) => setForm({ ...form, draft: { ...form.draft, name: e.target.value } })} className={inputClass} />
           </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground/80">آیکون</label>
-            <select value={form.draft.icon} onChange={(e) => setForm({ ...form, draft: { ...form.draft, icon: e.target.value } })} className={inputClass}>
-              <option value="">بدون آیکون</option>
-              {CATEGORY_ICON_KEYS.map((key) => (
-                <option key={key} value={key}>
-                  {CATEGORY_ICON_LABELS[key]}
-                </option>
-              ))}
-            </select>
+          <div className="sm:col-span-2">
+            <IconPicker
+              label="آیکون"
+              value={form.draft.icon}
+              onChange={(icon) => setForm({ ...form, draft: { ...form.draft, icon } })}
+              options={CATEGORY_ICON_PICKER_OPTIONS}
+            />
           </div>
           <div className="max-w-[8rem]">
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">ترتیب</label>
@@ -184,7 +193,7 @@ export default function CategoryManager({ categories }: { categories: ProductCat
                 چیزی انتخاب نشود، چند مشخصه‌ی اول محصول به‌صورت پیش‌فرض نمایش داده می‌شود.
               </p>
               <div className="flex flex-wrap gap-2">
-                {SPEC_TEMPLATES[resolvedSpecTemplateKey(form.draft.specTemplateKey)].map((label) => {
+                {specTemplates[resolvedSpecTemplateKey(form.draft.specTemplateKey)].map((label) => {
                   const checked = form.draft.previewSpecKeys.includes(label);
                   return (
                     <button

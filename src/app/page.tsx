@@ -7,6 +7,7 @@ import FAQ from "@/components/FAQ";
 import ConsultationSection from "@/components/ConsultationSection";
 import {
   getHeroSlides,
+  getHeroSettings,
   getFaqItems,
   getWhyUsContent,
   getCustomersContent,
@@ -19,9 +20,19 @@ import { debugSlowLoad } from "@/lib/debug-slow-load";
 export default async function Home() {
   await debugSlowLoad();
 
-  const [heroSlides, faqItems, whyUsContent, customersContent, featuresContent, socialProofContent, consultationContent] =
+  const [
+    heroSlides,
+    heroSettings,
+    faqItems,
+    whyUsContent,
+    customersContent,
+    featuresContent,
+    socialProofContent,
+    consultationContent,
+  ] =
     await Promise.all([
       getHeroSlides(),
+      getHeroSettings(),
       getFaqItems(),
       getWhyUsContent(),
       getCustomersContent(),
@@ -32,7 +43,7 @@ export default async function Home() {
 
   return (
     <>
-      <Hero slides={heroSlides} />
+      <Hero slides={heroSlides} autoplaySeconds={heroSettings.autoplaySeconds} />
       <WhyUs content={whyUsContent} />
       <Customers content={customersContent} />
       <Features content={featuresContent} />

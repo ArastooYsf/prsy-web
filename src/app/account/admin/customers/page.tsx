@@ -4,6 +4,7 @@ import { FileSpreadsheet, UserCheck, UserPlus, Users } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { formatNumber } from "@/lib/format-number";
 import { CUSTOMER_TYPE, APPROVAL_STATUS } from "@/lib/status-labels";
 import { filterQueryString, param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import ListFilterBar from "@/components/admin/ListFilterBar";
@@ -77,7 +78,7 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
             اشخاص حقوقی نیازمند بررسی دستی
             {needsReviewCount > 0 && (
               <span className="mr-1.5 rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                {needsReviewCount}
+                {formatNumber(needsReviewCount)}
               </span>
             )}
           </Link>

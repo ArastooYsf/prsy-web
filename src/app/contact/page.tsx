@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { MapPin, Phone as PhoneIcon, EnvelopeSimple } from "@phosphor-icons/react/ssr";
 import { getFooterContact, getLegalPageHtml, getContactHeroContent } from "@/lib/site-content";
-import { SOCIAL_ICONS } from "@/lib/social-icons";
+import { getSocialLink } from "@/lib/social-platforms";
 import { toPersianDigits } from "@/lib/format-number";
-import ThemedMapFrame from "@/components/ui/ThemedMapFrame";
+import ContactMapCard from "@/components/ContactMapCard";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 import ThemedProse from "@/components/ui/ThemedProse";
 
@@ -34,9 +34,7 @@ export default async function ContactPage() {
   ];
   const contactItems = rawContactItems.filter((item): item is ContactItem => item !== null);
 
-  const socials = (Object.keys(SOCIAL_ICONS) as (keyof typeof SOCIAL_ICONS)[])
-    .map((key) => ({ ...SOCIAL_ICONS[key], href: contact[key] }))
-    .filter((social) => social.href);
+  const socials = contact.socialLinks.map((href) => ({ ...getSocialLink(href), href }));
 
   return (
     <>
@@ -84,13 +82,7 @@ export default async function ContactPage() {
             ))}
           </div>
 
-          <div className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-foreground/10">
-            <ThemedMapFrame
-              title={hero.mapLabel}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(contact.address)}&output=embed`}
-              className="h-72 w-full sm:h-80"
-            />
-          </div>
+          <ContactMapCard address={contact.address} mapLabel={hero.mapLabel} />
 
           {socials.length > 0 && (
             <div className="mx-auto mt-10 max-w-2xl text-center">
@@ -100,14 +92,14 @@ export default async function ContactPage() {
               <div className="mt-4 flex items-center justify-center gap-3">
                 {socials.map((social) => (
                   <a
-                    key={social.name}
+                    key={social.href}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.name}
                     className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400"
                   >
-                    {social.icon}
+                    <social.Icon size={18} />
                   </a>
                 ))}
               </div>

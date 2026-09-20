@@ -15,6 +15,12 @@ type PriceRangeFilterProps = {
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-2.5 py-2 text-sm text-foreground outline-none transition-colors focus:border-accent-500/50";
 
+// Every product price in this catalog is entered as a round multiple of
+// 1,000,000 toman (28M, 45M, 62M, 320M, ...) — so a 1,000,000 step lets the
+// slider land on every real price exactly, without ever settling on an ugly
+// in-between number, and without being finer than the data actually is.
+const PRICE_STEP = 1_000_000;
+
 export default function PriceRangeFilter({ bounds, min, max, onCommit }: PriceRangeFilterProps) {
   // The slider needs live values while dragging (before the drag ends); the
   // number inputs need their own editable string state so a user can clear a
@@ -24,12 +30,27 @@ export default function PriceRangeFilter({ bounds, min, max, onCommit }: PriceRa
   const [range, setRange] = useState<[number, number]>([min, max]);
   const [minText, setMinText] = useState(String(min));
   const [maxText, setMaxText] = useState(String(max));
+  // Which thumb shows its live-value tooltip: whichever is being dragged, or
+  // (with nothing being dragged) whichever is hovered.
+  const [hoverThumb, setHoverThumb] = useState<0 | 1 | null>(null);
+  const [dragThumb, setDragThumb] = useState<0 | 1 | null>(null);
+  const tooltipThumb = dragThumb ?? hoverThumb;
 
   useEffect(() => {
     setRange([min, max]);
     setMinText(String(min));
     setMaxText(String(max));
   }, [min, max]);
+
+  // A pointerdown on a thumb can end (pointerup) anywhere on the page once
+  // dragging — not necessarily back over the thumb — so releasing has to be
+  // caught globally rather than via the thumb's own handlers.
+  useEffect(() => {
+    if (dragThumb === null) return;
+    const clear = () => setDragThumb(null);
+    window.addEventListener("pointerup", clear);
+    return () => window.removeEventListener("pointerup", clear);
+  }, [dragThumb]);
 
   const clamp = (value: number) => Math.min(Math.max(value, bounds.min), bounds.max);
 
@@ -60,11 +81,11 @@ export default function PriceRangeFilter({ bounds, min, max, onCommit }: PriceRa
   return (
     <div>
       <Slider.Root
-        className="relative flex h-5 w-full touch-none select-none items-center"
+        className="relative mt-9 flex h-5 w-full touch-none select-none items-center"
         dir="ltr"
         min={bounds.min}
         max={bounds.max}
-        step={1}
+        step={PRICE_STEP}
         value={range}
         onValueChange={(v) => setRange([v[0], v[1]])}
         onValueCommit={(v) => {
@@ -76,14 +97,25 @@ export default function PriceRangeFilter({ bounds, min, max, onCommit }: PriceRa
         <Slider.Track className="relative h-1.5 w-full grow rounded-full bg-foreground/10">
           <Slider.Range className="absolute h-full rounded-full bg-accent-500" />
         </Slider.Track>
-        <Slider.Thumb
-          aria-label="کمترین قیمت"
-          className="block size-5 rounded-full border-2 border-accent-500 bg-background shadow transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40"
-        />
-        <Slider.Thumb
-          aria-label="بیشترین قیمت"
-          className="block size-5 rounded-full border-2 border-accent-500 bg-background shadow transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40"
-        />
+        {([0, 1] as const).map((i) => (
+          <Slider.Thumb
+            key={i}
+            aria-label={i === 0 ? "کمترین قیمت" : "بیشترین قیمت"}
+            onPointerEnter={() => setHoverThumb(i)}
+            onPointerLeave={() => setHoverThumb((h) => (h === i ? null : h))}
+            onPointerDown={() => setDragThumb(i)}
+            className="relative block size-5 rounded-full border-2 border-accent-500 bg-background shadow transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40"
+          >
+            {tooltipThumb === i && (
+              <span
+                dir="ltr"
+                className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-[11px] font-semibold text-background shadow-lg"
+              >
+                {formatNumber(range[i])}
+              </span>
+            )}
+          </Slider.Thumb>
+        ))}
       </Slider.Root>
 
       <div className="mt-3 flex items-center gap-2" dir="ltr">

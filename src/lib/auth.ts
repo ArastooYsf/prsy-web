@@ -152,10 +152,21 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+      }
+      // Fired by the client calling useSession().update() — used right
+      // after a successful email change so session.user.email reflects the
+      // new address immediately instead of waiting for the token's normal
+      // updateAge refresh (up to 24h) or the next full login.
+      if (trigger === "update" && token.id) {
+        const fresh = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { email: true },
+        });
+        if (fresh) token.email = fresh.email;
       }
       return token;
     },

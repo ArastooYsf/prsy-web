@@ -28,7 +28,11 @@ export default function OfflineBanner() {
           // itself down by exactly this much when offline, so the two need
           // to agree on a concrete number rather than one measuring the
           // other.
-          className="fixed inset-x-0 top-0 z-[60] flex min-h-9 items-center justify-center gap-2 border-b border-accent-500/20 bg-background/95 px-4 py-1.5 text-center text-xs font-medium text-foreground/80 shadow-md backdrop-blur supports-[backdrop-filter]:bg-background/80"
+          // Solid background, no backdrop-blur — same fix as
+          // CookieConsentBanner/ProductBuyBox: a fixed element with a
+          // backdrop-filter that stays on screen through scroll forces a
+          // recomposite every frame.
+          className="fixed inset-x-0 top-0 z-[60] flex min-h-9 items-center justify-center gap-2 border-b border-accent-500/20 bg-background px-4 py-1.5 text-center text-xs font-medium text-foreground/80 shadow-md"
         >
           <WifiOff className="size-4 shrink-0 text-accent-400" aria-hidden />
           اتصال اینترنت شما قطع شده — تا وصل شدن دوباره، برخی بخش‌های سایت ممکنه به‌روز نشن.

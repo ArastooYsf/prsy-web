@@ -6,6 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
 import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
 import ProductPicker from "@/components/admin/ProductPicker";
+import FormattedNumberInput from "@/components/ui/FormattedNumberInput";
 import type { AdminProductSearchResult } from "@/lib/admin-product-search";
 
 const inputClass =
@@ -229,12 +230,9 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
                   />
                 </div>
                 <div className="w-36 shrink-0">
-                  <input
-                    type="number"
-                    min={0}
-                    dir="ltr"
-                    value={item.price}
-                    onChange={(e) => updateItem(index, "price", e.target.value)}
+                  <FormattedNumberInput
+                    value={String(item.price)}
+                    onChange={(v) => updateItem(index, "price", v)}
                     placeholder="قیمت واحد (تومان)"
                     aria-label="قیمت واحد (تومان)"
                     className={`${inputClass} ${priceInvalid ? "border-red-500/50" : ""}`}

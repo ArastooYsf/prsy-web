@@ -37,15 +37,38 @@ export function MobileProductsAccordion({
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className={buttonVariants({ variant: "ghost", className: "w-full justify-between" })}
-      >
-        محصولات
-        <ChevronDown aria-hidden className={cn("size-4 transition-transform duration-300", open && "rotate-180")} />
-      </button>
+      {/* Two separate tap targets sharing one row, not one <button> — the
+          text and the chevron need different actions once the menu is
+          already open (text then navigates to /products/all; the chevron
+          always just toggles), which a single click handler can't express. */}
+      <div className={cn(buttonVariants({ variant: "ghost", className: "w-full justify-between p-0" }), "h-auto min-h-11")}>
+        {open ? (
+          <Link
+            href="/products/all"
+            onClick={onNavigate}
+            className="flex min-h-11 flex-1 items-center px-4 py-2"
+          >
+            محصولات
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="flex min-h-11 flex-1 items-center px-4 py-2 text-right"
+          >
+            محصولات
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-label={open ? "بستن زیرمنوی محصولات" : "باز کردن زیرمنوی محصولات"}
+          className="flex min-h-11 shrink-0 items-center px-4 py-2"
+        >
+          <ChevronDown aria-hidden className={cn("size-4 transition-transform duration-300", open && "rotate-180")} />
+        </button>
+      </div>
 
       <div
         aria-hidden={!open}

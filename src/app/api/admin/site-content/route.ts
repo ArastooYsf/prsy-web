@@ -4,10 +4,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
-import { SITE_CONTENT_TAG, type HeroSlideContent } from "@/lib/site-content";
+import { SITE_CONTENT_TAG, DEFAULT_HERO_SETTINGS, type HeroSlideContent, type HeroSettingsContent } from "@/lib/site-content";
 
 const MAX_TEXT_LENGTH = 300;
 const MAX_HTML_LENGTH = 5000;
+// Below MIN it flicks past before anyone can read it; above MAX the slider
+// reads as stuck/broken rather than intentionally slow.
+const MIN_AUTOPLAY_SECONDS = 2;
+const MAX_AUTOPLAY_SECONDS = 30;
 
 function cleanHeroSlide(raw: unknown): HeroSlideContent | null {
   if (!raw || typeof raw !== "object") return null;
@@ -24,6 +28,15 @@ function cleanHeroSlide(raw: unknown): HeroSlideContent | null {
   };
 }
 
+function cleanHeroSettings(raw: unknown): HeroSettingsContent {
+  const r = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const parsed = typeof r.autoplaySeconds === "number" ? r.autoplaySeconds : Number(r.autoplaySeconds);
+  const autoplaySeconds = Number.isFinite(parsed)
+    ? Math.min(Math.max(Math.round(parsed), MIN_AUTOPLAY_SECONDS), MAX_AUTOPLAY_SECONDS)
+    : DEFAULT_HERO_SETTINGS.autoplaySeconds;
+  return { autoplaySeconds };
+}
+
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
@@ -38,12 +51,20 @@ export async function POST(request: Request) {
   }
 
   const heroSlides = body.heroSlides.map(cleanHeroSlide).filter((s: HeroSlideContent | null): s is HeroSlideContent => s !== null);
+  const heroSettings = cleanHeroSettings(body.heroSettings);
 
-  await prisma.siteContent.upsert({
-    where: { key: "hero.slides" },
-    update: { value: JSON.stringify(heroSlides) },
-    create: { key: "hero.slides", value: JSON.stringify(heroSlides) },
-  });
+  await Promise.all([
+    prisma.siteContent.upsert({
+      where: { key: "hero.slides" },
+      update: { value: JSON.stringify(heroSlides) },
+      create: { key: "hero.slides", value: JSON.stringify(heroSlides) },
+    }),
+    prisma.siteContent.upsert({
+      where: { key: "hero.settings" },
+      update: { value: JSON.stringify(heroSettings) },
+      create: { key: "hero.settings", value: JSON.stringify(heroSettings) },
+    }),
+  ]);
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/");

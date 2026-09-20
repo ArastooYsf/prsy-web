@@ -5,6 +5,7 @@ import { ArrowRight, FolderTree } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import CategoryManager from "@/components/admin/CategoryManager";
+import { getSpecTemplates } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +13,10 @@ export default async function CategoriesAdminPage() {
   const session = await getServerSession(authOptions);
   if (session!.user.role !== "ADMIN") redirect("/account/admin");
 
-  const categories = await prisma.productCategory.findMany({
-    orderBy: [{ order: "asc" }, { name: "asc" }],
-  });
+  const [categories, specTemplates] = await Promise.all([
+    prisma.productCategory.findMany({ orderBy: [{ order: "asc" }, { name: "asc" }] }),
+    getSpecTemplates(),
+  ]);
 
   return (
     <div>
@@ -31,7 +33,7 @@ export default async function CategoriesAdminPage() {
           بازگشت به محصولات
         </Link>
       </div>
-      <CategoryManager categories={categories} />
+      <CategoryManager categories={categories} specTemplates={specTemplates} />
     </div>
   );
 }

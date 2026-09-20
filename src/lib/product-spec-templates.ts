@@ -38,6 +38,14 @@ export const SPEC_TEMPLATES = {
 
 export type SpecTemplateKey = keyof typeof SPEC_TEMPLATES;
 
+/** Admin-editable copy of SPEC_TEMPLATES (see spec.templates in site-content.ts); SPEC_TEMPLATES itself is only the shipped default. */
+export type SpecTemplates = Record<SpecTemplateKey, readonly string[]>;
+
+export const SPEC_TEMPLATE_NAMES: Record<SpecTemplateKey, string> = {
+  generator: "ژنراتور، موتور برق و پیش‌فرض عمومی",
+  "spare-parts": "قطعات یدکی",
+};
+
 const DEFAULT_SPEC_TEMPLATE: SpecTemplateKey = "generator";
 
 function isSpecTemplateKey(value: string | null | undefined): value is SpecTemplateKey {
@@ -61,18 +69,26 @@ function findRootCategory<T extends CategoryForTemplate>(categoryId: string, cat
 }
 
 /** The ordered list of spec labels to pre-fill for a given category (or the general-default set when categoryId is empty/unmatched). */
-export function resolveSpecTemplate(categoryId: string | null | undefined, categories: CategoryForTemplate[]): readonly string[] {
+export function resolveSpecTemplate(
+  categoryId: string | null | undefined,
+  categories: CategoryForTemplate[],
+  templates: SpecTemplates = SPEC_TEMPLATES,
+): readonly string[] {
   const root = categoryId ? findRootCategory(categoryId, categories) : undefined;
-  return SPEC_TEMPLATES[resolvedSpecTemplateKey(root?.specTemplateKey)];
+  return templates[resolvedSpecTemplateKey(root?.specTemplateKey)];
 }
 
 // Only labels that are actually part of the category's own spec template can
 // be picked as quick-preview fields — same trust boundary as specTemplateKey.
 // Shared by both categories API routes (create and update) so the allow-list
 // rule only has one place to change.
-export function normalizePreviewSpecKeys(input: unknown, specTemplateKey: string | null): string[] | null {
+export function normalizePreviewSpecKeys(
+  input: unknown,
+  specTemplateKey: string | null,
+  templates: SpecTemplates = SPEC_TEMPLATES,
+): string[] | null {
   if (!Array.isArray(input)) return null;
-  const allowed = new Set<string>(SPEC_TEMPLATES[resolvedSpecTemplateKey(specTemplateKey)]);
+  const allowed = new Set<string>(templates[resolvedSpecTemplateKey(specTemplateKey)]);
   const out = [...new Set(input.filter((v): v is string => typeof v === "string" && allowed.has(v)))];
   return out.length > 0 ? out : null;
 }

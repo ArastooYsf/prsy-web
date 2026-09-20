@@ -16,10 +16,12 @@ import {
   Info,
   Rows,
   Navigation,
+  Image as ImageIcon,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import {
   getHeroSlides,
+  getHeroSettings,
   getFooterContact,
   getFaqItems,
   getLegalPageHtml,
@@ -33,8 +35,10 @@ import {
   getFooterEditableContent,
   getHeaderNavLabels,
   getLegalPageHeading,
+  getSiteLogo,
 } from "@/lib/site-content";
 import SiteContentForm from "@/components/admin/SiteContentForm";
+import SiteLogoForm from "@/components/admin/SiteLogoForm";
 import FooterContactForm from "@/components/admin/FooterContactForm";
 import FaqManagerForm from "@/components/admin/FaqManagerForm";
 import LegalPageForm from "@/components/admin/LegalPageForm";
@@ -66,6 +70,7 @@ export default async function AdminContentPage() {
 
   const [
     heroSlides,
+    heroSettings,
     footerContact,
     faqItems,
     termsHtml,
@@ -84,8 +89,10 @@ export default async function AdminContentPage() {
     termsHeading,
     privacyHeading,
     warrantyHeading,
+    siteLogo,
   ] = await Promise.all([
     getHeroSlides(),
+    getHeroSettings(),
     getFooterContact(),
     getFaqItems(),
     getLegalPageHtml("terms"),
@@ -104,16 +111,25 @@ export default async function AdminContentPage() {
     getLegalPageHeading("terms"),
     getLegalPageHeading("privacy"),
     getLegalPageHeading("warranty"),
+    getSiteLogo(),
   ]);
 
   const sections: SiteContentSection[] = [
+    {
+      id: "site-logo",
+      icon: <ImageIcon size={18} />,
+      title: "لوگوی سایت",
+      description: "لوگوی کنار نام شرکت در هدر و فوتر؛ در صورت نبود، نشان پیش‌فرض «یا» نمایش داده می‌شود.",
+      searchText: "لوگو نشان برند هدر فوتر",
+      content: <SiteLogoForm initialContent={siteLogo} />,
+    },
     {
       id: "hero",
       icon: <LayoutTemplate size={18} />,
       title: "اسلایدر صفحه اصلی (Hero)",
       description: "اسلایدهای بالای صفحه اصلی — عنوان، توضیح، دکمه و تصویر هر اسلاید.",
       searchText: heroSlides.map((s) => `${s.title} ${s.description} ${s.ctaLabel}`).join(" "),
-      content: <SiteContentForm initialHeroSlides={heroSlides} />,
+      content: <SiteContentForm initialHeroSlides={heroSlides} initialHeroSettings={heroSettings} />,
     },
     {
       id: "whyus",

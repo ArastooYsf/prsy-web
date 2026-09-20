@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ImageOff, Search, TrendingUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useExclusiveOverlay } from "@/components/OverlayCoordinator";
 import { formatNumber } from "@/lib/format-number";
 import { SEARCH_MIN_QUERY_LENGTH, type SiteSearchResponse } from "@/lib/site-search";
 import EmptyState from "@/components/ui/EmptyState";
@@ -41,6 +42,7 @@ export function HeaderSearch() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  useExclusiveOverlay("header-search", open, () => setOpen(false));
 
   const trimmed = query.trim();
   const filteredTrending = trimmed

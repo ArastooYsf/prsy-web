@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import localFont from "next/font/local";
+import { cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { cn } from "@/lib/utils";
 import { Header } from "@/components/ui/header-2";
 import AnalyticsScripts from "@/components/AnalyticsScripts";
 import Footer from "@/components/Footer";
@@ -11,9 +16,11 @@ import CookieConsentBanner from "@/components/CookieConsentBanner";
 import OfflineBanner from "@/components/OfflineBanner";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import ToastProvider from "@/components/ToastProvider";
-import { getFooterContact, getFooterEditableContent, getHeaderNavLabels } from "@/lib/site-content";
+import { getFooterContact, getFooterEditableContent, getHeaderNavLabels, getSiteLogo } from "@/lib/site-content";
 import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
-import RouteThemeScope from "@/components/RouteThemeScope";
+import RouteThemeScope, { type SiteTheme } from "@/components/RouteThemeScope";
+import CartProvider from "@/components/CartProvider";
+import { OverlayCoordinatorProvider } from "@/components/OverlayCoordinator";
 import { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "./globals.css";
@@ -107,16 +114,64 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [footerContact, menuTaxonomy, footerContent, headerNavLabels] = await Promise.all([
+  const [footerContact, menuTaxonomy, footerContent, headerNavLabels, siteLogo, session] = await Promise.all([
     getFooterContact(),
     getMenuTaxonomy(),
     getFooterEditableContent(),
     getHeaderNavLabels(),
+    getSiteLogo(),
+    getServerSession(authOptions),
   ]);
 
+  // Resolved server-side so the very first response already has the right
+  // theme baked in — no post-hydration flip for anyone who has a stored
+  // choice. A signed-in account's choice (synced to every device) always
+  // wins over this browser's own cookie; a signed-out visitor's cookie is
+  // the only signal available. `null` means neither exists yet (a genuinely
+  // first-time, signed-out visitor), left for the client to resolve from
+  // prefers-color-scheme via the beforeInteractive script below.
+  let initialTheme: SiteTheme | null = null;
+  if (session?.user?.id) {
+    const account = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { themeLight: true },
+    });
+    if (account && account.themeLight !== null) initialTheme = account.themeLight ? "light" : "dark";
+  } else {
+    const cookieTheme = cookies().get("theme")?.value;
+    if (cookieTheme === "light" || cookieTheme === "dark") initialTheme = cookieTheme;
+  }
+
   return (
-    <html lang="fa" dir="rtl" className={`${shabnamFD.variable} ${vazirmatn.variable}`} suppressHydrationWarning>
+    <html
+      lang="fa"
+      dir="rtl"
+      className={cn(shabnamFD.variable, vazirmatn.variable, initialTheme === "light" && "theme-white-blue")}
+      suppressHydrationWarning
+    >
       <head>
+        {/* Only needed when the server had no stored preference to render
+            directly (see initialTheme above) — a signed-in account's choice
+            or a returning guest's cookie already produced the right <html>
+            class server-side, so this never even ships for them. Runs
+            synchronously before <body> exists, exactly like the loader-skip
+            script below, so the very first paint already matches the OS
+            setting instead of flashing the dark default and correcting
+            itself once React hydrates. */}
+        {initialTheme === null && (
+          <script
+            id="theme-detect"
+            dangerouslySetInnerHTML={{
+              __html: `
+                try {
+                  if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    document.documentElement.classList.add('theme-white-blue');
+                  }
+                } catch (e) {}
+              `,
+            }}
+          />
+        )}
         {/* A plain <script> here (NOT next/script) is required: next/script's
             beforeInteractive strategy still ships its body through Next's RSC
             flight payload and only runs once Next's own runtime chunk has
@@ -147,28 +202,32 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <RouteThemeScope>
-          <ScrollProgress />
-          {GA_MEASUREMENT_ID && <AnalyticsScripts measurementId={GA_MEASUREMENT_ID} />}
-          <SessionProviderWrapper>
-            <ToastProvider>
-              <SkeletonTheme
-                baseColor="rgb(var(--foreground) / 0.06)"
-                highlightColor="rgba(249,146,63,0.12)"
-                borderRadius="0.5rem"
-                direction="rtl"
-                inline
-              >
-                <PageViewTracker />
-                <PageLoader />
-                <Header menuCategories={menuTaxonomy.categories} navLabels={headerNavLabels} />
-                <main>{children}</main>
-                <Footer contact={footerContact} content={footerContent} />
-              </SkeletonTheme>
-            </ToastProvider>
-          </SessionProviderWrapper>
-          <CookieConsentBanner />
-          <OfflineBanner />
+        <RouteThemeScope initialTheme={initialTheme} isLoggedIn={!!session?.user}>
+          <OverlayCoordinatorProvider>
+            <ScrollProgress />
+            {GA_MEASUREMENT_ID && <AnalyticsScripts measurementId={GA_MEASUREMENT_ID} />}
+            <SessionProviderWrapper>
+              <ToastProvider>
+                <CartProvider>
+                  <SkeletonTheme
+                    baseColor="rgb(var(--foreground) / 0.06)"
+                    highlightColor="rgba(249,146,63,0.12)"
+                    borderRadius="0.5rem"
+                    direction="rtl"
+                    inline
+                  >
+                    <PageViewTracker />
+                    <PageLoader />
+                    <Header menuCategories={menuTaxonomy.categories} navLabels={headerNavLabels} logo={siteLogo.logo} />
+                    <main>{children}</main>
+                    <Footer contact={footerContact} content={footerContent} logo={siteLogo.logo} />
+                  </SkeletonTheme>
+                </CartProvider>
+              </ToastProvider>
+            </SessionProviderWrapper>
+            <CookieConsentBanner />
+            <OfflineBanner />
+          </OverlayCoordinatorProvider>
         </RouteThemeScope>
       </body>
     </html>

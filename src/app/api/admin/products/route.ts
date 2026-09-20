@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
+import { rememberSpecSuggestions } from "@/lib/spec-suggestions";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import {
   resolveCategoryId,
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
     },
   });
 
+  await rememberSpecSuggestions(specs);
   revalidatePath("/products/all");
   return NextResponse.json({ product }, { status: 201 });
 }

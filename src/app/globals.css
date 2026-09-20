@@ -133,9 +133,13 @@ body {
   }
 }
 
-/* Site-wide white + blue light theme, applied via RouteThemeScope's toggle
-   (see ThemeToggleButton) on top of the default dark/orange theme in :root
-   above. Deliberately unlayered (outside @tailwind's utilities layer) so it
+/* Site-wide white + blue light theme, applied to <html> on top of the
+   default dark/orange theme in :root above — either server-side in
+   layout.tsx (a signed-in account's saved choice, or a returning guest's
+   `theme` cookie), by its beforeInteractive prefers-color-scheme script for
+   a first-time visitor, or client-side by RouteThemeScope's toggle (see
+   ThemeToggleButton) after a manual switch. Deliberately unlayered (outside
+   @tailwind's utilities layer) so it
    beats Tailwind's generated utility rules regardless of selector
    specificity — CSS Cascade Layers give unlayered styles priority over any
    layered ones. Chosen with ui-ux-pro-max (--domain color, "industrial B2B

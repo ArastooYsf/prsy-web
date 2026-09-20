@@ -39,6 +39,8 @@ export default async function AccountSettingsPage() {
           initialName={user.name ?? ""}
           initialPhone={user.phone ?? ""}
           initialEmail={user.email}
+          initialEmailVerified={user.emailVerified !== null}
+          initialPendingEmail={user.pendingEmail}
           initialAlternatePhone={user.alternatePhone ?? ""}
           initialAddress={user.address ?? ""}
           initialAvatarUrl={user.avatarUrl ?? ""}

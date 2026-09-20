@@ -53,6 +53,51 @@
         "value": "10px",
         "createdAt": "2026-09-14T19:55:30.886Z",
         "reason": "pre-existing codebase convention: text-[10px] already used for pending-count badges in AccountSidebar.tsx and customers/page.tsx; not a new invented size"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "tahoma",
+        "files": [
+          "src/lib/email-verification.ts"
+        ],
+        "createdAt": "2026-09-19T19:04:51.781Z",
+        "reason": "transactional email HTML template — email clients can't read the site's CSS custom properties/fonts, must use literal safe fonts"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "18px",
+        "files": [
+          "src/lib/email-verification.ts"
+        ],
+        "createdAt": "2026-09-19T19:04:51.873Z",
+        "reason": "transactional email HTML template — inline literal sizes are required for email client compatibility, no access to the site's type scale"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "12px",
+        "files": [
+          "src/lib/email-verification.ts"
+        ],
+        "createdAt": "2026-09-19T19:04:51.956Z",
+        "reason": "transactional email HTML template — literal inline values required, no access to the site's radius tokens"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "28px",
+        "files": [
+          "src/lib/email-verification.ts"
+        ],
+        "createdAt": "2026-09-19T19:04:52.063Z",
+        "reason": "transactional email HTML template — inline literal sizes required for email client compatibility"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "12px",
+        "files": [
+          "src/lib/email-verification.ts"
+        ],
+        "createdAt": "2026-09-19T19:04:52.160Z",
+        "reason": "transactional email HTML template — inline literal sizes required for email client compatibility"
       }
     ]
   }

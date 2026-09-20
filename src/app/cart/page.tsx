@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { ShoppingCart } from "lucide-react";
-import EmptyState from "@/components/ui/EmptyState";
+import CartPageContent from "@/components/CartPageContent";
 
 export const metadata: Metadata = {
   title: "سبد خرید",
@@ -9,15 +8,9 @@ export const metadata: Metadata = {
 
 export default function CartPage() {
   return (
-    <section className="container py-14 sm:py-20">
-      <div className="mx-auto max-w-md">
-        <EmptyState
-          icon={<ShoppingCart />}
-          title="سبد خرید شما خالی است"
-          description="این بخش فعلاً فقط رابط کاربری‌ست؛ فعال‌سازی کامل سبد خرید (افزودن محصول، پرداخت، تسویه‌حساب) نیاز به تصمیم درباره‌ی جریان خرید سایت دارد."
-          action={{ label: "مشاهده‌ی محصولات", href: "/products" }}
-        />
-      </div>
+    <section className="container py-8 sm:py-12">
+      <h1 className="mb-6 text-2xl font-bold sm:text-3xl">سبد خرید</h1>
+      <CartPageContent />
     </section>
   );
 }

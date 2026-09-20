@@ -9,6 +9,7 @@ import { ensureUniqueSlug } from "@/lib/unique-slug";
 import { CATEGORY_ICON_KEYS } from "@/lib/category-icons";
 import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
 import { normalizePreviewSpecKeys } from "@/lib/product-spec-templates";
+import { getSpecTemplates } from "@/lib/site-content";
 
 function normalizeIcon(input: unknown): string | null {
   return typeof input === "string" && (CATEGORY_ICON_KEYS as readonly string[]).includes(input) ? input : null;
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   // Only meaningful on a root category — a new child never carries its own template.
-  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, null);
+  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, null, await getSpecTemplates());
 
   const slug = await ensureUniqueSlug(slugify(name), async (s) => {
     const clash = await prisma.productCategory.findUnique({ where: { slug: s } });

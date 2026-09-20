@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { generateOrderNumber } from "@/lib/order-number";
 
 type ItemInput = { productId: string | null; productName: string; quantity: number; price: number };
 
@@ -38,10 +39,6 @@ async function resolveProductLinks(items: ItemInput[]): Promise<ItemInput[]> {
   const validIds = new Set(found.map((p) => p.id));
 
   return items.map((item) => (item.productId && !validIds.has(item.productId) ? { ...item, productId: null } : item));
-}
-
-function generateOrderNumber(): string {
-  return `ORD-${Date.now().toString(36).toUpperCase()}`;
 }
 
 export async function POST(request: Request) {

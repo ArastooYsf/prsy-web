@@ -2,8 +2,11 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
+import { SPEC_TEMPLATES, type SpecTemplateKey, type SpecTemplates } from "@/lib/product-spec-templates";
+import type { SpecSuggestions } from "@/lib/spec-options";
 import {
   DEFAULT_HERO_SLIDES,
+  DEFAULT_HERO_SETTINGS,
   DEFAULT_FOOTER_CONTACT,
   DEFAULT_FAQ_ITEMS,
   DEFAULT_TERMS_HTML,
@@ -20,7 +23,10 @@ import {
   DEFAULT_LEGAL_HEADINGS,
   DEFAULT_FOOTER_CONTENT,
   DEFAULT_HEADER_NAV_LABELS,
+  DEFAULT_SITE_LOGO,
+  type SiteLogoContent,
   type HeroSlideContent,
+  type HeroSettingsContent,
   type FooterContactContent,
   type FaqItemContent,
   type WhyUsContent,
@@ -36,9 +42,11 @@ import {
   type HeaderNavLabelsContent,
 } from "@/lib/site-content-defaults";
 
-export { DEFAULT_HERO_SLIDES, DEFAULT_FOOTER_CONTACT, DEFAULT_FAQ_ITEMS };
+export { DEFAULT_HERO_SLIDES, DEFAULT_HERO_SETTINGS, DEFAULT_FOOTER_CONTACT, DEFAULT_FAQ_ITEMS };
 export type {
+  SiteLogoContent,
   HeroSlideContent,
+  HeroSettingsContent,
   FooterContactContent,
   FaqItemContent,
   WhyUsContent,
@@ -56,6 +64,7 @@ export type {
 export const SITE_CONTENT_TAG = "site-content";
 
 const HERO_SLIDES_KEY = "hero.slides";
+export const HERO_SETTINGS_KEY = "hero.settings";
 export const FOOTER_CONTACT_KEY = "footer.contact";
 export const FAQ_ITEMS_KEY = "faq.items";
 export const WHYUS_KEY = "whyus.content";
@@ -67,6 +76,9 @@ export const ABOUT_KEY = "about.content";
 export const CONTACT_HERO_KEY = "contact.hero";
 export const FOOTER_CONTENT_KEY = "footer.content";
 export const HEADER_NAV_LABELS_KEY = "header.navLabels";
+export const SITE_LOGO_KEY = "site.logo";
+export const SPEC_TEMPLATES_KEY = "spec.templates";
+export const SPEC_SUGGESTIONS_KEY = "spec.suggestions";
 
 // One rich-text blob per admin-editable legal/info page — same simple
 // key/value SiteContent row the hero slides and footer contact already use,
@@ -132,9 +144,28 @@ function parseJsonObject<T extends object>(raw: string | undefined, fallback: T)
   }
 }
 
+export async function getSiteLogo(): Promise<SiteLogoContent> {
+  const map = await getSiteContentMap();
+  return parseJsonObject<SiteLogoContent>(map[SITE_LOGO_KEY], DEFAULT_SITE_LOGO);
+}
+
+export async function getHeroSettings(): Promise<HeroSettingsContent> {
+  const map = await getSiteContentMap();
+  return parseJsonObject<HeroSettingsContent>(map[HERO_SETTINGS_KEY], DEFAULT_HERO_SETTINGS);
+}
+
 export async function getFooterContact(): Promise<FooterContactContent> {
   const map = await getSiteContentMap();
-  return parseJsonObject<FooterContactContent>(map[FOOTER_CONTACT_KEY], DEFAULT_FOOTER_CONTACT);
+  const saved = parseJsonObject<FooterContactContent & { instagramUrl?: string; linkedinUrl?: string; telegramUrl?: string }>(
+    map[FOOTER_CONTACT_KEY],
+    DEFAULT_FOOTER_CONTACT,
+  );
+  // Rows saved before social links became a free-form list carry three fixed
+  // fields instead — fold them into the list so nothing an admin already
+  // entered disappears (the next save rewrites the row without them).
+  const { instagramUrl, linkedinUrl, telegramUrl, ...rest } = saved;
+  const legacy = [instagramUrl, linkedinUrl, telegramUrl].filter((u): u is string => !!u);
+  return { ...rest, socialLinks: Array.isArray(saved.socialLinks) && saved.socialLinks.length > 0 ? saved.socialLinks : legacy };
 }
 
 export async function getFaqItems(): Promise<FaqItemContent[]> {
@@ -247,4 +278,64 @@ export async function getLegalPageMeta(
     getLegalPageLatestUpdatedAt(page),
   ]);
   return { html, heading, updatedAt };
+}
+
+const MAX_SPEC_LABEL_LENGTH = 120;
+const MAX_TEMPLATE_ROWS = 60;
+
+function cleanStringList(input: unknown, maxLength: number, maxItems: number): string[] {
+  if (!Array.isArray(input)) return [];
+  const out: string[] = [];
+  for (const raw of input) {
+    if (typeof raw !== "string") continue;
+    const value = raw.trim().slice(0, maxLength);
+    if (value && !out.includes(value)) out.push(value);
+    if (out.length >= maxItems) break;
+  }
+  return out;
+}
+
+/** Saved per-template label lists layered over the shipped SPEC_TEMPLATES defaults — a key missing from the saved row keeps its default. */
+export function parseSpecTemplates(raw: string | undefined): SpecTemplates {
+  let saved: Record<string, unknown> = {};
+  try {
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && typeof parsed === "object") saved = parsed;
+  } catch {
+    // fall through to defaults
+  }
+  const out = { ...SPEC_TEMPLATES } as SpecTemplates;
+  for (const key of Object.keys(SPEC_TEMPLATES) as SpecTemplateKey[]) {
+    if (Array.isArray(saved[key])) out[key] = cleanStringList(saved[key], MAX_SPEC_LABEL_LENGTH, MAX_TEMPLATE_ROWS);
+  }
+  return out;
+}
+
+export function cleanSpecTemplates(input: unknown): SpecTemplates {
+  const obj = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
+  const out = {} as SpecTemplates;
+  for (const key of Object.keys(SPEC_TEMPLATES) as SpecTemplateKey[]) {
+    out[key] = cleanStringList(obj[key], MAX_SPEC_LABEL_LENGTH, MAX_TEMPLATE_ROWS);
+  }
+  return out;
+}
+
+/** Only the admin-typed additions — the built-in units/labels are merged in by the caller. */
+export function parseSpecSuggestions(raw: string | undefined): SpecSuggestions {
+  try {
+    const parsed = raw ? JSON.parse(raw) : null;
+    return { units: cleanStringList(parsed?.units, 30, 200), labels: cleanStringList(parsed?.labels, MAX_SPEC_LABEL_LENGTH, 200) };
+  } catch {
+    return { units: [], labels: [] };
+  }
+}
+
+export async function getSpecTemplates(): Promise<SpecTemplates> {
+  const map = await getSiteContentMap();
+  return parseSpecTemplates(map[SPEC_TEMPLATES_KEY]);
+}
+
+export async function getSpecSuggestions(): Promise<SpecSuggestions> {
+  const map = await getSiteContentMap();
+  return parseSpecSuggestions(map[SPEC_SUGGESTIONS_KEY]);
 }

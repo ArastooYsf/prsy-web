@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
+import { rememberSpecSuggestions } from "@/lib/spec-suggestions";
 import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import {
   resolveCategoryId,
@@ -54,6 +55,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     data: { name, slug, description, images, specs, categoryId, brandId, availability, showPrice, price, isActive },
   });
 
+  await rememberSpecSuggestions(specs);
   revalidatePath("/products/all");
   return NextResponse.json({ product });
 }

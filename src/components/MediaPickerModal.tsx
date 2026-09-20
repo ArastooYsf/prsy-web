@@ -327,7 +327,7 @@ export default function MediaPickerModal({
         </div>
 
         <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-4">
-          <span className="text-xs text-foreground/50">{draftSelected.length} مورد انتخاب‌شده</span>
+          <span className="text-xs text-foreground/50">{toPersianDigits(draftSelected.length)} مورد انتخاب‌شده</span>
           <div className="flex gap-2">
             <button
               type="button"

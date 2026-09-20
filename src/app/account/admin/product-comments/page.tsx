@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MessageSquare } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { prisma } from "@/lib/prisma";
+import { formatNumber } from "@/lib/format-number";
 import { formatJalali } from "@/lib/jalali";
 import { APPROVAL_STATUS } from "@/lib/status-labels";
 import { cn } from "@/lib/utils";
@@ -66,7 +67,7 @@ export default async function AdminProductCommentsPage({
             {filter === "ALL" ? "همه" : APPROVAL_STATUS[filter]?.label ?? filter}
             {filter === "PENDING" && pendingCount > 0 && (
               <span className="rounded-full bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
-                {pendingCount}
+                {formatNumber(pendingCount)}
               </span>
             )}
           </Link>

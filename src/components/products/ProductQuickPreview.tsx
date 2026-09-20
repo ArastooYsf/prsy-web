@@ -1,12 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoreVertical, ArrowLeft, X } from "lucide-react";
-import type { ProductSpec } from "@/lib/product-json";
+import { formatSpecValue, type ProductSpec } from "@/lib/product-json";
 import { useSiteTheme } from "@/components/RouteThemeScope";
+import { useExclusiveOverlay } from "@/components/OverlayCoordinator";
 import { scaleIn } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,11 @@ export default function ProductQuickPreview({
   productName: string;
 }) {
   const [open, setOpen] = useState(false);
+  // One instance renders per product card — a shared id would make every
+  // card's popover fight over the same coordinator slot, so this is scoped
+  // per instance instead of a hardcoded string like the single-instance panels.
+  const instanceId = useId();
+  useExclusiveOverlay(`product-quick-preview-${instanceId}`, open, () => setOpen(false));
   const containerRef = useRef<HTMLDivElement>(null);
   // RouteThemeScope wraps this in a normal DOM ancestor here (unlike a
   // Radix Portal, which renders into document.body and breaks CSS-variable
@@ -101,7 +107,7 @@ export default function ProductQuickPreview({
                     className="flex items-baseline justify-between gap-2 border-b border-foreground/5 pb-1.5 text-xs last:border-0"
                   >
                     <span className="shrink-0 text-foreground/50">{spec.label}</span>
-                    <span className="truncate font-medium text-foreground">{spec.value}</span>
+                    <span className="truncate font-medium text-foreground">{formatSpecValue(spec)}</span>
                   </li>
                 ))}
               </ul>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ChevronDown, ChevronLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { useExclusiveOverlay } from "@/components/OverlayCoordinator";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import type { MenuCategory } from "@/lib/menu-taxonomy";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function ProductsMegaMenu({ categories, onBumpEnter, onBumpLeave }: Produ
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | undefined>(categories[0]?.id);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useExclusiveOverlay("products-mega-menu", open, () => setOpen(false));
 
   if (categories.length === 0) {
     return (

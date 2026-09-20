@@ -171,6 +171,12 @@ export default function WhyUsContentForm({ initialContent }: { initialContent: W
             />
           </div>
           <div>
+            <IconPicker
+              label="آیکون کنار نام همکاران"
+              value={content.partnersIcon}
+              onChange={(icon) => setContent((p) => ({ ...p, partnersIcon: icon }))}
+            /></div>
+          <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">توضیح بخش</label>
             <input
               value={content.partnersSubtext}

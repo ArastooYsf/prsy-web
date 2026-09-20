@@ -6,10 +6,9 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
-import { DEFAULT_HERO_SLIDES, type HeroSlideContent } from "@/lib/site-content-defaults";
+import { DEFAULT_HERO_SLIDES, DEFAULT_HERO_SETTINGS, type HeroSlideContent } from "@/lib/site-content-defaults";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
 
-const SLIDE_DURATION = 5;
 // Shared by the background and text AnimatePresence trees below so their
 // fades stay in lockstep — they can't be one motion.div because the text's
 // y-offset animation would add a `transform` on its ancestor and break the
@@ -19,12 +18,17 @@ const SLIDE_TRANSITION = { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const };
 
 type HeroProps = {
   slides?: HeroSlideContent[];
+  autoplaySeconds?: number;
 };
 
-export default function Hero({ slides: slidesProp }: HeroProps) {
+export default function Hero({ slides: slidesProp, autoplaySeconds }: HeroProps) {
   const [index, setIndex] = useState(0);
 
   const slides = slidesProp && slidesProp.length > 0 ? slidesProp : DEFAULT_HERO_SLIDES;
+  // Defensive floor — an admin-editable value coming from the DB, re-checked
+  // here even though the save API already clamps it, since a slide flicking
+  // by in under ~1s would be unreadable regardless of where a bad value came from.
+  const slideDuration = autoplaySeconds && autoplaySeconds > 0 ? autoplaySeconds : DEFAULT_HERO_SETTINGS.autoplaySeconds;
 
   const slide = slides[index];
 
@@ -120,7 +124,7 @@ export default function Hero({ slides: slidesProp }: HeroProps) {
                   key={`${s.id}-${index}`}
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: SLIDE_DURATION, ease: "linear" }}
+                  transition={{ duration: slideDuration, ease: "linear" }}
                   onAnimationComplete={goNext}
                   style={{ transformOrigin: "right" }}
                   className="absolute inset-0 bg-accent-500"

@@ -17,6 +17,17 @@ export function toPersianDigits(input: string | number): string {
   return String(input).replace(/[0-9]/g, (digit) => PERSIAN_DIGITS[digit]);
 }
 
+const LATIN_DIGITS: Record<string, string> = Object.fromEntries(
+  Object.entries(PERSIAN_DIGITS).map(([latin, persian]) => [persian, latin]),
+);
+
+// The inverse of toPersianDigits — normalizes Persian numerals back to plain
+// ASCII digits before parsing user input (e.g. FormattedNumberInput, where a
+// Persian/Arabic keyboard can type ۰-۹ directly into a numeric field).
+export function toLatinDigits(input: string): string {
+  return input.replace(/[۰-۹]/g, (digit) => LATIN_DIGITS[digit]);
+}
+
 // The single call site for a bare numeric value anywhere on the site — counts,
 // quantities, dashboard stats. The whole app is fa-IR/RTL, so numbers render
 // with Persian digits/grouping by convention. Exempt: postal code, national ID,

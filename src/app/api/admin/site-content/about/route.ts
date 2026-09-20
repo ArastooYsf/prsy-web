@@ -55,6 +55,7 @@ export async function POST(request: Request) {
     registrationLabel: cleanText(body.registrationLabel, 100),
     trustBadgeTitle: cleanText(body.trustBadgeTitle, 150),
     trustBadgeText: cleanText(body.trustBadgeText, 500),
+    trustBadgeIcon: (typeof body.trustBadgeIcon === "string" && VALID_ICON_KEYS.has(body.trustBadgeIcon) ? body.trustBadgeIcon : "star") as IconCardContent["icon"],
   };
 
   await prisma.siteContent.upsert({

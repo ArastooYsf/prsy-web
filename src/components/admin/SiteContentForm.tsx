@@ -8,7 +8,11 @@ import RichTextEditor from "@/components/admin/RichTextEditor";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
 import { useScrollNewestIntoView } from "@/hooks/useScrollNewestIntoView";
-import type { HeroSlideContent } from "@/lib/site-content-defaults";
+import { toPersianDigits } from "@/lib/format-number";
+import { DEFAULT_HERO_SETTINGS, type HeroSlideContent, type HeroSettingsContent } from "@/lib/site-content-defaults";
+
+const MIN_AUTOPLAY_SECONDS = 2;
+const MAX_AUTOPLAY_SECONDS = 30;
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -23,12 +27,14 @@ function emptySlide(): HeroSlideContent {
 
 type SiteContentFormProps = {
   initialHeroSlides: HeroSlideContent[];
+  initialHeroSettings: HeroSettingsContent;
 };
 
-export default function SiteContentForm({ initialHeroSlides }: SiteContentFormProps) {
+export default function SiteContentForm({ initialHeroSlides, initialHeroSettings }: SiteContentFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [heroSlides, setHeroSlides] = useState<HeroSlideContent[]>(initialHeroSlides);
+  const [heroSettings, setHeroSettings] = useState<HeroSettingsContent>(initialHeroSettings);
   const newestSlideRef = useScrollNewestIntoView<HTMLDivElement>(heroSlides.length);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ index: number } | null>(null);
@@ -50,7 +56,7 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
     const res = await fetch("/api/admin/site-content", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ heroSlides }),
+      body: JSON.stringify({ heroSlides, heroSettings }),
     });
 
     setSaving(false);
@@ -78,6 +84,22 @@ export default function SiteContentForm({ initialHeroSlides }: SiteContentFormPr
             <Plus className="size-3.5" />
             افزودن اسلاید
           </button>
+        </div>
+        <div className="mb-6 max-w-xs">
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">مدت زمان نمایش هر اسلاید (ثانیه)</label>
+          <input
+            type="number"
+            min={MIN_AUTOPLAY_SECONDS}
+            max={MAX_AUTOPLAY_SECONDS}
+            value={heroSettings.autoplaySeconds}
+            onChange={(e) =>
+              setHeroSettings({ autoplaySeconds: Number(e.target.value) || DEFAULT_HERO_SETTINGS.autoplaySeconds })
+            }
+            className={inputClass}
+          />
+          <p className="mt-1.5 text-xs text-foreground/50">
+            بین {toPersianDigits(MIN_AUTOPLAY_SECONDS)} تا {toPersianDigits(MAX_AUTOPLAY_SECONDS)} ثانیه. این مدت برای همه‌ی اسلایدها یکسان است.
+          </p>
         </div>
         <div className="space-y-6">
           {heroSlides.map((slide, i) => (

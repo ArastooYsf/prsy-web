@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -7,7 +8,8 @@ import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import type { FooterContactContent, FooterEditableContent } from "@/lib/site-content";
 import { DEFAULT_FOOTER_CONTENT } from "@/lib/site-content-defaults";
 import { toPersianDigits } from "@/lib/format-number";
-import { SOCIAL_ICONS } from "@/lib/social-icons";
+import { getSocialLink } from "@/lib/social-platforms";
+import { getMediaUrl } from "@/lib/media";
 
 // href for each link stays fixed here, keyed by the same `id` the admin
 // panel's label editor uses — a typo in the panel can only ever change
@@ -33,15 +35,18 @@ const SERVICE_HREFS: Record<string, string> = {
 
 // Icons stay hardcoded per platform; only the destination URL is admin-editable
 // (see FooterContactContent) — a platform with no URL set just isn't rendered.
-// The icon set itself lives in src/lib/social-icons.tsx (shared with the
-// /contact page, which renders the same platforms against the same URLs).
+// The platform/icon detection lives in src/lib/social-platforms.tsx (shared
+// with the /contact page, which renders the same links).
 
 export default function Footer({
   contact,
   content = DEFAULT_FOOTER_CONTENT,
+  logo = "",
 }: {
   contact: FooterContactContent;
   content?: FooterEditableContent;
+  /** Admin-set logo image (media path); empty = the built-in "یا" monogram. */
+  logo?: string;
 }) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
@@ -54,9 +59,7 @@ export default function Footer({
     contact.email ? { label: contact.email, href: `mailto:${contact.email}` } : null,
   ].filter((item): item is { label: string; href?: string } => item !== null);
 
-  const socials = (Object.keys(SOCIAL_ICONS) as (keyof typeof SOCIAL_ICONS)[])
-    .map((key) => ({ ...SOCIAL_ICONS[key], href: contact[key] }))
-    .filter((social) => social.href);
+  const socials = contact.socialLinks.map((href) => ({ ...getSocialLink(href), href }));
 
   return (
     <footer className="border-t border-foreground/10 bg-background/20">
@@ -70,9 +73,15 @@ export default function Footer({
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <motion.div variants={fadeInUp}>
             <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
-                یا
-              </span>
+              {logo ? (
+                <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg">
+                  <Image src={getMediaUrl(logo)} alt="" fill sizes="36px" className="object-contain" />
+                </span>
+              ) : (
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-bold text-brand-950 shadow-md shadow-accent-500/20 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-accent-500/30">
+                  یا
+                </span>
+              )}
               پویش راه صنعت
               <span className="text-accent-400"> یاشار</span>
             </Link>
@@ -81,7 +90,7 @@ export default function Footer({
               <div className="mt-6 flex items-center gap-3">
                 {socials.map((social) => (
                   <motion.a
-                    key={social.name}
+                    key={social.href}
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -89,7 +98,7 @@ export default function Footer({
                     whileHover={{ y: -3, scale: 1.05 }}
                     className="flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 text-foreground/60 transition-all duration-300 hover:border-accent-500/40 hover:text-accent-400 hover:shadow-lg hover:shadow-accent-500/15"
                   >
-                    {social.icon}
+                    <social.Icon size={18} />
                   </motion.a>
                 ))}
               </div>

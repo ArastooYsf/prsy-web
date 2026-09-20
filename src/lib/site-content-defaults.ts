@@ -24,6 +24,7 @@ import {
   Star,
   Tag,
   Truck,
+  Buildings,
 } from "@phosphor-icons/react/ssr";
 // Type-only import (erased at compile time, no runtime code) — safe even
 // though the bare package's runtime export would crash in the RSC bundle.
@@ -48,6 +49,7 @@ export const ICON_OPTIONS = [
   { key: "star", label: "ستاره", Icon: Star },
   { key: "tag", label: "برچسب قیمت", Icon: Tag },
   { key: "truck", label: "کامیون/ارسال", Icon: Truck },
+  { key: "buildings", label: "ساختمان/شرکت", Icon: Buildings },
 ] as const satisfies { key: string; label: string; Icon: Icon }[];
 
 export type IconKey = (typeof ICON_OPTIONS)[number]["key"];
@@ -70,6 +72,21 @@ export type HeroSlideContent = {
   image: string;
 };
 
+// Separate from the slides array itself (a sibling SiteContent key) rather
+// than a per-slide field — one autoplay speed for the whole slider, matching
+// how the admin already thinks of "the hero slider" as one unit with a list
+// of slides inside it, not N independently-timed slides.
+export type HeroSettingsContent = {
+  autoplaySeconds: number;
+};
+
+export const DEFAULT_HERO_SETTINGS: HeroSettingsContent = { autoplaySeconds: 5 };
+
+// The mark next to the site name in the header and footer. Empty = the
+// built-in "یا" monogram; otherwise a media-library image path.
+export type SiteLogoContent = { logo: string };
+export const DEFAULT_SITE_LOGO: SiteLogoContent = { logo: "" };
+
 export type FaqItemContent = {
   id: string;
   question: string;
@@ -81,11 +98,10 @@ export type FooterContactContent = {
   phone: string; // display label, e.g. "۰۲۱-۹۱۰۰۰۰۰۰"
   phoneHref: string; // e.g. "tel:+982191000000"
   email: string;
-  // Empty string hides that platform's icon in the footer — icons themselves
-  // stay hardcoded in Footer.tsx, only the destination URL is admin-editable.
-  instagramUrl: string;
-  linkedinUrl: string;
-  telegramUrl: string;
+  // Any number of social links (footer + /contact page). Only the URL is
+  // stored — the platform name/icon is detected from its domain at render
+  // time (src/lib/social-platforms.tsx), so adding a network needs no data change.
+  socialLinks: string[];
 };
 
 export const DEFAULT_FOOTER_CONTACT: FooterContactContent = {
@@ -93,9 +109,7 @@ export const DEFAULT_FOOTER_CONTACT: FooterContactContent = {
   phone: "۰۲۱-۹۱۰۰۰۰۰۰",
   phoneHref: "tel:+982191000000",
   email: "info@yasharindustry.com",
-  instagramUrl: "",
-  linkedinUrl: "",
-  telegramUrl: "",
+  socialLinks: [],
 };
 
 export const DEFAULT_FAQ_ITEMS: FaqItemContent[] = [
@@ -289,6 +303,7 @@ export type WhyUsContent = {
   advantages: IconCardContent[];
   partnersLabel: string;
   partnersSubtext: string;
+  partnersIcon: IconKey;
   partners: string[];
 };
 
@@ -317,6 +332,7 @@ export const DEFAULT_WHYUS: WhyUsContent = {
   ],
   partnersLabel: "همکاران و مشتریان ما",
   partnersSubtext: "افتخار همکاری با شرکت‌های بزرگ و شناخته‌شده صنعت نفت و حفاری کشور",
+  partnersIcon: "buildings",
   partners: ["شرکت ملی حفاری ایران", "صنعت نفت"],
 };
 
@@ -432,6 +448,7 @@ export type AboutContent = {
   registrationLabel: string;
   trustBadgeTitle: string;
   trustBadgeText: string;
+  trustBadgeIcon: IconKey;
 };
 
 export const DEFAULT_ABOUT: AboutContent = {
@@ -447,6 +464,7 @@ export const DEFAULT_ABOUT: AboutContent = {
   registrationLabel: "شماره ثبت رسمی",
   trustBadgeTitle: "نشان اعتماد B2B",
   trustBadgeText: "افتخار همکاری با شرکت‌های بزرگ، از جمله شرکت‌های حفاری، را داشته‌ایم.",
+  trustBadgeIcon: "star",
 };
 
 export type ContactHeroContent = {

@@ -6,10 +6,11 @@ import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
-import { parseProductImages, parseProductSpecs } from "@/lib/product-json";
+import { formatSpecValue, parseProductImages, parseProductSpecs } from "@/lib/product-json";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import { toPersianDigits } from "@/lib/format-number";
 import { SITE_URL, toAbsoluteUrl } from "@/lib/site-url";
+import { buildTicketHref } from "@/lib/ticket-href";
 import Breadcrumb, { type Crumb } from "@/components/products/Breadcrumb";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductSpecsTable from "@/components/products/ProductSpecsTable";
@@ -127,10 +128,17 @@ export default async function ProductDetailPage({
   }
   crumbs.push({ label: product.name });
 
-  const canonicalUrl = `${SITE_URL}/products/${rootSlug}/${product.slug}`;
-  const requestPriceHref = `/account/tickets/new?subject=${encodeURIComponent(
-    `استعلام قیمت: ${product.name}`
-  )}&message=${encodeURIComponent(`درخواست قیمت برای محصول: ${product.name}\n${canonicalUrl}`)}`;
+  const canonicalPath = `/products/${rootSlug}/${product.slug}`;
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
+  const isOutOfStock = product.availability === "OUT_OF_STOCK";
+  const requestPriceHref = buildTicketHref(
+    `استعلام قیمت: ${product.name}`,
+    `درخواست قیمت برای محصول: ${product.name}\n${canonicalUrl}`,
+  );
+  const outOfStockHref = buildTicketHref(
+    `درخواست موجودی/تأمین: ${product.name}`,
+    `با سلام،\nاین محصول در حال حاضر ناموجود نمایش داده می‌شود. لطفاً برای موجودی/زمان تأمین آن با من هماهنگ کنید.\nمحصول: ${product.name}\n${canonicalUrl}`,
+  );
   const ctaLabel = product.showPrice && product.price != null ? "سفارش این محصول" : "درخواست قیمت";
 
   const breadcrumbJsonLd = {
@@ -225,7 +233,7 @@ export default async function ProductDetailPage({
               {keyFeatures.map((spec) => (
                 <li key={spec.label} className="flex items-baseline gap-2 text-sm">
                   <span className="text-foreground/50">{spec.label}:</span>
-                  <span className="font-semibold text-foreground">{spec.value}</span>
+                  <span className="font-semibold text-foreground">{formatSpecValue(spec)}</span>
                 </li>
               ))}
             </ul>
@@ -236,8 +244,11 @@ export default async function ProductDetailPage({
           showPrice={product.showPrice}
           price={product.price}
           availability={availability}
+          isOutOfStock={isOutOfStock}
           ctaHref={requestPriceHref}
           ctaLabel={ctaLabel}
+          outOfStockHref={outOfStockHref}
+          cartProduct={{ productId: product.id, name: product.name, href: canonicalPath, image: images[0] ?? null }}
         />
       </div>
 

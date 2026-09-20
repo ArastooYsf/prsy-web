@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { MailWarning } from "lucide-react";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import AdminSearchBox from "@/components/admin/AdminSearchBox";
 import NotificationBell from "@/components/account/NotificationBell";
@@ -17,10 +19,11 @@ function isBareShellRoute(pathname: string): boolean {
 type AccountShellProps = {
   role: string;
   userLabel: string;
+  emailVerified: boolean;
   children: React.ReactNode;
 };
 
-export default function AccountShell({ role, userLabel, children }: AccountShellProps) {
+export default function AccountShell({ role, userLabel, emailVerified, children }: AccountShellProps) {
   const pathname = usePathname() ?? "";
 
   if (isBareShellRoute(pathname)) {
@@ -29,6 +32,7 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
 
   const isAdmin = pathname.startsWith("/account/admin");
   const canSearch = role === "ADMIN" || role === "SUPPORT";
+  const showVerifyBanner = !emailVerified && pathname !== "/account/verify-email";
 
   return (
     <div className="flex h-screen flex-col overflow-hidden [@supports(height:100dvh)]:h-dvh lg:flex-row">
@@ -53,6 +57,17 @@ export default function AccountShell({ role, userLabel, children }: AccountShell
           list and already falls back to whichever ancestor really
           overflows, so it isn't relying on this specific min-h-0. */}
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-24">
+        {showVerifyBanner && (
+          <div className="sticky top-0 z-30 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 border-b border-amber-500/30 bg-amber-500/15 px-4 py-2.5 text-center text-xs font-medium text-amber-500">
+            <span className="flex items-center gap-1.5">
+              <MailWarning className="size-4 shrink-0" aria-hidden />
+              ایمیل حساب شما هنوز تأیید نشده است.
+            </span>
+            <Link href="/account/verify-email" className="font-bold underline underline-offset-2 hover:no-underline">
+              تأیید ایمیل
+            </Link>
+          </div>
+        )}
         <section
           className={
             isAdmin

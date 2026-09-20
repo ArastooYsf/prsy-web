@@ -4,9 +4,11 @@ import { ImageOff } from "lucide-react";
 import { getMediaUrl } from "@/lib/media";
 import { formatNumber } from "@/lib/format-number";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
+import { buildTicketHref } from "@/lib/ticket-href";
 import { parseProductSpecs, type ProductSpec } from "@/lib/product-json";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ProductQuickPreview from "@/components/products/ProductQuickPreview";
+import AddToCartButton from "@/components/products/AddToCartButton";
 import type { ProductViewMode } from "@/lib/product-view-mode";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -51,16 +53,39 @@ export type ProductCardVariant = ProductViewMode;
 const CTA_CLASS =
   "relative z-10 inline-flex min-h-11 items-center rounded-full border border-accent-500/40 px-4 text-xs font-semibold text-accent-500 transition-colors hover:bg-accent-500/10";
 
-const priceOrCta = (product: CatalogProduct) =>
-  product.showPrice && product.price != null ? (
-    <p dir="ltr" className="text-right text-sm font-bold text-foreground">
-      {formatNumber(product.price)} تومان
-    </p>
+function outOfStockTicketHref(product: CatalogProduct, href: string | null) {
+  return buildTicketHref(
+    `درخواست موجودی/تأمین: ${product.name}`,
+    `با سلام،\nاین محصول در حال حاضر ناموجود نمایش داده می‌شود. لطفاً برای موجودی/زمان تأمین آن با من هماهنگ کنید.\nمحصول: ${product.name}${href ? `\n${href}` : ""}`,
+  );
+}
+
+const priceOrCta = (product: CatalogProduct, href: string | null, img: string | null) => {
+  // Out of stock always routes to a prefilled supply-request ticket, even
+  // for a priced product — there's nothing to add to cart while unavailable.
+  if (product.availability === "OUT_OF_STOCK") {
+    return (
+      <Link href={outOfStockTicketHref(product, href)} className={CTA_CLASS}>
+        درخواست موجودی/تأمین
+      </Link>
+    );
+  }
+
+  return product.showPrice && product.price != null ? (
+    <div className="flex items-center justify-between gap-2">
+      <p dir="ltr" className="text-right text-sm font-bold text-foreground">
+        {formatNumber(product.price)} تومان
+      </p>
+      <AddToCartButton
+        product={{ productId: product.id, name: product.name, href, price: product.price, image: img }}
+      />
+    </div>
   ) : (
     <Link href="/contact" className={CTA_CLASS}>
       درخواست قیمت
     </Link>
   );
+};
 
 export default function ProductCard({ product, variant = "large" }: { product: CatalogProduct; variant?: ProductCardVariant }) {
   const img = firstImage(product.images);
@@ -114,7 +139,7 @@ export default function ProductCard({ product, variant = "large" }: { product: C
             )}
             <div className="mt-1.5">{badges}</div>
           </div>
-          {priceOrCta(product)}
+          {priceOrCta(product, href, img)}
         </div>
       </div>
     );
@@ -168,7 +193,7 @@ export default function ProductCard({ product, variant = "large" }: { product: C
         {badges}
 
         <div className="mt-auto pt-2">
-          {priceOrCta(product)}
+          {priceOrCta(product, href, img)}
         </div>
       </div>
     </div>

@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Buildings } from "@phosphor-icons/react";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
 import { DEFAULT_WHYUS, getIconByKey } from "@/lib/site-content-defaults";
 import type { WhyUsContent } from "@/lib/site-content";
 
 export default function WhyUs({ content = DEFAULT_WHYUS }: { content?: WhyUsContent }) {
-  const { eyebrow, heading, subheading, advantages, partnersLabel, partnersSubtext, partners } = content;
+  const { eyebrow, heading, subheading, advantages, partnersLabel, partnersSubtext, partnersIcon, partners } = content;
+  const PartnersIcon = getIconByKey(partnersIcon);
   return (
     <section id="why-us" className="section-padding relative border-t border-foreground/10">
       <div className="container">
@@ -77,7 +77,7 @@ export default function WhyUs({ content = DEFAULT_WHYUS }: { content?: WhyUsCont
                   key={partner}
                   className="flex items-center gap-2 rounded-full border border-accent-500/25 bg-background/60 px-5 py-2.5 text-sm font-semibold text-foreground/90"
                 >
-                  <Buildings size={16} className="shrink-0 text-accent-400" />
+                  <PartnersIcon size={16} className="shrink-0 text-accent-400" />
                   {partner}
                 </span>
               ))}

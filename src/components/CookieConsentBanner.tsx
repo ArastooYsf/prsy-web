@@ -22,10 +22,14 @@ export default function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
+    // Solid background, no backdrop-blur — this sits fixed on screen through
+    // every scroll on every page until dismissed, and a `backdrop-filter`
+    // there forces a recomposite on every scroll frame (see the same fix on
+    // ProductBuyBox's mobile bar for the full reasoning).
     <div
       role="dialog"
       aria-label="رضایت کوکی"
-      className="fixed inset-x-4 bottom-20 z-50 flex flex-col gap-3 rounded-2xl border border-foreground/10 bg-background/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center lg:bottom-4 [@media(max-height:500px)]:!top-4 [@media(max-height:500px)]:!bottom-auto"
+      className="fixed inset-x-4 bottom-20 z-50 flex flex-col gap-3 rounded-2xl border border-foreground/10 bg-background p-4 shadow-2xl sm:inset-x-auto sm:end-4 sm:max-w-sm sm:flex-row sm:items-center lg:bottom-4 [@media(max-height:500px)]:!top-4 [@media(max-height:500px)]:!bottom-auto"
     >
       <p className="flex-1 text-xs leading-6 text-foreground/70">
         این سایت برای بهبود تجربه‌ی کاربری از کوکی استفاده می‌کند. با ادامه استفاده از سایت، با{" "}

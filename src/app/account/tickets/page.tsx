@@ -4,7 +4,7 @@ import { MessageSquare, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/ui/EmptyState";
-import { TicketListItem } from "./TicketListItem";
+import { TicketListItem } from "@/components/account/TicketListItem";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";

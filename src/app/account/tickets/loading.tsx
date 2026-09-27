@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MessageSquare, Plus } from "lucide-react";
-import { TicketListItem } from "./TicketListItem";
+import { TicketListItem } from "@/components/account/TicketListItem";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 6 });
 

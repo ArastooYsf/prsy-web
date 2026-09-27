@@ -8,7 +8,7 @@ type StepIndicatorProps = {
 };
 
 // Numbered circles connected by a line — same visual language as
-// OrderProgress (src/components/OrderProgress.tsx). Shared by every
+// OrderProgress (src/components/account/OrderProgress.tsx). Shared by every
 // multi-step flow (registration, checkout, ...) so they all read as the same
 // wizard pattern rather than independently-styled steppers.
 export default function StepIndicator({ steps, currentStep }: StepIndicatorProps) {

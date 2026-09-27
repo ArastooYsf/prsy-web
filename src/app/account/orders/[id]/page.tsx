@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
-import OrderProgress from "@/components/OrderProgress";
+import OrderProgress from "@/components/account/OrderProgress";
 import StatusBadge from "@/components/ui/StatusBadge";
 import OrderItemRemoveButton from "@/components/account/OrderItemRemoveButton";
 

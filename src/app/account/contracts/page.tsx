@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getMediaUrl } from "@/lib/media";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
-import DateRangeDisplay from "@/components/DateRangeDisplay";
+import DateRangeDisplay from "@/components/account/DateRangeDisplay";
 import { FileTypeIcon, fileKindFromName } from "@/components/FileTypeIcon";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { debugSlowLoad } from "@/lib/debug-slow-load";

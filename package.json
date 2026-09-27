@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx --no-install prisma generate && next build",
+    "build": "bash scripts/generate-prisma.sh && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npx --no-install prisma generate",
+    "postinstall": "bash scripts/generate-prisma.sh",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",

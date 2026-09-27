@@ -18,6 +18,7 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -62,3 +63,4 @@ next-env.d.ts
 # dev tooling — generated/installed locally, not part of the deployed app
 /graphify-out
 /.claude/skills
+/.agents/skills

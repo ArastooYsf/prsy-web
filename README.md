@@ -1,94 +1,392 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 🏭 پویش راه صنعت یاشار
 
-First, run the development server:
+**سایت فروشگاهی و پنل مدیریت شرکت تجهیزات صنعتی یاشار — ساخته‌شده با Next.js**
+
+![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwindcss&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-7.9-2D3748?logo=prisma&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?logo=mysql&logoColor=white)
+![License](https://img.shields.io/badge/license-Proprietary-red)
+
+![نمای صفحه اصلی سایت](public/media/readme-screenshot.png)
+
+</div>
+
+---
+
+## 📚 فهرست مطالب
+
+- [🧭 درباره پروژه](#about)
+- [✨ امکانات](#features)
+- [🧱 تکنولوژی‌های استفاده‌شده](#tech-stack)
+- [🗂️ ساختار پوشه‌ها](#project-structure)
+- [✅ پیش‌نیازها](#prerequisites)
+- [🚀 راه‌اندازی روی سیستم شخصی](#getting-started)
+- [📜 اسکریپت‌های موجود](#available-scripts)
+- [🔐 متغیرهای محیطی](#environment-variables)
+- [☁️ دیپلوی](#deployment)
+- [👥 نقش‌های کاربری](#user-roles)
+- [🤝 مشارکت و توسعه بیشتر](#contributing)
+- [📄 مجوز و تماس](#license-contact)
+
+---
+
+<a id="about"></a>
+## 🧭 درباره پروژه
+
+این پروژه، وب‌سایت رسمی و پنل مدیریت داخلی شرکت **«پویش راه صنعت یاشار»** است — شرکتی فعال در حوزه‌ی فروش و پشتیبانی **دیزل ژنراتور صنعتی و تجاری**، قطعات یدکی، و خدمات تعمیر اساسی موتور.
+
+سایت دو بخش اصلی دارد:
+
+1. **سایت عمومی** — جایی که مشتری‌ها می‌توانند محصولات را ببینند، درخواست مشاوره ثبت کنند، ثبت‌نام/ورود کنند، سفارش دهند، قرارداد و فاکتورهای خودشان را دانلود کنند و با تیم پشتیبانی از طریق سیستم تیکت گفتگو کنند.
+2. **پنل مدیریت** — جایی که کارکنان شرکت محصولات، سفارش‌ها، قراردادها، مشتری‌ها، وبلاگ، و حتی متن‌های خود سایت (مثل هدر و فوتر) را بدون نیاز به نوشتن کد مدیریت می‌کنند.
+
+اگر کدنویسی بلد نباشید هم با خواندن همین فایل باید بتوانید بفهمید این پروژه چیست و چطور روی سیستم خودتان اجرایش کنید.
+
+---
+
+<a id="features"></a>
+## ✨ امکانات
+
+### 🌐 سایت عمومی
+
+- 🏠 **صفحه اصلی قابل‌ویرایش** — محتوای صفحه اصلی (تصاویر هیرو، معرفی، مشتریان، سوالات متداول) از دیتابیس خوانده می‌شود؛ ادمین می‌تواند بدون نیاز به دیپلوی جدید متن‌ها را عوض کند.
+- 📝 **ثبت‌نام با استعلام آنی شناسه ملی** — برای مشتریان حقوقی، شناسه ملی شرکت به‌صورت زنده از سرویس `api.ir` استعلام می‌شود؛ فرم با کپچای Cloudflare Turnstile محافظت می‌شود.
+- 🔐 **ورود امن با قفل حساب و ۲مرحله‌ای** — محدودیت تعداد تلاش ورود (rate limiting)، قفل موقت حساب بعد از چند تلاش ناموفق، و احراز هویت دومرحله‌ای (TOTP) اجباری برای حساب‌های کارمندی که آن را فعال کرده‌اند.
+- ✉️ **تأیید ایمیل با کد یکبارمصرف** — کد ۶رقمی با انقضای ۱۰دقیقه‌ای، هم برای تأیید ثبت‌نام و هم برای تغییر ایمیل.
+- 🛡️ **فعال/غیرفعال‌سازی ۲مرحله‌ای از تنظیمات حساب** — تولید QR Code و کد یکبارمصرف برای اپ‌های Authenticator.
+- 🔍 **کاتالوگ محصولات با فیلتر و جستجو** — فیلتر بر اساس دسته، زیردسته، برند، موجودی و بازه قیمت، به‌همراه جستجوی متنی و مرتب‌سازی.
+- 📦 **صفحه اختصاصی هر محصول** — مشخصات فنی و دیدگاه‌های کاربران برای هر محصول.
+- ⭐ **دیدگاه و امتیاز محصول با تأیید ادمین** — نظر مشتری تا زمانی که ادمین تأیید نکند برای بقیه نمایش داده نمی‌شود.
+- 🔎 **جستجوی سراسری در هدر سایت** — جستجوی زنده بین محصولات و دسته‌بندی‌ها.
+- 🛒 **سبد خرید** — نگهداری سبد خرید در مرورگر کاربر (بدون نیاز به دیتابیس).
+- 💳 **فرآیند تسویه‌حساب** — فقط برای کاربران واردشده، با پیش‌پر شدن خودکار اطلاعات تماس.
+- 💬 **فرم درخواست مشاوره رایگان** — به محض ثبت، همه‌ی کارکنان مرتبط با ایمیل و اعلان درون‌برنامه‌ای مطلع می‌شوند.
+- 🏢 **استعلام عمومی شناسه ملی** — بازدیدکننده می‌تواند حتی بدون ثبت‌نام، شناسه ملی یک شرکت را استعلام بگیرد.
+- 📰 **وبلاگ عمومی** — مقالات منتشرشده با صفحه اختصاصی هر مقاله.
+- 📄 **صفحات محتوایی ثابت قابل‌ویرایش** — درباره ما، تماس با ما، سوالات متداول، گارانتی، حریم خصوصی و قوانین، همگی از پنل ادمین قابل ویرایش‌اند.
+- 🧾 **پیش‌نمایش و دانلود اسناد سفارش/قرارداد** — تولید فایل PDF رسمی برای هر سفارش و قرارداد.
+- 🗺️ **نقشه سایت و robots.txt خودکار** — برای بهینه‌سازی موتورهای جستجو (SEO)، بدون نیاز به به‌روزرسانی دستی هنگام افزودن صفحه جدید.
+- 📊 **گوگل آنالیتیکس با رضایت کوکی** — اسکریپت آنالیتیکس فقط بعد از تأیید کاربر در بنر رضایت کوکی بارگذاری می‌شود.
+- 🚨 **ردیابی خطا با Sentry** — خطاهای سمت سرور و کلاینت به‌صورت خودکار گزارش می‌شوند.
+- 📡 **نوار وضعیت آفلاین** — وقتی اتصال اینترنت کاربر قطع شود، یک نوار هشدار نمایش داده می‌شود.
+- 🌗 **حالت روشن/تیره** — ترجیح تم برای کاربران واردشده در دیتابیس ذخیره و بین دستگاه‌ها همگام می‌شود.
+- 🙋 **پنل حساب کاربری مشتری** — پروفایل، تنظیمات امنیتی، تاریخچه سفارش/قرارداد با دانلود PDF، تاریخچه تیکت، و فایل‌های ارسالی از طرف پشتیبانی.
+- 🔔 **اعلان‌های چندکاناله** — اعلان از طریق ایمیل (Resend)، پیامک (Kavenegar) و اعلان درون‌برنامه‌ای، با قابلیت خاموش‌کردن هرکدام از طرف کاربر.
+
+### 🛠️ پنل مدیریت
+
+- 📈 **داشبورد مدیریت** — آمار کلیدی (تیکت باز، قرارداد و سفارش فعال) و نمودار روند ۳۰روزه.
+- 📦 **مدیریت محصولات، برندها، دسته‌بندی‌ها و قالب مشخصات فنی** — عملیات کامل CRUD.
+- ✍️ **ویرایشگر وبلاگ با متن غنی (Rich Text)** — پررنگ/مورب، لیست، نقل‌قول، لینک، تصویر و امکان Undo/Redo.
+- 💭 **مدیریت دیدگاه‌های محصول** — تأیید یا رد نظرات ثبت‌شده توسط مشتریان.
+- 👤 **مدیریت مشتریان** — شامل صف اختصاصی برای بررسی دستی مشتریان حقوقی که استعلام خودکار شناسه ملی‌شان ناموفق بوده.
+- 🧾 **مدیریت سفارش‌ها با تولید سند PDF رسمی**
+- 📑 **مدیریت قراردادها و انواع قرارداد با تولید سند PDF رسمی**
+- 💬 **سیستم تیکت پشتیبانی با چت زنده** — پیوست فایل، ویرایش/حذف پیام، نشانگر «در حال تایپ»، وضعیت خوانده‌شدن، و پاسخ‌های آماده (Canned Responses).
+- 🔌 **مرکز یکپارچه‌سازی با سرویس‌های بیرونی** — نمایش وضعیت اتصال به هر سرویس خارجی (مثل استعلام شناسه ملی).
+- 📋 **گزارش رویدادها و مانیتورینگ** — لاگ‌های سیستم، آمار uptime و تاریخچه تست Lighthouse.
+- 🎨 **مدیریت محتوای سایت (CMS)** — ویرایش هدر، فوتر، اسلایدهای هیرو، سوالات متداول، صفحات قانونی و غیره، بدون نیاز به دیپلوی.
+- 🖼️ **مدیریت رسانه** — آپلود متمرکز فایل با اعتبارسنجی نوع/حجم فایل و دسترسی بر اساس نقش کاربر.
+- 📊 **خروجی اکسل** — خروجی گرفتن از سفارش‌ها، مشتریان، قراردادها و لاگ‌ها.
+
+---
+
+<a id="tech-stack"></a>
+## 🧱 تکنولوژی‌های استفاده‌شده
+
+| تکنولوژی | نسخه | برای چه استفاده شده؟ |
+|---|---|---|
+| [Next.js](https://nextjs.org/) | 14.2.35 | فریم‌ورک اصلی سایت — هم صفحات (frontend) و هم API ها (backend) را با یک کد می‌سازد (App Router). |
+| [React](https://react.dev/) | 18 | کتابخانه‌ای که رابط کاربری (دکمه‌ها، فرم‌ها، صفحات) با آن ساخته شده. |
+| [TypeScript](https://www.typescriptlang.org/) | 5 | نسخه‌ی «تایپ‌دار» جاوااسکریپت — قبل از اجرای کد، خطاهای احتمالی را نشان می‌دهد. |
+| [Tailwind CSS](https://tailwindcss.com/) | 3.4 | استایل‌دهی به کل سایت با کلاس‌های آماده، بدون نیاز به نوشتن فایل CSS جدا برای هر بخش. |
+| [Prisma](https://www.prisma.io/) | 7.9 | ابزار ارتباط با دیتابیس — به‌جای نوشتن SQL خام، با کد جاوااسکریپت/تایپ‌اسکریپت با دیتابیس کار می‌کنیم. |
+| [MySQL](https://www.mysql.com/) | 8.4 | دیتابیسی که تمام اطلاعات سایت (محصولات، سفارش‌ها، کاربران و…) در آن ذخیره می‌شود. |
+| [NextAuth.js](https://next-auth.js.org/) | 4.24 | مدیریت ورود/خروج کاربران و نشست (session) آن‌ها. |
+| [Framer Motion](https://www.framer.com/motion/) | 12 | انیمیشن و جلوه‌های حرکتی رابط کاربری. |
+| [Radix UI](https://www.radix-ui.com/) | — | اجزای پایه‌ی رابط کاربری (مودال، منوی کشویی، تب و…) با دسترسی‌پذیری (accessibility) استاندارد. |
+| [Tiptap](https://tiptap.dev/) | 3 | ویرایشگر متن غنی (Rich Text) استفاده‌شده در وبلاگ و بخش‌های CMS. |
+| [NextAuth + bcryptjs + otplib](https://www.npmjs.com/package/bcryptjs) | — | هش‌کردن امن پسورد (bcrypt) و تولید/بررسی کد ۲مرحله‌ای (TOTP). |
+| [Resend](https://resend.com/) | 6 | سرویس ارسال ایمیل (تأیید ایمیل، اعلان‌ها و غیره). |
+| [Kavenegar](https://kavenegar.com/) | — | سرویس ارسال پیامک (SMS). |
+| [Sentry](https://sentry.io/) | 10 | ردیابی خودکار خطاهای برنامه در محیط واقعی. |
+| [Carbone](https://carbone.io/) + [ExcelJS](https://github.com/exceljs/exceljs) | — | تولید فایل‌های PDF (قرارداد/فاکتور) و خروجی اکسل. |
+| [rate-limiter-flexible](https://www.npmjs.com/package/rate-limiter-flexible) | 11 | جلوگیری از حملات brute-force روی فرم ورود. |
+| [jalaali-js](https://www.npmjs.com/package/jalaali-js) | 2 | تبدیل و نمایش تاریخ شمسی. |
+
+---
+
+<a id="project-structure"></a>
+## 🗂️ ساختار پوشه‌ها
+
+```text
+src/
+├── app/                  # صفحات و مسیرهای سایت (Next.js App Router)
+│   │                     #   فقط page.tsx / layout.tsx / loading.tsx / route.ts اینجا قرار می‌گیرند
+│   ├── account/          # پنل حساب مشتری + زیرپوشه‌ی admin/ برای پنل مدیریت
+│   └── api/              # تمام API Route Handler ها (/api/**)
+│
+├── components/
+│   ├── ui/               # کامپوننت‌های عمومی و پایه (دکمه، اینپوت، بج، Spinner و…)
+│   ├── layout/            # هدر، فوتر و بخش‌های ثابت چیدمان سایت
+│   ├── admin/             # کامپوننت‌های اختصاصی پنل مدیریت
+│   ├── account/           # کامپوننت‌های اختصاصی پنل حساب مشتری
+│   ├── products/          # کامپوننت‌های کاتالوگ و صفحه محصول
+│   └── (root)             # کامپوننت‌های واقعاً مشترک بین چند بخش (مثل ConfirmDialog، TicketChat)
+│
+├── lib/                  # توابع کمکی و منطق مشترک (auth، email، sms، prisma و…)
+│   ├── documents/         # تولید سند PDF (قرارداد/سفارش)
+│   ├── integrations/      # اتصال به سرویس‌های بیرونی (مثل api.ir)
+│   └── notifications/     # منطق اعلان‌های ایمیل/پیامک/درون‌برنامه‌ای
+│
+├── hooks/                # React hook های سفارشی
+└── types/                # تایپ‌های TypeScript مشترک بین چند فایل نامرتبط
+
+prisma/
+├── schema.prisma         # مدل کامل دیتابیس
+├── migrations/           # تاریخچه‌ی تغییرات دیتابیس (Migration)
+├── seed.ts               # ساخت داده‌ی اولیه (اولین ادمین و…) برای توسعه محلی
+└── seed-catalog.ts       # ساخت داده‌ی نمونه برای کاتالوگ محصولات
+
+docker-compose.yml        # دیتابیس MySQL محلی برای توسعه (فقط development)
+.env.example              # قالب متغیرهای محیطی — بخش «متغیرهای محیطی» را ببینید
+```
+
+> 💡 قانون کلی: هر کامپوننتی که فقط برای پنل مدیریت یا فقط برای حساب مشتری است، باید در `components/admin/` یا `components/account/` باشد، نه در `app/` و نه در `components/` ریشه.
+
+---
+
+<a id="prerequisites"></a>
+## ✅ پیش‌نیازها
+
+قبل از شروع، این‌ها باید روی سیستم شما نصب باشند:
+
+| ابزار | چرا لازم است | لینک دانلود |
+|---|---|---|
+| **Node.js** (پیشنهادی: نسخه ۱۸.۱۷ یا بالاتر) | برای اجرای پروژه Next.js. این ریپازیتوری نسخه‌ی خاصی را الزامی نکرده (فایل `.nvmrc` یا `engines` وجود ندارد) — این فقط حداقل نسخه‌ی مستندشده‌ی خود Next.js 14 است. | [nodejs.org](https://nodejs.org/) |
+| **npm** | مدیر پکیج — همراه Node.js نصب می‌شود. | (همراه Node.js) |
+| **MySQL 8** یا **Docker** | برای دیتابیس. اگر Docker دارید، خودِ پروژه یک `docker-compose.yml` آماده برای اجرای MySQL محلی دارد و نیازی به نصب دستی MySQL نیست. | [mysql.com](https://dev.mysql.com/downloads/) یا [docker.com](https://www.docker.com/get-started/) |
+| **Git** | برای دریافت (clone) کد پروژه. | [git-scm.com](https://git-scm.com/downloads) |
+
+---
+
+<a id="getting-started"></a>
+## 🚀 راه‌اندازی روی سیستم شخصی
+
+مرحله‌به‌مرحله، از صفر تا اجرای کامل سایت روی سیستم خودتان:
+
+**۱. کلون کردن پروژه**
+
+```bash
+git clone https://github.com/ArastooYsf/prsy-we.git
+cd prsy-we
+```
+
+**۲. نصب پکیج‌ها**
+
+```bash
+npm install
+```
+
+**۳. ساخت فایل متغیرهای محیطی**
+
+فایل نمونه را کپی کنید:
+
+```bash
+cp .env.example .env.local
+```
+
+سپس فایل `.env.local` را باز کنید و حداقل این سه متغیر **الزامی** را پر کنید (توضیح کامل همه‌ی متغیرها در بخش [متغیرهای محیطی](#environment-variables)):
+
+- `DATABASE_URL` — آدرس اتصال به دیتابیس MySQL، مثل: `mysql://yashar:yashar_dev_password@localhost:3306/yashar` (اگر از `docker-compose.yml` همین پروژه استفاده می‌کنید، این مقدار دقیقاً کار می‌کند)
+- `NEXTAUTH_SECRET` — یک رشته‌ی تصادفی برای امضای امن نشست‌های ورود. با این دستور بسازید:
+  ```bash
+  openssl rand -base64 32
+  ```
+- `NEXTAUTH_URL` — برای توسعه محلی برابر است با `http://localhost:3000`
+
+**۴. راه‌اندازی دیتابیس**
+
+اگر Docker دارید (ساده‌ترین راه):
+
+```bash
+docker compose up -d db
+```
+
+این دستور یک MySQL 8.4 روی پورت 3306 با نام دیتابیس `yashar` بالا می‌آورد (دقیقاً مطابق مقدار `DATABASE_URL` نمونه در مرحله قبل). اگر ترجیح می‌دهید از یک نصب MySQL موجود روی سیستم خودتان استفاده کنید، همان‌جا یک دیتابیس خالی بسازید و `DATABASE_URL` را متناسب با آن اصلاح کنید.
+
+**۵. اجرای Migration ها** (ساخت جدول‌های دیتابیس)
+
+```bash
+npm run db:migrate
+```
+
+**۶. (اختیاری) ساخت اولین حساب ادمین**
+
+در `.env.local`، مقدار `ADMIN_EMAIL` و `ADMIN_PASSWORD` را پر کنید، سپس:
+
+```bash
+npm run db:seed
+```
+
+**۷. اجرای پروژه**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**۸. باز کردن در مرورگر**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+آدرس [http://localhost:3000](http://localhost:3000) را باز کنید — سایت باید اجرا شده باشد. 🎉
 
-## Project structure
+---
 
-Where a new file goes, by what it is:
+<a id="available-scripts"></a>
+## 📜 اسکریپت‌های موجود
 
-- `src/app/` — routes only (`page.tsx`, `layout.tsx`, `loading.tsx`, `route.ts`). Don't colocate one-off components here — put them in `src/components/` under the folder below that matches who uses them, even if only one route imports it today.
-- `src/components/ui/` — generic, reusable primitives with no knowledge of this site's features (buttons, inputs, badges, spinners, empty states). If a component imports site-specific data, hooks, or is only ever used from one feature area, it doesn't belong here. shadcn-generated primitives (e.g. `button.tsx`) keep their lowercase filename per shadcn convention; everything else in `components/` is PascalCase.
-- `src/components/layout/` — site chrome: `Header.tsx`, `Footer.tsx`, and the header's own sub-pieces (cart menu, mega menu, mobile nav, search, theme toggle, scroll progress).
-- `src/components/admin/` — super_admin/editor/sales-only components (forms, tables, dashboards).
-- `src/components/account/` — customer-account-only components (profile, tickets, orders, contracts).
-- `src/components/products/` — product catalog & PDP components.
-- `src/components/` (root) — components genuinely shared across more than one of the areas above (e.g. `ConfirmDialog`, `TicketChat`, `MediaPickerModal`).
-- `src/lib/` — framework-agnostic helpers, one concern per file, grouped into a subfolder only once a domain has enough files to need one (see `lib/documents/`, `lib/integrations/`, `lib/notifications/`); otherwise flat with a `<domain>-*.ts` filename prefix (e.g. `ticket-*.ts`, `log-*.ts`, `site-*.ts`) is fine and matches the existing convention here.
-- `src/types/` — only for types shared across multiple unrelated files/domains. A type used by a single component stays colocated in that component's file — that's the default, not a gap to fill.
-- `prisma/` — `schema.prisma` and `migrations/` (standard Prisma layout, don't move).
+همه‌ی این دستورات با `npm run <name>` اجرا می‌شوند (به‌جز دو مورد اول که بدون `run` هم کار می‌کنند):
 
-## Product media (images/videos)
+| دستور | توضیح |
+|---|---|
+| `npm run dev` | اجرای سایت در حالت توسعه (development) با بارگذاری خودکار تغییرات. |
+| `npm run build` | ساخت نسخه‌ی نهایی و بهینه‌شده‌ی سایت برای production (شامل `prisma generate` قبل از build). |
+| `npm run start` | اجرای نسخه‌ی build‌شده (باید قبلش `npm run build` اجرا شده باشد). |
+| `npm run lint` | بررسی کیفیت و استاندارد بودن کد با ESLint. |
+| `npm run db:generate` | تولید دوباره‌ی Prisma Client بر اساس آخرین schema (این کار به‌صورت خودکار بعد از `npm install` هم اجرا می‌شود). |
+| `npm run db:migrate` | اجرای migration های جدید روی دیتابیس محلی (حالت توسعه). |
+| `npm run db:migrate:deploy` | اجرای migration ها در محیط production (بدون ساخت migration جدید). |
+| `npm run db:seed` | ساخت داده‌ی اولیه (اولین ادمین و چند حساب نمونه) برای توسعه محلی. |
+| `npm run db:seed:catalog` | ساخت داده‌ی نمونه برای کاتالوگ محصولات. |
+| `npm run db:studio` | باز کردن Prisma Studio — یک رابط گرافیکی برای مشاهده و ویرایش مستقیم داده‌های دیتابیس. |
+| `npm run db:backup` | گرفتن بکاپ از دیتابیس (اسکریپت `scripts/backup-db.ts`). |
+| `npm run notify:contracts` | ارسال یادآوری برای قراردادهایی که رو به انقضا هستند (اسکریپت `scripts/notify-expiring-contracts.ts`). |
 
-All product images and videos are loaded through one environment variable,
-`NEXT_PUBLIC_MEDIA_URL` (set in `.env.local`, template in `.env.example`).
+---
 
-Right now it points at the local `public/media` folder:
+<a id="environment-variables"></a>
+## 🔐 متغیرهای محیطی
 
-```
-NEXT_PUBLIC_MEDIA_URL=/media
-```
+همه‌ی این متغیرها در فایل `.env.example` با توضیح مستند شده‌اند. فایل را در `.env.local` کپی و پر کنید (این فایل هرگز نباید commit شود).
 
-Components never hardcode a media URL — they call `getMediaUrl(path)` from
-`src/lib/media.ts`, which joins `NEXT_PUBLIC_MEDIA_URL` with a relative path
-(e.g. `getMediaUrl("products/diesel-generators.svg")`).
+### هسته‌ی اصلی (الزامی برای اجرا)
 
-When a separate media/CDN host is ready, change `NEXT_PUBLIC_MEDIA_URL` to
-that host's URL (e.g. `https://media.yasharindustry.com`) and redeploy — every
-image and video on the site will load from the new host automatically, with
-no code changes.
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `DATABASE_URL` | آدرس اتصال به دیتابیس MySQL. فرمت: `mysql://USER:PASSWORD@HOST:3306/DB_NAME` | ✅ الزامی |
+| `NEXTAUTH_SECRET` | رشته‌ی تصادفی برای امضای امن نشست‌ها. با `openssl rand -base64 32` بسازید. | ✅ الزامی |
+| `NEXTAUTH_URL` | آدرس کامل سایت که NextAuth برای callback ها استفاده می‌کند. | ✅ الزامی |
 
-## Google Analytics (GA4)
+### آدرس و محتوای سایت
 
-Analytics is wired up but disabled by default. `NEXT_PUBLIC_GA_MEASUREMENT_ID`
-in `.env.local` is empty, so no GA script ever loads and nothing errors.
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `NEXT_PUBLIC_MEDIA_URL` | آدرس پایه‌ی تصاویر/ویدیوهای محصولات. پیش‌فرض `/media` (پوشه‌ی محلی `public/media`). | اختیاری |
+| `NEXT_PUBLIC_SITE_URL` | آدرس کامل سایت — در لینک‌های داخل ایمیل/پیامک استفاده می‌شود. پیش‌فرض `http://localhost:3000`. | اختیاری |
 
-To turn it on: create a GA4 property, grab its Measurement ID (looks like
-`G-XXXXXXXXXX`), and set it in `.env.local`:
+### ایمیل و پیامک
 
-```
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `RESEND_API_KEY` | کلید API سرویس [Resend](https://resend.com/) برای ارسال ایمیل. | برای فعال بودن ارسال ایمیل، بله |
+| `RESEND_FROM_EMAIL` | آدرس فرستنده‌ی ایمیل‌ها. باید روی یک دامنه‌ی تأییدشده در Resend باشد. | اختیاری (مقدار پیش‌فرض دارد) |
+| `KAVENEGAR_API_KEY` | کلید API سرویس [Kavenegar](https://kavenegar.com/) برای ارسال پیامک. | برای فعال بودن ارسال پیامک، بله |
+| `KAVENEGAR_SENDER_LINE` | خط اختصاصی ارسال پیامک (در صورت خرید). خالی بماند از خط پیش‌فرض استفاده می‌شود. | اختیاری |
 
-Redeploy — `src/app/layout.tsx` picks it up automatically and starts loading
-`gtag.js` on every page. No other code changes needed.
+### امنیت و کپچا
 
-## Sitemap & robots.txt
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | کلید عمومی کپچای Cloudflare Turnstile (فرم‌های ورود/ثبت‌نام). از `dash.cloudflare.com` بگیرید. | اختیاری |
+| `TURNSTILE_SECRET_KEY` | کلید محرمانه‌ی همان کپچا. | اختیاری |
+| `LOG_EXPORT_PASSWORD` | رمز محافظت از فایل فشرده‌ی خروجی لاگ‌ها (پنل ادمین › Logs). | ⚠️ در production الزامی — اگر خالی بماند، خروجی لاگ با یک رمز پیش‌فرض عمومی (که در کد قابل مشاهده است) محافظت می‌شود. |
 
-`src/app/sitemap.ts` and `src/app/robots.ts` use Next.js's built-in
-conventions and are served at `/sitemap.xml` and `/robots.txt`. The sitemap
-scans `src/app` for `page.tsx` files at build time, so adding a new page
-(e.g. `src/app/new-route/page.tsx`) shows up in the sitemap automatically —
-nothing to edit by hand.
+### مانیتورینگ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | آدرس DSN پروژه‌ی Sentry برای ردیابی خطا (هر دو باید یک مقدار یکسان داشته باشند). | اختیاری |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | فقط برای آپلود source map به Sentry لازم است. | اختیاری |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | شناسه‌ی Google Analytics 4 (`G-XXXXXXX`). خالی = آنالیتیکس غیرفعال. | اختیاری |
+| `LIGHTHOUSE_TARGET_URL` | آدرسی که دکمه‌ی «Lighthouse» در پنل ادمین › Logs تست می‌کند. پیش‌فرض: خودِ سایت روی لوکال. | اختیاری |
+| `CHROME_PATH` | مسیر مرورگر Chromium برای اجرای همان تست Lighthouse. | اختیاری |
 
-## Learn More
+### استعلام هویت
 
-To learn more about Next.js, take a look at the following resources:
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `API_IR_TOKEN` | توکن سرویس `api.ir` برای استعلام شناسه ملی اشخاص حقوقی. | برای فعال بودن این ویژگی، بله |
+| `API_IR_BASE_URL` | فقط برای تست، آدرس سرویس را بازنویسی می‌کند. پیش‌فرض `https://s.api.ir`. | اختیاری |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### متفرقه و توسعه محلی
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `LOG_DIR` | مسیر ذخیره‌ی لاگ‌های روزانه. پیش‌فرض `~/.prsy-website/logs`. | اختیاری |
+| `SEVEN_ZIP_PATH` | مسیر برنامه‌ی `7z` برای خروجی‌گرفتن از لاگ‌ها. پیش‌فرض `7z`. | اختیاری |
+| `DB_DOCKER_CONTAINER` | فقط وقتی `npm run db:backup` را روی MySQL داکر اجرا می‌کنید لازم است. | اختیاری |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | فقط یک‌بار، توسط `npm run db:seed` برای ساخت اولین حساب ادمین خوانده می‌شود. | فقط برای seed |
+| `CUSTOMER_EMAIL` / `CUSTOMER_PASSWORD` / `SUPPORT_EMAIL` / `SUPPORT_PASSWORD` | حساب‌های نمونه‌ی اضافی که seed می‌تواند بسازد (فقط توسعه). | اختیاری |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+<a id="deployment"></a>
+## ☁️ دیپلوی
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+در حال حاضر این ریپازیتوری سند دیپلوی اختصاصی (مثل `docs/deployment.md`) ندارد. آنچه از پیکربندی موجود مشخص است:
+
+- **دیتابیس production جدا از دیتابیس محلی Docker است** — طبق کامنت داخل `docker-compose.yml`، در production از یک دیتابیس MySQL که روی هاست (از طریق cPanel) ساخته می‌شود استفاده می‌شود، نه کانتینر Docker پروژه که فقط برای توسعه‌ی محلی است.
+- روش دیپلوی مدنظر، اتصال مستقیم یک سرویس PaaS به گیت‌هاب است: سرویس کد را از شاخه‌ی `main` می‌کشد و `npm install && npm run build` را اجرا می‌کند — دقیقاً همان دستوراتی که در بخش [راه‌اندازی روی سیستم شخصی](#getting-started) دیدید.
+- تمام متغیرهای بخش [متغیرهای محیطی](#environment-variables) باید در تنظیمات محیطی همان سرویس PaaS (نه در کد!) مقداردهی شوند.
+
+اگر یک راهنمای دیپلوی رسمی‌تر لازم شد، پیشنهاد می‌شود در `docs/deployment.md` مستند و از همین‌جا لینک داده شود.
+
+---
+
+<a id="user-roles"></a>
+## 👥 نقش‌های کاربری
+
+سیستم دقیقاً **سه** نقش کاربری دارد (در دیتابیس: `CUSTOMER`، `SUPPORT`، `ADMIN`):
+
+| نقش | به چه چیزی دسترسی دارد |
+|---|---|
+| 🙋 **مشتری (CUSTOMER)** | کل سایت عمومی، به‌علاوه‌ی پنل حساب شخصی خودش: پروفایل، تنظیمات امنیتی، سفارش‌ها و قراردادهای خودش (با دانلود PDF)، تیکت‌های پشتیبانی خودش، و فایل‌هایی که پشتیبانی برایش آپلود کرده. **اصلاً نمی‌تواند** وارد پنل مدیریت شود. |
+| 🎧 **پشتیبانی (SUPPORT)** | وارد پنل مدیریت می‌شود و به این بخش‌ها دسترسی دارد: داشبورد، مشتریان (مشاهده + ویرایش محدود)، سفارش‌ها، قراردادها، تیکت‌های پشتیبانی (چت کامل)، تأیید/رد دیدگاه محصولات، استعلام دوباره‌ی شناسه ملی، و جستجوی داخلی پنل. **دسترسی ندارد** به: مدیریت محصولات/برندها/دسته‌بندی، ویرایشگر وبلاگ، مدیریت محتوای سایت (CMS)، مرکز یکپارچه‌سازی، و بخش لاگ‌ها. |
+| 👑 **ادمین (ADMIN)** | همه‌ی دسترسی‌های SUPPORT به‌علاوه‌ی تمام بخش‌های اختصاصی ادمین: مدیریت کامل محصولات، ویرایشگر وبلاگ، مدیریت محتوای سایت (هدر، فوتر، صفحات قانونی و…)، مرکز یکپارچه‌سازی، و بخش لاگ/مانیتورینگ. همچنین تنها نقشی است که می‌تواند عملیات حساس روی مشتریان (مثل حذف) را انجام دهد. |
+
+> ℹ️ در حال حاضر هیچ صفحه‌ای در پنل مدیریت برای تغییر نقش یک کاربر وجود ندارد — این کار فقط از طریق دیتابیس ممکن است.
+
+---
+
+<a id="contributing"></a>
+## 🤝 مشارکت و توسعه بیشتر
+
+اگر می‌خواهید بعداً فیچر جدیدی اضافه کنید یا پروژه را نگهداری کنید:
+
+1. **قبل از هرچیز**، بخش [ساختار پوشه‌ها](#project-structure) را بخوانید — هر فایل باید بر اساس همان الگو در جای درستش قرار بگیرد (مثلاً یک کامپوننت مخصوص پنل ادمین، در `components/admin/`، نه در `components/` ریشه).
+2. برای کامپوننت‌های عمومی و قابل‌استفاده در همه‌جا از `components/ui/` استفاده کنید؛ برای هر چیز اختصاصی یک بخش (پنل ادمین، حساب کاربری، کاتالوگ) از پوشه‌ی همان بخش استفاده کنید.
+3. تایپ‌های TypeScript که فقط در یک فایل استفاده می‌شوند را همان‌جا نگه دارید؛ فقط تایپ‌هایی که بین چند فایل نامرتبط مشترک‌اند را به `src/types/` منتقل کنید.
+4. قبل از هر commit:
+   ```bash
+   npm run lint
+   npm run build
+   ```
+   اجرا کنید و مطمئن شوید هر دو بدون خطا پاس می‌شوند.
+5. تغییرات دیتابیس همیشه از طریق Prisma Migration انجام شود (`npm run db:migrate`)، هرگز مستقیم روی دیتابیس.
+
+---
+
+<a id="license-contact"></a>
+## 📄 مجوز و تماس
+
+**مجوز:** این پروژه **اختصاصی (Proprietary)** است و تمام حقوق آن متعلق به شرکت «پویش راه صنعت یاشار» است. کپی، توزیع یا استفاده‌ی مجدد از این کد بدون اجازه‌ی کتبی مجاز نیست.
+
+**تماس:**
+
+- 📍 آدرس: تهران، خیابان ولیعصر، برج صنعت، طبقه ۵
+- 📞 تلفن: ۰۲۱-۹۱۰۰۰۰۰۰
+- ✉️ ایمیل: [info@yasharindustry.com](mailto:info@yasharindustry.com)
+

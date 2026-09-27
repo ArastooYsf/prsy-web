@@ -2,11 +2,12 @@ import { config } from "dotenv";
 import bcrypt from "bcryptjs";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient, Role } from "../src/generated/prisma/client";
+import { buildDatabaseUrl } from "../src/lib/db-connection-string";
 
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
 
-const adapter = new PrismaMariaDb(process.env.DATABASE_URL ?? "");
+const adapter = new PrismaMariaDb(buildDatabaseUrl());
 const prisma = new PrismaClient({ adapter });
 
 function daysFromNow(days: number): Date {

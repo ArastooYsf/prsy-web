@@ -3,9 +3,10 @@ import { config } from "dotenv";
 // Same reasoning as scripts/backup-db.ts: cron won't have Next.js's automatic
 // .env.local loading, so this has to load it explicitly. This MUST happen
 // before src/lib/prisma is loaded (its top-level PrismaMariaDb(...) reads
-// process.env.DATABASE_URL at import time) — a static top-level `import`
-// would get hoisted above these config() calls regardless of source order,
-// so the prisma/events modules are loaded dynamically below instead.
+// DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME at import time, via
+// src/lib/db-connection-string.ts) — a static top-level `import` would get
+// hoisted above these config() calls regardless of source order, so the
+// prisma/events modules are loaded dynamically below instead.
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
 

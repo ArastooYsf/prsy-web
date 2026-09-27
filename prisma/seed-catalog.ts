@@ -1,11 +1,12 @@
 import { config } from "dotenv";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { buildDatabaseUrl } from "../src/lib/db-connection-string";
 
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
 
-const prisma = new PrismaClient({ adapter: new PrismaMariaDb(process.env.DATABASE_URL ?? "") });
+const prisma = new PrismaClient({ adapter: new PrismaMariaDb(buildDatabaseUrl()) });
 
 type SubSeed = { slug: string; name: string };
 type CatSeed = { slug: string; name: string; icon: string; order: number; specTemplateKey?: string; children: SubSeed[] };

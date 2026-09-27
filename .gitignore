@@ -68,3 +68,14 @@ next-env.d.ts
 
 # Strix pentest run output — may contain real vulnerability details, never commit
 /strix_runs
+
+# never commit these, even if they show up later
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*

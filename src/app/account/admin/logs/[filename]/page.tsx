@@ -6,7 +6,7 @@ import { ArrowRight, History, Lock } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { getLogFileMeta, isValidLogFilename, readLogEntries } from "@/lib/logger";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
-import { CategoryBadge } from "@/components/admin/log-category-meta";
+import { CategoryBadge } from "@/components/admin/LogCategoryMeta";
 import LogFileDetail from "@/components/admin/LogFileDetail";
 
 export const metadata: Metadata = {

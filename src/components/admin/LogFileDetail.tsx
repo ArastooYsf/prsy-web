@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import { ACTION_LABELS_FA, type LogCategory, type LogEntry } from "@/lib/log-types";
-import { CATEGORY_META } from "@/components/admin/log-category-meta";
+import { CATEGORY_META } from "@/components/admin/LogCategoryMeta";
 
 type LogFileDetailProps = {
   category: LogCategory;

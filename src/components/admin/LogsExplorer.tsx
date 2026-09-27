@@ -8,7 +8,7 @@ import { toPersianDigits, formatNumber } from "@/lib/format-number";
 import DateInput, { type Calendar } from "@/components/admin/DateInput";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useToast } from "@/components/ToastProvider";
-import { CATEGORY_META, CategoryBadge } from "@/components/admin/log-category-meta";
+import { CATEGORY_META, CategoryBadge } from "@/components/admin/LogCategoryMeta";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import type { LogFileSummary } from "@/lib/logger";

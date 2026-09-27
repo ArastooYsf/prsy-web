@@ -5,7 +5,7 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 import { scoreTierHex } from "@/lib/score-tier";
 import { axisTick, ChartCard, ChartLegend, RangeFilter, tooltipLabelStyle, tooltipStyle } from "@/components/admin/DashboardCharts";
-import { CATEGORY_META } from "@/components/admin/log-category-meta";
+import { CATEGORY_META } from "@/components/admin/LogCategoryMeta";
 import { jalaliDayLabel, type StatsRange } from "@/lib/stats-range";
 import { ALL_LOG_CATEGORIES, CATEGORY_LABELS_FA, type LogCategory } from "@/lib/log-types";
 import type { CategoryTrendPoint } from "@/lib/log-stats";
@@ -16,7 +16,7 @@ import type { LighthouseRun } from "@/lib/lighthouse";
 // range filter (same RangeFilter used elsewhere in the admin dashboard) and
 // a click-to-toggle legend (standard recharts pattern) let an admin isolate
 // one category or compare all of them. Line colors come straight from
-// CATEGORY_META (log-category-meta.tsx) — the same source the file-list
+// CATEGORY_META (LogCategoryMeta.tsx) — the same source the file-list
 // badges and detail-page tint already use — so a category never reads as a
 // different color here than anywhere else in the logs UI.
 export function LogEventsTrendChart({ initialData, initialRange }: { initialData: CategoryTrendPoint[]; initialRange: StatsRange }) {

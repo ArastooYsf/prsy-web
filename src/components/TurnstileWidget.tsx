@@ -45,6 +45,17 @@ export default function TurnstileWidget({ onVerify, onExpire }: TurnstileWidgetP
   const widgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey) {
+      // Not configured — skip rendering instead of leaving the login button
+      // disabled forever waiting for a token that will never arrive (the
+      // widget's callback is the only thing that sets it). Server side,
+      // src/lib/turnstile.ts skips verification the same way when
+      // TURNSTILE_SECRET_KEY is unset, so this sentinel is never checked.
+      onVerify("captcha-disabled");
+      return;
+    }
+
     let cancelled = false;
 
     loadTurnstileScript().then(() => {
@@ -52,7 +63,7 @@ export default function TurnstileWidget({ onVerify, onExpire }: TurnstileWidgetP
       const el = document.getElementById(containerId);
       if (!el) return;
       widgetIdRef.current = window.turnstile.render(el, {
-        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "",
+        sitekey: siteKey,
         callback: onVerify,
         "expired-callback": onExpire,
       });

@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   description: "آخرین مقالات و اخبار پویش راه صنعت یاشار درباره دیزل ژنراتور و موتور برق.",
 };
 
-export const revalidate = 60;
+// Not `revalidate` — that alone doesn't stop Next from prerendering this
+// route (and running the Prisma query below) at build time; only this does.
+// Currently redundant with the root layout's own forced-dynamic behavior
+// (see src/app/sitemap.ts for why that matters), kept explicit here so this
+// page stays build-time-safe even if that layout logic ever changes.
+export const dynamic = "force-dynamic";
 
 async function getPosts() {
   try {

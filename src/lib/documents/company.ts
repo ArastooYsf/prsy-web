@@ -1,7 +1,7 @@
 import { getFooterContact } from "@/lib/site-content";
 
-// Same identity shown in the site header/footer (src/components/ui/header-2.tsx,
-// src/components/Footer.tsx) and the official registration number quoted on
+// Same identity shown in the site header/footer (src/components/layout/Header.tsx,
+// src/components/layout/Footer.tsx) and the official registration number quoted on
 // the About page (src/components/About.tsx) — kept here as the single source
 // for generated documents rather than re-deriving it from those components.
 export const COMPANY_NAME = "پویش راه صنعت یاشار";

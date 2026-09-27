@@ -525,7 +525,7 @@ export const DEFAULT_FOOTER_CONTENT: FooterEditableContent = {
 };
 
 // Header nav labels — only the visible text is admin-editable; href, order,
-// and count of these 5 entries stay fixed in header-2.tsx (that component's
+// and count of these 5 entries stay fixed in layout/Header.tsx (that component's
 // hover-indicator tracks the real DOM nodes, not this list, so relabeling is
 // safe but changing the shape here wouldn't do anything on its own).
 export type HeaderNavLabelsContent = {

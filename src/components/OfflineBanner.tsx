@@ -10,7 +10,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 // they're still looking at an already-loaded page; it never takes over the
 // whole screen, since cached content usually stays perfectly usable while
 // offline. The sticky header reads this same isOffline value (see
-// header-2.tsx) to pad itself down by this banner's height, so this fixed
+// layout/Header.tsx) to pad itself down by this banner's height, so this fixed
 // strip never overlaps the header's own clickable content.
 export default function OfflineBanner() {
   const isOffline = useOnlineStatus();
@@ -24,7 +24,7 @@ export default function OfflineBanner() {
           exit={{ y: -40, opacity: 0 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
           role="status"
-          // min-h-9 (2.25rem) is a fixed, known height — header-2.tsx pads
+          // min-h-9 (2.25rem) is a fixed, known height — layout/Header.tsx pads
           // itself down by exactly this much when offline, so the two need
           // to agree on a concrete number rather than one measuring the
           // other.

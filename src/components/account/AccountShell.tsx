@@ -6,7 +6,7 @@ import { MailWarning } from "lucide-react";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import AdminSearchBox from "@/components/admin/AdminSearchBox";
 import NotificationBell from "@/components/account/NotificationBell";
-import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
+import { ThemeToggleButton } from "@/components/layout/ThemeToggleButton";
 
 // The blog editor (new + edit) owns its own full-screen split-panel layout
 // (see /account/admin/blog/[id] and /account/admin/blog/new) — no sidebar,

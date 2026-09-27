@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 // raw pointer coordinates are stashed in a ref on every `pointermove`, and
 // the actual DOM write (the CSS custom properties the gradient is centered
 // on) happens once per frame inside a single requestAnimationFrame callback
-// — the same rAF-batching pattern header-2.tsx's nav hover indicator
+// — the same rAF-batching pattern Header.tsx's nav hover indicator
 // already uses, so a fast mouse sweep costs at most one write per frame,
 // never one per raw event. The container's own rect is cached rather than
 // re-measured (a forced layout) on every one of those frames — it only

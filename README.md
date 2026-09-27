@@ -18,6 +18,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Project structure
+
+Where a new file goes, by what it is:
+
+- `src/app/` — routes only (`page.tsx`, `layout.tsx`, `loading.tsx`, `route.ts`). Don't colocate one-off components here — put them in `src/components/` under the folder below that matches who uses them, even if only one route imports it today.
+- `src/components/ui/` — generic, reusable primitives with no knowledge of this site's features (buttons, inputs, badges, spinners, empty states). If a component imports site-specific data, hooks, or is only ever used from one feature area, it doesn't belong here. shadcn-generated primitives (e.g. `button.tsx`) keep their lowercase filename per shadcn convention; everything else in `components/` is PascalCase.
+- `src/components/layout/` — site chrome: `Header.tsx`, `Footer.tsx`, and the header's own sub-pieces (cart menu, mega menu, mobile nav, search, theme toggle, scroll progress).
+- `src/components/admin/` — super_admin/editor/sales-only components (forms, tables, dashboards).
+- `src/components/account/` — customer-account-only components (profile, tickets, orders, contracts).
+- `src/components/products/` — product catalog & PDP components.
+- `src/components/` (root) — components genuinely shared across more than one of the areas above (e.g. `ConfirmDialog`, `TicketChat`, `MediaPickerModal`).
+- `src/lib/` — framework-agnostic helpers, one concern per file, grouped into a subfolder only once a domain has enough files to need one (see `lib/documents/`, `lib/integrations/`, `lib/notifications/`); otherwise flat with a `<domain>-*.ts` filename prefix (e.g. `ticket-*.ts`, `log-*.ts`, `site-*.ts`) is fine and matches the existing convention here.
+- `src/types/` — only for types shared across multiple unrelated files/domains. A type used by a single component stays colocated in that component's file — that's the default, not a gap to fill.
+- `prisma/` — `schema.prisma` and `migrations/` (standard Prisma layout, don't move).
+
 ## Product media (images/videos)
 
 All product images and videos are loaded through one environment variable,

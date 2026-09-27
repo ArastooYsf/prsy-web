@@ -6,7 +6,7 @@ import { dateRangeWhere, param, sortParams, type ListSearchParams } from "@/lib/
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { TicketCardMobile, TicketRowDesktop } from "./TicketRow";
+import { TicketCardMobile, TicketRowDesktop } from "@/components/admin/TicketRow";
 import type { Prisma } from "@/generated/prisma/client";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 

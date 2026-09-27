@@ -10,7 +10,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { param, sortParams, type ListSearchParams } from "@/lib/list-query";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
-import { ProductCardMobile, ProductRowDesktop } from "./ProductRow";
+import { ProductCardMobile, ProductRowDesktop } from "@/components/admin/ProductRow";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";

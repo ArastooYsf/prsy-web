@@ -7,7 +7,7 @@ import { getContractOrderTrend, getOrderStatusBreakdown, getTicketStatusBreakdow
 import UploadWidget from "@/components/admin/UploadWidget";
 import { SiteViewsCard } from "@/components/admin/DashboardCharts";
 import { TrendChart, OrderStatusChart, TicketStatusChart } from "@/components/admin/DashboardChartsLazy";
-import { StatCard } from "./StatCard";
+import { StatCard } from "@/components/admin/StatCard";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 async function getAdminStats() {

@@ -10,7 +10,7 @@ import { filterQueryString, param, sortParams, type ListSearchParams } from "@/l
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { CustomerCardMobile, CustomerRowDesktop } from "./CustomerRow";
+import { CustomerCardMobile, CustomerRowDesktop } from "@/components/admin/CustomerRow";
 import { LEGAL_CUSTOMER_NEEDS_REVIEW_WHERE } from "@/lib/national-id-verification";
 import type { Prisma } from "@/generated/prisma/client";
 import { debugSlowLoad } from "@/lib/debug-slow-load";

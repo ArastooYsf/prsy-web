@@ -7,7 +7,7 @@ import { dateOnwardsWhere, filterQueryString, param, sortParams, type ListSearch
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { ContractCardMobile, ContractRowDesktop } from "./ContractRow";
+import { ContractCardMobile, ContractRowDesktop } from "@/components/admin/ContractRow";
 import type { Prisma } from "@/generated/prisma/client";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 

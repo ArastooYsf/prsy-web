@@ -3,7 +3,7 @@ import { ORDER_STATUS } from "@/lib/status-labels";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { OrderCardMobile, OrderRowDesktop } from "./OrderRow";
+import { OrderCardMobile, OrderRowDesktop } from "@/components/admin/OrderRow";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 6 });
 

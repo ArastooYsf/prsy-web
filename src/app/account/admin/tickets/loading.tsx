@@ -3,7 +3,7 @@ import { TICKET_STATUS } from "@/lib/status-labels";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { TicketCardMobile, TicketRowDesktop } from "./TicketRow";
+import { TicketCardMobile, TicketRowDesktop } from "@/components/admin/TicketRow";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 6 });
 

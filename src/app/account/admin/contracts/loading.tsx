@@ -3,7 +3,7 @@ import { CONTRACT_STATUS } from "@/lib/status-labels";
 import ListFilterBar from "@/components/admin/ListFilterBar";
 import SortableHeader from "@/components/admin/SortableHeader";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { ContractCardMobile, ContractRowDesktop } from "./ContractRow";
+import { ContractCardMobile, ContractRowDesktop } from "@/components/admin/ContractRow";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 5 });
 

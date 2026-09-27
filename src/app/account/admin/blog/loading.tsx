@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Newspaper, Plus } from "lucide-react";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
-import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
+import { BlogCardMobile, BlogRowDesktop } from "@/components/admin/BlogRow";
 
 const PLACEHOLDER_ROWS = Array.from({ length: 6 });
 

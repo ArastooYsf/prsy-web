@@ -6,7 +6,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { AdminTableScroll, AdminTh } from "@/components/admin/AdminTable";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { BlogCardMobile, BlogRowDesktop } from "./BlogRow";
+import { BlogCardMobile, BlogRowDesktop } from "@/components/admin/BlogRow";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 export const dynamic = "force-dynamic";

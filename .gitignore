@@ -54,7 +54,7 @@ next-env.d.ts
 /public/media/ticket-attachments
 
 # personal/local Claude Code state
-.claude/settings.local.json
+/.claude
 *.graphify-bak
 
 # logs
@@ -62,5 +62,9 @@ next-env.d.ts
 
 # dev tooling — generated/installed locally, not part of the deployed app
 /graphify-out
-/.claude/skills
 /.agents/skills
+/.superpowers
+/skills-lock.json
+
+# Strix pentest run output — may contain real vulnerability details, never commit
+/strix_runs

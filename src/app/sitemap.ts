@@ -4,6 +4,15 @@ import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site-url";
 
+// Without this, Next prerenders this route at build time — and its Prisma
+// queries below need a database that's reachable from wherever the build
+// runs, which isn't guaranteed (e.g. build and runtime on separate networks
+// on some PaaS hosts). Forcing it dynamic defers those queries to request
+// time instead, exactly like every other route in this app already is
+// (only this file and robots.ts default to static — robots.ts has no DB
+// dependency, so it's left alone).
+export const dynamic = "force-dynamic";
+
 const APP_DIR = path.join(process.cwd(), "src", "app");
 const PAGE_FILE = /^page\.(tsx|ts|jsx|js)$/;
 

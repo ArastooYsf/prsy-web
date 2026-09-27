@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "timeout -k 10 300 sh -c 'prisma generate && next build'; code=$?; if [ $code -eq 124 ]; then echo 'BUILD TIMEOUT: پروسه بیش از ۵ دقیقه طول کشید و متوقف شد - احتمالاً یک اتصال شبکه یا دیتابیس در حال هنگ کردن است' >&2; fi; exit $code",
+    "build": "timeout -k 10 900 sh -c 'prisma generate && next build'; code=$?; if [ $code -eq 124 ]; then echo 'BUILD TIMEOUT: پروسه بیش از ۱۵ دقیقه طول کشید و متوقف شد - احتمالاً یک اتصال شبکه یا دیتابیس در حال هنگ کردن است' >&2; fi; exit $code",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",

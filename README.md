@@ -200,9 +200,9 @@ npm install
 cp .env.example .env.local
 ```
 
-سپس فایل `.env.local` را باز کنید و حداقل این متغیرهای **الزامی** را پر کنید (توضیح کامل همه‌ی متغیرها در بخش [متغیرهای محیطی](#environment-variables)):
+سپس فایل `.env.local` را باز کنید و حداقل این سه متغیر **الزامی** را پر کنید (توضیح کامل همه‌ی متغیرها در بخش [متغیرهای محیطی](#environment-variables)):
 
-- `DB_HOST`، `DB_PORT`، `DB_USER`، `DB_PASSWORD`، `DB_NAME` — مشخصات اتصال به دیتابیس MySQL، به‌صورت پنج متغیر جدا (نه یک رشته‌ی کامل — این پنج مقدار در زمان اجرا با هم ترکیب می‌شوند، نه در زمان build). `.env.example` فقط `DB_PORT` را از پیش پر کرده (بقیه خالی‌اند، چون این فایل commit می‌شود و نباید مقدار واقعی داشته باشد)؛ اگر از `docker-compose.yml` همین پروژه استفاده می‌کنید، این مقادیر را دستی وارد کنید: `DB_HOST=localhost`, `DB_PORT=3306`, `DB_USER=yashar`, `DB_PASSWORD=yashar_dev_password`, `DB_NAME=yashar`
+- `DATABASE_URL` — آدرس اتصال به دیتابیس MySQL، مثل: `mysql://yashar:yashar_dev_password@localhost:3306/yashar` (اگر از `docker-compose.yml` همین پروژه استفاده می‌کنید، این مقدار دقیقاً کار می‌کند)
 - `NEXTAUTH_SECRET` — یک رشته‌ی تصادفی برای امضای امن نشست‌های ورود. با این دستور بسازید:
   ```bash
   openssl rand -base64 32
@@ -217,7 +217,7 @@ cp .env.example .env.local
 docker compose up -d db
 ```
 
-این دستور یک MySQL 8.4 روی پورت 3306 با نام دیتابیس `yashar` بالا می‌آورد (دقیقاً مطابق مقادیر نمونه‌ی مرحله قبل). اگر ترجیح می‌دهید از یک نصب MySQL موجود روی سیستم خودتان استفاده کنید، همان‌جا یک دیتابیس خالی بسازید و پنج متغیر `DB_HOST`/`DB_PORT`/`DB_USER`/`DB_PASSWORD`/`DB_NAME` را متناسب با آن اصلاح کنید.
+این دستور یک MySQL 8.4 روی پورت 3306 با نام دیتابیس `yashar` بالا می‌آورد (دقیقاً مطابق مقدار `DATABASE_URL` نمونه در مرحله قبل). اگر ترجیح می‌دهید از یک نصب MySQL موجود روی سیستم خودتان استفاده کنید، همان‌جا یک دیتابیس خالی بسازید و `DATABASE_URL` را متناسب با آن اصلاح کنید.
 
 **۵. اجرای Migration ها** (ساخت جدول‌های دیتابیس)
 
@@ -276,7 +276,7 @@ npm run dev
 
 | متغیر | توضیح | الزامی؟ |
 |---|---|---|
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | مشخصات اتصال به دیتابیس MySQL، به‌صورت پنج متغیر جدا (نه یک رشته‌ی کامل — در `src/lib/db-connection-string.ts` در زمان اجرا ترکیب می‌شوند) | ✅ الزامی |
+| `DATABASE_URL` | آدرس اتصال به دیتابیس MySQL. فرمت: `mysql://USER:PASSWORD@HOST:3306/DB_NAME` | ✅ الزامی |
 | `NEXTAUTH_SECRET` | رشته‌ی تصادفی برای امضای امن نشست‌ها. با `openssl rand -base64 32` بسازید. | ✅ الزامی |
 | `NEXTAUTH_URL` | آدرس کامل سایت که NextAuth برای callback ها استفاده می‌کند. | ✅ الزامی |
 

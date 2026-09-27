@@ -5,7 +5,6 @@ import { createWriteStream } from "fs";
 import { mkdir, readdir, stat, unlink } from "fs/promises";
 import path from "path";
 import { toJalaali } from "jalaali-js";
-import { getDbParts } from "../src/lib/db-connection-string";
 
 // Matches prisma.config.ts / prisma/seed.ts: cron won't have Next.js's
 // automatic .env.local loading, so this has to load it explicitly.
@@ -28,13 +27,15 @@ const DAILY_KEEP = 7;
 const WEEKLY_KEEP = 4;
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
 
-function readDbCredentials() {
-  const parts = getDbParts();
-  if (!parts) {
-    console.error("Missing required database environment variable(s) — see .env.example (DB_HOST/DB_USER/DB_PASSWORD/DB_NAME).");
-    process.exit(1);
-  }
-  return parts;
+function parseDatabaseUrl(databaseUrl: string) {
+  const url = new URL(databaseUrl);
+  return {
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    host: url.hostname,
+    port: url.port || "3306",
+    database: url.pathname.replace(/^\//, ""),
+  };
 }
 
 function backupFilename(now: Date): string {
@@ -47,7 +48,7 @@ function backupFilename(now: Date): string {
 // Runs `mysqldump` (via `docker exec` into the DB container, or directly if
 // DB_DOCKER_CONTAINER is unset) and streams its stdout straight through gzip
 // into the destination file — the dump never touches disk uncompressed.
-function runDump(db: ReturnType<typeof readDbCredentials>, destPath: string): Promise<void> {
+function runDump(db: ReturnType<typeof parseDatabaseUrl>, destPath: string): Promise<void> {
   const dumpArgs = [`-u${db.user}`, `-p${db.password}`, "--single-transaction", "--quick", db.database];
 
   const child = DB_DOCKER_CONTAINER
@@ -125,9 +126,15 @@ async function rotateBackups(): Promise<void> {
 }
 
 async function main() {
-  const db = readDbCredentials();
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error("DATABASE_URL is not set.");
+    process.exit(1);
+  }
 
   await mkdir(BACKUP_DIR, { recursive: true });
+
+  const db = parseDatabaseUrl(databaseUrl);
   const filename = backupFilename(new Date());
   const destPath = path.join(BACKUP_DIR, filename);
 

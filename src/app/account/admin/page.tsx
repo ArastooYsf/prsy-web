@@ -23,7 +23,7 @@ async function getAdminStats() {
       posts: 0,
       contentEntries: 0,
       media: 0,
-      error: "اتصال به دیتابیس برقرار نیست. تنظیمات DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME را بررسی کنید.",
+      error: "اتصال به دیتابیس برقرار نیست. تنظیمات DATABASE_URL را بررسی کنید.",
     };
   }
 }

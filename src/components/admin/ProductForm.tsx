@@ -41,6 +41,7 @@ type ProductFormProps = {
     availability: string;
     showPrice: boolean;
     price: number | null;
+    catalogUrl: string | null;
     isActive: boolean;
   };
 };
@@ -81,6 +82,7 @@ export default function ProductForm({ mode, categories, brands, specTemplates, u
   const [availability, setAvailability] = useState(product?.availability ?? "IN_STOCK");
   const [showPrice, setShowPrice] = useState(product?.showPrice ?? false);
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : "");
+  const [catalogUrl, setCatalogUrl] = useState(product?.catalogUrl ?? "");
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
   const [saving, setSaving] = useState(false);
   const newestSpecRef = useScrollNewestIntoView<HTMLDivElement>(customSpecs.length);
@@ -148,6 +150,7 @@ export default function ProductForm({ mode, categories, brands, specTemplates, u
       availability,
       showPrice,
       price: showPrice ? Number(price) || 0 : null,
+      catalogUrl,
       isActive,
     };
     const res = await fetch(mode === "create" ? "/api/admin/products" : `/api/admin/products/${product!.id}`, {
@@ -270,6 +273,20 @@ export default function ProductForm({ mode, categories, brands, specTemplates, u
             <FormattedNumberInput value={price} onChange={setPrice} className={inputClass} />
           </div>
         )}
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-foreground/80">لینک کاتالوگ یا ویدیوی محصول (از هاست دانلود)</label>
+        <input
+          dir="ltr"
+          value={catalogUrl}
+          onChange={(e) => setCatalogUrl(e.target.value)}
+          className={inputClass}
+          placeholder="https://download.example.com/catalog.pdf"
+        />
+        <p className="mt-1 text-xs text-foreground/40">
+          فایل را مستقیم روی هاست دانلود آپلود کنید و لینکش را اینجا بچسبانید — اختیاری، خالی بماند چیزی نمایش داده نمی‌شود.
+        </p>
       </div>
 
       <label className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground/80">

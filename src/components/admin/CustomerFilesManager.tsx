@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, Upload } from "lucide-react";
-import { getMediaUrl } from "@/lib/media";
+import { getPrivateFileUrl } from "@/lib/media";
 import { formatFileSize } from "@/lib/format-number";
 import { formatJalali } from "@/lib/jalali";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
@@ -84,7 +84,7 @@ export default function CustomerFilesManager({ customerId, files }: { customerId
               </div>
               <div className="flex items-center gap-2">
                 <a
-                  href={getMediaUrl(file.url)}
+                  href={getPrivateFileUrl(file.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex min-h-9 items-center gap-1.5 rounded-full border border-foreground/10 px-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"

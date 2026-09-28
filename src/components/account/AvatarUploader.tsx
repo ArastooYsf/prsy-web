@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Camera, User } from "lucide-react";
-import { getMediaUrl } from "@/lib/media";
+import { getPrivateFileUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
 
 type AvatarUploaderProps = {
@@ -22,7 +22,7 @@ export default function AvatarUploader({ value, onChange, nameForAlt }: AvatarUp
       <div className="relative">
         <div className="relative flex size-24 items-center justify-center overflow-hidden rounded-full border border-foreground/10 bg-foreground/5">
           {value ? (
-            <Image src={getMediaUrl(value)} alt={nameForAlt} fill sizes="96px" className="object-cover" />
+            <Image src={getPrivateFileUrl(value)} alt={nameForAlt} fill sizes="96px" className="object-cover" unoptimized />
           ) : (
             <User className="size-10 text-foreground/30" />
           )}

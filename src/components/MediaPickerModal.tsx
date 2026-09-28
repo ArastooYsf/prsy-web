@@ -27,6 +27,13 @@ type MediaKind = "image" | "file" | "all";
 // gallery from being polluted by customer ticket attachments (and vice versa).
 export type MediaScope = "SITE_CONTENT" | "TICKET_ATTACHMENT" | "PROFILE_AVATAR" | "CONTRACT_FILE" | "PRODUCT_COMMENT";
 
+// These 3 are private, per-record files (never public, never a shared
+// cross-record gallery — see src/app/api/uploads/private/route.ts). Upload
+// and attach immediately, no browsing/reusing a previous upload: a shared
+// gallery here would let one ticket/contract/customer's file leak into an
+// unrelated one.
+const PRIVATE_SCOPES: readonly MediaScope[] = ["TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE"];
+
 type MediaPickerModalProps = {
   open: boolean;
   onClose: () => void;
@@ -79,7 +86,8 @@ export default function MediaPickerModal({
   hint,
 }: MediaPickerModalProps) {
   const { showToast } = useToast();
-  const [tab, setTab] = useState<"gallery" | "upload">("gallery");
+  const isPrivate = PRIVATE_SCOPES.includes(scope);
+  const [tab, setTab] = useState<"gallery" | "upload">(isPrivate ? "upload" : "gallery");
   const [gallery, setGallery] = useState<MediaAsset[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
   const [draftSelected, setDraftSelected] = useState<string[]>(initialSelected);
@@ -94,6 +102,10 @@ export default function MediaPickerModal({
   useEffect(() => {
     if (!open) return;
     setDraftSelected(initialSelected);
+    if (isPrivate) {
+      setTab("upload");
+      return;
+    }
     setTab("gallery");
     fetchGallery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,7 +149,7 @@ export default function MediaPickerModal({
       formData.append("file", file);
       formData.append("scope", scope);
 
-      const res = await fetch("/api/media/upload", { method: "POST", body: formData });
+      const res = await fetch(isPrivate ? "/api/uploads/private" : "/api/media/upload", { method: "POST", body: formData });
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -145,7 +157,15 @@ export default function MediaPickerModal({
         continue;
       }
 
-      const { media } = await res.json();
+      // Private uploads return { file } (no MediaAsset row — see
+      // src/app/api/uploads/private/route.ts); normalize into the same
+      // shape used everywhere else in this component. id is client-only,
+      // never sent anywhere, and canDelete is always false since there's no
+      // gallery entry to delete.
+      const body = await res.json();
+      const media: MediaAsset = isPrivate
+        ? { id: crypto.randomUUID(), canDelete: false, ...body.file }
+        : body.media;
       setGallery((prev) => [media, ...prev]);
       newPaths.push(media.url);
     }
@@ -226,29 +246,31 @@ export default function MediaPickerModal({
           </button>
         </div>
 
-        <div className="flex gap-2 border-b border-foreground/10 px-5 py-3">
-          <button
-            type="button"
-            onClick={() => setTab("gallery")}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              tab === "gallery" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
-            }`}
-          >
-            گالری
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("upload")}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              tab === "upload" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
-            }`}
-          >
-            آپلود
-          </button>
-        </div>
+        {!isPrivate && (
+          <div className="flex gap-2 border-b border-foreground/10 px-5 py-3">
+            <button
+              type="button"
+              onClick={() => setTab("gallery")}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                tab === "gallery" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
+              }`}
+            >
+              گالری
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("upload")}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                tab === "upload" ? "bg-accent-500 text-primary-foreground" : "border border-foreground/10 text-foreground/70 hover:border-accent-500/40"
+              }`}
+            >
+              آپلود
+            </button>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto p-5">
-          {tab === "gallery" ? (
+          {tab === "gallery" && !isPrivate ? (
             loadingGallery ? (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (

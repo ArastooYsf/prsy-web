@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { LifeBuoy, User, MoreVertical, ListChecks, Trash2, X } from "lucide-react";
 import { X as PhosphorX, Check, Paperclip, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
-import { getMediaUrl } from "@/lib/media";
+import { getPrivateFileUrl } from "@/lib/media";
 import { triggerBlobDownload } from "@/lib/blob-download";
 import { cn } from "@/lib/utils";
 import { formatNumber, formatFileSize } from "@/lib/format-number";
@@ -215,13 +215,11 @@ function MessageMenu({
   onEdit,
   onDelete,
   onDownload,
-  onSave,
   forceVisible,
 }: {
   onEdit?: () => void;
   onDelete?: () => void;
   onDownload?: () => void;
-  onSave?: () => void;
   forceVisible: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -263,14 +261,6 @@ function MessageMenu({
               className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-foreground/10"
             >
               دانلود
-            </DropdownMenu.Item>
-          )}
-          {onSave && (
-            <DropdownMenu.Item
-              onSelect={onSave}
-              className="w-full cursor-pointer select-none rounded-lg px-3 py-2 text-right text-xs font-medium text-foreground/80 outline-none transition-colors data-[highlighted]:bg-foreground/10"
-            >
-              ذخیره در گالری من
             </DropdownMenu.Item>
           )}
           {onEdit && (
@@ -616,32 +606,15 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
   const hasOwnMessages = messages.some((m) => m.isReply && !m.deletedAt && m.authorId === viewerId);
 
-  const attachmentsEndpointBase =
-    viewerRole === "customer" ? `/api/account/tickets/${ticketId}/attachments` : `/api/admin/tickets/${ticketId}/attachments`;
-
   const downloadAttachments = async (m: ChatMessage) => {
     for (const a of m.attachments) {
       try {
-        const res = await fetch(getMediaUrl(a.url));
+        const res = await fetch(getPrivateFileUrl(a.url));
         const blob = await res.blob();
         triggerBlobDownload(blob, a.filename);
       } catch {
         showToast("خطا در دانلود فایل.", "error");
       }
-    }
-  };
-
-  const saveAttachmentsToGallery = async (m: ChatMessage) => {
-    let savedCount = 0;
-    for (const a of m.attachments) {
-      const res = await fetch(`${attachmentsEndpointBase}/${a.id}/save`, { method: "POST" });
-      if (res.ok) savedCount++;
-    }
-
-    if (savedCount === 0) {
-      showToast("خطا در ذخیره‌سازی فایل.", "error");
-    } else {
-      showToast(`${formatNumber(savedCount)} فایل در گالری شما ذخیره شد.`, "success");
     }
   };
 
@@ -766,7 +739,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                             {images.map((img) => (
                               <a
                                 key={img.id}
-                                href={getMediaUrl(img.url)}
+                                href={getPrivateFileUrl(img.url)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={cn(
@@ -777,11 +750,12 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                                 )}
                               >
                                 <Image
-                                  src={getMediaUrl(img.url)}
+                                  src={getPrivateFileUrl(img.url)}
                                   alt={img.filename}
                                   fill
                                   sizes="(min-width: 640px) 320px, 220px"
                                   className="object-cover"
+                                  unoptimized
                                 />
                               </a>
                             ))}
@@ -793,7 +767,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                             {files.map((f) => (
                               <a
                                 key={f.id}
-                                href={getMediaUrl(f.url)}
+                                href={getPrivateFileUrl(f.url)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 rounded-lg border border-foreground/10 bg-background/10 px-3 py-2 text-xs hover:border-foreground/30"
@@ -834,7 +808,6 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                 onEdit={canModify ? () => startEdit(m) : undefined}
                 onDelete={canModify ? () => setDeleteTargetId(m.id) : undefined}
                 onDownload={hasAttachments ? () => downloadAttachments(m) : undefined}
-                onSave={hasAttachments ? () => saveAttachmentsToGallery(m) : undefined}
                 forceVisible={longPressedId === m.id}
               />
             ) : canModify && selectMode ? (
@@ -945,7 +918,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
                             key={img.tempId}
                             className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-foreground/10"
                           >
-                            <Image src={getMediaUrl(img.url)} alt={img.filename} fill sizes="56px" className="object-cover" />
+                            <Image src={getPrivateFileUrl(img.url)} alt={img.filename} fill sizes="56px" className="object-cover" unoptimized />
                             <button
                               type="button"
                               onClick={() => removeOne(img.tempId)}

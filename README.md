@@ -287,6 +287,20 @@ npm run dev
 | `NEXT_PUBLIC_MEDIA_URL` | آدرس پایه‌ی تصاویر/ویدیوهای محصولات. پیش‌فرض `/media` (پوشه‌ی محلی `public/media`). | اختیاری |
 | `NEXT_PUBLIC_SITE_URL` | آدرس کامل سایت — در لینک‌های داخل ایمیل/پیامک استفاده می‌شود. پیش‌فرض `http://localhost:3000`. | اختیاری |
 
+### ذخیره‌سازی فایل (Media Storage)
+
+فایل‌های عمومی (محتوای سایت، تصاویر نظرات محصول) و خصوصی (پیوست تیکت، فایل قرارداد، آواتار، فایل مشتری) جدا مدیریت می‌شوند — برای جزئیات کامل معماری، به [docs/media-hosting.md](docs/media-hosting.md) مراجعه کنید.
+
+| متغیر | توضیح | الزامی؟ |
+|---|---|---|
+| `MEDIA_STORAGE_DRIVER` | درایور فایل‌های عمومی: `local` (پیش‌فرض)، `sftp` یا `s3`. | اختیاری |
+| `MEDIA_SFTP_HOST` / `MEDIA_SFTP_PORT` / `MEDIA_SFTP_USERNAME` / `MEDIA_SFTP_REMOTE_DIR` | فقط با `MEDIA_STORAGE_DRIVER=sftp`. | اختیاری |
+| `MEDIA_SFTP_PASSWORD` | فقط با `MEDIA_STORAGE_DRIVER=sftp` — حساس، در پارس‌پک باید Secret باشد. | اختیاری |
+| `MEDIA_S3_ENDPOINT` / `MEDIA_S3_REGION` / `MEDIA_S3_BUCKET` / `MEDIA_S3_FORCE_PATH_STYLE` | فقط با `MEDIA_STORAGE_DRIVER=s3` (با هر هاست سازگار با S3 کار می‌کند). | اختیاری |
+| `MEDIA_S3_ACCESS_KEY_ID` / `MEDIA_S3_SECRET_ACCESS_KEY` | فقط با `MEDIA_STORAGE_DRIVER=s3` — حساس، در پارس‌پک باید Secret باشند. | اختیاری |
+| `UPLOAD_PRIVATE_DIR` | مسیر دیسک محلی برای فایل‌های خصوصی. پیش‌فرض `private-uploads` در ریشه‌ی پروژه. ⚠️ روی پارس‌پک دیسک دائمی نیست — فایل‌های خصوصی با هر redeploy از بین می‌روند. | اختیاری |
+| `DOWNLOAD_HOST_ALLOWED_DOMAIN` | دامنه‌ی مجاز (با کاما جدا) برای فیلد «افزودن از هاست دانلود» (کاتالوگ محصول، محتوای سایت). | اختیاری |
+
 ### ایمیل و پیامک
 
 | متغیر | توضیح | الزامی؟ |

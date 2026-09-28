@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { unlink } from "fs/promises";
-import path from "path";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPublicStorage } from "@/lib/storage/public";
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -32,7 +31,8 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
   await prisma.mediaAsset.delete({ where: { id: asset.id } });
 
-  await unlink(path.join(process.cwd(), "public", "media", asset.url)).catch(() => {});
+  const storage = await getPublicStorage();
+  await storage.delete(asset.url);
 
   return NextResponse.json({ success: true });
 }

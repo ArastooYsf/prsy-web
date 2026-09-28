@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
-import type { FooterContactContent, FooterEditableContent } from "@/lib/site-content";
-import { DEFAULT_FOOTER_CONTENT } from "@/lib/site-content-defaults";
+import type { FooterContactContent, FooterEditableContent, DownloadsContent } from "@/lib/site-content";
+import { DEFAULT_FOOTER_CONTENT, DEFAULT_DOWNLOADS_CONTENT } from "@/lib/site-content-defaults";
 import { toPersianDigits } from "@/lib/format-number";
 import { getSocialLink } from "@/lib/social-platforms";
-import { getMediaUrl } from "@/lib/media";
+import { getMediaUrl, resolveMediaUrl } from "@/lib/media";
 
 // href for each link stays fixed here, keyed by the same `id` the admin
 // panel's label editor uses — a typo in the panel can only ever change
@@ -42,11 +42,13 @@ export default function Footer({
   contact,
   content = DEFAULT_FOOTER_CONTENT,
   logo = "",
+  downloads = DEFAULT_DOWNLOADS_CONTENT,
 }: {
   contact: FooterContactContent;
   content?: FooterEditableContent;
   /** Admin-set logo image (media path); empty = the built-in "یا" monogram. */
   logo?: string;
+  downloads?: DownloadsContent;
 }) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
@@ -183,7 +185,27 @@ export default function Footer({
           <p>
             © {year.toLocaleString("fa-IR", { useGrouping: false })} پویش راه صنعت یاشار. {content.copyrightSuffix}
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-6">
+            {downloads.catalogUrl && (
+              <a
+                href={resolveMediaUrl(downloads.catalogUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-foreground"
+              >
+                دانلود کاتالوگ
+              </a>
+            )}
+            {downloads.introVideoUrl && (
+              <a
+                href={resolveMediaUrl(downloads.introVideoUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-foreground"
+              >
+                مشاهده ویدیوی معرفی
+              </a>
+            )}
             <Link href="/privacy" className="transition-colors hover:text-foreground">
               حریم خصوصی
             </Link>

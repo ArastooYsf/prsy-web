@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateUploadedFile } from "@/lib/uploads";
 import { actorFromSession, logEvent } from "@/lib/logger";
-
-const UPLOAD_SUBDIR = "uploads";
+import { privateStorage } from "@/lib/storage/private";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -51,10 +48,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
   const { bytes, extension } = validation.result;
 
-  const filename = `${randomUUID()}${extension}`;
-  const uploadDir = path.join(process.cwd(), "public", "media", UPLOAD_SUBDIR);
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), bytes);
+  const key = `${randomUUID()}${extension}`;
+  await privateStorage.put(key, bytes);
 
   const title = typeof titleInput === "string" && titleInput.trim() ? titleInput.trim().slice(0, 191) : file.name;
 
@@ -62,7 +57,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     data: {
       userId: customer.id,
       title,
-      url: `${UPLOAD_SUBDIR}/${filename}`,
+      url: key,
       filename: file.name,
       mimeType: file.type,
       size: file.size,

@@ -4,7 +4,7 @@ import { FileText, Plus, Ban } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMediaUrl } from "@/lib/media";
+import { getPrivateFileUrl } from "@/lib/media";
 import { CONTRACT_STATUS } from "@/lib/status-labels";
 import { formatNumber } from "@/lib/format-number";
 import DateRangeDisplay from "@/components/account/DateRangeDisplay";
@@ -95,7 +95,7 @@ export default async function AccountContractsPage() {
                   <StatusBadge status={CONTRACT_STATUS[contract.status]} />
                   {contract.fileUrl && (
                     <a
-                      href={getMediaUrl(contract.fileUrl)}
+                      href={getPrivateFileUrl(contract.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"

@@ -14,6 +14,7 @@ import {
   normalizeAvailability,
   normalizePrice,
 } from "@/lib/product-normalize";
+import { validateDownloadHostUrl } from "@/lib/download-host";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -38,6 +39,11 @@ export async function POST(request: Request) {
   const categoryId = await resolveCategoryId(body.categoryId);
   const brandId = await resolveBrandId(body.brandId);
 
+  const catalogUrlResult = validateDownloadHostUrl(typeof body.catalogUrl === "string" ? body.catalogUrl : "");
+  if (!catalogUrlResult.ok) {
+    return NextResponse.json({ error: catalogUrlResult.error }, { status: 400 });
+  }
+
   const requestedSlug =
     typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
   const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
@@ -57,6 +63,7 @@ export async function POST(request: Request) {
       availability,
       showPrice,
       price,
+      catalogUrl: catalogUrlResult.value || null,
       isActive,
     },
   });

@@ -43,6 +43,10 @@ next-env.d.ts
 # admin-uploaded media (lives on the host, not in version control)
 /public/media/uploads
 
+# private files (ticket attachments, contracts, avatars, customer files) —
+# never public, never version control. See docs/media-hosting.md.
+/private-uploads
+
 # event logs (host-local, contain user emails/ids — not version control)
 /logs
 

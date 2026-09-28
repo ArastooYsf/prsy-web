@@ -17,6 +17,7 @@ import {
   Rows,
   Navigation,
   Image as ImageIcon,
+  Download,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import {
@@ -32,6 +33,7 @@ import {
   getConsultationContent,
   getAboutContent,
   getContactHeroContent,
+  getDownloadsContent,
   getFooterEditableContent,
   getHeaderNavLabels,
   getLegalPageHeading,
@@ -49,6 +51,7 @@ import SocialProofContentForm from "@/components/admin/SocialProofContentForm";
 import ConsultationContentForm from "@/components/admin/ConsultationContentForm";
 import AboutContentForm from "@/components/admin/AboutContentForm";
 import ContactHeroForm from "@/components/admin/ContactHeroForm";
+import DownloadsContentForm from "@/components/admin/DownloadsContentForm";
 import FooterContentForm from "@/components/admin/FooterContentForm";
 import HeaderNavLabelsForm from "@/components/admin/HeaderNavLabelsForm";
 import SiteContentAccordion, { type SiteContentSection } from "@/components/admin/SiteContentAccordion";
@@ -84,6 +87,7 @@ export default async function AdminContentPage() {
     consultation,
     about,
     contactHero,
+    downloads,
     footerContent,
     headerNavLabels,
     termsHeading,
@@ -106,6 +110,7 @@ export default async function AdminContentPage() {
     getConsultationContent(),
     getAboutContent(),
     getContactHeroContent(),
+    getDownloadsContent(),
     getFooterEditableContent(),
     getHeaderNavLabels(),
     getLegalPageHeading("terms"),
@@ -186,6 +191,14 @@ export default async function AdminContentPage() {
       description: "بج، عنوان و برچسب نقشه بالای صفحه «تماس با ما».",
       searchText: `${contactHero.badge} ${contactHero.heading} ${contactHero.mapLabel}`,
       content: <ContactHeroForm initialContent={contactHero} />,
+    },
+    {
+      id: "downloads",
+      icon: <Download size={18} />,
+      title: "کاتالوگ و ویدیوی معرفی",
+      description: "لینک کاتالوگ و ویدیوی معرفی — فایل روی هاست دانلود آپلود می‌شود، فقط لینکش اینجا ثبت می‌شود.",
+      searchText: `${downloads.catalogUrl} ${downloads.introVideoUrl}`,
+      content: <DownloadsContentForm initialContent={downloads} />,
     },
     {
       id: "footer-contact",

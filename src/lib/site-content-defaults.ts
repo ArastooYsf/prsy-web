@@ -479,6 +479,19 @@ export const DEFAULT_CONTACT_HERO: ContactHeroContent = {
   mapLabel: "نقشه موقعیت ما",
 };
 
+// Admin-pasted links to files uploaded directly to the download host (see
+// src/lib/download-host.ts) — bypasses the Next.js upload API's body-size
+// limit for large catalogs/product videos. Empty = nothing renders.
+export type DownloadsContent = {
+  catalogUrl: string;
+  introVideoUrl: string;
+};
+
+export const DEFAULT_DOWNLOADS_CONTENT: DownloadsContent = {
+  catalogUrl: "",
+  introVideoUrl: "",
+};
+
 export type LegalPageHeadingContent = {
   eyebrow: string;
   heading: string;

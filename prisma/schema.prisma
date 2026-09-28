@@ -115,6 +115,9 @@ model User {
   customerFiles         CustomerFile[]   @relation("CustomerFiles")
   uploadedCustomerFiles CustomerFile[]   @relation("UploadedCustomerFiles")
 
+  // Backs the private-file lookup in src/app/api/files/[id]/route.ts, which
+  // disambiguates a storage key by querying this column (among others).
+  @@index([avatarUrl])
   @@map("users")
 }
 
@@ -189,6 +192,7 @@ model TicketAttachment {
   createdAt DateTime    @default(now())
 
   @@index([replyId])
+  @@index([url])
   @@map("ticket_attachments")
 }
 
@@ -228,6 +232,7 @@ model Contract {
   updatedAt            DateTime       @updatedAt
 
   @@index([userId])
+  @@index([fileUrl])
   @@map("contracts")
 }
 
@@ -361,6 +366,7 @@ model CustomerFile {
   createdAt    DateTime @default(now())
 
   @@index([userId])
+  @@index([url])
   @@map("customer_files")
 }
 
@@ -429,6 +435,10 @@ model Product {
   availability ProductAvailability @default(IN_STOCK)
   showPrice    Boolean             @default(false)
   price        Int?
+  // Link to a catalog PDF or product video the admin uploaded directly to
+  // the download host (bypassing the Next.js upload API's body-size limit —
+  // see src/lib/download-host.ts). Null/empty renders nothing.
+  catalogUrl   String?
   isActive     Boolean             @default(true)
   deletedAt    DateTime?
   createdAt    DateTime            @default(now())

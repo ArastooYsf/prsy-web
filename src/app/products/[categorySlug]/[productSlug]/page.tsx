@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMediaUrl } from "@/lib/media";
+import { getMediaUrl, resolveMediaUrl } from "@/lib/media";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { linkifyKnownPhrases } from "@/lib/site-section-links";
 import { formatSpecValue, parseProductImages, parseProductSpecs } from "@/lib/product-json";
@@ -250,6 +250,17 @@ export default async function ProductDetailPage({
           outOfStockHref={outOfStockHref}
           cartProduct={{ productId: product.id, name: product.name, href: canonicalPath, image: images[0] ?? null }}
         />
+
+        {product.catalogUrl && (
+          <a
+            href={resolveMediaUrl(product.catalogUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-foreground/10 px-4 text-sm font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+          >
+            کاتالوگ / ویدیوی محصول
+          </a>
+        )}
       </div>
 
       {tabSections.length > 0 && (

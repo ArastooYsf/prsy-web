@@ -26,6 +26,7 @@ export default function UploadWidget() {
     for (const file of Array.from(fileList)) {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("scope", "SITE_CONTENT");
 
       const res = await fetch("/api/media/upload", {
         method: "POST",
@@ -52,7 +53,7 @@ export default function UploadWidget() {
     <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
       <h2 className="text-lg font-bold">آپلود سریع به مخزن سایت</h2>
       <p className="mt-1 text-sm text-foreground/60">
-        فایل‌ها به مخزن مشترک سایت اضافه می‌شوند و همه‌جا (وبلاگ، محتوای سایت، قرارداد، تیکت) قابل انتخاب هستند.
+        فایل‌ها به مخزن عمومی سایت اضافه می‌شوند و همه‌جا (وبلاگ، محتوای سایت) قابل انتخاب هستند.
       </p>
 
       <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-foreground/15 px-6 py-8 text-center transition-colors hover:border-accent-500/40">

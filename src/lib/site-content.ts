@@ -24,7 +24,9 @@ import {
   DEFAULT_FOOTER_CONTENT,
   DEFAULT_HEADER_NAV_LABELS,
   DEFAULT_SITE_LOGO,
+  DEFAULT_DOWNLOADS_CONTENT,
   type SiteLogoContent,
+  type DownloadsContent,
   type HeroSlideContent,
   type HeroSettingsContent,
   type FooterContactContent,
@@ -59,6 +61,7 @@ export type {
   LegalPageHeadingContent,
   FooterEditableContent,
   HeaderNavLabelsContent,
+  DownloadsContent,
 };
 
 export const SITE_CONTENT_TAG = "site-content";
@@ -77,6 +80,7 @@ export const CONTACT_HERO_KEY = "contact.hero";
 export const FOOTER_CONTENT_KEY = "footer.content";
 export const HEADER_NAV_LABELS_KEY = "header.navLabels";
 export const SITE_LOGO_KEY = "site.logo";
+export const DOWNLOADS_KEY = "downloads.content";
 export const SPEC_TEMPLATES_KEY = "spec.templates";
 export const SPEC_SUGGESTIONS_KEY = "spec.suggestions";
 
@@ -218,6 +222,11 @@ export async function getAboutContent(): Promise<AboutContent> {
 export async function getContactHeroContent(): Promise<ContactHeroContent> {
   const map = await getSiteContentMap();
   return parseJsonObject<ContactHeroContent>(map[CONTACT_HERO_KEY], DEFAULT_CONTACT_HERO);
+}
+
+export async function getDownloadsContent(): Promise<DownloadsContent> {
+  const map = await getSiteContentMap();
+  return parseJsonObject<DownloadsContent>(map[DOWNLOADS_KEY], DEFAULT_DOWNLOADS_CONTENT);
 }
 
 export async function getFooterEditableContent(): Promise<FooterEditableContent> {

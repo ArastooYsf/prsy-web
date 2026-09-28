@@ -1,26 +1,24 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateUploadedFile } from "@/lib/uploads";
+import { getPublicStorage } from "@/lib/storage/public";
 
 const UPLOAD_SUBDIR = "uploads";
-const VALID_SCOPES = ["SITE_CONTENT", "TICKET_ATTACHMENT", "PROFILE_AVATAR", "CONTRACT_FILE", "PRODUCT_COMMENT"] as const;
+
+// TICKET_ATTACHMENT, PROFILE_AVATAR and CONTRACT_FILE are private scopes —
+// they go through /api/uploads/private instead (never public, no shared
+// gallery). Only these two genuinely-public scopes are handled here.
+const VALID_SCOPES = ["SITE_CONTENT", "PRODUCT_COMMENT"] as const;
 type MediaScope = (typeof VALID_SCOPES)[number];
 
 // SITE_CONTENT is only ever populated through the admin-only site-content/blog
 // editor's image picker — without this gate any authenticated user, including
 // a CUSTOMER, could tag an upload with this scope directly via the API and
-// have it show up in the shared admin gallery. CONTRACT_FILE is the contract
-// form's file field, which ADMIN and SUPPORT both manage (see contracts
-// API routes), so it's gated to staff rather than ADMIN alone. TICKET_ATTACHMENT
-// and PROFILE_AVATAR are legitimately uploaded by every role (a customer
-// attaching a file to their own ticket, anyone setting their own avatar).
+// have it show up in the shared admin gallery.
 const ADMIN_ONLY_SCOPES: readonly MediaScope[] = ["SITE_CONTENT"];
-const STAFF_ONLY_SCOPES: readonly MediaScope[] = ["CONTRACT_FILE"];
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -32,13 +30,13 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
   const scopeInput = formData.get("scope");
-  const scope: MediaScope = VALID_SCOPES.includes(scopeInput as MediaScope) ? (scopeInput as MediaScope) : "SITE_CONTENT";
 
-  const isStaff = session.user.role === "ADMIN" || session.user.role === "SUPPORT";
-  if (ADMIN_ONLY_SCOPES.includes(scope) && session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
+  if (!VALID_SCOPES.includes(scopeInput as MediaScope)) {
+    return NextResponse.json({ error: "این scope دیگر از این مسیر پشتیبانی نمی‌شود — از /api/uploads/private استفاده کنید." }, { status: 400 });
   }
-  if (STAFF_ONLY_SCOPES.includes(scope) && !isStaff) {
+  const scope = scopeInput as MediaScope;
+
+  if (ADMIN_ONLY_SCOPES.includes(scope) && session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
   }
 
@@ -53,11 +51,10 @@ export async function POST(request: Request) {
   const { bytes, extension } = validation.result;
 
   const filename = `${randomUUID()}${extension}`;
-  const uploadDir = path.join(process.cwd(), "public", "media", UPLOAD_SUBDIR);
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), bytes);
-
   const relativePath = `${UPLOAD_SUBDIR}/${filename}`;
+
+  const storage = await getPublicStorage();
+  await storage.put(relativePath, bytes, file.type);
 
   const asset = await prisma.mediaAsset.create({
     data: {

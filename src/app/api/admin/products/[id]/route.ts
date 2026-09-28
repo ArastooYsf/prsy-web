@@ -14,6 +14,7 @@ import {
   normalizeAvailability,
   normalizePrice,
 } from "@/lib/product-normalize";
+import { validateDownloadHostUrl } from "@/lib/download-host";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -43,6 +44,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const categoryId = await resolveCategoryId(body.categoryId);
   const brandId = await resolveBrandId(body.brandId);
 
+  const catalogUrlResult = validateDownloadHostUrl(typeof body.catalogUrl === "string" ? body.catalogUrl : "");
+  if (!catalogUrlResult.ok) {
+    return NextResponse.json({ error: catalogUrlResult.error }, { status: 400 });
+  }
+
   const requestedSlug =
     typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
   const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
@@ -52,7 +58,20 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   const product = await prisma.product.update({
     where: { id: existing.id },
-    data: { name, slug, description, images, specs, categoryId, brandId, availability, showPrice, price, isActive },
+    data: {
+      name,
+      slug,
+      description,
+      images,
+      specs,
+      categoryId,
+      brandId,
+      availability,
+      showPrice,
+      price,
+      catalogUrl: catalogUrlResult.value || null,
+      isActive,
+    },
   });
 
   await rememberSpecSuggestions(specs);

@@ -46,6 +46,7 @@ export default async function EditProductPage({ params }: { params: { id: string
         availability: product.availability,
         showPrice: product.showPrice,
         price: product.price,
+        catalogUrl: product.catalogUrl,
         isActive: product.isActive,
       }}
     />

@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMediaUrl } from "@/lib/media";
+import { getPrivateFileUrl } from "@/lib/media";
 import { formatFileSize } from "@/lib/format-number";
 import { formatJalali } from "@/lib/jalali";
 import { FileTypeIcon, fileKindFromMime } from "@/components/FileTypeIcon";
@@ -54,7 +54,7 @@ export default async function AccountFilesPage() {
                 </div>
               </div>
               <a
-                href={getMediaUrl(file.url)}
+                href={getPrivateFileUrl(file.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-4 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"

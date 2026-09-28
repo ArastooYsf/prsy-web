@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
+import { privateStorage } from "@/lib/storage/private";
 
 export async function DELETE(request: Request, { params }: { params: { id: string; fileId: string } }) {
   const session = await getServerSession(authOptions);
@@ -17,6 +18,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   await prisma.customerFile.delete({ where: { id: file.id } });
+  await privateStorage.delete(file.url);
 
   await logEvent({
     actor: actorFromSession(session),

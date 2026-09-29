@@ -95,6 +95,9 @@
     "kaios 2.5"
   ],
   "overrides": {
-    "electron-to-chromium": "1.5.380"
+    "browserslist": "4.29.0",
+    "caniuse-lite": "1.0.30001810",
+    "electron-to-chromium": "1.5.430",
+    "node-releases": "2.0.56"
   }
 }

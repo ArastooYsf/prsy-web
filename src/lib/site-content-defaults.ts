@@ -632,6 +632,19 @@ export type FooterEditableContent = {
   services: FooterLinkContent[];
 };
 
+// Trust/license seals in the footer (اینماد, ساماندهی, نماد اتحادیه, ...):
+// each is just an uploaded image + the seal issuer's official verification
+// link — no live iframe/script embed, so the footer never makes an
+// extra request to an external service on every page load.
+export type TrustSealContent = {
+  id: string;
+  label: string; // admin-facing name + the image's alt text; not otherwise shown
+  image: string; // media path, same as SiteLogoContent.logo
+  href: string; // the issuer's official verification page
+};
+
+export const DEFAULT_TRUST_SEALS: TrustSealContent[] = [];
+
 export const DEFAULT_FOOTER_CONTENT: FooterEditableContent = {
   tagline: "تأمین‌کننده دیزل ژنراتور، موتور برق و قطعات یدکی با برندهای معتبر جهانی؛ به‌صورت نو و دست‌دوم، با بهترین قیمت و سریع‌ترین تحویل.",
   copyrightSuffix: "تمامی حقوق محفوظ است.",

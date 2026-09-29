@@ -16,7 +16,7 @@ import CookieConsentBanner from "@/components/CookieConsentBanner";
 import OfflineBanner from "@/components/OfflineBanner";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import ToastProvider from "@/components/ToastProvider";
-import { getFooterContact, getFooterEditableContent, getHeaderNavLabels, getSiteLogo, getDownloadsContent } from "@/lib/site-content";
+import { getFooterContact, getFooterEditableContent, getHeaderNavLabels, getSiteLogo, getDownloadsContent, getTrustSeals } from "@/lib/site-content";
 import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
 import RouteThemeScope, { type SiteTheme } from "@/components/RouteThemeScope";
 import CartProvider from "@/components/CartProvider";
@@ -114,13 +114,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [footerContact, menuTaxonomy, footerContent, headerNavLabels, siteLogo, downloads, session] = await Promise.all([
+  const [footerContact, menuTaxonomy, footerContent, headerNavLabels, siteLogo, downloads, trustSeals, session] = await Promise.all([
     getFooterContact(),
     getMenuTaxonomy(),
     getFooterEditableContent(),
     getHeaderNavLabels(),
     getSiteLogo(),
     getDownloadsContent(),
+    getTrustSeals(),
     getServerSession(authOptions),
   ]);
 
@@ -221,7 +222,7 @@ export default async function RootLayout({
                     <PageLoader />
                     <Header menuCategories={menuTaxonomy.categories} navLabels={headerNavLabels} logo={siteLogo.logo} />
                     <main>{children}</main>
-                    <Footer contact={footerContact} content={footerContent} logo={siteLogo.logo} downloads={downloads} />
+                    <Footer contact={footerContact} content={footerContent} logo={siteLogo.logo} downloads={downloads} trustSeals={trustSeals} />
                   </SkeletonTheme>
                 </CartProvider>
               </ToastProvider>

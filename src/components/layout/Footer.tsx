@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, viewportOnce } from "@/lib/motion";
-import type { FooterContactContent, FooterEditableContent, DownloadsContent } from "@/lib/site-content";
+import type { FooterContactContent, FooterEditableContent, DownloadsContent, TrustSealContent } from "@/lib/site-content";
 import { DEFAULT_FOOTER_CONTENT, DEFAULT_DOWNLOADS_CONTENT } from "@/lib/site-content-defaults";
 import { toPersianDigits } from "@/lib/format-number";
 import { getSocialLink } from "@/lib/social-platforms";
@@ -43,12 +43,14 @@ export default function Footer({
   content = DEFAULT_FOOTER_CONTENT,
   logo = "",
   downloads = DEFAULT_DOWNLOADS_CONTENT,
+  trustSeals = [],
 }: {
   contact: FooterContactContent;
   content?: FooterEditableContent;
   /** Admin-set logo image (media path); empty = the built-in "یا" monogram. */
   logo?: string;
   downloads?: DownloadsContent;
+  trustSeals?: TrustSealContent[];
 }) {
   const pathname = usePathname();
   const year = new Date().getFullYear();
@@ -106,14 +108,25 @@ export default function Footer({
               </div>
             )}
 
-            {/* Placeholder for the Enamad trust-seal embed. Once verified on
-                enamad.ir, replace this box with the exact <a>/<script> snippet
-                they provide — see the project report for the registration steps. */}
-            <div className="mt-6 flex h-16 w-16 flex-col items-center justify-center rounded-lg border border-dashed border-foreground/15 text-center text-[9px] leading-4 text-foreground/40">
-              محل درج
-              <br />
-              نماد اعتماد
-            </div>
+            {/* Each seal is just an uploaded image + the issuer's official
+                verification link — no live iframe/script embed, so the
+                footer never makes an extra request on every page load. */}
+            {trustSeals.length > 0 && (
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {trustSeals.map((seal) => (
+                  <a
+                    key={seal.id}
+                    href={seal.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={seal.label}
+                    className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-foreground/10 transition-opacity hover:opacity-80"
+                  >
+                    <Image src={getMediaUrl(seal.image)} alt={seal.label} fill sizes="64px" className="object-contain" />
+                  </a>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           <motion.div variants={fadeInUp}>

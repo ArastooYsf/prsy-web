@@ -25,8 +25,10 @@ import {
   DEFAULT_HEADER_NAV_LABELS,
   DEFAULT_SITE_LOGO,
   DEFAULT_DOWNLOADS_CONTENT,
+  DEFAULT_TRUST_SEALS,
   type SiteLogoContent,
   type DownloadsContent,
+  type TrustSealContent,
   type HeroSlideContent,
   type HeroSettingsContent,
   type FooterContactContent,
@@ -62,6 +64,7 @@ export type {
   FooterEditableContent,
   HeaderNavLabelsContent,
   DownloadsContent,
+  TrustSealContent,
 };
 
 export const SITE_CONTENT_TAG = "site-content";
@@ -78,6 +81,7 @@ export const CONSULTATION_KEY = "consultation.content";
 export const ABOUT_KEY = "about.content";
 export const CONTACT_HERO_KEY = "contact.hero";
 export const FOOTER_CONTENT_KEY = "footer.content";
+export const TRUST_SEALS_KEY = "footer.trustSeals";
 export const HEADER_NAV_LABELS_KEY = "header.navLabels";
 export const SITE_LOGO_KEY = "site.logo";
 export const DOWNLOADS_KEY = "downloads.content";
@@ -227,6 +231,11 @@ export async function getContactHeroContent(): Promise<ContactHeroContent> {
 export async function getDownloadsContent(): Promise<DownloadsContent> {
   const map = await getSiteContentMap();
   return parseJsonObject<DownloadsContent>(map[DOWNLOADS_KEY], DEFAULT_DOWNLOADS_CONTENT);
+}
+
+export async function getTrustSeals(): Promise<TrustSealContent[]> {
+  const map = await getSiteContentMap();
+  return parseJsonArray<TrustSealContent>(map[TRUST_SEALS_KEY], DEFAULT_TRUST_SEALS);
 }
 
 export async function getFooterEditableContent(): Promise<FooterEditableContent> {

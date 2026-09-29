@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDown, Search, X } from "lucide-react";
+import { scrollIntoViewIfNeeded } from "@/lib/scroll-into-view";
 
 export type SiteContentSection = {
   id: string;
@@ -27,6 +28,39 @@ function matchesQuery(section: SiteContentSection, query: string): boolean {
 export default function SiteContentAccordion({ sections }: { sections: SiteContentSection[] }) {
   const [query, setQuery] = useState("");
   const [openIds, setOpenIds] = useState<string[]>([]);
+  const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
+  const itemRefs = useRef(new Map<string, HTMLDivElement>());
+
+  function setItemRef(id: string) {
+    return (el: HTMLDivElement | null) => {
+      if (el) itemRefs.current.set(id, el);
+      else itemRefs.current.delete(id);
+    };
+  }
+
+  // Radix's onValueChange only fires from a real trigger click (a search's
+  // own setOpenIds call below bypasses it entirely, so multi-open search
+  // results are untouched by this). A click that added a new id to the open
+  // set collapses everything else to just that one — accordion behavior —
+  // while a click that only removed one (closing it) is left as-is.
+  const handleAccordionChange = (next: string[]) => {
+    if (next.length > openIds.length) {
+      const opened = next.find((id) => !openIds.includes(id));
+      if (opened) {
+        setOpenIds([opened]);
+        setLastOpenedId(opened);
+        return;
+      }
+    }
+    setOpenIds(next);
+  };
+
+  useEffect(() => {
+    if (!lastOpenedId) return;
+    const el = itemRefs.current.get(lastOpenedId);
+    if (el) scrollIntoViewIfNeeded(el);
+    setLastOpenedId(null);
+  }, [lastOpenedId]);
 
   const handleQueryChange = (next: string) => {
     setQuery(next);
@@ -71,11 +105,12 @@ export default function SiteContentAccordion({ sections }: { sections: SiteConte
           نتیجه‌ای برای «{query}» پیدا نشد.
         </p>
       ) : (
-        <Accordion.Root type="multiple" value={openIds} onValueChange={setOpenIds} className="space-y-3">
+        <Accordion.Root type="multiple" value={openIds} onValueChange={handleAccordionChange} className="space-y-3">
           {visibleSections.map((section) => (
             <Accordion.Item
               key={section.id}
               value={section.id}
+              ref={setItemRef(section.id)}
               className="overflow-hidden rounded-2xl border border-foreground/10"
             >
               <Accordion.Header>
@@ -95,8 +130,32 @@ export default function SiteContentAccordion({ sections }: { sections: SiteConte
                   />
                 </Accordion.Trigger>
               </Accordion.Header>
-              <Accordion.Content className="overflow-hidden border-t border-foreground/10 px-5 py-6 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                {section.content}
+              {/* Grid-rows collapse instead of a height-keyframe animation:
+                  animates purely off two known CSS values (0fr/1fr), with no
+                  dependency on Radix's measured --radix-accordion-content-height
+                  custom property. forceMount is required too — without it,
+                  Radix toggles a native `hidden` attribute on this element in
+                  the same update as the open/close class change, and per the
+                  CSS Transitions spec a transition never runs on an element
+                  becoming visible in the same update that unhides it — it
+                  just snaps straight to the end value.
+
+                  The transition itself lives on a CHILD div, not on
+                  Accordion.Content directly — confirmed (by walking
+                  content.style.cssText live) that Radix sets its own inline
+                  `transition-duration: 0s; animation-name: none;` on
+                  Content itself as part of its internal height-measurement
+                  pass, and an inline style always beats a class regardless
+                  of source order, silently cancelling any transition placed
+                  there. A separate child node never gets that inline
+                  override, so `group/content` forwards Content's
+                  data-state to it instead. */}
+              <Accordion.Content forceMount className="group/content">
+                <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out group-data-[state=open]/content:grid-rows-[1fr]">
+                  <div className="overflow-hidden">
+                    <div className="border-t border-foreground/10 px-5 py-6">{section.content}</div>
+                  </div>
+                </div>
               </Accordion.Content>
             </Accordion.Item>
           ))}

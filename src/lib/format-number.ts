@@ -42,3 +42,19 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return toPersianDigits(`${Math.round(bytes / 1024)} KB`);
   return toPersianDigits(`${(bytes / (1024 * 1024)).toFixed(1)} MB`);
 }
+
+// Unlike formatFileSize (tops out at MB — right for a single upload), this
+// goes up to GB — for whole-disk/whole-directory totals (storage bars),
+// which are realistically in that range.
+export function formatBytesLarge(bytes: number): string {
+  if (bytes < 1024) return toPersianDigits(`${bytes} بایت`);
+  if (bytes < 1024 ** 2) return toPersianDigits(`${(bytes / 1024).toFixed(1)} کیلوبایت`);
+  if (bytes < 1024 ** 3) return toPersianDigits(`${(bytes / 1024 ** 2).toFixed(1)} مگابایت`);
+  return toPersianDigits(`${(bytes / 1024 ** 3).toFixed(2)} گیگابایت`);
+}
+
+// Shared by every storage-usage bar — "۰.۵٪" below 1%, whole numbers above.
+export function formatPercent(value: number): string {
+  const rounded = value < 1 && value > 0 ? value.toFixed(1) : Math.round(value).toString();
+  return toPersianDigits(`${rounded}٪`);
+}

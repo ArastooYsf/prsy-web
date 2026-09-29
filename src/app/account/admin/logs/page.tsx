@@ -7,9 +7,12 @@ import { listLogFiles, getLogStorageUsage } from "@/lib/logger";
 import { getLogEventTrend, summarizeCategoryTrend } from "@/lib/log-stats";
 import { getUptimeStats, getUptimeSegments } from "@/lib/uptime";
 import { getLighthouseHistory } from "@/lib/lighthouse";
+import { getDownloadHostStorageStatus } from "@/lib/download-host";
 import { ALL_LOG_CATEGORIES } from "@/lib/log-types";
 import LogsExplorer from "@/components/admin/LogsExplorer";
 import LogsDashboard from "@/components/admin/LogsDashboard";
+import SiteStorageBar from "@/components/admin/SiteStorageBar";
+import DownloadHostStorageBar from "@/components/admin/DownloadHostStorageBar";
 import LogsStorageBar from "@/components/admin/LogsStorageBar";
 
 export const metadata: Metadata = {
@@ -57,6 +60,8 @@ export default async function AdminLogsPage() {
         فقط در همین رابط کاربری. برای مشاهده‌ی جزئیات رویدادهای هر فایل، روی آن کلیک کنید.
       </p>
 
+      <SiteStorageBar usage={storageUsage} />
+      <DownloadHostStorageBar status={getDownloadHostStorageStatus()} />
       <LogsStorageBar usage={storageUsage} />
 
       <LogsDashboard

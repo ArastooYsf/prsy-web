@@ -33,3 +33,21 @@ export function validateDownloadHostUrl(raw: string): DownloadHostValidation {
   }
   return { ok: true, value: trimmed };
 }
+
+export type DownloadHostStorageStatus =
+  | { connected: false; configuredDomain: string | null }
+  | { connected: true; usedBytes: number; totalBytes: number };
+
+/**
+ * The download host is a manually-managed external destination — staff
+ * upload catalogs/videos to it themselves and paste back a link (see
+ * validateDownloadHostUrl above). Nothing in this app authenticates to it or
+ * calls any API against it, so there is no way to read its used/free space
+ * today. Always reports "not connected"; a real integration (once the host
+ * exposes some API/SFTP quota this app can call) fills in the `connected:
+ * true` branch instead of every caller needing to change.
+ */
+export function getDownloadHostStorageStatus(): DownloadHostStorageStatus {
+  const configuredDomain = (process.env.DOWNLOAD_HOST_ALLOWED_DOMAIN || "").split(",")[0]?.trim() || null;
+  return { connected: false, configuredDomain };
+}

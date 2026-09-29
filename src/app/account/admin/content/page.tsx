@@ -204,7 +204,7 @@ export default async function AdminContentPage() {
       id: "footer-contact",
       icon: <MapPin size={18} />,
       title: "اطلاعات تماس فوتر و شبکه‌های اجتماعی",
-      description: "آدرس، شماره تماس، ایمیل و لینک شبکه‌های اجتماعی — در فوتر سایت و صفحه «تماس با ما» نمایش داده می‌شوند.",
+      description: "آدرس، شماره تماس، ایمیل، نقشه و لینک شبکه‌های اجتماعی — در فوتر سایت و صفحه «تماس با ما» نمایش داده می‌شوند.",
       searchText: `${footerContact.address} ${footerContact.phone} ${footerContact.email}`,
       content: <FooterContactForm initialContact={footerContact} />,
     },

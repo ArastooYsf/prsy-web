@@ -82,7 +82,7 @@ export default async function ContactPage() {
             ))}
           </div>
 
-          <ContactMapCard address={contact.address} mapLabel={hero.mapLabel} />
+          <ContactMapCard address={contact.address} mapLabel={hero.mapLabel} mapUrl={contact.mapUrl} />
 
           {socials.length > 0 && (
             <div className="mx-auto mt-10 max-w-2xl text-center">

@@ -13,6 +13,24 @@ function cleanText(value: unknown, maxLength = MAX_TEXT_LENGTH): string {
   return sanitizePlainText(typeof value === "string" ? value : "").slice(0, maxLength);
 }
 
+// sanitizePlainText HTML-entity-encodes "&" (safe for text later dropped
+// into HTML, wrong for a value used as a URL attribute) — a real map link
+// with more than one query param (e.g. "...q=...&output=embed") would come
+// back corrupted. Just trim/cap; React escapes attribute output itself.
+//
+// Mirrors ContactMapCard's own coordinate check: "lat,lng" is stored as-is
+// (never used as a URL), anything else must normalize to a real http(s)
+// link — this field renders as both an <a href> and an <iframe src> on the
+// public /contact page, so a scheme like "javascript:" can't be allowed
+// through the way it would be for e.g. socialLinks' known-safe icon-only use.
+const COORDINATES_RE = /^-?\d{1,3}(?:\.\d+)?\s*,\s*-?\d{1,3}(?:\.\d+)?$/;
+
+function cleanMapUrl(value: unknown, maxLength = 500): string {
+  const text = typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+  if (!text || COORDINATES_RE.test(text)) return text;
+  return normalizeSocialUrl(text);
+}
+
 const MAX_SOCIAL_LINKS = 12;
 
 // Each entry must normalise to a real http(s) URL (a missing scheme is added
@@ -47,6 +65,7 @@ export async function POST(request: Request) {
     phoneHref: cleanText(body.phoneHref, 40),
     email: cleanText(body.email, 120),
     socialLinks: cleanSocialLinks(body.socialLinks),
+    mapUrl: cleanMapUrl(body.mapUrl),
   };
 
   await prisma.siteContent.upsert({

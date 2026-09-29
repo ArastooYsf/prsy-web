@@ -70,6 +70,17 @@ export default function FooterContactForm({ initialContact }: { initialContact: 
           <label className="mb-1.5 block text-sm font-medium text-foreground/80">ایمیل</label>
           <input dir="ltr" value={contact.email} onChange={(e) => set("email", e.target.value)} className={inputClass} placeholder="info@example.com" />
         </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">نقشه (مختصات یا لینک — اختیاری)</label>
+          <input
+            dir="ltr"
+            value={contact.mapUrl}
+            onChange={(e) => set("mapUrl", e.target.value)}
+            className={inputClass}
+            placeholder="35.7219, 51.3347  یا  https://maps.google.com/..."
+          />
+          <p className="mt-1 text-xs text-foreground/40">خالی بماند تا نقشه بر اساس متن آدرس جست‌وجو شود.</p>
+        </div>
       </div>
 
       <div>

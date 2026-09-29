@@ -214,6 +214,10 @@ export type FooterContactContent = {
   // stored — the platform name/icon is detected from its domain at render
   // time (src/lib/social-platforms.tsx), so adding a network needs no data change.
   socialLinks: string[];
+  // Optional manual override for the /contact page map: either "lat,lng"
+  // coordinates or a full map link (any provider). Empty means the map
+  // falls back to searching the address text (see ContactMapCard).
+  mapUrl: string;
 };
 
 export const DEFAULT_FOOTER_CONTACT: FooterContactContent = {
@@ -222,6 +226,7 @@ export const DEFAULT_FOOTER_CONTACT: FooterContactContent = {
   phoneHref: "tel:+982191000000",
   email: "info@yasharindustry.com",
   socialLinks: [],
+  mapUrl: "",
 };
 
 export const DEFAULT_FAQ_ITEMS: FaqItemContent[] = [

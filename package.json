@@ -33,12 +33,12 @@
     "@radix-ui/react-tabs": "^1.1.21",
     "@react-pdf/renderer": "^4.9.0",
     "@sentry/nextjs": "^10.70.0",
-    "@tiptap/extension-color": "3.31.3",
-    "@tiptap/extension-image": "3.31.3",
-    "@tiptap/extension-text-style": "3.31.3",
-    "@tiptap/pm": "3.31.3",
-    "@tiptap/react": "3.31.3",
-    "@tiptap/starter-kit": "3.31.3",
+    "@tiptap/extension-color": "3.29.2",
+    "@tiptap/extension-image": "3.29.2",
+    "@tiptap/extension-text-style": "3.29.2",
+    "@tiptap/pm": "3.29.2",
+    "@tiptap/react": "3.29.2",
+    "@tiptap/starter-kit": "3.29.2",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -93,11 +93,5 @@
     "and_chr 64",
     "and_uc 12",
     "kaios 2.5"
-  ],
-  "overrides": {
-    "browserslist": "4.29.0",
-    "caniuse-lite": "1.0.30001810",
-    "electron-to-chromium": "1.5.430",
-    "node-releases": "2.0.56"
-  }
+  ]
 }

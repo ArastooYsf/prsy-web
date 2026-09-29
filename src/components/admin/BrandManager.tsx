@@ -119,10 +119,11 @@ export default function BrandManager({ brands }: { brands: Brand[] }) {
           </div>
           <MediaPicker
             label="لوگو"
+            kind="logo"
             multiple={false}
             value={draft.logo ? [draft.logo] : []}
             onChange={(p) => setDraft({ ...draft, logo: p[0] ?? "" })}
-            hint="ترجیحاً PNG با پس‌زمینه‌ی شفاف، تصویر مربعی یا افقی حداقل ۴۰۰×۴۰۰ پیکسل — چون در اندازه‌های کوچک نمایش داده می‌شود. حداکثر ۸ مگابایت."
+            hint="ترجیحاً SVG یا PNG با پس‌زمینه‌ی شفاف، تصویر مربعی یا افقی حداقل ۴۰۰×۴۰۰ پیکسل — چون در اندازه‌های کوچک نمایش داده می‌شود. حداکثر ۸ مگابایت."
           />
           <div className="max-w-[8rem]">
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">ترتیب</label>

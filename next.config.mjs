@@ -13,7 +13,19 @@ if (/^https?:\/\//i.test(mediaUrl)) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { remotePatterns },
+  images: {
+    remotePatterns,
+    // Logos can now be uploaded as SVG (sanitized server-side — see
+    // src/lib/sanitize.ts#sanitizeSvg before this is ever trusted). Next
+    // blocks SVG in next/image by default because an *unsanitized* SVG can
+    // carry a <script>; this is next's own documented mitigation for
+    // sanitized-but-still-SVG content: force the optimizer's response to be
+    // downloaded rather than rendered inline, and disable script execution
+    // even if something slipped through.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
   // ssh2 (a dependency of ssh2-sftp-client, used only when
   // MEDIA_STORAGE_DRIVER=sftp — src/lib/storage/public-sftp.ts) ships a
   // native .node binary that webpack can't bundle. This tells Next to

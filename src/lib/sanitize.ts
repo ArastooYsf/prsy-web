@@ -62,3 +62,143 @@ export function sanitizeRichText(html: string): string {
 export function sanitizePlainText(value: string): string {
   return sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }).trim();
 }
+
+// Structural/shape/text SVG elements only — no <script>, <foreignObject>,
+// <image> (can embed external/base64 raster payloads), <animate*>/<set>
+// (can point xlink:href at javascript:), or <a>/<iframe>/<object>/<embed>.
+const SVG_ALLOWED_TAGS = [
+  "svg",
+  "g",
+  "defs",
+  "symbol",
+  "title",
+  "desc",
+  "path",
+  "rect",
+  "circle",
+  "ellipse",
+  "line",
+  "polyline",
+  "polygon",
+  "text",
+  "tspan",
+  "textPath",
+  "linearGradient",
+  "radialGradient",
+  "stop",
+  "clipPath",
+  "mask",
+  "pattern",
+  "marker",
+  "use",
+  "style",
+];
+
+// "*" applies to every allowed tag in addition to any tag-specific list
+// below — this is what actually blocks XSS: anything not named here
+// (onload, onclick, onerror, ...) is stripped regardless of tag.
+const SVG_ALLOWED_ATTRIBUTES: sanitizeHtml.IOptions["allowedAttributes"] = {
+  "*": [
+    "id",
+    "class",
+    "style",
+    "transform",
+    "fill",
+    "fill-rule",
+    "fill-opacity",
+    "stroke",
+    "stroke-width",
+    "stroke-linecap",
+    "stroke-linejoin",
+    "stroke-dasharray",
+    "stroke-opacity",
+    "opacity",
+    "viewBox",
+    "preserveAspectRatio",
+    "width",
+    "height",
+    "x",
+    "y",
+    "cx",
+    "cy",
+    "r",
+    "rx",
+    "ry",
+    "x1",
+    "y1",
+    "x2",
+    "y2",
+    "points",
+    "d",
+    "offset",
+    "stop-color",
+    "stop-opacity",
+    "gradientUnits",
+    "gradientTransform",
+    "spreadMethod",
+    "clipPathUnits",
+    "maskUnits",
+    "patternUnits",
+    "patternContentUnits",
+    "patternTransform",
+    "markerWidth",
+    "markerHeight",
+    "refX",
+    "refY",
+    "orient",
+    "font-family",
+    "font-size",
+    "font-weight",
+    "text-anchor",
+    "xmlns",
+    "xmlns:xlink",
+    "version",
+  ],
+  use: ["href", "xlink:href"],
+};
+
+/**
+ * Strict allowlist sanitizer for uploaded SVGs (logos etc.) — removes any
+ * script/event-handler/foreign-content vector while preserving the vector
+ * markup a design tool actually exports. Callers must persist the SANITIZED
+ * output, never the original uploaded bytes.
+ *
+ * ponytail: `style` attribute content and `<style>` tag CSS are not further
+ * parsed — modern browsers don't execute JS via CSS, so this accepts a
+ * residual (very low severity) CSS-injection surface rather than writing a
+ * CSS parser. Revisit if that ever changes.
+ */
+export function sanitizeSvg(svg: string): string {
+  return sanitizeHtml(svg, {
+    allowedTags: SVG_ALLOWED_TAGS,
+    allowedAttributes: SVG_ALLOWED_ATTRIBUTES,
+    // SVG element/attribute names are case-sensitive (viewBox, clipPath,
+    // linearGradient, textPath, ...) — sanitize-html's htmlparser2 backend
+    // lowercases everything by default, which would silently break these.
+    parser: { lowerCaseTags: false, lowerCaseAttributeNames: false },
+    // No scheme is allowed on href/xlink:href, which blocks javascript:/data:
+    // URIs. A same-document fragment ref like "#gradient-a" (what `use`
+    // legitimately needs) has no scheme prefix, so it passes through — but so
+    // would a scheme-less "//evil.com/x.svg", which the scheme check alone
+    // can't catch. transformTags below closes that: `use` is only legitimate
+    // for referencing this same document's own <defs>, so anything that
+    // isn't a "#id" fragment is dropped rather than merely scheme-checked.
+    allowedSchemes: [],
+    allowedSchemesByTag: {},
+    transformTags: {
+      use: (tagName, attribs) => {
+        const ref = attribs.href ?? attribs["xlink:href"];
+        if (ref && !ref.startsWith("#")) {
+          const { href: _href, "xlink:href": _xlinkHref, ...rest } = attribs;
+          return { tagName, attribs: rest };
+        }
+        return { tagName, attribs };
+      },
+    },
+    // sanitize-html flags <style> as inherently risky (CSS can be used for
+    // passive data exfiltration, e.g. @import or attribute-selector probes)
+    // and warns loudly unless this is set. Accepted per the ponytail note
+    // above — this silences the warning, it doesn't add a new hole.
+    allowVulnerableTags: true,
+  });
+}

@@ -13,9 +13,11 @@ type MediaPickerProps = {
   multiple?: boolean;
   /** Format/dimension/quality guidance tailored to this specific field — shown under the trigger button and inside the upload dialog. */
   hint?: ReactNode;
+  /** "logo" additionally accepts SVG (sanitized server-side) — use only for actual logo fields, not photographic content. */
+  kind?: "image" | "logo";
 };
 
-export default function MediaPicker({ label, value, onChange, multiple = true, hint }: MediaPickerProps) {
+export default function MediaPicker({ label, value, onChange, multiple = true, hint, kind = "image" }: MediaPickerProps) {
   const [open, setOpen] = useState(false);
 
   const removeSelected = (path: string) => {
@@ -64,7 +66,7 @@ export default function MediaPicker({ label, value, onChange, multiple = true, h
         open={open}
         onClose={() => setOpen(false)}
         onConfirm={(assets) => onChange(assets.map((a) => a.url))}
-        kind="image"
+        kind={kind}
         scope="SITE_CONTENT"
         multiple={multiple}
         initialSelected={value}

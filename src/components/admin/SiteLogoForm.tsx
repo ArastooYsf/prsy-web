@@ -32,10 +32,11 @@ export default function SiteLogoForm({ initialContent }: { initialContent: SiteL
     <div className="space-y-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
       <MediaPicker
         label="لوگوی سایت"
+        kind="logo"
         multiple={false}
         value={logo ? [logo] : []}
         onChange={(paths) => setLogo(paths[0] ?? "")}
-        hint="تصویر مربعی (ترجیحاً PNG با پس‌زمینه‌ی شفاف). JPG یا WEBP هم پذیرفته می‌شود، حداکثر ۸ مگابایت. در هدر و فوتر کنار نام شرکت نمایش داده می‌شود؛ اگر حذف شود، نشان پیش‌فرض «یا» برمی‌گردد."
+        hint="تصویر مربعی (ترجیحاً SVG یا PNG با پس‌زمینه‌ی شفاف). JPG یا WEBP هم پذیرفته می‌شود، حداکثر ۸ مگابایت. در هدر و فوتر کنار نام شرکت نمایش داده می‌شود؛ اگر حذف شود، نشان پیش‌فرض «یا» برمی‌گردد."
       />
       <button
         type="button"

@@ -1,7 +1,10 @@
 import path from "path";
+import { sanitizeSvg } from "@/lib/sanitize";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+const SVG_MIME_TYPE = "image/svg+xml";
+const SVG_EXTENSION = ".svg";
 const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_DOCUMENT_SIZE_BYTES = 15 * 1024 * 1024; // 15MB (PDF and DOCX)
@@ -42,14 +45,15 @@ function isZipContainer(bytes: Buffer): boolean {
 export async function validateUploadedFile(file: File): Promise<{ ok: true; result: ValidatedUpload } | { ok: false; error: string }> {
   const extension = path.extname(file.name).toLowerCase();
   const isImageCandidate = ALLOWED_IMAGE_TYPES.includes(file.type) && ALLOWED_IMAGE_EXTENSIONS.includes(extension);
+  const isSvgCandidate = file.type === SVG_MIME_TYPE && extension === SVG_EXTENSION;
   const isPdfCandidate = file.type === "application/pdf" && extension === ".pdf";
   const isDocxCandidate = file.type === DOCX_MIME_TYPE && extension === ".docx";
 
-  if (!isImageCandidate && !isPdfCandidate && !isDocxCandidate) {
+  if (!isImageCandidate && !isSvgCandidate && !isPdfCandidate && !isDocxCandidate) {
     return { ok: false, error: "فرمت فایل مجاز نیست." };
   }
 
-  const maxSize = isImageCandidate ? MAX_IMAGE_SIZE_BYTES : MAX_DOCUMENT_SIZE_BYTES;
+  const maxSize = isImageCandidate || isSvgCandidate ? MAX_IMAGE_SIZE_BYTES : MAX_DOCUMENT_SIZE_BYTES;
   if (file.size > maxSize) {
     return { ok: false, error: "حجم فایل بیش از حد مجاز است." };
   }
@@ -58,6 +62,17 @@ export async function validateUploadedFile(file: File): Promise<{ ok: true; resu
 
   if (isImageCandidate && !matchesImageSignature(bytes, file.type)) {
     return { ok: false, error: "محتوای فایل با نوع تصویر مطابقت ندارد." };
+  }
+  if (isSvgCandidate) {
+    // SVG is text, not a binary format with magic bytes — "validation" here
+    // means running it through a strict allowlist sanitizer (strips
+    // <script>, event handlers, <foreignObject>, external references, ...).
+    // The SANITIZED output is what gets persisted, never the raw upload.
+    const sanitized = sanitizeSvg(bytes.toString("utf8"));
+    if (!/<svg[\s>]/i.test(sanitized)) {
+      return { ok: false, error: "محتوای فایل با نوع SVG مطابقت ندارد." };
+    }
+    return { ok: true, result: { bytes: Buffer.from(sanitized, "utf8"), extension } };
   }
   if (isPdfCandidate && !isPdf(bytes)) {
     return { ok: false, error: "محتوای فایل با نوع PDF مطابقت ندارد." };

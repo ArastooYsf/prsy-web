@@ -21,7 +21,7 @@ export type MediaAsset = {
   canDelete: boolean;
 };
 
-type MediaKind = "image" | "file" | "all";
+type MediaKind = "image" | "logo" | "file" | "all";
 
 // Which bucket this picker instance reads/writes — keeps the admin site-content
 // gallery from being polluted by customer ticket attachments (and vice versa).
@@ -48,6 +48,7 @@ type MediaPickerModalProps = {
 
 const KIND_LABEL: Record<MediaKind, string> = {
   image: "انتخاب تصویر",
+  logo: "انتخاب لوگو",
   file: "انتخاب فایل",
   all: "انتخاب فایل یا تصویر",
 };
@@ -56,14 +57,29 @@ const DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordproces
 
 const KIND_ACCEPT: Record<MediaKind, string> = {
   image: "image/png,image/jpeg,image/webp",
+  // Only logo-type fields (site logo, brand logo) offer SVG — it's sanitized
+  // server-side (src/lib/uploads.ts) but still pointless noise for
+  // photographic uploads (product images, avatars, ticket attachments).
+  logo: "image/png,image/jpeg,image/webp,image/svg+xml",
   file: `application/pdf,${DOCX_MIME_TYPE}`,
   all: `image/png,image/jpeg,image/webp,application/pdf,${DOCX_MIME_TYPE}`,
 };
 
 const KIND_HINT: Record<MediaKind, string> = {
   image: "PNG، JPG یا WEBP — حداکثر ۸ مگابایت",
+  logo: "PNG، JPG، WEBP یا SVG — حداکثر ۸ مگابایت",
   file: "PDF یا DOCX — حداکثر ۱۵ مگابایت",
   all: "تصویر (PNG/JPG/WEBP) تا ۸ مگابایت، یا PDF/DOCX تا ۱۵ مگابایت",
+};
+
+// /api/media's `type` filter only knows "image" and "file" (see its mimeFilter
+// switch) — "logo" is a client-side-only distinction for accept/hint, so the
+// gallery fetch below maps it back to the image mime filter.
+const API_MEDIA_TYPE: Record<MediaKind, string> = {
+  image: "image",
+  logo: "image",
+  file: "file",
+  all: "all",
 };
 
 function isImageMime(mimeType: string) {
@@ -122,7 +138,7 @@ export default function MediaPickerModal({
 
   const fetchGallery = async () => {
     setLoadingGallery(true);
-    const res = await fetch(`/api/media?type=${kind}&scope=${scope}`);
+    const res = await fetch(`/api/media?type=${API_MEDIA_TYPE[kind]}&scope=${scope}`);
     if (res.ok) {
       const { media } = await res.json();
       setGallery(media);

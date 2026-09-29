@@ -18,15 +18,24 @@ export type SelectFilter = {
 export type DateRangeFilter = { fromKey: string; toKey: string; label: string };
 /** A single-cutoff date filter (one field, not a from/to pair) — e.g. "تاریخ شروع". */
 export type DateFilter = { key: string; label: string };
+/** A min/max numeric pair (e.g. file size in MB) — same from/to shape as DateRangeFilter, just plain number inputs instead of date pickers. */
+export type NumberRangeFilter = { minKey: string; maxKey: string; label: string; unit?: string };
 
 type ListFilterBarProps = {
   searchPlaceholder?: string;
   selects?: SelectFilter[];
   dateRanges?: DateRangeFilter[];
   dates?: DateFilter[];
+  numberRanges?: NumberRangeFilter[];
 };
 
-export default function ListFilterBar({ searchPlaceholder, selects = [], dateRanges = [], dates = [] }: ListFilterBarProps) {
+export default function ListFilterBar({
+  searchPlaceholder,
+  selects = [],
+  dateRanges = [],
+  dates = [],
+  numberRanges = [],
+}: ListFilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -62,7 +71,8 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
     !!searchParams.get("q") ||
     selects.some((s) => !!searchParams.get(s.key)) ||
     dateRanges.some((d) => !!searchParams.get(d.fromKey) || !!searchParams.get(d.toKey)) ||
-    dates.some((d) => !!searchParams.get(d.key));
+    dates.some((d) => !!searchParams.get(d.key)) ||
+    numberRanges.some((n) => !!searchParams.get(n.minKey) || !!searchParams.get(n.maxKey));
 
   return (
     <div className="mb-4 flex flex-wrap items-start gap-2">
@@ -133,6 +143,30 @@ export default function ListFilterBar({ searchPlaceholder, selects = [], dateRan
             // (rendered in JSX order: dateRanges, then dates) — if dateRanges
             // already rendered one, every `dates` field hides its own too.
             hideToggle={dateRanges.length > 0 || i > 0}
+          />
+        </div>
+      ))}
+
+      {numberRanges.map((n) => (
+        <div key={n.minKey} className="flex items-center gap-1.5">
+          <input
+            type="number"
+            min={0}
+            inputMode="decimal"
+            value={searchParams.get(n.minKey) ?? ""}
+            onChange={(e) => updateParam(n.minKey, e.target.value || null)}
+            placeholder={`حداقل ${n.label}${n.unit ? ` (${n.unit})` : ""}`}
+            className={`${selectClass} w-32`}
+          />
+          <span className="text-xs text-foreground/40">تا</span>
+          <input
+            type="number"
+            min={0}
+            inputMode="decimal"
+            value={searchParams.get(n.maxKey) ?? ""}
+            onChange={(e) => updateParam(n.maxKey, e.target.value || null)}
+            placeholder={`حداکثر ${n.label}${n.unit ? ` (${n.unit})` : ""}`}
+            className={`${selectClass} w-32`}
           />
         </div>
       ))}

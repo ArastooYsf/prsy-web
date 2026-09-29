@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
-import { privateStorage } from "@/lib/storage/private";
+import { deleteUploadedFile } from "@/lib/uploaded-files";
 
 export async function DELETE(request: Request, { params }: { params: { id: string; fileId: string } }) {
   const session = await getServerSession(authOptions);
@@ -17,8 +17,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "فایل یافت نشد." }, { status: 404 });
   }
 
-  await prisma.customerFile.delete({ where: { id: file.id } });
-  await privateStorage.delete(file.url);
+  const result = await deleteUploadedFile("customer_file", file.id);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 404 });
+  }
 
   await logEvent({
     actor: actorFromSession(session),

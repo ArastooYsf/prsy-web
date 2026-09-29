@@ -29,6 +29,7 @@ import {
   History,
   Home,
   Plug,
+  FolderOpen,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,6 +56,7 @@ const ADMIN_LINKS: { href: string; label: string; icon: LucideIcon; roles: strin
   { href: "/account/admin/product-comments", label: "دیدگاه‌های محصولات", icon: MessageCircle, roles: ["ADMIN", "SUPPORT"] },
   { href: "/account/admin/blog", label: "وبلاگ", icon: Newspaper, roles: ["ADMIN"] },
   { href: "/account/admin/content", label: "محتوای سایت", icon: LayoutTemplate, roles: ["ADMIN"] },
+  { href: "/account/admin/files", label: "فایل‌های آپلودشده", icon: FolderOpen, roles: ["ADMIN"] },
   { href: "/account/admin/logs", label: "گزارش رویدادها", icon: History, roles: ["ADMIN"] },
   { href: "/account/admin/integrations", label: "یکپارچه‌سازی‌ها", icon: Plug, roles: ["ADMIN"] },
 ];

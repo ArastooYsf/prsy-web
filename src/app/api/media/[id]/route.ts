@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getPublicStorage } from "@/lib/storage/public";
+import { deleteUploadedFile } from "@/lib/uploaded-files";
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -29,10 +29,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "اجازه حذف این فایل را ندارید." }, { status: 403 });
   }
 
-  await prisma.mediaAsset.delete({ where: { id: asset.id } });
-
-  const storage = await getPublicStorage();
-  await storage.delete(asset.url);
+  const result = await deleteUploadedFile("media_asset", asset.id);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 404 });
+  }
 
   return NextResponse.json({ success: true });
 }

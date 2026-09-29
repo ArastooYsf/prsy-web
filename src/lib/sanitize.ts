@@ -189,7 +189,9 @@ export function sanitizeSvg(svg: string): string {
       use: (tagName, attribs) => {
         const ref = attribs.href ?? attribs["xlink:href"];
         if (ref && !ref.startsWith("#")) {
-          const { href: _href, "xlink:href": _xlinkHref, ...rest } = attribs;
+          const rest = { ...attribs };
+          delete rest.href;
+          delete rest["xlink:href"];
           return { tagName, attribs: rest };
         }
         return { tagName, attribs };

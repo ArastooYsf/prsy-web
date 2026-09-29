@@ -1,11 +1,10 @@
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { formatJalali } from "@/lib/jalali";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 import { getCompanyProfile } from "@/lib/documents/company";
-import { renderPdf } from "@/lib/documents/carbone-client";
-
-const TEMPLATE_PATH = path.join(process.cwd(), "src/lib/documents/templates/order.html");
+import { renderPdfElement } from "@/lib/documents/pdf/render";
+import OrderDocument from "@/lib/documents/pdf/OrderDocument";
+import { createElement } from "react";
 
 // Same rationale as contract-document.ts: fixed, theme-independent colors for
 // a printed/downloaded document rather than the app's theme-relative classes.
@@ -18,6 +17,8 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }>
 };
 
 export class OrderNotFoundError extends Error {}
+
+export type OrderDocumentData = Awaited<ReturnType<typeof buildOrderData>>;
 
 async function buildOrderData(orderId: string) {
   const order = await prisma.order.findFirst({
@@ -72,7 +73,7 @@ async function buildOrderData(orderId: string) {
 
 export async function renderOrderPdf(orderId: string): Promise<{ buffer: Buffer; orderNumber: string }> {
   const data = await buildOrderData(orderId);
-  const buffer = await renderPdf(TEMPLATE_PATH, data);
+  const buffer = await renderPdfElement(createElement(OrderDocument, { data }));
   return { buffer, orderNumber: data.order.orderNumber };
 }
 

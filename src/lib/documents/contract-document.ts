@@ -1,10 +1,9 @@
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { formatJalali } from "@/lib/jalali";
 import { getCompanyProfile } from "@/lib/documents/company";
-import { renderPdf } from "@/lib/documents/carbone-client";
-
-const TEMPLATE_PATH = path.join(process.cwd(), "src/lib/documents/templates/contract.html");
+import { renderPdfElement } from "@/lib/documents/pdf/render";
+import ContractDocument from "@/lib/documents/pdf/ContractDocument";
+import { createElement } from "react";
 
 // Independent of the app's theme-relative StatusBadge classes (accent-500 is
 // orange in dark theme, blue in light theme) — a printed document needs fixed
@@ -18,6 +17,8 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }>
 };
 
 export class ContractNotFoundError extends Error {}
+
+export type ContractDocumentData = Awaited<ReturnType<typeof buildContractData>>;
 
 async function buildContractData(contractId: string) {
   const contract = await prisma.contract.findFirst({
@@ -58,7 +59,7 @@ async function buildContractData(contractId: string) {
 
 export async function renderContractPdf(contractId: string): Promise<{ buffer: Buffer; contractTitle: string }> {
   const data = await buildContractData(contractId);
-  const buffer = await renderPdf(TEMPLATE_PATH, data);
+  const buffer = await renderPdfElement(createElement(ContractDocument, { data }));
   return { buffer, contractTitle: data.contract.title };
 }
 

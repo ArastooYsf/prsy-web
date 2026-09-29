@@ -1,7 +1,9 @@
 {
   "detector": {
     "ignoreRules": [],
-    "ignoreFiles": [],
+    "ignoreFiles": [
+      "src/lib/documents/pdf/**"
+    ],
     "ignoreValues": [
       {
         "rule": "side-tab",

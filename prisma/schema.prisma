@@ -403,8 +403,8 @@ model ProductCategory {
   // Which admin-product-form spec template (src/lib/product-spec-templates.ts)
   // applies to products under this root category — set on the root only,
   // read by walking up from a product's own category. Deliberately NOT
-  // derived from `slug`: slug is regenerated from `name` on every category
-  // edit (see the categories PATCH route), so it can't be trusted as a
+  // derived from `slug`: slug is admin-editable (see the categories
+  // PATCH route) and can change at any time, so it can't be trusted as a
   // stable key. Null means "use the general default template".
   specTemplateKey String?
   // Ordered subset of that template's labels to show in the product card's

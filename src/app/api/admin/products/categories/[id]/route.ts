@@ -56,7 +56,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   // Only meaningful on a root category.
   const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, existing.specTemplateKey, await getSpecTemplates());
 
-  const slug = await ensureUniqueSlug(slugify(name), async (s) => {
+  const requestedSlug = typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
+  const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
     const clash = await prisma.productCategory.findFirst({ where: { slug: s, NOT: { id: existing.id } } });
     return clash !== null;
   });

@@ -43,7 +43,8 @@ export async function POST(request: Request) {
   // Only meaningful on a root category — a new child never carries its own template.
   const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, null, await getSpecTemplates());
 
-  const slug = await ensureUniqueSlug(slugify(name), async (s) => {
+  const requestedSlug = typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
+  const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
     const clash = await prisma.productCategory.findUnique({ where: { slug: s } });
     return clash !== null;
   });

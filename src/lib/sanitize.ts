@@ -26,10 +26,23 @@ export function sanitizeRichText(html: string): string {
       "pre",
       "img",
       "hr",
+      "span",
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
       img: ["src", "alt", "loading", "decoding", "width", "height"],
+      // span+style is what Tiptap's Color extension produces for text-color
+      // marks — allowedStyles below restricts this to only the `color`
+      // property with a hex/rgb value, not arbitrary CSS.
+      span: ["style"],
+    },
+    // Restrictive on purpose: only `color`, only hex or rgb() values — this
+    // is the one CSS property the editor's color picker can actually
+    // produce, not a general "allow inline styles" escape hatch.
+    allowedStyles: {
+      span: {
+        color: [/^#[0-9a-f]{3,6}$/i, /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/i],
+      },
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
     allowedSchemesByTag: {

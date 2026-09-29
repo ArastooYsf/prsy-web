@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, FolderTree, CornerDownLeft, X } from "lucide-react";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -9,6 +9,8 @@ import { useToast } from "@/components/ToastProvider";
 import IconPicker, { type IconPickerOption } from "@/components/admin/IconPicker";
 import { CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS, type CategoryIconKey } from "@/lib/category-icons";
 import { resolvedSpecTemplateKey, type SpecTemplates } from "@/lib/product-spec-templates";
+import { slugify } from "@/lib/slugify";
+import { scrollIntoViewIfNeeded } from "@/lib/scroll-into-view";
 import type { ProductCategory } from "@/generated/prisma/client";
 
 const inputClass =
@@ -16,6 +18,8 @@ const inputClass =
 
 type Draft = {
   name: string;
+  slug: string;
+  slugTouched: boolean;
   icon: string;
   order: string;
   parentId: string | null;
@@ -38,11 +42,61 @@ const CATEGORY_ICON_PICKER_OPTIONS: IconPickerOption<string>[] = [
   })),
 ];
 
+// Module-level, not React state: confirmed empirically (via a render-marker
+// log) that router.refresh() — needed here to pull in the newly-created
+// category — actually remounts CategoryManager once the fresh data lands,
+// resetting every piece of that render's React state (a useState "pending
+// scroll target" gets wiped in the very same commit that brings in the
+// category it was waiting for, so it's never seen). A plain module variable
+// isn't part of the fiber tree, so it survives that remount intact — the
+// freshly-mounted instance's own effect below picks it up and finishes the
+// scroll. Caveat: this is page-global, not per-instance — fine for this
+// page (one CategoryManager, no concurrent create flows), not something to
+// copy for a component that could render more than once at a time.
+let pendingScrollCategoryId: string | null = null;
+
 function CategoryIcon({ icon }: { icon: string | null }) {
   if (!icon || !(CATEGORY_ICON_KEYS as readonly string[]).includes(icon)) {
     return <FolderTree className="size-4 text-foreground/40" />;
   }
   return <span className="[&_svg]:size-5 text-foreground/60">{CATEGORY_ICONS[icon as CategoryIconKey]}</span>;
+}
+
+type CategoryTreeNode = ProductCategory & { children: ProductCategory[] };
+
+function CategoryChildrenList({
+  root,
+  onEdit,
+  onDelete,
+  setItemRef,
+}: {
+  root: CategoryTreeNode;
+  onEdit: (c: ProductCategory) => void;
+  onDelete: (c: ProductCategory) => void;
+  setItemRef: (id: string) => (el: HTMLLIElement | null) => void;
+}) {
+  if (root.children.length === 0) return null;
+
+  return (
+    <ul className="mt-2 space-y-1.5 border-r border-foreground/10 pr-3">
+      {root.children.map((child) => (
+        <li key={child.id} ref={setItemRef(child.id)} className="flex items-center gap-3 rounded-lg bg-foreground/[0.02] p-2">
+          <CornerDownLeft className="size-3.5 text-foreground/30" />
+          <CategoryIcon icon={child.icon} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm">{child.name}</p>
+            <p dir="ltr" className="truncate text-xs text-foreground/40">{child.slug}</p>
+          </div>
+          <button type="button" onClick={() => onEdit(child)} aria-label="ویرایش" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
+            <Pencil className="size-3.5" />
+          </button>
+          <button type="button" onClick={() => onDelete(child)} aria-label="حذف" className="flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
+            <Trash2 className="size-3.5" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export default function CategoryManager({ categories, specTemplates }: { categories: ProductCategory[]; specTemplates: SpecTemplates }) {
@@ -63,10 +117,55 @@ export default function CategoryManager({ categories, specTemplates }: { categor
   const [deleteTarget, setDeleteTarget] = useState<ProductCategory | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Scrolls to a just-created category once it actually appears in `tree`
+  // (see the pendingScrollCategoryId comment above for why this doesn't use
+  // React state for the pending target).
+  const itemRefs = useRef(new Map<string, HTMLLIElement>());
+
+  function setItemRef(id: string) {
+    return (el: HTMLLIElement | null) => {
+      if (el) itemRefs.current.set(id, el);
+      else itemRefs.current.delete(id);
+    };
+  }
+
+  useEffect(() => {
+    if (!pendingScrollCategoryId) return;
+    const id = pendingScrollCategoryId;
+    if (!itemRefs.current.get(id)) return;
+    pendingScrollCategoryId = null;
+
+    // The remount this effect runs after (see the comment above) can still
+    // be settling its layout across a couple of paints — a single
+    // requestAnimationFrame measurement wasn't always enough (confirmed
+    // empirically). A *retry loop* made this worse, not better: each retry
+    // called scrollBy({behavior: "smooth"}) again before the previous
+    // smooth-scroll animation had time to actually progress, restarting it
+    // from a barely-moved position every ~16ms instead of letting it run —
+    // net result was a small residual scroll, not the full one. A single
+    // short, one-shot delay avoids that interruption entirely.
+    const timeout = setTimeout(() => {
+      const el = itemRefs.current.get(id);
+      if (el) scrollIntoViewIfNeeded(el);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [tree]);
+
+  // Guards a real edge case: create a category, then navigate away (client-
+  // side, same tab) before router.refresh() resolves and the effect above
+  // gets to consume pendingScrollCategoryId — since it's module state, not
+  // React state, it would otherwise survive that navigation and trigger an
+  // unprompted scroll on a later, unrelated visit to this page.
+  useEffect(() => {
+    return () => {
+      pendingScrollCategoryId = null;
+    };
+  }, []);
+
   const openCreate = (parentId: string | null) =>
     setForm({
       mode: "create",
-      draft: { name: "", icon: "", order: "0", parentId, previewSpecKeys: [], specTemplateKey: null },
+      draft: { name: "", slug: "", slugTouched: false, icon: "", order: "0", parentId, previewSpecKeys: [], specTemplateKey: null },
     });
   const openEdit = (c: ProductCategory) =>
     setForm({
@@ -74,6 +173,8 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       id: c.id,
       draft: {
         name: c.name,
+        slug: c.slug,
+        slugTouched: true,
         icon: c.icon ?? "",
         order: String(c.order),
         parentId: c.parentId,
@@ -82,6 +183,14 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       },
     });
   const close = () => setForm(null);
+
+  const handleName = (name: string) => {
+    setForm((prev) => {
+      if (!prev) return prev;
+      const slug = prev.draft.slugTouched ? prev.draft.slug : slugify(name);
+      return { ...prev, draft: { ...prev.draft, name, slug } };
+    });
+  };
 
   const togglePreviewSpecKey = (label: string) => {
     // Functional update: several chips toggled in quick succession can land
@@ -104,6 +213,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
     setSaving(true);
     const payload = {
       name: form.draft.name,
+      slug: form.draft.slug,
       icon: form.draft.icon || null,
       order: Number(form.draft.order) || 0,
       parentId: form.draft.parentId,
@@ -120,6 +230,10 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       const b = await res.json().catch(() => null);
       showToast(b?.error || "خطا در ذخیره دسته.", "error");
       return;
+    }
+    if (form.mode === "create") {
+      const { category } = await res.json();
+      pendingScrollCategoryId = category.id;
     }
     showToast(form.mode === "create" ? "دسته ثبت شد." : "دسته به‌روزرسانی شد.");
     close();
@@ -165,7 +279,18 @@ export default function CategoryManager({ categories, specTemplates }: { categor
           </p>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام</label>
-            <input value={form.draft.name} onChange={(e) => setForm({ ...form, draft: { ...form.draft, name: e.target.value } })} className={inputClass} />
+            <input value={form.draft.name} onChange={(e) => handleName(e.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-foreground/80">نامک (slug)</label>
+            <input
+              dir="ltr"
+              value={form.draft.slug}
+              onChange={(e) =>
+                setForm({ ...form, draft: { ...form.draft, slug: e.target.value, slugTouched: true } })
+              }
+              className={inputClass}
+            />
           </div>
           <div className="sm:col-span-2">
             <IconPicker
@@ -231,7 +356,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       ) : (
         <ul className="space-y-2">
           {tree.map((root) => (
-            <li key={root.id} className="rounded-xl border border-foreground/10 bg-foreground/[0.02] p-3">
+            <li key={root.id} ref={setItemRef(root.id)} className="rounded-xl border border-foreground/10 bg-foreground/[0.02] p-3">
               <div className="flex items-center gap-3">
                 <CategoryIcon icon={root.icon} />
                 <div className="min-w-0 flex-1">
@@ -249,26 +374,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
                 </button>
               </div>
 
-              {root.children.length > 0 && (
-                <ul className="mt-2 space-y-1.5 border-r border-foreground/10 pr-3">
-                  {root.children.map((child) => (
-                    <li key={child.id} className="flex items-center gap-3 rounded-lg bg-foreground/[0.02] p-2">
-                      <CornerDownLeft className="size-3.5 text-foreground/30" />
-                      <CategoryIcon icon={child.icon} />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm">{child.name}</p>
-                        <p dir="ltr" className="truncate text-xs text-foreground/40">{child.slug}</p>
-                      </div>
-                      <button type="button" onClick={() => openEdit(child)} aria-label="ویرایش" className="flex size-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/60 transition-colors hover:border-accent-500/40 hover:text-accent-400">
-                        <Pencil className="size-3.5" />
-                      </button>
-                      <button type="button" onClick={() => setDeleteTarget(child)} aria-label="حذف" className="flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10">
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <CategoryChildrenList root={root} onEdit={openEdit} onDelete={setDeleteTarget} setItemRef={setItemRef} />
             </li>
           ))}
         </ul>

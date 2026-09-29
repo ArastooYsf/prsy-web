@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
 import {
   TextB,
   TextItalic,
@@ -16,6 +18,7 @@ import {
   Minus,
   ArrowCounterClockwise,
   ArrowClockwise,
+  X,
 } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import MediaPickerModal from "@/components/MediaPickerModal";
@@ -58,6 +61,39 @@ function ToolbarButton({
 
 function ToolbarDivider() {
   return <span className="mx-1 h-5 w-px shrink-0 bg-foreground/10" />;
+}
+
+// Native <input type="color"> hidden behind a styled trigger — this project
+// only has one font (Shabnam FD; see tailwind.config.ts and
+// src/app/layout.tsx), so there's nothing for a font-picker to switch
+// between, only a color picker.
+function ColorPickerButton({ editor }: { editor: Editor }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const color = (editor.getAttributes("textStyle").color as string | undefined) || null;
+
+  return (
+    <div className="relative flex shrink-0 items-center">
+      <ToolbarButton label="رنگ متن" active={!!color} onClick={() => inputRef.current?.click()}>
+        <span className="flex flex-col items-center leading-none">
+          <span className="text-xs font-bold">A</span>
+          <span className="mt-0.5 h-1 w-4 rounded-full border border-foreground/10" style={{ backgroundColor: color ?? "currentColor" }} />
+        </span>
+      </ToolbarButton>
+      <input
+        ref={inputRef}
+        type="color"
+        value={color ?? "#000000"}
+        onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+        className="hidden"
+        tabIndex={-1}
+      />
+      {color && (
+        <ToolbarButton label="حذف رنگ" onClick={() => editor.chain().focus().unsetColor().run()}>
+          <X size={14} weight="bold" />
+        </ToolbarButton>
+      )}
+    </div>
+  );
 }
 
 function Toolbar({ editor, onOpenImagePicker }: { editor: Editor; onOpenImagePicker: () => void }) {
@@ -116,6 +152,10 @@ function Toolbar({ editor, onOpenImagePicker }: { editor: Editor; onOpenImagePic
 
       <ToolbarDivider />
 
+      <ColorPickerButton editor={editor} />
+
+      <ToolbarDivider />
+
       <ToolbarButton
         label="افزودن لینک"
         active={editor.isActive("link")}
@@ -152,7 +192,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
 
   const editor = useEditor(
     {
-      extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image],
+      extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image, TextStyle, Color],
       content: value,
       immediatelyRender: false,
       editorProps: {

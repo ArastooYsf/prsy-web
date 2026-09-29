@@ -1,17 +1,23 @@
 import type { ReactNode } from "react";
+import { AlertTriangle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatPercent } from "@/lib/format-number";
 
-// Anything above these is a real "this is eating the disk" concern, not just
-// informational — shared by every storage bar (site-wide, logs, ...) so they
-// all agree on what counts as "worth flagging".
-const WARN_THRESHOLD = 10;
-const DANGER_THRESHOLD = 25;
+// Default thresholds — right for "% of the whole shared disk" (logs bar):
+// even 10% of a whole server volume is worth a look. A fixed dedicated quota
+// (a 5GB upload volume) needs much higher thresholds since being, say, 15%
+// full there is completely normal — callers pass their own via props.
+const DEFAULT_WARN_THRESHOLD = 10;
+const DEFAULT_DANGER_THRESHOLD = 25;
 
 export type StorageTone = "ok" | "warn" | "danger" | "unknown";
 
-export function toneForPercent(percent: number): StorageTone {
-  return percent >= DANGER_THRESHOLD ? "danger" : percent >= WARN_THRESHOLD ? "warn" : "ok";
+export function toneForPercent(
+  percent: number,
+  warnThreshold = DEFAULT_WARN_THRESHOLD,
+  dangerThreshold = DEFAULT_DANGER_THRESHOLD,
+): StorageTone {
+  return percent >= dangerThreshold ? "danger" : percent >= warnThreshold ? "warn" : "ok";
 }
 
 const TONE_BAR: Record<StorageTone, string> = {
@@ -33,15 +39,27 @@ type StorageBarProps = {
   /** null = unknown/not connected — renders an empty track and no percentage, instead of a fake 0%. */
   percent: number | null;
   description: ReactNode;
+  warnThreshold?: number;
+  dangerThreshold?: number;
+  /** Shown as a visible banner (not just a color change) once tone reaches "danger" — e.g. "نزدیک به سقف ظرفیت". Color alone never carries this warning. */
+  warningLabel?: string;
 };
 
 /**
- * Shared shell for every storage-usage bar in the admin panel (site-wide,
- * download host, logs) — one place for the bar's look, thresholds, and
- * "not connected" state instead of three near-identical copies.
+ * Shared shell for every storage-usage bar in the admin panel (site-wide
+ * upload volumes, download host, logs) — one place for the bar's look and
+ * "not connected" state instead of near-identical copies.
  */
-export default function StorageBar({ icon: Icon, label, percent, description }: StorageBarProps) {
-  const tone: StorageTone = percent === null ? "unknown" : toneForPercent(percent);
+export default function StorageBar({
+  icon: Icon,
+  label,
+  percent,
+  description,
+  warnThreshold,
+  dangerThreshold,
+  warningLabel,
+}: StorageBarProps) {
+  const tone: StorageTone = percent === null ? "unknown" : toneForPercent(percent, warnThreshold, dangerThreshold);
 
   return (
     <div className="mb-4 rounded-xl border border-foreground/10 bg-foreground/[0.02] p-4">
@@ -68,7 +86,14 @@ export default function StorageBar({ icon: Icon, label, percent, description }: 
         )}
       </div>
 
-      <p className="mt-2 text-xs text-foreground/50">{description}</p>
+      <div className="mt-2 text-xs text-foreground/50">{description}</div>
+
+      {tone === "danger" && warningLabel && (
+        <div className="mt-2.5 flex items-center gap-1.5 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-xs font-medium text-red-400">
+          <AlertTriangle className="size-3.5 shrink-0" />
+          {warningLabel}
+        </div>
+      )}
     </div>
   );
 }

@@ -500,3 +500,18 @@ model ProductCommentImage {
   @@index([commentId])
   @@map("product_comment_images")
 }
+
+// One row per day (at most), taken lazily on an admin's first /account/admin/logs
+// visit after the previous snapshot turns 24h old (see maybeTakeStorageSnapshot
+// in src/lib/storage-usage.ts) — powers the storage growth trend chart. BigInt
+// because a directory total can exceed Int32's ~2GB ceiling; callers convert to
+// Number() immediately (site totals are nowhere near Number.MAX_SAFE_INTEGER).
+model StorageSnapshot {
+  id               String   @id @default(cuid())
+  publicUsedBytes  BigInt
+  privateUsedBytes BigInt
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("storage_snapshots")
+}

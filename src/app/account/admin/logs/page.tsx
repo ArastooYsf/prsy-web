@@ -8,6 +8,7 @@ import { getLogEventTrend, summarizeCategoryTrend } from "@/lib/log-stats";
 import { getUptimeStats, getUptimeSegments } from "@/lib/uptime";
 import { getLighthouseHistory } from "@/lib/lighthouse";
 import { getDownloadHostStorageStatus } from "@/lib/download-host";
+import { getStorageUsageReport, maybeTakeStorageSnapshot, getStorageTrend } from "@/lib/storage-usage";
 import { ALL_LOG_CATEGORIES } from "@/lib/log-types";
 import LogsExplorer from "@/components/admin/LogsExplorer";
 import LogsDashboard from "@/components/admin/LogsDashboard";
@@ -31,12 +32,13 @@ export default async function AdminLogsPage() {
   // Only the stats/trend calls actually need `files` — kick that off
   // alongside the independent reads (uptime, uptime segments, lighthouse
   // history) instead of serializing everything behind it.
-  const [files, uptime, uptimeSegmentsResult, lighthouseHistory, storageUsage] = await Promise.all([
+  const [files, uptime, uptimeSegmentsResult, lighthouseHistory, storageUsage, storageReport] = await Promise.all([
     listLogFiles(),
     getUptimeStats(),
     getUptimeSegments(),
     getLighthouseHistory(),
     getLogStorageUsage(),
+    getStorageUsageReport(),
   ]);
   // One read+bucket pass across every category (getLogEventTrend), not
   // three overlapping ones — crash/important/security files would otherwise
@@ -46,6 +48,11 @@ export default async function AdminLogsPage() {
   const initialTrend = await getLogEventTrend(files, "30d", ALL_LOG_CATEGORIES);
   const crashStats = summarizeCategoryTrend(initialTrend, ["crash"]);
   const warningStats = summarizeCategoryTrend(initialTrend, ["important", "security"]);
+
+  // Lazy, once-a-day snapshot for the storage trend chart — no cron needed,
+  // and reuses the directory-walk totals already computed above.
+  await maybeTakeStorageSnapshot(storageReport);
+  const storageTrend = await getStorageTrend();
 
   return (
     <div className="pb-12">
@@ -60,7 +67,7 @@ export default async function AdminLogsPage() {
         فقط در همین رابط کاربری. برای مشاهده‌ی جزئیات رویدادهای هر فایل، روی آن کلیک کنید.
       </p>
 
-      <SiteStorageBar usage={storageUsage} />
+      <SiteStorageBar report={storageReport} trend={storageTrend} />
       <DownloadHostStorageBar status={getDownloadHostStorageStatus()} />
       <LogsStorageBar usage={storageUsage} />
 

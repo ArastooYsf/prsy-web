@@ -2,7 +2,7 @@ import { mkdir, writeFile, unlink } from "fs/promises";
 import { createReadStream, type ReadStream } from "fs";
 import path from "path";
 
-const PRIVATE_DIR = process.env.UPLOAD_PRIVATE_DIR || path.join(process.cwd(), "private-uploads");
+export const PRIVATE_DIR = process.env.UPLOAD_PRIVATE_DIR || path.join(process.cwd(), "private-uploads");
 
 export type PrivateStorageDriver = {
   put(key: string, bytes: Buffer): Promise<void>;

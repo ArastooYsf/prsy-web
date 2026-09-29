@@ -12,16 +12,16 @@ import { debugSlowLoad } from "@/lib/debug-slow-load";
 
 async function getAdminStats() {
   try {
-    const [posts, contentEntries, media] = await Promise.all([
+    const [posts, products, media] = await Promise.all([
       prisma.blogPost.count(),
-      prisma.siteContent.count(),
+      prisma.product.count({ where: { deletedAt: null } }),
       prisma.mediaAsset.count(),
     ]);
-    return { posts, contentEntries, media, error: null as string | null };
+    return { posts, products, media, error: null as string | null };
   } catch {
     return {
       posts: 0,
-      contentEntries: 0,
+      products: 0,
       media: 0,
       error: "اتصال به دیتابیس برقرار نیست. تنظیمات DATABASE_URL را بررسی کنید.",
     };
@@ -87,7 +87,7 @@ export default async function AdminDashboardPage() {
 
   const cards: { label: string; value: number; icon: LucideIcon }[] = [
     { label: "پست‌های وبلاگ", value: stats.posts, icon: Newspaper },
-    { label: "محصولات سایت", value: stats.contentEntries, icon: LayoutTemplate },
+    { label: "محصولات سایت", value: stats.products, icon: LayoutTemplate },
     { label: "فایل‌های آپلودشده", value: stats.media, icon: ImageIcon },
   ];
 

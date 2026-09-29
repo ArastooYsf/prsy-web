@@ -148,7 +148,13 @@ body {
    matching this site's existing "One Signal Rule" — just swapping which hue
    plays that role. */
 .theme-white-blue {
-  --background: 248 250 252; /* slate-50 */
+  /* Off-white, not pure white — #FFFFFF/slate-50 read as harsh under sustained
+     use. This value keeps foreground/background contrast at ~16.7:1 (huge
+     margin) but drops muted-foreground's margin below AA's 4.5:1 floor, so
+     muted-foreground is darkened a notch below slate-500 below to hold
+     ~4.7:1 against it — checked by hand (WCAG relative-luminance formula),
+     not eyeballed. */
+  --background: 247 247 245;
   --foreground: 15 23 42; /* slate-900 */
 
   --border: 226 232 240; /* slate-200 */
@@ -165,7 +171,7 @@ body {
   --destructive-foreground: 255 255 255;
 
   --muted: 241 245 249;
-  --muted-foreground: 100 116 139; /* slate-500 */
+  --muted-foreground: 96 112 134; /* a shade below slate-500 — see --background comment */
 
   --accent: 241 245 249; /* ghost/outline hover wash */
   --accent-foreground: 15 23 42;

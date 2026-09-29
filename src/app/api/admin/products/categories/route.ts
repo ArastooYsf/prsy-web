@@ -28,7 +28,10 @@ export async function POST(request: Request) {
 
   const name = sanitizePlainText(body.name).slice(0, 120);
   const icon = normalizeIcon(body.icon);
-  const order = Number.isFinite(body.order) ? Math.trunc(body.order) : 0;
+  const order = Number.isFinite(body.order) ? Math.trunc(body.order) : 1;
+  if (order < 1) {
+    return NextResponse.json({ error: "ترتیب نمایش باید حداقل ۱ باشد." }, { status: 400 });
+  }
 
   let parentId: string | null = null;
   if (typeof body.parentId === "string" && body.parentId) {
@@ -38,6 +41,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "فقط دو سطح دسته‌بندی مجاز است." }, { status: 400 });
     }
     parentId = parent.id;
+  }
+
+  // Siblings (same parentId, including root categories which share
+  // parentId: null) can't share an order value — findFirst here rather than
+  // a DB-level unique constraint because a composite unique index on
+  // (parentId, order) wouldn't actually enforce this for root categories:
+  // every SQL engine treats each NULL as distinct, so multiple NULL-parentId
+  // rows with the same order would silently pass a DB constraint anyway.
+  const orderClash = await prisma.productCategory.findFirst({ where: { parentId, order } });
+  if (orderClash) {
+    return NextResponse.json(
+      { error: `دسته‌ی «${orderClash.name}» در همین سطح از ترتیب ${order} استفاده می‌کند.` },
+      { status: 400 },
+    );
   }
 
   // Only meaningful on a root category — a new child never carries its own template.

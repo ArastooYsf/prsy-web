@@ -162,11 +162,18 @@ export default function CategoryManager({ categories, specTemplates }: { categor
     };
   }, []);
 
-  const openCreate = (parentId: string | null) =>
+  const openCreate = (parentId: string | null) => {
+    // Suggest the next free slot among this category's own siblings rather
+    // than a fixed "1" — with the new duplicate-order rule below, defaulting
+    // every new category to the same number would make the *second* one
+    // created under any parent fail validation immediately.
+    const siblingOrders = categories.filter((c) => c.parentId === parentId).map((c) => c.order);
+    const nextOrder = siblingOrders.length > 0 ? Math.max(...siblingOrders) + 1 : 1;
     setForm({
       mode: "create",
-      draft: { name: "", slug: "", slugTouched: false, icon: "", order: "0", parentId, previewSpecKeys: [], specTemplateKey: null },
+      draft: { name: "", slug: "", slugTouched: false, icon: "", order: String(nextOrder), parentId, previewSpecKeys: [], specTemplateKey: null },
     });
+  };
   const openEdit = (c: ProductCategory) =>
     setForm({
       mode: "edit",
@@ -210,12 +217,16 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       showToast("نام دسته الزامی است.", "error");
       return;
     }
+    if (!Number.isFinite(Number(form.draft.order)) || Number(form.draft.order) < 1) {
+      showToast("ترتیب نمایش باید حداقل ۱ باشد.", "error");
+      return;
+    }
     setSaving(true);
     const payload = {
       name: form.draft.name,
       slug: form.draft.slug,
       icon: form.draft.icon || null,
-      order: Number(form.draft.order) || 0,
+      order: Number(form.draft.order),
       parentId: form.draft.parentId,
       previewSpecKeys: form.draft.previewSpecKeys,
     };
@@ -302,7 +313,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
           </div>
           <div className="max-w-[8rem]">
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">ترتیب</label>
-            <input type="number" dir="ltr" value={form.draft.order} onChange={(e) => setForm({ ...form, draft: { ...form.draft, order: e.target.value } })} className={inputClass} />
+            <input type="number" dir="ltr" min={1} value={form.draft.order} onChange={(e) => setForm({ ...form, draft: { ...form.draft, order: e.target.value } })} className={inputClass} />
           </div>
 
           {/* Only a root category carries its own spec template (see specTemplateKey

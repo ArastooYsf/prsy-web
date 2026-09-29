@@ -1,0 +1,15 @@
+[33m740ea47[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: add trust seals management and display in footer
+[33mf8cfb69[m feat: add map URL input to footer contact form and update related components
+[33m20e53ed[m admin pannel
+[33m8801598[m feat: split file storage into public (pluggable driver) and private (auth-checked)
+[33m1a7bcc6[m Turnstile
+[33maf5e1c4[m feat: add manual migration runner that bypasses Prisma's schema-engine
+[33m99ab605[m fix: always set allowPublicKeyRetrieval on the DB connection, not just via URL
+[33md3f0299[m Revert "refactor: build DATABASE_URL from five separate env vars, not one string"
+[33m47fa4ed[m refactor: build DATABASE_URL from five separate env vars, not one string
+[33m4f3b0a3[m build: bump build timeout from 5 to 15 minutes
+[33m301c8b7[m build: fail fast with a clear message if build hangs past 5 minutes
+[33m90bcb6d[m chore: force redeploy
+[33mf9197b1[m fix: force blog pages to render dynamically, not just revalidate
+[33m50eb969[m fix: force sitemap.xml to render dynamically instead of at build time
+[33ma84a150[m test: remove postinstall entirely, rely only on build's prisma generate

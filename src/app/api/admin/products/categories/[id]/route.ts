@@ -36,6 +36,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const name = sanitizePlainText(body.name).slice(0, 120);
   const icon = normalizeIcon(body.icon);
   const order = Number.isFinite(body.order) ? Math.trunc(body.order) : existing.order;
+  if (order < 1) {
+    return NextResponse.json({ error: "ترتیب نمایش باید حداقل ۱ باشد." }, { status: 400 });
+  }
 
   let parentId: string | null = null;
   if (typeof body.parentId === "string" && body.parentId) {
@@ -51,6 +54,16 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       return NextResponse.json({ error: "فقط دو سطح دسته‌بندی مجاز است." }, { status: 400 });
     }
     parentId = parent.id;
+  }
+
+  // Same duplicate-order guard as the create route — see the comment there
+  // about why this is an app-level check, not a DB unique constraint.
+  const orderClash = await prisma.productCategory.findFirst({ where: { parentId, order, NOT: { id: existing.id } } });
+  if (orderClash) {
+    return NextResponse.json(
+      { error: `دسته‌ی «${orderClash.name}» در همین سطح از ترتیب ${order} استفاده می‌کند.` },
+      { status: 400 },
+    );
   }
 
   // Only meaningful on a root category.

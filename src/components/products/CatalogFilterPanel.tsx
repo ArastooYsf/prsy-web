@@ -4,8 +4,10 @@ import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useCatalogFilters } from "@/hooks/useCatalogFilters";
 import PriceRangeFilter from "@/components/products/PriceRangeFilter";
+import type { ProductFiltersContent } from "@/lib/site-content";
 
 export type FacetOption = { label: string; slug: string };
+export type SpecFacet = { label: string; labelSlug: string; options: FacetOption[] };
 
 type Props = {
   basePath: string;
@@ -13,12 +15,33 @@ type Props = {
   subOptions: FacetOption[];
   brandOptions: FacetOption[];
   priceBounds: { min: number; max: number } | null;
+  builtinFilters: ProductFiltersContent;
+  specFacets: SpecFacet[];
 };
 
-export default function CatalogFilterPanel({ basePath, subLabel, subOptions, brandOptions, priceBounds }: Props) {
+export default function CatalogFilterPanel({
+  basePath,
+  subLabel,
+  subOptions,
+  brandOptions,
+  priceBounds,
+  builtinFilters,
+  specFacets,
+}: Props) {
   const [openMobile, setOpenMobile] = useState(false);
-  const { searchParams, subs, brands, stockOnly, pushParams, toggleList, toggleStock, hasActive, clearAll } =
-    useCatalogFilters(basePath);
+  const {
+    searchParams,
+    subs,
+    brands,
+    stockOnly,
+    pushParams,
+    toggleList,
+    toggleStock,
+    specValues,
+    toggleSpecValue,
+    hasActive,
+    clearAll,
+  } = useCatalogFilters(basePath);
 
   const priceMin = priceBounds ? Number(searchParams.get("priceMin") ?? priceBounds.min) : null;
   const priceMax = priceBounds ? Number(searchParams.get("priceMax") ?? priceBounds.max) : null;
@@ -78,23 +101,55 @@ export default function CatalogFilterPanel({ basePath, subLabel, subOptions, bra
         </Section>
       )}
 
-      {brandOptions.length > 0 && (
-        <Section title="برند">
-          {brandOptions.map((o) => (
-            <CheckRow key={o.slug} label={o.label} checked={brands.includes(o.slug)} onChange={() => toggleList("brand", o.slug)} />
+      {(
+        [
+          {
+            key: "brand",
+            order: builtinFilters.brand.order,
+            render: brandOptions.length > 0 && (
+              <Section key="brand" title="برند">
+                {brandOptions.map((o) => (
+                  <CheckRow key={o.slug} label={o.label} checked={brands.includes(o.slug)} onChange={() => toggleList("brand", o.slug)} />
+                ))}
+              </Section>
+            ),
+          },
+          {
+            key: "stock",
+            order: builtinFilters.stock.order,
+            render: (
+              <Section key="stock" title="موجودی">
+                <CheckRow label="فقط کالاهای موجود" checked={stockOnly} onChange={toggleStock} />
+              </Section>
+            ),
+          },
+          {
+            key: "price",
+            order: builtinFilters.price.order,
+            render: priceBounds && priceMin !== null && priceMax !== null && (
+              <Section key="price" title="بازه‌ی قیمت (تومان)">
+                <PriceRangeFilter bounds={priceBounds} min={priceMin} max={priceMax} onCommit={commitPrice} />
+              </Section>
+            ),
+          },
+        ] satisfies { key: keyof ProductFiltersContent; order: number; render: React.ReactNode }[]
+      )
+        .filter((f) => builtinFilters[f.key].enabled)
+        .sort((a, b) => a.order - b.order)
+        .map((f) => f.render)}
+
+      {specFacets.map((facet) => (
+        <Section key={facet.labelSlug} title={facet.label}>
+          {facet.options.map((o) => (
+            <CheckRow
+              key={o.slug}
+              label={o.label}
+              checked={specValues(facet.labelSlug).includes(o.slug)}
+              onChange={() => toggleSpecValue(facet.labelSlug, o.slug)}
+            />
           ))}
         </Section>
-      )}
-
-      <Section title="موجودی">
-        <CheckRow label="فقط کالاهای موجود" checked={stockOnly} onChange={toggleStock} />
-      </Section>
-
-      {priceBounds && priceMin !== null && priceMax !== null && (
-        <Section title="بازه‌ی قیمت (تومان)">
-          <PriceRangeFilter bounds={priceBounds} min={priceMin} max={priceMax} onCommit={commitPrice} />
-        </Section>
-      )}
+      ))}
     </div>
   );
 

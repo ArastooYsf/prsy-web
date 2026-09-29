@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import CatalogView from "@/components/products/CatalogView";
 import type { ListSearchParams } from "@/lib/list-query";
 import { safeDecode } from "@/lib/slug-param";
+import { parseStringArray } from "@/lib/product-json";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,13 @@ export default async function CategoryCatalogPage({
     <CatalogView
       basePath={`/products/${category.slug}`}
       searchParams={searchParams}
-      category={{ id: category.id, name: category.name, slug: category.slug, children: category.children }}
+      category={{
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        children: category.children,
+        filterSpecKeys: parseStringArray(category.filterSpecKeys),
+      }}
     />
   );
 }

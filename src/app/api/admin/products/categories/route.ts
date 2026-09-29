@@ -58,7 +58,9 @@ export async function POST(request: Request) {
   }
 
   // Only meaningful on a root category — a new child never carries its own template.
-  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, null, await getSpecTemplates());
+  const specTemplates = await getSpecTemplates();
+  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, null, specTemplates);
+  const filterSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.filterSpecKeys, null, specTemplates);
 
   const requestedSlug = typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
   const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
@@ -67,7 +69,15 @@ export async function POST(request: Request) {
   });
 
   const category = await prisma.productCategory.create({
-    data: { name, slug, icon, order, parentId, previewSpecKeys: previewSpecKeys ?? undefined },
+    data: {
+      name,
+      slug,
+      icon,
+      order,
+      parentId,
+      previewSpecKeys: previewSpecKeys ?? undefined,
+      filterSpecKeys: filterSpecKeys ?? undefined,
+    },
   });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);

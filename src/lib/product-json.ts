@@ -2,6 +2,11 @@ import { sanitizePlainText } from "@/lib/sanitize";
 
 export type ProductSpec = { label: string; value: string; unit?: string };
 
+/** Shared by previewSpecKeys/filterSpecKeys readers (ProductCard, CategoryManager, category page loaders). */
+export function parseStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}
+
 /** "۵۰۰ کاوا" — the value with its optional unit appended, for display. */
 export function formatSpecValue(spec: ProductSpec): string {
   return spec.unit ? `${spec.value} ${spec.unit}` : spec.value;

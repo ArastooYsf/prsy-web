@@ -412,6 +412,11 @@ model ProductCategory {
   // as specTemplateKey. Null/empty means "use the default fallback" (the
   // product's first few specs, see ProductCard.tsx).
   previewSpecKeys Json?
+  // Ordered subset of the spec template's labels the admin has opened up as
+  // selectable facets in the public filter sidebar (CatalogFilterPanel) —
+  // same root-only convention as previewSpecKeys/specTemplateKey. Null/empty
+  // means no spec-based filters are shown for this category's products.
+  filterSpecKeys  Json?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 

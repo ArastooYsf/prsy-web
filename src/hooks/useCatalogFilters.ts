@@ -38,10 +38,44 @@ export function useCatalogFilters(basePath: string) {
 
   const toggleStock = () => pushParams((p) => (stockOnly ? p.delete("stock") : p.set("stock", "1")));
 
+  // Spec-based facets are dynamic (one per admin-enabled spec label per
+  // category), so unlike sub/brand they don't get a fixed param name — each
+  // uses `spec_<labelSlug>` instead, same comma-list value shape as sub/brand.
+  const specValues = (labelSlug: string) => splitParam(searchParams.get(`spec_${labelSlug}`));
+
+  const toggleSpecValue = (labelSlug: string, valueSlug: string) => {
+    pushParams((p) => {
+      const key = `spec_${labelSlug}`;
+      const cur = splitParam(p.get(key));
+      const next = cur.includes(valueSlug) ? cur.filter((s) => s !== valueSlug) : [...cur, valueSlug];
+      if (next.length) p.set(key, next.join(","));
+      else p.delete(key);
+    });
+  };
+
+  const hasActiveSpecFilter = [...searchParams.keys()].some((k) => k.startsWith("spec_"));
+
   const hasActive =
-    subs.length > 0 || brands.length > 0 || stockOnly || searchParams.has("priceMin") || searchParams.has("priceMax");
+    subs.length > 0 ||
+    brands.length > 0 ||
+    stockOnly ||
+    searchParams.has("priceMin") ||
+    searchParams.has("priceMax") ||
+    hasActiveSpecFilter;
 
   const clearAll = () => router.push(basePath, { scroll: false });
 
-  return { searchParams, subs, brands, stockOnly, pushParams, toggleList, toggleStock, hasActive, clearAll };
+  return {
+    searchParams,
+    subs,
+    brands,
+    stockOnly,
+    pushParams,
+    toggleList,
+    toggleStock,
+    specValues,
+    toggleSpecValue,
+    hasActive,
+    clearAll,
+  };
 }

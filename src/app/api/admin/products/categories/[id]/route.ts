@@ -67,7 +67,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   // Only meaningful on a root category.
-  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, existing.specTemplateKey, await getSpecTemplates());
+  const specTemplates = await getSpecTemplates();
+  const previewSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.previewSpecKeys, existing.specTemplateKey, specTemplates);
+  const filterSpecKeys = parentId ? null : normalizePreviewSpecKeys(body.filterSpecKeys, existing.specTemplateKey, specTemplates);
 
   const requestedSlug = typeof body.slug === "string" && body.slug.trim() ? slugify(body.slug) : slugify(name);
   const slug = await ensureUniqueSlug(requestedSlug, async (s) => {
@@ -77,7 +79,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   const category = await prisma.productCategory.update({
     where: { id: existing.id },
-    data: { name, slug, icon, order, parentId, previewSpecKeys: previewSpecKeys ?? Prisma.JsonNull },
+    data: {
+      name,
+      slug,
+      icon,
+      order,
+      parentId,
+      previewSpecKeys: previewSpecKeys ?? Prisma.JsonNull,
+      filterSpecKeys: filterSpecKeys ?? Prisma.JsonNull,
+    },
   });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);

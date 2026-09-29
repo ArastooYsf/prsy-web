@@ -26,8 +26,10 @@ import {
   DEFAULT_SITE_LOGO,
   DEFAULT_DOWNLOADS_CONTENT,
   DEFAULT_TRUST_SEALS,
+  DEFAULT_PRODUCT_FILTERS_CONTENT,
   type SiteLogoContent,
   type DownloadsContent,
+  type ProductFiltersContent,
   type TrustSealContent,
   type HeroSlideContent,
   type HeroSettingsContent,
@@ -46,7 +48,7 @@ import {
   type HeaderNavLabelsContent,
 } from "@/lib/site-content-defaults";
 
-export { DEFAULT_HERO_SLIDES, DEFAULT_HERO_SETTINGS, DEFAULT_FOOTER_CONTACT, DEFAULT_FAQ_ITEMS };
+export { DEFAULT_HERO_SLIDES, DEFAULT_HERO_SETTINGS, DEFAULT_FOOTER_CONTACT, DEFAULT_FAQ_ITEMS, DEFAULT_PRODUCT_FILTERS_CONTENT };
 export type {
   SiteLogoContent,
   HeroSlideContent,
@@ -65,6 +67,7 @@ export type {
   HeaderNavLabelsContent,
   DownloadsContent,
   TrustSealContent,
+  ProductFiltersContent,
 };
 
 export const SITE_CONTENT_TAG = "site-content";
@@ -85,6 +88,7 @@ export const TRUST_SEALS_KEY = "footer.trustSeals";
 export const HEADER_NAV_LABELS_KEY = "header.navLabels";
 export const SITE_LOGO_KEY = "site.logo";
 export const DOWNLOADS_KEY = "downloads.content";
+export const PRODUCT_FILTERS_KEY = "products.filters";
 export const SPEC_TEMPLATES_KEY = "spec.templates";
 export const SPEC_SUGGESTIONS_KEY = "spec.suggestions";
 
@@ -236,6 +240,11 @@ export async function getDownloadsContent(): Promise<DownloadsContent> {
 export async function getTrustSeals(): Promise<TrustSealContent[]> {
   const map = await getSiteContentMap();
   return parseJsonArray<TrustSealContent>(map[TRUST_SEALS_KEY], DEFAULT_TRUST_SEALS);
+}
+
+export async function getProductFiltersContent(): Promise<ProductFiltersContent> {
+  const map = await getSiteContentMap();
+  return parseJsonObject<ProductFiltersContent>(map[PRODUCT_FILTERS_KEY], DEFAULT_PRODUCT_FILTERS_CONTENT);
 }
 
 export async function getFooterEditableContent(): Promise<FooterEditableContent> {

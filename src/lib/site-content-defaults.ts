@@ -609,6 +609,24 @@ export const DEFAULT_DOWNLOADS_CONTENT: DownloadsContent = {
   introVideoUrl: "",
 };
 
+// Enable/order for the built-in facets on the public product filter panel
+// (CatalogFilterPanel) — subcategory is structural navigation, not admin-
+// toggleable. Spec-based facets are configured per-category instead (see
+// ProductCategory.filterSpecKeys), since which specs make sense as filters
+// depends entirely on the category (motor power only applies to generators).
+export type ProductFilterToggle = { enabled: boolean; order: number };
+export type ProductFiltersContent = {
+  brand: ProductFilterToggle;
+  stock: ProductFilterToggle;
+  price: ProductFilterToggle;
+};
+
+export const DEFAULT_PRODUCT_FILTERS_CONTENT: ProductFiltersContent = {
+  brand: { enabled: true, order: 0 },
+  stock: { enabled: true, order: 1 },
+  price: { enabled: true, order: 2 },
+};
+
 export type LegalPageHeadingContent = {
   eyebrow: string;
   heading: string;

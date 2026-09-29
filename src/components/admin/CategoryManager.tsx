@@ -9,6 +9,7 @@ import { useToast } from "@/components/ToastProvider";
 import IconPicker, { type IconPickerOption } from "@/components/admin/IconPicker";
 import { CATEGORY_ICON_KEYS, CATEGORY_ICON_LABELS, CATEGORY_ICONS, type CategoryIconKey } from "@/lib/category-icons";
 import { resolvedSpecTemplateKey, type SpecTemplates } from "@/lib/product-spec-templates";
+import { parseStringArray } from "@/lib/product-json";
 import { slugify } from "@/lib/slugify";
 import { scrollIntoViewIfNeeded } from "@/lib/scroll-into-view";
 import type { ProductCategory } from "@/generated/prisma/client";
@@ -24,12 +25,9 @@ type Draft = {
   order: string;
   parentId: string | null;
   previewSpecKeys: string[];
+  filterSpecKeys: string[];
   specTemplateKey: string | null;
 };
-
-function parsePreviewSpecKeys(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
-}
 
 // Same closed grid the content cards use (IconPicker), fed with the
 // category-specific icon set; "" = no icon.
@@ -171,7 +169,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
     const nextOrder = siblingOrders.length > 0 ? Math.max(...siblingOrders) + 1 : 1;
     setForm({
       mode: "create",
-      draft: { name: "", slug: "", slugTouched: false, icon: "", order: String(nextOrder), parentId, previewSpecKeys: [], specTemplateKey: null },
+      draft: { name: "", slug: "", slugTouched: false, icon: "", order: String(nextOrder), parentId, previewSpecKeys: [], filterSpecKeys: [], specTemplateKey: null },
     });
   };
   const openEdit = (c: ProductCategory) =>
@@ -185,7 +183,8 @@ export default function CategoryManager({ categories, specTemplates }: { categor
         icon: c.icon ?? "",
         order: String(c.order),
         parentId: c.parentId,
-        previewSpecKeys: parsePreviewSpecKeys(c.previewSpecKeys),
+        previewSpecKeys: parseStringArray(c.previewSpecKeys),
+        filterSpecKeys: parseStringArray(c.filterSpecKeys),
         specTemplateKey: c.specTemplateKey,
       },
     });
@@ -211,6 +210,15 @@ export default function CategoryManager({ categories, specTemplates }: { categor
     });
   };
 
+  const toggleFilterSpecKey = (label: string) => {
+    setForm((prev) => {
+      if (!prev) return prev;
+      const current = prev.draft.filterSpecKeys;
+      const next = current.includes(label) ? current.filter((l) => l !== label) : [...current, label];
+      return { ...prev, draft: { ...prev.draft, filterSpecKeys: next } };
+    });
+  };
+
   const save = async () => {
     if (!form) return;
     if (!form.draft.name.trim()) {
@@ -229,6 +237,7 @@ export default function CategoryManager({ categories, specTemplates }: { categor
       order: Number(form.draft.order),
       parentId: form.draft.parentId,
       previewSpecKeys: form.draft.previewSpecKeys,
+      filterSpecKeys: form.draft.filterSpecKeys,
     };
     const url = form.mode === "create" ? "/api/admin/products/categories" : `/api/admin/products/categories/${form.id}`;
     const res = await fetch(url, {
@@ -336,6 +345,40 @@ export default function CategoryManager({ categories, specTemplates }: { categor
                       key={label}
                       type="button"
                       onClick={() => togglePreviewSpecKey(label)}
+                      aria-pressed={checked}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        checked
+                          ? "border-accent-500/40 bg-accent-500/10 text-accent-400"
+                          : "border-foreground/10 text-foreground/60 hover:border-foreground/30"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Same root-only convention as previewSpecKeys above — these become
+              the selectable spec facets in the public filter sidebar. */}
+          {!form.draft.parentId && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground/80">
+                مشخصات قابل‌فیلتر (در فیلترهای صفحه‌ی محصولات)
+              </label>
+              <p className="mb-2 text-xs text-foreground/50">
+                کدام مشخصه‌های این دسته به‌عنوان فیلتر قابل‌انتخاب (مثل توان موتور) کنار لیست محصولات نمایش داده
+                شوند. اگر چیزی انتخاب نشود، فیلتر مشخصات نمایش داده نمی‌شود.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {specTemplates[resolvedSpecTemplateKey(form.draft.specTemplateKey)].map((label) => {
+                  const checked = form.draft.filterSpecKeys.includes(label);
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => toggleFilterSpecKey(label)}
                       aria-pressed={checked}
                       className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                         checked

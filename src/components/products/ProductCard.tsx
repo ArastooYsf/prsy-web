@@ -5,7 +5,7 @@ import { getMediaUrl } from "@/lib/media";
 import { formatNumber } from "@/lib/format-number";
 import { PRODUCT_AVAILABILITY } from "@/lib/status-labels";
 import { buildTicketHref } from "@/lib/ticket-href";
-import { parseProductSpecs, type ProductSpec } from "@/lib/product-json";
+import { parseProductSpecs, parseStringArray, type ProductSpec } from "@/lib/product-json";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ProductQuickPreview from "@/components/products/ProductQuickPreview";
 import AddToCartButton from "@/components/products/AddToCartButton";
@@ -36,9 +36,7 @@ function detailHref(product: CatalogProduct): string | null {
 function quickPreviewSpecs(product: CatalogProduct): ProductSpec[] {
   const allSpecs = parseProductSpecs(product.specs);
   const root = product.category?.parent ?? product.category ?? null;
-  const previewKeys = Array.isArray(root?.previewSpecKeys)
-    ? root.previewSpecKeys.filter((k): k is string => typeof k === "string")
-    : [];
+  const previewKeys = parseStringArray(root?.previewSpecKeys);
 
   if (previewKeys.length === 0) return allSpecs.slice(0, QUICK_PREVIEW_FALLBACK_COUNT);
 

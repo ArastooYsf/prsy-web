@@ -8,8 +8,10 @@ import {
   getWatterBillInfo,
   getSandboxEcho,
 } from "@/lib/integrations/api-ir";
-import { sendSms } from "@/lib/notifications/sms";
+import { sendSms, getKavenegarAccountInfo } from "@/lib/notifications/sms";
 import { sendEmail } from "@/lib/notifications/email";
+import { checkTurnstileConnection } from "@/lib/turnstile";
+import { toPersianDigits } from "@/lib/format-number";
 
 // Single source of truth for every external service this project talks to —
 // the admin "یکپارچه‌سازی‌ها" hub (src/app/account/admin/integrations) is
@@ -93,6 +95,21 @@ async function runSideEffect(fn: () => Promise<void>, successMessage: string): P
     return { ok: true, data: null, message: successMessage };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "اجرا ناموفق بود." };
+  }
+}
+
+// Sentry's DSN is write-only (events flow client -> Sentry, never the other
+// way), and its only "real" test would be sending a fake error into the
+// actual project's error stream — polluting production error tracking just
+// to test a connection. The correct equivalent here (per this provider's own
+// nature, same call the user asked for on Turnstile) is a format check: a
+// DSN is a URL shaped like https://<publicKey>@<host>/<projectId>.
+function isValidSentryDsn(dsn: string): boolean {
+  try {
+    const url = new URL(dsn);
+    return ["http:", "https:"].includes(url.protocol) && url.username.length > 0 && /^\/\d+\/?$/.test(url.pathname);
+  } catch {
+    return false;
   }
 }
 
@@ -220,6 +237,21 @@ export const INTEGRATIONS_REGISTRY: IntegrationProvider[] = [
     baseUrl: "https://api.kavenegar.com",
     authType: "apikey",
     envVarsRequired: ["KAVENEGAR_API_KEY"],
+    testConnection: async () => {
+      try {
+        const info = await getKavenegarAccountInfo();
+        return {
+          ok: true,
+          data: info,
+          message:
+            info.remainingCredit !== null
+              ? `اتصال برقرار است — اعتبار باقی‌مانده: ${toPersianDigits(String(info.remainingCredit))}`
+              : "اتصال برقرار است.",
+        };
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : "اتصال ناموفق بود." };
+      }
+    },
     services: [
       {
         id: "send-test-sms",
@@ -241,6 +273,15 @@ export const INTEGRATIONS_REGISTRY: IntegrationProvider[] = [
     baseUrl: "https://api.resend.com",
     authType: "apikey",
     envVarsRequired: ["RESEND_API_KEY"],
+    // "delivered@resend.dev" is Resend's own documented simulation address
+    // (resend.com/docs/dashboard/emails/send-test-emails) — a real send that
+    // never reaches an actual inbox and costs nothing, the same role
+    // api.ir's Sandbox Echo plays for that provider.
+    testConnection: () =>
+      runSideEffect(
+        () => sendEmail({ to: "delivered@resend.dev", subject: "تست اتصال یکپارچه‌سازی", html: "<p>این یک ایمیل آزمایشی برای بررسی اتصال است.</p>" }),
+        "اتصال برقرار است — ایمیل آزمایشی به آدرس شبیه‌سازی Resend ارسال شد.",
+      ),
     services: [
       {
         id: "send-test-email",
@@ -266,6 +307,10 @@ export const INTEGRATIONS_REGISTRY: IntegrationProvider[] = [
     icon: ShieldAlert,
     authType: "apikey",
     envVarsRequired: ["TURNSTILE_SECRET_KEY", "NEXT_PUBLIC_TURNSTILE_SITE_KEY"],
+    testConnection: async () => {
+      const result = await checkTurnstileConnection();
+      return result.ok ? { ok: true, data: null, message: result.message } : result;
+    },
     services: [],
   },
   {
@@ -275,6 +320,18 @@ export const INTEGRATIONS_REGISTRY: IntegrationProvider[] = [
     icon: Bug,
     authType: "apikey",
     envVarsRequired: ["SENTRY_DSN"],
+    testConnection: async () => {
+      const dsn = process.env.SENTRY_DSN;
+      if (!dsn) return { ok: false, error: "SENTRY_DSN تنظیم نشده است." };
+      if (!isValidSentryDsn(dsn)) {
+        return { ok: false, error: "فرمت SENTRY_DSN نامعتبر است — باید مانند https://<key>@o0.ingest.sentry.io/0 باشد." };
+      }
+      return {
+        ok: true,
+        data: null,
+        message: "فرمت SENTRY_DSN معتبر است (پینگ زنده انجام نشد — ارسال یک رویداد آزمایشی، خطای واقعی قلابی در پروژه‌ی Sentry ثبت می‌کرد).",
+      };
+    },
     services: [],
   },
 ];

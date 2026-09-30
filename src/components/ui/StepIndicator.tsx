@@ -11,16 +11,27 @@ type StepIndicatorProps = {
 // OrderProgress (src/components/account/OrderProgress.tsx). Shared by every
 // multi-step flow (registration, checkout, ...) so they all read as the same
 // wizard pattern rather than independently-styled steppers.
+//
+// Both flex rows below use items-start rather than items-center, on
+// purpose: with items-center, a step's own row height is set by its tallest
+// content (circle + gap + label), so a label that wraps to 2-3 lines grows
+// that row — and items-center then centers the *connecting line* against
+// that whole taller row instead of against the circle, and centers
+// *shorter neighboring steps* against this one's extra height too, pulling
+// every circle and line off the shared horizontal guideline. items-start
+// pins the circle (and the line, offset to the circle's own mid-height via
+// mt-[13px] = h-7/2 - h-0.5/2) to a fixed y regardless of label height, and
+// leaves the label free to wrap without moving anything above it.
 export default function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   return (
-    <div className="mb-7 flex items-center" aria-label={`مرحله ${toPersianDigits(currentStep)} از ${toPersianDigits(steps.length)}`}>
+    <div className="mb-7 flex items-start" aria-label={`مرحله ${toPersianDigits(currentStep)} از ${toPersianDigits(steps.length)}`}>
       {steps.map((label, index) => {
         const stepNum = index + 1;
         const done = stepNum < currentStep;
         const active = stepNum === currentStep;
         const isLast = index === steps.length - 1;
         return (
-          <div key={label} className="flex flex-1 items-center last:flex-none">
+          <div key={label} className="flex flex-1 items-start last:flex-none">
             <div className="flex flex-col items-center gap-2">
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-colors duration-300 ${
@@ -31,13 +42,13 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
               >
                 {done ? <Check className="size-3.5" /> : toPersianDigits(stepNum)}
               </span>
-              <span className={`text-[11px] ${done || active ? "text-accent-400" : "text-foreground/40"}`}>
+              <span className={`text-center text-[11px] ${done || active ? "text-accent-400" : "text-foreground/40"}`}>
                 {label}
               </span>
             </div>
             {!isLast && (
               <span
-                className={`mx-2 h-0.5 flex-1 rounded-full transition-colors duration-300 ${
+                className={`mx-2 mt-[13px] h-0.5 flex-1 rounded-full transition-colors duration-300 ${
                   done ? "bg-accent-500" : "bg-foreground/10"
                 }`}
               />

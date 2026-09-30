@@ -7,6 +7,7 @@ import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
 import { useSiteTheme } from "@/components/RouteThemeScope";
 import { popoverAnimation } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import EmojiPicker from "@/components/EmojiPicker";
 
 type CannedResponse = {
   id: string;
@@ -85,6 +86,22 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
           align="start"
           sideOffset={8}
           collisionPadding={8}
+          // The "add response" form nests EmojiPicker inside this Content —
+          // its own Popover.Content (the emoji grid) renders through a
+          // separate Radix Portal once opened, so a click/focus landing
+          // there isn't a DOM descendant of this Content and would
+          // otherwise read as an outside interaction and close this popover
+          // the moment the emoji grid opens. Any interaction inside another
+          // Radix popper (data-radix-popper-content-wrapper covers every
+          // Popover/DropdownMenu/etc., not just the emoji picker) is
+          // excluded from dismissal here — same fix as the composer's main
+          // chat instance, generalized to "any nested Radix overlay".
+          onInteractOutside={(e) => {
+            const target = e.target as HTMLElement | null;
+            if (target?.closest("[data-radix-popper-content-wrapper]")) {
+              e.preventDefault();
+            }
+          }}
           className={cn(
             "z-20 flex max-h-96 w-80 max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-background shadow-2xl",
             isLightTheme && "theme-white-blue",
@@ -115,6 +132,10 @@ export default function CannedResponsePicker({ onSelect }: { onSelect: (body: st
                 placeholder="عنوان کوتاه"
                 className="w-full rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 outline-none focus:border-accent-500/50"
               />
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium text-foreground/50">متن پاسخ</span>
+                <EmojiPicker onSelect={(emoji) => setNewBody((prev) => prev + emoji)} />
+              </div>
               <textarea
                 value={newBody}
                 onChange={(e) => setNewBody(e.target.value)}

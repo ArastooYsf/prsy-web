@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { normalizeSocialUrl } from "@/lib/social-platforms";
 import { SITE_CONTENT_TAG, FOOTER_CONTACT_KEY, type FooterContactContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 const MAX_TEXT_LENGTH = 300;
 
@@ -78,6 +79,12 @@ export async function POST(request: Request) {
   // Footer renders via the root layout on every route, not just "/" — the
   // "layout" type revalidates every page nested under it in one call.
   revalidatePath("/", "layout");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: FOOTER_CONTACT_KEY, label: "اطلاعات تماس فوتر" },
+  });
 
   return NextResponse.json({ ok: true, contact });
 }

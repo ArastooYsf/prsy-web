@@ -7,6 +7,7 @@ import { slugify } from "@/lib/slugify";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
 import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -41,6 +42,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "brand", id: brand.id, label: brand.name },
+  });
+
   return NextResponse.json({ brand });
 }
 
@@ -64,5 +72,12 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   await prisma.brand.delete({ where: { id: existing.id } });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "delete",
+    target: { type: "brand", id: existing.id, label: existing.name },
+  });
+
   return NextResponse.json({ ok: true });
 }

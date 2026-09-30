@@ -8,6 +8,7 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import { getMediaUrl } from "@/lib/media";
 import { DEFAULT_HERO_SLIDES, DEFAULT_HERO_SETTINGS, type HeroSlideContent } from "@/lib/site-content-defaults";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
+import ScrollHintArrow from "@/components/ui/ScrollHintArrow";
 
 // Shared by the background and text AnimatePresence trees below so their
 // fades stay in lockstep — they can't be one motion.div because the text's
@@ -41,7 +42,17 @@ export default function Hero({ slides: slidesProp, autoplaySeconds }: HeroProps)
   };
 
   return (
-    <section className="group relative flex min-h-[calc(100vh-3.5rem)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-3rem)]">
+    // The two subtracted values below are the header's real total rendered
+    // height (its search-bar row + nav row together — Header.tsx always
+    // renders both, the search row isn't lg:hidden), measured at 123px below
+    // lg and 111px at lg+. The previous 3.5rem/3rem here only matched the nav
+    // row's own h-14/lg:h-12 and forgot the search row sits above it, so the
+    // hero was taller than "the rest of the viewport" by exactly that much —
+    // pushing the scroll-hint arrow (and the fold itself) below what's
+    // actually visible on load. If Header.tsx's rows ever resize, these need
+    // to move with them. The `dvh` variants additionally correct for mobile
+    // browsers where `100vh` includes area the address bar currently covers.
+    <section className="group relative flex min-h-[calc(100vh-123px)] items-center overflow-hidden py-20 sm:py-28 lg:min-h-[calc(100vh-111px)] [@supports(height:100dvh)]:min-h-[calc(100dvh-123px)] lg:[@supports(height:100dvh)]:min-h-[calc(100dvh-111px)]">
       {/* Full-bleed slide background: the slide image itself (cropped via
           object-cover) is the hero's background, with a dark overlay for
           guaranteed text contrast regardless of what the admin uploads. A
@@ -97,12 +108,12 @@ export default function Hero({ slides: slidesProp, autoplaySeconds }: HeroProps)
               className="prose prose-invert prose-sm mt-4 max-w-none text-balance leading-8 text-white/85 sm:text-lg [&_p]:m-0"
               dangerouslySetInnerHTML={{ __html: slide.description }}
             />
-            <span className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-primary/90 group-focus-within:ring-2 group-focus-within:ring-white group-focus-within:ring-offset-2 group-focus-within:ring-offset-black/50 sm:text-base">
+            <span className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-5 text-sm font-semibold text-primary-foreground shadow-lg shadow-black/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-[1.04] group-hover:shadow-xl group-hover:shadow-primary/40 group-focus-within:-translate-y-0.5 group-focus-within:scale-[1.04] group-focus-within:shadow-xl group-focus-within:shadow-primary/40 group-focus-within:ring-2 group-focus-within:ring-white group-focus-within:ring-offset-2 group-focus-within:ring-offset-black/50 sm:text-base">
               {slide.ctaLabel}
               <ArrowLeft
                 size={18}
                 weight="bold"
-                className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
+                className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1 group-focus-within:-translate-x-1"
               />
             </span>
           </motion.div>
@@ -135,25 +146,11 @@ export default function Hero({ slides: slidesProp, autoplaySeconds }: HeroProps)
         </div>
       </div>
 
-      <motion.a
+      <ScrollHintArrow
         href="#why-us"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
-        aria-label="مشاهده‌ی ادامه‌ی محتوا"
-        className="absolute inset-x-0 bottom-3 z-10 mx-auto flex w-fit flex-col items-center gap-1 text-white/60 transition-colors hover:text-white sm:bottom-4"
-      >
-        <motion.svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </motion.svg>
-      </motion.a>
+        label="مشاهده‌ی ادامه‌ی محتوا"
+        className="bottom-6 text-white/60 hover:text-white sm:bottom-10"
+      />
     </section>
   );
 }

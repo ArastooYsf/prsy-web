@@ -6,6 +6,7 @@ import { sanitizePlainText } from "@/lib/sanitize";
 import { isValidIranPhone } from "@/lib/validation";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { verifyNationalId, summarizeOutcome } from "@/lib/national-id-verification";
+import { notifyNationalIdVerified } from "@/lib/notifications/events";
 import type { User, CustomerType } from "@/generated/prisma/client";
 
 // Fields an admin/support agent can change from the customer detail page —
@@ -114,6 +115,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       target: { type: "customer", id: customer.id, label: `مشتری «${customer.name || customer.email}»` },
       summary: summarizeOutcome(outcome),
     });
+    if (outcome.verified && !existing.nationalIdVerified) {
+      await notifyNationalIdVerified({ id: customer.id });
+    }
   }
 
   return NextResponse.json({ customer: { id: customer.id } });

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { TICKET_STATUS } from "@/lib/status-labels";
+import { notifyTicketStatusChange } from "@/lib/notifications/events";
 
 const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "WAITING_REPLY", "ANSWERED", "CLOSED"];
 
@@ -21,10 +22,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "وضعیت نامعتبر است." }, { status: 400 });
   }
 
-  const ticket = await prisma.ticket.findFirst({ where: { id: params.id, deletedAt: null } });
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: params.id, deletedAt: null },
+    include: { user: { select: { id: true, email: true } } },
+  });
   if (!ticket) {
     return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
   }
+
+  const statusChanged = ticket.status !== status;
 
   await prisma.ticket.update({ where: { id: ticket.id }, data: { status: status as typeof ticket.status } });
 
@@ -34,6 +40,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     target: { type: "ticket", id: ticket.id, label: `تیکت «${ticket.subject}»` },
     summary: `از «${TICKET_STATUS[ticket.status]?.label ?? ticket.status}» به «${TICKET_STATUS[status]?.label ?? status}»`,
   });
+
+  if (statusChanged) {
+    await notifyTicketStatusChange({
+      ticket: { id: ticket.id, subject: ticket.subject },
+      customer: { id: ticket.user.id, email: ticket.user.email },
+      statusLabel: TICKET_STATUS[status]?.label ?? status,
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

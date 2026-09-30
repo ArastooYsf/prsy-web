@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, ABOUT_KEY, type AboutContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 import { ICON_OPTIONS, type IconCardContent } from "@/lib/site-content-defaults";
 
 const MAX_TEXT = 300;
@@ -66,6 +67,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/about");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: ABOUT_KEY, label: "درباره ما" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

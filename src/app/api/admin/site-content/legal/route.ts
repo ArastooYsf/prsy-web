@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, LEGAL_PAGE_KEYS, type LegalPageKey, type LegalPageWithHeading } from "@/lib/site-content";
 import { DEFAULT_LEGAL_HEADINGS, type LegalPageHeadingContent } from "@/lib/site-content-defaults";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 const MAX_HTML_LENGTH = 20000;
 
@@ -86,6 +87,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   for (const path of REVALIDATE_PATHS[page]) revalidatePath(path);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: key, label: `صفحه‌ی «${page}»` },
+  });
 
   return NextResponse.json({ ok: true, html, heading });
 }

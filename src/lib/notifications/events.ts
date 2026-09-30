@@ -6,7 +6,17 @@ import { SITE_URL } from "@/lib/site-url";
 import { sendEmail } from "./email";
 import { sendSms } from "./sms";
 import { createNotification } from "./inapp";
-import { ticketReplyEmail, staffNewMessageEmail, consultationRequestEmail, orderStatusEmail, contractExpiryEmail } from "./templates";
+import {
+  ticketReplyEmail,
+  ticketStatusEmail,
+  staffNewMessageEmail,
+  consultationRequestEmail,
+  orderStatusEmail,
+  orderCreatedEmail,
+  contractExpiryEmail,
+  contractCreatedEmail,
+  accountSecurityAlertEmail,
+} from "./templates";
 
 // Every notify* function below is safe to call without awaiting: internal
 // errors are always caught and logged, never thrown, so a failed email/SMS
@@ -122,6 +132,27 @@ export async function notifyTicketReply({
   }
 }
 
+/** A ticket's status changed WITHOUT a reply message attached (the dedicated status route, separate from the reply route) — notify the customer by email + in-app, reusing the ticket-reply pref (closest topical match). */
+export async function notifyTicketStatusChange({
+  ticket,
+  customer,
+  statusLabel,
+}: {
+  ticket: TicketRef;
+  customer: UserRef;
+  statusLabel: string;
+}): Promise<void> {
+  const link = `${SITE_URL}/account/tickets/${ticket.id}`;
+  const title = `وضعیت تیکت «${ticket.subject}» تغییر کرد`;
+  const message = `وضعیت جدید: ${statusLabel}`;
+
+  await createNotification({ userId: customer.id, title, message, link }).catch(() => {});
+  const prefs = await getNotifyPrefs(customer.id);
+  if (prefs.notifyEmail && prefs.notifyTicketReply) {
+    await trySendEmail(customer.email, title, ticketStatusEmail({ subject: ticket.subject, statusLabel, link }), "تغییر وضعیت تیکت");
+  }
+}
+
 /** A customer posted a new message on an (unassigned) ticket — notify every ADMIN/SUPPORT user by email + in-app, no SMS. */
 export async function notifyStaffNewCustomerMessage({ ticket, customer }: { ticket: TicketRef; customer: UserRef }): Promise<void> {
   const staff = await prisma.user.findMany({
@@ -182,6 +213,25 @@ export async function notifyStaffConsultationRequest(request: ConsultationReques
   return results.filter(Boolean).length;
 }
 
+/** A new order was placed (self-checkout or created for a customer by staff) — notify by email + in-app (reuses the order-status pref, the closest topical match). */
+export async function notifyOrderCreated({
+  order,
+  customer,
+}: {
+  order: { id: string; orderNumber: string };
+  customer: UserRef;
+}): Promise<void> {
+  const link = `${SITE_URL}/account/orders/${order.id}`;
+  const title = `سفارش «${order.orderNumber}» ثبت شد`;
+  const message = "سفارش شما با موفقیت ثبت شد.";
+
+  await createNotification({ userId: customer.id, title, message, link }).catch(() => {});
+  const prefs = await getNotifyPrefs(customer.id);
+  if (prefs.notifyEmail && prefs.notifyOrderStatus) {
+    await trySendEmail(customer.email, title, orderCreatedEmail({ orderNumber: order.orderNumber, link }), "ثبت سفارش");
+  }
+}
+
 /** An order's status changed — notify the customer by email + in-app (no SMS, per spec). */
 export async function notifyOrderStatusChange({
   order,
@@ -201,6 +251,87 @@ export async function notifyOrderStatusChange({
   const prefs = await getNotifyPrefs(customer.id);
   if (prefs.notifyEmail && prefs.notifyOrderStatus) {
     await trySendEmail(customer.email, title, orderStatusEmail({ orderNumber: order.orderNumber, statusLabel, link }), "تغییر وضعیت سفارش");
+  }
+}
+
+export type AccountSecurityEventKind = "password_changed" | "two_factor_enabled" | "two_factor_disabled" | "email_changed";
+
+const ACCOUNT_SECURITY_COPY: Record<AccountSecurityEventKind, { title: string; message: string }> = {
+  password_changed: { title: "رمز عبور حساب شما تغییر کرد", message: "رمز عبور حساب کاربری شما همین الان تغییر کرد." },
+  two_factor_enabled: {
+    title: "احراز هویت دومرحله‌ای فعال شد",
+    message: "احراز هویت دومرحله‌ای (۲FA) برای حساب شما فعال شد.",
+  },
+  two_factor_disabled: {
+    title: "احراز هویت دومرحله‌ای غیرفعال شد",
+    message: "احراز هویت دومرحله‌ای (۲FA) برای حساب شما غیرفعال شد.",
+  },
+  email_changed: { title: "ایمیل حساب شما تغییر کرد", message: "ایمیل حساب کاربری شما به آدرس جدیدی تغییر کرد." },
+};
+
+/**
+ * A security-sensitive change to the account itself (password/2FA/email) —
+ * in-app + email UNCONDITIONALLY, deliberately bypassing the notifyEmail
+ * opt-out that every other notify* function respects: an attacker who
+ * compromises an account could otherwise flip that toggle off first to
+ * silence exactly this alert.
+ */
+export async function notifyAccountSecurityChange({
+  user,
+  kind,
+}: {
+  user: UserRef;
+  kind: AccountSecurityEventKind;
+}): Promise<void> {
+  const { title, message } = ACCOUNT_SECURITY_COPY[kind];
+  await createNotification({ userId: user.id, title, message }).catch(() => {});
+  await trySendEmail(user.email, title, accountSecurityAlertEmail({ title, message }), title);
+}
+
+/** A legal customer's national-ID verification just succeeded — in-app only (informational, not a security alert, no dedicated pref field). Caller is responsible for only calling this on a real verified transition, not every re-check. */
+export async function notifyNationalIdVerified(customer: { id: string }): Promise<void> {
+  await createNotification({
+    userId: customer.id,
+    title: "استعلام شناسه ملی موفق بود",
+    message: "شناسه ملی شرکت شما با موفقیت تأیید شد.",
+  }).catch(() => {});
+}
+
+/** A customer's product comment was approved/rejected — in-app only (content-moderation status, not a security or transactional alert, no dedicated pref field). */
+export async function notifyProductCommentModeration({
+  author,
+  productName,
+  approved,
+}: {
+  author: { id: string };
+  productName: string;
+  approved: boolean;
+}): Promise<void> {
+  await createNotification({
+    userId: author.id,
+    title: approved ? "دیدگاه شما تأیید شد" : "دیدگاه شما رد شد",
+    message: approved
+      ? `دیدگاه شما روی «${productName}» تأیید و منتشر شد.`
+      : `دیدگاه شما روی «${productName}» رد شد.`,
+  }).catch(() => {});
+}
+
+/** A new contract was created for a customer — notify by email + in-app (reuses the contract-expiry pref, the closest topical match). */
+export async function notifyContractCreated({
+  contract,
+  customer,
+}: {
+  contract: { id: string; title: string };
+  customer: UserRef;
+}): Promise<void> {
+  const link = `${SITE_URL}/account/contracts`;
+  const title = `قرارداد جدید «${contract.title}»`;
+  const message = "یک قرارداد جدید برای شما ثبت شد.";
+
+  await createNotification({ userId: customer.id, title, message, link }).catch(() => {});
+  const prefs = await getNotifyPrefs(customer.id);
+  if (prefs.notifyEmail && prefs.notifyContractExpiry) {
+    await trySendEmail(customer.email, title, contractCreatedEmail({ title: contract.title, link }), "قرارداد جدید");
   }
 }
 

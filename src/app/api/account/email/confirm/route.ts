@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MAX_ATTEMPTS, hashVerificationCode } from "@/lib/email-verification";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { notifyAccountSecurityChange } from "@/lib/notifications/events";
+import { createNotification } from "@/lib/notifications/inapp";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -72,6 +75,9 @@ export async function POST(request: Request) {
     }
   }
 
+  const wasRealEmailChange = Boolean(user.pendingEmail);
+  const oldEmail = user.email;
+
   await prisma.user.update({
     where: { id: user.id },
     data: {
@@ -83,6 +89,28 @@ export async function POST(request: Request) {
       emailVerificationAttempts: 0,
     },
   });
+
+  if (wasRealEmailChange) {
+    await logEvent({
+      actor: actorFromSession(session),
+      action: "update",
+      target: { type: "user", id: user.id, label: "تغییر ایمیل" },
+      summary: `از «${oldEmail}» به «${confirmedEmail}»`,
+    });
+    // Sent to the OLD address on purpose — if this change wasn't the real
+    // owner's doing, they can still only be reached at the address an
+    // attacker hasn't taken over yet.
+    await notifyAccountSecurityChange({ user: { id: user.id, email: oldEmail }, kind: "email_changed" });
+  } else {
+    // First-time verification of an email that was never changed — a
+    // lighter "you're confirmed" note, not a security alert, so no email
+    // send (the confirmation email/code they just used already told them).
+    await createNotification({
+      userId: user.id,
+      title: "ایمیل شما تأیید شد",
+      message: `آدرس ایمیل ${confirmedEmail} با موفقیت تأیید شد.`,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ ok: true, email: confirmedEmail });
 }

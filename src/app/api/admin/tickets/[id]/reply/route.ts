@@ -6,6 +6,7 @@ import { sanitizePlainText } from "@/lib/sanitize";
 import { parseAttachmentsInput } from "@/lib/ticket-attachments";
 import { findRecentDuplicateReply } from "@/lib/ticket-reply-dedup";
 import { notifyTicketReply } from "@/lib/notifications/events";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -53,6 +54,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
     ticket: { id: ticket.id, subject: ticket.subject },
     customer: ticket.user,
     replyMessage: message || "یک پیوست جدید برای تیکت شما ارسال شد.",
+  });
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "ticket_reply", id: reply.id, label: `پاسخ به تیکت «${ticket.subject}»` },
   });
 
   return NextResponse.json({ reply });

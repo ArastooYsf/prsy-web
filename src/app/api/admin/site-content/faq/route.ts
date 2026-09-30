@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, FAQ_ITEMS_KEY, type FaqItemContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 const MAX_QUESTION_LENGTH = 300;
 const MAX_ANSWER_LENGTH = 4000;
@@ -46,6 +47,12 @@ export async function POST(request: Request) {
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/");
   revalidatePath("/faq");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: FAQ_ITEMS_KEY, label: "سوالات متداول" },
+  });
 
   return NextResponse.json({ ok: true, items });
 }

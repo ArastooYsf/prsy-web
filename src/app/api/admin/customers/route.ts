@@ -82,6 +82,12 @@ export async function POST(request: Request) {
     },
   });
 
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "customer", id: customer.id, label: `مشتری جدید «${companyName ?? customer.email}»` },
+  });
+
   if (outcome) {
     await logEvent({
       actor: actorFromSession(session),

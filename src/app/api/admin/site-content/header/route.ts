@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, HEADER_NAV_LABELS_KEY, type HeaderNavLabelsContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 import { DEFAULT_HEADER_NAV_LABELS } from "@/lib/site-content-defaults";
 
 const MAX_TEXT = 30;
@@ -44,6 +45,12 @@ export async function POST(request: Request) {
   revalidateTag(SITE_CONTENT_TAG);
   // Header renders via the root layout on every route.
   revalidatePath("/", "layout");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: HEADER_NAV_LABELS_KEY, label: "برچسب‌های منوی هدر" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

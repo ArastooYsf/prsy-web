@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/order-number";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { notifyOrderCreated } from "@/lib/notifications/events";
 
 type ItemInput = { productId: string | null; productName: string; quantity: number; price: number };
 
@@ -69,6 +71,13 @@ export async function POST(request: Request) {
     },
     include: { items: true },
   });
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "order", id: order.id, label: order.orderNumber },
+  });
+  await notifyOrderCreated({ order, customer: { id: customer.id, email: customer.email } });
 
   return NextResponse.json({ order });
 }

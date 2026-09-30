@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateDownloadHostUrl } from "@/lib/download-host";
 import { SITE_CONTENT_TAG, DOWNLOADS_KEY, type DownloadsContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -39,6 +40,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: DOWNLOADS_KEY, label: "بخش دانلودها" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

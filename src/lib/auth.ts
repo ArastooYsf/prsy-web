@@ -5,6 +5,7 @@ import { RateLimiterMemory } from "rate-limiter-flexible";
 import { prisma } from "@/lib/prisma";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { verifyTwoFactorCode } from "@/lib/twofactor";
+import { logEvent, type LogActor } from "@/lib/logger";
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
@@ -78,15 +79,34 @@ export const authOptions: AuthOptions = {
         }
 
         const ip = clientIp(req?.headers);
+        // No session exists yet at any point in this function — every
+        // logEvent call below builds its own literal actor instead of using
+        // actorFromSession. Before a user row is found, `id` is the IP (the
+        // only identity we have); once found, it switches to the real user id.
+        const anonymousActor: LogActor = { id: ip, name: null, email: credentials.email, role: "UNKNOWN" };
 
         const turnstileOk = await verifyTurnstileToken(credentials.turnstileToken, ip !== "unknown" ? ip : undefined);
         if (!turnstileOk) {
+          await logEvent({
+            category: "security",
+            actor: anonymousActor,
+            action: "unauthorized_access",
+            target: { type: "login", id: ip, label: credentials.email },
+            summary: "تأیید Turnstile (ضدربات) ناموفق بود.",
+          });
           throw new Error("TURNSTILE_FAILED");
         }
 
         try {
           await loginIpRateLimiter.consume(ip);
         } catch {
+          await logEvent({
+            category: "security",
+            actor: anonymousActor,
+            action: "unauthorized_access",
+            target: { type: "login", id: ip, label: credentials.email },
+            summary: "تعداد تلاش‌های ورود از این IP بیش از حد مجاز بود.",
+          });
           throw new Error("TOO_MANY_REQUESTS");
         }
 
@@ -95,11 +115,26 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user || user.deletedAt) {
+          await logEvent({
+            actor: anonymousActor,
+            action: "login_failed",
+            target: { type: "login", id: credentials.email, label: credentials.email },
+            summary: "کاربری با این ایمیل یافت نشد.",
+          });
           return null;
         }
 
+        const userActor: LogActor = { id: user.id, name: user.name, email: user.email, role: user.role };
+
         const now = new Date();
         if (user.lockedUntil && user.lockedUntil > now) {
+          await logEvent({
+            category: "security",
+            actor: userActor,
+            action: "unauthorized_access",
+            target: { type: "user", id: user.id, label: user.email },
+            summary: "تلاش ورود به حساب قفل‌شده.",
+          });
           throw new Error("ACCOUNT_LOCKED");
         }
 
@@ -109,7 +144,20 @@ export const authOptions: AuthOptions = {
           // A previously-expired lock (lockedUntil in the past) resets the
           // streak instead of stacking onto a stale count.
           const lockingNow = await registerFailedAttempt(user.id, user.failedLoginAttempts, user.lockedUntil, now);
+          await logEvent({
+            actor: userActor,
+            action: "login_failed",
+            target: { type: "user", id: user.id, label: user.email },
+            summary: "رمز عبور اشتباه بود.",
+          });
           if (lockingNow) {
+            await logEvent({
+              category: "security",
+              actor: userActor,
+              action: "unauthorized_access",
+              target: { type: "user", id: user.id, label: user.email },
+              summary: `حساب به‌دلیل ${MAX_FAILED_LOGIN_ATTEMPTS} تلاش ناموفق پیاپی قفل شد.`,
+            });
             throw new Error("ACCOUNT_LOCKED");
           }
           return null;
@@ -122,6 +170,21 @@ export const authOptions: AuthOptions = {
           const totpValid = await verifyTwoFactorCode(user.twoFactorSecret, credentials.totpCode);
           if (!totpValid) {
             const lockingNow = await registerFailedAttempt(user.id, user.failedLoginAttempts, user.lockedUntil, now);
+            await logEvent({
+              actor: userActor,
+              action: "login_failed",
+              target: { type: "user", id: user.id, label: user.email },
+              summary: "کد احراز هویت دومرحله‌ای اشتباه بود.",
+            });
+            if (lockingNow) {
+              await logEvent({
+                category: "security",
+                actor: userActor,
+                action: "unauthorized_access",
+                target: { type: "user", id: user.id, label: user.email },
+                summary: `حساب به‌دلیل ${MAX_FAILED_LOGIN_ATTEMPTS} تلاش ناموفق پیاپی قفل شد.`,
+              });
+            }
             throw new Error(lockingNow ? "ACCOUNT_LOCKED" : "TOTP_INVALID");
           }
         }
@@ -135,9 +198,23 @@ export const authOptions: AuthOptions = {
 
         if (user.role === "CUSTOMER") {
           if (user.approvalStatus === "PENDING") {
+            await logEvent({
+              category: "security",
+              actor: userActor,
+              action: "unauthorized_access",
+              target: { type: "user", id: user.id, label: user.email },
+              summary: "تلاش ورود قبل از تأیید حساب.",
+            });
             throw new Error("PENDING_APPROVAL");
           }
           if (user.approvalStatus === "REJECTED") {
+            await logEvent({
+              category: "security",
+              actor: userActor,
+              action: "unauthorized_access",
+              target: { type: "user", id: user.id, label: user.email },
+              summary: "تلاش ورود به حساب ردشده.",
+            });
             throw new Error("REJECTED");
           }
         }

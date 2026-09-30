@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { APPROVAL_STATUS } from "@/lib/status-labels";
+import { notifyProductCommentModeration } from "@/lib/notifications/events";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -41,6 +42,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       label: `دیدگاه «${comment.user.name || comment.user.email}» روی «${comment.product.name}»`,
     },
     summary: `به «${APPROVAL_STATUS[action]?.label ?? action}»`,
+  });
+
+  await notifyProductCommentModeration({
+    author: { id: comment.user.id },
+    productName: comment.product.name,
+    approved: action === "APPROVED",
   });
 
   return NextResponse.json({ comment: { id: updated.id, status: updated.status } });

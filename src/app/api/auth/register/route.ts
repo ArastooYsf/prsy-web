@@ -91,6 +91,12 @@ export async function POST(request: Request) {
     },
   });
 
+  await logEvent({
+    actor: { id: user.id, name: user.name, email: user.email, role: user.role },
+    action: "create",
+    target: { type: "user", id: user.id, label: `ثبت‌نام «${companyName ?? user.email}»` },
+  });
+
   if (outcome) {
     await logEvent({
       actor: { id: user.id, name: user.name, email: user.email, role: user.role },

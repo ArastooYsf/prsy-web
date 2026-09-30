@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { notifyAccountSecurityChange } from "@/lib/notifications/events";
 
 export async function PATCH(request: Request) {
   const session = await getServerSession(authOptions);
@@ -28,6 +30,13 @@ export async function PATCH(request: Request) {
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
   await prisma.user.update({ where: { id: user.id }, data: { password: passwordHash } });
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "user", id: user.id, label: "تغییر رمز عبور" },
+  });
+  await notifyAccountSecurityChange({ user: { id: user.id, email: user.email }, kind: "password_changed" });
 
   return NextResponse.json({ ok: true });
 }

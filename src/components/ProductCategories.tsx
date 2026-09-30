@@ -13,7 +13,7 @@ type ProductCategoriesProps = {
 
 export default function ProductCategories({ categories }: ProductCategoriesProps) {
   return (
-    <section className="section-padding relative">
+    <section id="product-categories" className="section-padding relative">
       <div className="container">
         <motion.div
           initial="hidden"

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { normalizeSocialUrl } from "@/lib/social-platforms";
 import { SITE_CONTENT_TAG, TRUST_SEALS_KEY, type TrustSealContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 const MAX_LABEL_LENGTH = 80;
 const MAX_IMAGE_LENGTH = 500;
@@ -52,6 +53,12 @@ export async function POST(request: Request) {
   revalidateTag(SITE_CONTENT_TAG);
   // Footer renders via the root layout on every route, not just "/".
   revalidatePath("/", "layout");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: TRUST_SEALS_KEY, label: "نشان‌های اعتماد" },
+  });
 
   return NextResponse.json({ ok: true, items });
 }

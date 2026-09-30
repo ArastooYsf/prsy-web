@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, FOOTER_CONTENT_KEY, type FooterEditableContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 import { DEFAULT_FOOTER_CONTENT, type FooterLinkContent } from "@/lib/site-content-defaults";
 
 const MAX_TEXT = 300;
@@ -55,6 +56,12 @@ export async function POST(request: Request) {
   revalidateTag(SITE_CONTENT_TAG);
   // Footer renders via the root layout on every route.
   revalidatePath("/", "layout");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: FOOTER_CONTENT_KEY, label: "محتوای فوتر" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

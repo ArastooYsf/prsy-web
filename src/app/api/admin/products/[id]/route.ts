@@ -15,6 +15,7 @@ import {
   normalizePrice,
 } from "@/lib/product-normalize";
 import { validateDownloadHostUrl } from "@/lib/download-host";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -76,6 +77,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   await rememberSpecSuggestions(specs);
   revalidatePath("/products/all");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "product", id: product.id, label: product.name },
+  });
+
   return NextResponse.json({ product });
 }
 
@@ -93,5 +101,12 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   await prisma.product.update({ where: { id: existing.id }, data: { deletedAt: new Date() } });
 
   revalidatePath("/products/all");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "delete",
+    target: { type: "product", id: existing.id, label: existing.name },
+  });
+
   return NextResponse.json({ ok: true });
 }

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, CONTACT_HERO_KEY, type ContactHeroContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 const MAX_TEXT = 200;
 
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/contact");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: CONTACT_HERO_KEY, label: "هیرو صفحه تماس با ما" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

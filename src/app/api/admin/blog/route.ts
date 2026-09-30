@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { revalidatePath } from "next/cache";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 async function ensureUniqueSlug(base: string): Promise<string> {
   const candidate = base || "post";
@@ -62,6 +63,12 @@ export async function POST(request: Request) {
   });
 
   revalidatePath("/blog");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "blog_post", id: post.id, label: post.title },
+  });
 
   return NextResponse.json({ post });
 }

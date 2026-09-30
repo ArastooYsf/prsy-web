@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { deleteUploadedFile } from "@/lib/uploaded-files";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -33,6 +34,12 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 404 });
   }
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "delete",
+    target: { type: "media_asset", id: asset.id, label: asset.url },
+  });
 
   return NextResponse.json({ success: true });
 }

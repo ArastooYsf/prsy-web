@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -32,6 +33,12 @@ export async function POST(request: Request) {
 
   const response = await prisma.cannedResponse.create({
     data: { title, body: responseBody, createdById: session.user.id },
+  });
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "canned_response", id: response.id, label: response.title },
   });
 
   return NextResponse.json({ response });

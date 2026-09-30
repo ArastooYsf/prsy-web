@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { isValidLogFilename, setLogFileLocked } from "@/lib/logger";
+import { actorFromSession, isValidLogFilename, logEvent, setLogFileLocked } from "@/lib/logger";
 
 export async function PATCH(request: Request, { params }: { params: { filename: string } }) {
   const session = await getServerSession(authOptions);
@@ -29,6 +29,18 @@ export async function PATCH(request: Request, { params }: { params: { filename: 
     const message = err instanceof Error ? err.message : "این عملیات مجاز نیست.";
     return NextResponse.json({ error: message }, { status: 403 });
   }
+
+  // Tampering-adjacent (an unlocked file can then be deleted) — always
+  // "security" category regardless of the default for "update", and always
+  // logged, on both directions (locking is routine housekeeping, but the
+  // guarantee this enforces only matters if unlocking is equally visible).
+  await logEvent({
+    category: "security",
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "log_file", id: params.filename, label: params.filename },
+    summary: body.locked ? "قفل شد" : "باز شد",
+  });
 
   return NextResponse.json({ ok: true, locked: body.locked });
 }

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 import { sanitizePlainText, sanitizeRichText } from "@/lib/sanitize";
 import { revalidatePath } from "next/cache";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 async function ensureUniqueSlug(base: string, excludeId: string): Promise<string> {
   const candidate = base || "post";
@@ -64,6 +65,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   revalidatePath(`/blog/${existing.slug}`);
   revalidatePath(`/blog/${slug}`);
 
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "blog_post", id: post.id, label: post.title },
+  });
+
   return NextResponse.json({ post });
 }
 
@@ -83,6 +90,12 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
 
   revalidatePath("/blog");
   revalidatePath(`/blog/${existing.slug}`);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "delete",
+    target: { type: "blog_post", id: existing.id, label: existing.title },
+  });
 
   return NextResponse.json({ ok: true });
 }

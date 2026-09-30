@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, SPEC_TEMPLATES_KEY, cleanSpecTemplates } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -36,5 +37,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/account/admin/products", "layout");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: SPEC_TEMPLATES_KEY, label: "قالب‌های مشخصات فنی" },
+  });
+
   return NextResponse.json({ ok: true, templates });
 }

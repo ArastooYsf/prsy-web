@@ -15,6 +15,7 @@ import {
   normalizePrice,
 } from "@/lib/product-normalize";
 import { validateDownloadHostUrl } from "@/lib/download-host";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -70,5 +71,12 @@ export async function POST(request: Request) {
 
   await rememberSpecSuggestions(specs);
   revalidatePath("/products/all");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "product", id: product.id, label: product.name },
+  });
+
   return NextResponse.json({ product }, { status: 201 });
 }

@@ -4,6 +4,7 @@ import ProductCategories from "@/components/ProductCategories";
 import AuxiliaryServices from "@/components/AuxiliaryServices";
 import { getMenuTaxonomy } from "@/lib/menu-taxonomy";
 import ThemedGridBackdrop from "@/components/ui/ThemedGridBackdrop";
+import ScrollHintArrow from "@/components/ui/ScrollHintArrow";
 
 export const metadata: Metadata = {
   title: "محصولات",
@@ -16,7 +17,7 @@ export default async function ProductsPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden pb-8 pt-14 sm:pt-20">
+      <section className="relative overflow-hidden pb-12 pt-14 sm:pb-14 sm:pt-20">
         <ThemedGridBackdrop />
         <div className="container relative text-center">
           <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-1.5 text-xs font-medium text-foreground/70 backdrop-blur-sm sm:text-sm">
@@ -40,6 +41,12 @@ export default async function ProductsPage() {
             </Link>
           </div>
         </div>
+
+        <ScrollHintArrow
+          href="#product-categories"
+          label="مشاهده‌ی دسته‌بندی محصولات"
+          className="bottom-0 text-foreground/40 hover:text-foreground/80 sm:bottom-1"
+        />
       </section>
 
       <ProductCategories categories={categories} />

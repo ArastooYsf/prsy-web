@@ -7,6 +7,7 @@ import { slugify } from "@/lib/slugify";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { ensureUniqueSlug } from "@/lib/unique-slug";
 import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -35,5 +36,12 @@ export async function POST(request: Request) {
   const brand = await prisma.brand.create({ data: { name, slug, description, logo, order } });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "brand", id: brand.id, label: brand.name },
+  });
+
   return NextResponse.json({ brand }, { status: 201 });
 }

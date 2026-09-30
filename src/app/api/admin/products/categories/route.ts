@@ -10,6 +10,7 @@ import { CATEGORY_ICON_KEYS } from "@/lib/category-icons";
 import { PRODUCT_TAXONOMY_TAG } from "@/lib/menu-taxonomy";
 import { normalizePreviewSpecKeys } from "@/lib/product-spec-templates";
 import { getSpecTemplates } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 function normalizeIcon(input: unknown): string | null {
   return typeof input === "string" && (CATEGORY_ICON_KEYS as readonly string[]).includes(input) ? input : null;
@@ -81,5 +82,12 @@ export async function POST(request: Request) {
   });
   revalidatePath("/products/all");
   revalidateTag(PRODUCT_TAXONOMY_TAG);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "product_category", id: category.id, label: category.name },
+  });
+
   return NextResponse.json({ category }, { status: 201 });
 }

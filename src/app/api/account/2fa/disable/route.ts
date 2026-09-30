@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { verifyTwoFactorCode } from "@/lib/twofactor";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { notifyAccountSecurityChange } from "@/lib/notifications/events";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -27,6 +29,15 @@ export async function POST(request: Request) {
     where: { id: user.id },
     data: { twoFactorSecret: null, twoFactorEnabled: false },
   });
+
+  await logEvent({
+    category: "security",
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "user", id: user.id, label: "احراز هویت دومرحله‌ای" },
+    summary: "غیرفعال شد",
+  });
+  await notifyAccountSecurityChange({ user: { id: user.id, email: user.email }, kind: "two_factor_disabled" });
 
   return NextResponse.json({ ok: true });
 }

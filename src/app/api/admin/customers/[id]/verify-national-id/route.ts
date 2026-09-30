@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { verifyNationalId, summarizeOutcome } from "@/lib/national-id-verification";
+import { notifyNationalIdVerified } from "@/lib/notifications/events";
 
 // Manual "تلاش مجدد استعلام" (retry inquiry) for the advisory list at
 // /account/admin/customers/pending — for a LEGAL customer whose automatic
@@ -42,6 +43,8 @@ export async function POST(_request: Request, { params }: { params: { id: string
   if (!outcome!.verified) {
     return NextResponse.json({ error: outcome!.message }, { status: 422 });
   }
+
+  await notifyNationalIdVerified({ id: customer.id });
 
   return NextResponse.json({ customer: { id: updated.id, nationalIdVerified: updated.nationalIdVerified } });
 }

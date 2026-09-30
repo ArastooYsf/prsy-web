@@ -4,6 +4,7 @@ import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SITE_CONTENT_TAG, PRODUCT_FILTERS_KEY, DEFAULT_PRODUCT_FILTERS_CONTENT, type ProductFiltersContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 
 function normalizeToggle(input: unknown, fallback: { enabled: boolean; order: number }) {
   if (!input || typeof input !== "object") return fallback;
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
   });
 
   revalidateTag(SITE_CONTENT_TAG);
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: PRODUCT_FILTERS_KEY, label: "فیلترهای محصول" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

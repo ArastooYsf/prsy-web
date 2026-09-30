@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, SOCIALPROOF_KEY, type SocialProofContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 import type { StatContent, TestimonialContent } from "@/lib/site-content-defaults";
 
 const MAX_TEXT = 300;
@@ -75,6 +76,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: SOCIALPROOF_KEY, label: "بخش اعتماد مشتریان" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

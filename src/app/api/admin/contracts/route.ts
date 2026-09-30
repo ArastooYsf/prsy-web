@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CONTRACT_STATUSES } from "@/lib/status-labels";
+import { actorFromSession, logEvent } from "@/lib/logger";
+import { notifyContractCreated } from "@/lib/notifications/events";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -34,6 +36,13 @@ export async function POST(request: Request) {
   const contract = await prisma.contract.create({
     data: { userId, title, type, startDate, endDate, status, fileUrl },
   });
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "create",
+    target: { type: "contract", id: contract.id, label: contract.title },
+  });
+  await notifyContractCreated({ contract, customer: { id: customer.id, email: customer.email } });
 
   return NextResponse.json({ contract });
 }

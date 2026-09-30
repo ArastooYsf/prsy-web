@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { SITE_CONTENT_TAG, FEATURES_KEY, type FeaturesContent } from "@/lib/site-content";
+import { actorFromSession, logEvent } from "@/lib/logger";
 import { ICON_OPTIONS, type IconCardContent } from "@/lib/site-content-defaults";
 
 const MAX_TEXT = 300;
@@ -60,6 +61,12 @@ export async function POST(request: Request) {
 
   revalidateTag(SITE_CONTENT_TAG);
   revalidatePath("/");
+
+  await logEvent({
+    actor: actorFromSession(session),
+    action: "update",
+    target: { type: "site_content", id: FEATURES_KEY, label: "بخش ویژگی‌ها" },
+  });
 
   return NextResponse.json({ ok: true, content });
 }

@@ -34,6 +34,7 @@ export default async function CheckoutPage() {
             phone: user?.phone ?? "",
             address: user?.address ?? "",
           }}
+          isStaff={session.user.role === "ADMIN" || session.user.role === "SUPPORT"}
         />
       </div>
     </section>

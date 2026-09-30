@@ -95,6 +95,18 @@ export function staffNewMessageEmail({ subject, customerName, link }: { subject:
   });
 }
 
+export function ticketStatusEmail({ subject, statusLabel, link }: { subject: string; statusLabel: string; link: string }): string {
+  return emailLayout({
+    title: `وضعیت تیکت «${subject}» تغییر کرد`,
+    bodyHtml: `
+      <p style="margin:0 0 8px;color:${TEXT};font-weight:bold;">وضعیت تیکت شما به‌روزرسانی شد</p>
+      <p style="margin:0 0 4px;color:${MUTED};">موضوع تیکت: <span style="color:${TEXT};">${escapeHtml(subject)}</span></p>
+      <p style="margin:12px 0 0;padding:12px 14px;background:rgba(255,255,255,0.04);border-radius:10px;color:${TEXT};">وضعیت جدید: <strong style="color:${ACCENT};">${escapeHtml(statusLabel)}</strong></p>
+      ${ctaButton("مشاهده تیکت", link)}
+    `,
+  });
+}
+
 export function consultationRequestEmail({
   name,
   phone,
@@ -123,6 +135,17 @@ export function consultationRequestEmail({
   });
 }
 
+export function orderCreatedEmail({ orderNumber, link }: { orderNumber: string; link: string }): string {
+  return emailLayout({
+    title: `سفارش «${orderNumber}» ثبت شد`,
+    bodyHtml: `
+      <p style="margin:0 0 8px;color:${TEXT};font-weight:bold;">سفارش شما با موفقیت ثبت شد</p>
+      <p style="margin:0 0 4px;color:${MUTED};">شماره سفارش: <span style="color:${TEXT};">${escapeHtml(orderNumber)}</span></p>
+      ${ctaButton("مشاهده سفارش", link)}
+    `,
+  });
+}
+
 export function orderStatusEmail({
   orderNumber,
   statusLabel,
@@ -139,6 +162,28 @@ export function orderStatusEmail({
       <p style="margin:0 0 4px;color:${MUTED};">شماره سفارش: <span style="color:${TEXT};">${escapeHtml(orderNumber)}</span></p>
       <p style="margin:12px 0 0;padding:12px 14px;background:rgba(255,255,255,0.04);border-radius:10px;color:${TEXT};">وضعیت جدید: <strong style="color:${ACCENT};">${escapeHtml(statusLabel)}</strong></p>
       ${ctaButton("مشاهده جزئیات سفارش", link)}
+    `,
+  });
+}
+
+export function accountSecurityAlertEmail({ title, message }: { title: string; message: string }): string {
+  return emailLayout({
+    title,
+    bodyHtml: `
+      <p style="margin:0 0 8px;color:${TEXT};font-weight:bold;">${escapeHtml(title)}</p>
+      <p style="margin:0;color:${MUTED};">${escapeHtml(message)}</p>
+      <p style="margin:16px 0 0;padding:12px 14px;background:rgba(239,68,68,0.08);border-radius:10px;color:${TEXT};font-size:12px;">اگر این تغییر را شما انجام نداده‌اید، فوراً از طریق صفحه تماس با ما با پشتیبانی تماس بگیرید.</p>
+    `,
+  });
+}
+
+export function contractCreatedEmail({ title, link }: { title: string; link: string }): string {
+  return emailLayout({
+    title: `قرارداد جدید «${title}»`,
+    bodyHtml: `
+      <p style="margin:0 0 8px;color:${TEXT};font-weight:bold;">یک قرارداد جدید برای شما ثبت شد</p>
+      <p style="margin:0 0 4px;color:${MUTED};">عنوان قرارداد: <span style="color:${TEXT};">${escapeHtml(title)}</span></p>
+      ${ctaButton("مشاهده قرارداد", link)}
     `,
   });
 }

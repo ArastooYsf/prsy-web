@@ -78,6 +78,15 @@ const TYPING_STALE_MS = 5000;
 // keystroke doesn't hit the API.
 const TYPING_PING_THROTTLE_MS = 2500;
 const SEND_COOLDOWN_MS = 400;
+// Same REST-polling approach as typing status, applied to the messages
+// themselves: the other party's new replies (and any edit/delete) show up
+// within this interval without the viewer refreshing the page.
+const MESSAGE_POLL_MS = 4000;
+
+// The composer grows with typed content up to this height, then scrolls
+// internally — same idea as a chat app's auto-sizing input, done with the
+// textarea's own scrollHeight rather than a sizing library.
+const COMPOSER_MAX_HEIGHT_PX = 160;
 
 // Shared width ceiling for every bubble (text or image), matching Telegram's
 // shrink-to-fit behavior: short content hugs itself, long content wraps at
@@ -318,6 +327,14 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
   const lastTypingPingRef = useRef(0);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, COMPOSER_MAX_HEIGHT_PX)}px`;
+  }, [text]);
 
   useEffect(() => {
     // autoFocus alone leaves the caret at position 0 in some browsers when the
@@ -389,6 +406,42 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
       clearInterval(interval);
     };
   }, [typingEndpoint, canReply]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const poll = async () => {
+      const res = await fetch(replyEndpoint).catch(() => null);
+      if (cancelled || !res?.ok) return;
+      const { messages: fetched }: { messages: ChatMessage[] } = await res.json();
+      // The ticket's own opening message (isReply: false) isn't part of this
+      // endpoint's response — only actual replies are, so it's kept as-is.
+      // The reply list is reconciled rather than wholesale-replaced: a poll
+      // request can still be in flight (queried the DB before) when
+      // sendMessage's own optimistic append lands, so a plain replace here
+      // would make the just-sent message flicker away until the next tick.
+      // Any reply the poll snapshot doesn't know about yet is kept — it's
+      // always a genuine server-confirmed send (messages only enter state
+      // after a successful POST response with a real id), never a phantom.
+      setMessages((prev) => {
+        const openingMessage = prev.find((m) => !m.isReply);
+        const fetchedIds = new Set(fetched.map((m) => m.id));
+        const localOnly = prev.filter((m) => m.isReply && !fetchedIds.has(m.id));
+        const replies = [...fetched, ...localOnly].sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
+        return openingMessage ? [openingMessage, ...replies] : replies;
+      });
+    };
+
+    const interval = setInterval(poll, MESSAGE_POLL_MS);
+    // No immediate poll() call here (unlike the typing-status effect above):
+    // initialMessages from SSR is already the full, current list, so firing
+    // on mount would just be a redundant round-trip.
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [replyEndpoint]);
 
   const pingTyping = () => {
     const now = Date.now();
@@ -660,7 +713,7 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
         </div>
       )}
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.map((m, i) => {
           // "Mine" is the viewer's actual identity, not their role — two
           // different SUPPORT agents on the same ticket must each see only
@@ -957,15 +1010,16 @@ export default function TicketChat({ ticketId, initialMessages, viewerRole, view
 
             <div className="flex items-end gap-2">
               <textarea
+                ref={composerRef}
                 value={text}
                 onChange={(e) => {
                   setText(e.target.value);
                   if (e.target.value.trim()) pingTyping();
                 }}
                 onKeyDown={handleTextareaKeyDown}
-                rows={2}
+                rows={1}
                 placeholder="پیام خود را بنویسید..."
-                className="flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-foreground outline-none placeholder:text-foreground/40"
+                className="max-h-40 flex-1 resize-none overflow-y-auto bg-transparent px-2 py-1.5 text-sm text-foreground outline-none placeholder:text-foreground/40"
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}

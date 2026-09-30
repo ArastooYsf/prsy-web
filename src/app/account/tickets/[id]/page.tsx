@@ -6,6 +6,7 @@ import { TICKET_STATUS } from "@/lib/status-labels";
 import TicketChat, { type ChatMessage } from "@/components/TicketChat";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { debugSlowLoad } from "@/lib/debug-slow-load";
+import { mapTicketReplyToChatMessage } from "@/lib/ticket-chat-messages";
 
 export const dynamic = "force-dynamic";
 
@@ -41,21 +42,7 @@ export default async function AccountTicketDetailPage({ params }: { params: { id
       editedAt: null,
       deletedAt: null,
     },
-    ...ticket.replies.map((reply) => ({
-      id: reply.id,
-      authorId: reply.authorId,
-      authorLabel: reply.authorId === userId ? "شما" : "تیم پشتیبانی",
-      isStaff: reply.authorId !== userId,
-      isReply: true,
-      message: reply.deletedAt ? "" : reply.message,
-      attachments: reply.deletedAt
-        ? []
-        : reply.attachments.map((a) => ({ id: a.id, url: a.url, filename: a.filename, mimeType: a.mimeType, size: a.size })),
-      createdAt: reply.createdAt.toISOString(),
-      seenAt: reply.seenAt ? reply.seenAt.toISOString() : null,
-      editedAt: reply.editedAt ? reply.editedAt.toISOString() : null,
-      deletedAt: reply.deletedAt ? reply.deletedAt.toISOString() : null,
-    })),
+    ...ticket.replies.map((reply) => mapTicketReplyToChatMessage(reply, userId, "customer")),
   ];
 
   return (

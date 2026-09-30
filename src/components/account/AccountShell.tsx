@@ -16,6 +16,15 @@ function isBareShellRoute(pathname: string): boolean {
   return /^\/account\/admin\/blog\/[^/]+$/.test(pathname);
 }
 
+// Only the ticket detail view needs its message list to scroll internally
+// (fixed-height chat box, header/composer pinned) rather than letting the
+// whole page grow and scroll as one unit — see the min-h-0 comment below.
+// Every other account page relies on the page-level scroll, so this stays
+// scoped to just these two routes instead of changing the shared behavior.
+function isTicketDetailRoute(pathname: string): boolean {
+  return /^\/account\/(admin\/)?tickets\/[^/]+$/.test(pathname);
+}
+
 type AccountShellProps = {
   role: string;
   userLabel: string;
@@ -52,10 +61,11 @@ export default function AccountShell({ role, userLabel, emailVerified, children 
           min-h-0 here makes flex size each item to its real content instead
           (content-based auto min-height), so this container's own
           pb-16/sm:pb-24 is always correctly included. TicketChat (the one
-          view that genuinely needs to stretch-and-scroll internally) has
-          its own `min-h-[420px]` + independent overflow-y-auto message
-          list and already falls back to whichever ancestor really
-          overflows, so it isn't relying on this specific min-h-0. */}
+          view that genuinely needs to stretch-and-scroll internally) gets
+          min-h-0 threaded back in locally — see isTicketDetailRoute below —
+          through the <section> and children wrapper further down, so only
+          its own chain becomes height-bound; every other route keeps this
+          container's content-based sizing. */}
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-16 sm:pb-24">
         {showVerifyBanner && (
           <div className="sticky top-0 z-30 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 border-b border-amber-500/30 bg-amber-500/15 px-4 py-2.5 text-center text-xs font-medium text-amber-500">
@@ -69,11 +79,11 @@ export default function AccountShell({ role, userLabel, emailVerified, children 
           </div>
         )}
         <section
-          className={
+          className={`${
             isAdmin
               ? "mx-auto flex w-full max-w-[1680px] flex-1 flex-col px-4 py-6 sm:px-6 sm:py-12 lg:px-10"
               : "container flex flex-1 flex-col py-6 sm:py-12"
-          }
+          } ${isTicketDetailRoute(pathname) ? "min-h-0" : ""}`}
         >
           <div className="mb-8 flex flex-col gap-4 border-b border-foreground/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -88,7 +98,7 @@ export default function AccountShell({ role, userLabel, emailVerified, children 
               <ThemeToggleButton />
             </div>
           </div>
-          <div className="flex flex-1 flex-col">{children}</div>
+          <div className={`flex flex-1 flex-col ${isTicketDetailRoute(pathname) ? "min-h-0" : ""}`}>{children}</div>
         </section>
       </div>
     </div>

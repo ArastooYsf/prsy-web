@@ -7,6 +7,36 @@ import { parseAttachmentsInput } from "@/lib/ticket-attachments";
 import { findRecentDuplicateReply } from "@/lib/ticket-reply-dedup";
 import { notifyTicketReply } from "@/lib/notifications/events";
 import { actorFromSession, logEvent } from "@/lib/logger";
+import { mapTicketReplyToChatMessage } from "@/lib/ticket-chat-messages";
+
+// See the customer-side GET handler (src/app/api/account/tickets/[id]/reply)
+// for why this returns the full reply list rather than an incremental diff.
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPPORT")) {
+    return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 401 });
+  }
+
+  const ticket = await prisma.ticket.findFirst({
+    where: { id: params.id, deletedAt: null },
+    select: { id: true },
+  });
+
+  if (!ticket) {
+    return NextResponse.json({ error: "تیکت یافت نشد." }, { status: 404 });
+  }
+
+  const replies = await prisma.ticketReply.findMany({
+    where: { ticketId: ticket.id },
+    include: { author: true, attachments: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return NextResponse.json({
+    messages: replies.map((reply) => mapTicketReplyToChatMessage(reply, session.user.id, "staff")),
+  });
+}
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);

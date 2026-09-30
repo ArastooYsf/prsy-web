@@ -1,16 +1,37 @@
 import { Check, X, Minus } from "lucide-react";
 
-type Rule = { key: string; label: string; test: (pw: string) => boolean };
+type Rule = { key: string; label: string; required: boolean; test: (pw: string) => boolean };
 
 // Same floor as the server's own check (password.length < 8 in
-// /api/auth/register) — the other four are purely UI-side guidance, not
-// enforced at submit, so tightening/loosening them later needs no API change.
+// /api/auth/register and /api/account/password) — the other four are purely
+// UI-side guidance, not enforced at submit, so tightening/loosening them
+// later needs no API change. `required` drives the badge shown per rule.
 const RULES: Rule[] = [
-  { key: "length", label: "حداقل ۸ کاراکتر", test: (pw) => pw.length >= 8 },
-  { key: "lower", label: "حداقل یک حرف کوچک انگلیسی (a-z)", test: (pw) => /[a-z]/.test(pw) },
-  { key: "upper", label: "حداقل یک حرف بزرگ انگلیسی (A-Z)", test: (pw) => /[A-Z]/.test(pw) },
-  { key: "number", label: "حداقل یک عدد (0-9)", test: (pw) => /[0-9]/.test(pw) },
-  { key: "special", label: "حداقل یک کاراکتر خاص (!@#$%...)", test: (pw) => /[^a-zA-Z0-9]/.test(pw) },
+  { key: "length", label: "باید حداقل ۸ کاراکتر باشد", required: true, test: (pw) => pw.length >= 8 },
+  {
+    key: "lower",
+    label: "بهتر است حداقل یک حرف کوچک انگلیسی (a-z) داشته باشد",
+    required: false,
+    test: (pw) => /[a-z]/.test(pw),
+  },
+  {
+    key: "upper",
+    label: "بهتر است حداقل یک حرف بزرگ انگلیسی (A-Z) داشته باشد",
+    required: false,
+    test: (pw) => /[A-Z]/.test(pw),
+  },
+  {
+    key: "number",
+    label: "بهتر است حداقل یک عدد (0-9) داشته باشد",
+    required: false,
+    test: (pw) => /[0-9]/.test(pw),
+  },
+  {
+    key: "special",
+    label: "بهتر است حداقل یک کاراکتر خاص (!@#$%...) داشته باشد",
+    required: false,
+    test: (pw) => /[^a-zA-Z0-9]/.test(pw),
+  },
 ];
 
 function strengthOf(metCount: number): { label: string; barClass: string; textClass: string } {
@@ -56,7 +77,14 @@ export default function PasswordStrengthMeter({ password }: { password: string }
               ) : (
                 <Minus className="size-3.5 shrink-0" />
               )}
-              {rule.label}
+              <span>{rule.label}</span>
+              <span
+                className={`ms-auto inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                  rule.required ? "bg-red-500/10 text-red-500" : "bg-foreground/10 text-foreground/50"
+                }`}
+              >
+                {rule.required ? "اجباری" : "اختیاری"}
+              </span>
             </li>
           );
         })}

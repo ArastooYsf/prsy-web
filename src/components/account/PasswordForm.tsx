@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ToastProvider";
 import PasswordInput from "@/components/ui/PasswordInput";
+import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -71,6 +72,7 @@ export default function PasswordForm() {
           className={inputClass}
           placeholder="حداقل ۸ کاراکتر"
         />
+        <PasswordStrengthMeter password={newPassword} />
       </div>
 
       <div>

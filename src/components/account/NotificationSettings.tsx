@@ -53,12 +53,12 @@ function Toggle({ checked, disabled, onClick }: { checked: boolean; disabled?: b
     >
       <span
         aria-hidden
+        dir="ltr"
         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
           checked ? "bg-accent-500" : "bg-foreground/15"
         }`}
       >
         <span
-          dir="ltr"
           className={`inline-block size-3.5 transform rounded-full bg-white shadow-sm transition-transform ${
             checked ? "translate-x-[18px]" : "translate-x-[4px]"
           }`}

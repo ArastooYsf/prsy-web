@@ -63,3 +63,27 @@ export function scoreGradientColor(score: number): string {
   const [r, g, b] = GRADIENT_STOPS[GRADIENT_STOPS.length - 1][1];
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+// Core Web Vitals good/needs-improvement/poor control points, straight from
+// web.dev/vitals and web.dev's Lighthouse scoring docs — deliberately a
+// separate table from the 0-100 score tiers above, since e.g. an LCP of 2.5s
+// is "good" but has nothing to do with the 50/90 score cutoffs.
+export type VitalKey = "lcp" | "cls" | "tbt" | "fcp";
+
+const VITAL_THRESHOLDS: Record<VitalKey, { good: number; poor: number }> = {
+  lcp: { good: 2.5, poor: 4 }, // seconds
+  cls: { good: 0.1, poor: 0.25 }, // unitless
+  tbt: { good: 200, poor: 600 }, // milliseconds
+  fcp: { good: 1.8, poor: 3 }, // seconds
+};
+
+export function vitalTier(key: VitalKey, value: number): ScoreTier {
+  const { good, poor } = VITAL_THRESHOLDS[key];
+  if (value <= good) return "good";
+  if (value <= poor) return "warning";
+  return "critical";
+}
+
+export function vitalTierTextClass(key: VitalKey, value: number): string {
+  return TIER_TEXT_CLASS[vitalTier(key, value)];
+}

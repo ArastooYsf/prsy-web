@@ -9,7 +9,7 @@ import { CATEGORY_META } from "@/components/admin/LogCategoryMeta";
 import { jalaliDayLabel, type StatsRange } from "@/lib/stats-range";
 import { ALL_LOG_CATEGORIES, CATEGORY_LABELS_FA, type LogCategory } from "@/lib/log-types";
 import type { CategoryTrendPoint } from "@/lib/log-stats";
-import type { LighthouseRun } from "@/lib/lighthouse";
+import type { LighthouseRun, LighthouseStrategy } from "@/lib/lighthouse";
 
 // One line per log category, all sharing an axis — replaces what used to be
 // two separate single-series 30-day-only charts (crash, warning). A time
@@ -107,21 +107,79 @@ function formatRunLabel(iso: string): string {
   return toPersianDigits(`${jalaliDayLabel(d)} ${time}`);
 }
 
+type StrategyFilter = LighthouseStrategy | "both";
+
+// Same validated categorical pair used for StorageTrendChart's two series
+// (public/private uploads) — reused here for mobile/desktop rather than
+// re-running the palette validator for what's the same "two fixed-identity
+// series" job (node scripts/validate_palette.js "#3987e5,#d95926" already
+// passed: lightness band, CVD ΔE 26.8, normal-vision ΔE 31.8, contrast).
+const MOBILE_COLOR = "#3987e5";
+const DESKTOP_COLOR = "#d95926";
+
+function StrategyFilterSelect({ value, onChange }: { value: StrategyFilter; onChange: (v: StrategyFilter) => void }) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value as StrategyFilter)}
+      aria-label="فیلتر استراتژی تست سرعت"
+      className="min-h-11 rounded-lg border border-foreground/10 bg-foreground/5 px-3 text-xs font-medium text-foreground/70 outline-none transition-colors focus:border-accent-500/50"
+    >
+      <option value="both" className="bg-background">
+        هر دو
+      </option>
+      <option value="mobile" className="bg-background">
+        موبایل
+      </option>
+      <option value="desktop" className="bg-background">
+        دسکتاپ
+      </option>
+    </select>
+  );
+}
+
+type ScoreDotPayload = { mobileScore?: number; desktopScore?: number };
+
+// Dot fill still encodes score tier (good/warning/critical) — a secondary
+// encoding layered on top of the line's own stroke color, which already
+// carries series identity (mobile vs desktop) via MOBILE_COLOR/DESKTOP_COLOR
+// and the legend, so this never has to double as identity by itself.
+function scoreDot(scoreKey: keyof ScoreDotPayload) {
+  function ScoreDot(props: { cx?: number; cy?: number; payload?: ScoreDotPayload; key?: React.Key | null }) {
+    const { cx, cy, payload, key } = props;
+    const value = payload?.[scoreKey];
+    if (cx == null || cy == null || value == null) return <g key={key} />;
+    return <circle key={key} cx={cx} cy={cy} r={4} fill={scoreTierHex(value)} stroke="none" />;
+  }
+  return ScoreDot;
+}
+
 export function LighthouseTrendChart({ history }: { history: LighthouseRun[] }) {
-  if (history.length < 2) {
+  const [filter, setFilter] = useState<StrategyFilter>("both");
+  const filtered = filter === "both" ? history : history.filter((r) => r.strategy === filter);
+
+  if (filtered.length < 2) {
     return (
-      <ChartCard title="روند امتیاز سرعت" height={56}>
+      <ChartCard title="روند امتیاز سرعت" height={56} action={<StrategyFilterSelect value={filter} onChange={setFilter} />}>
         <div className="flex h-full items-center justify-center text-center text-sm text-foreground/40">
-          برای نمایش روند، حداقل به دو بار اجرای تست سرعت نیاز است.
+          برای نمایش روند، حداقل به دو بار اجرای تست سرعت (با همین فیلتر) نیاز است.
         </div>
       </ChartCard>
     );
   }
 
-  const data = history.map((run) => ({ label: formatRunLabel(run.timestamp), score: run.performanceScore }));
+  const sorted = [...filtered].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  const data = sorted.map((run) => ({
+    label: formatRunLabel(run.timestamp),
+    mobileScore: run.strategy === "mobile" ? run.performanceScore : undefined,
+    desktopScore: run.strategy === "desktop" ? run.performanceScore : undefined,
+  }));
+
+  const showMobile = filter !== "desktop";
+  const showDesktop = filter !== "mobile";
 
   return (
-    <ChartCard title="روند امتیاز سرعت" height={56}>
+    <ChartCard title="روند امتیاز سرعت" height={56} action={<StrategyFilterSelect value={filter} onChange={setFilter} />}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--foreground) / 0.08)" vertical={false} />
@@ -131,20 +189,33 @@ export function LighthouseTrendChart({ history }: { history: LighthouseRun[] }) 
             contentStyle={tooltipStyle}
             labelStyle={tooltipLabelStyle}
             cursor={{ stroke: "rgb(var(--foreground) / 0.15)" }}
-            formatter={(value) => [toPersianDigits(String(value ?? "")), "امتیاز Performance"]}
+            formatter={(value, name) => [toPersianDigits(String(value ?? "")), name]}
           />
-          <Line
-            type="monotone"
-            dataKey="score"
-            stroke="#60a5fa"
-            strokeWidth={2}
-            dot={(props: { cx?: number; cy?: number; payload?: { score: number }; key?: React.Key | null }) => {
-              const { cx, cy, payload, key } = props;
-              if (cx == null || cy == null || !payload) return <g key={key} />;
-              return <circle key={key} cx={cx} cy={cy} r={4} fill={scoreTierHex(payload.score)} stroke="none" />;
-            }}
-            activeDot={{ r: 5 }}
-          />
+          {filter === "both" && <Legend content={(p) => <ChartLegend payload={p.payload} />} />}
+          {showMobile && (
+            <Line
+              type="monotone"
+              dataKey="mobileScore"
+              name="موبایل"
+              stroke={MOBILE_COLOR}
+              strokeWidth={2}
+              connectNulls
+              dot={scoreDot("mobileScore")}
+              activeDot={{ r: 5 }}
+            />
+          )}
+          {showDesktop && (
+            <Line
+              type="monotone"
+              dataKey="desktopScore"
+              name="دسکتاپ"
+              stroke={DESKTOP_COLOR}
+              strokeWidth={2}
+              connectNulls
+              dot={scoreDot("desktopScore")}
+              activeDot={{ r: 5 }}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </ChartCard>

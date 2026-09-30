@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { Activity, AlertTriangle, Gauge, Search, ShieldAlert, type LucideIcon } from "lucide-react";
 import { formatNumber, toPersianDigits } from "@/lib/format-number";
 import { formatJalaliDateTime } from "@/lib/jalali";
-import { scoreGradientColor } from "@/lib/score-tier";
+import { scoreGradientColor, vitalTierTextClass, type VitalKey } from "@/lib/score-tier";
 import { useToast } from "@/components/ToastProvider";
 import { LighthouseTrendChart, LogEventsTrendChart } from "@/components/admin/LogsDashboardChartsLazy";
 import type { UptimeStats, DailyUptimeSegment } from "@/lib/uptime";
 import type { CategoryEventStats, CategoryTrendPoint } from "@/lib/log-stats";
-import type { LighthouseRun } from "@/lib/lighthouse";
+import type { LighthouseOpportunity, LighthouseRun } from "@/lib/lighthouse";
+import { STRATEGY_LABELS_FA, type LighthouseStrategy } from "@/lib/lighthouse-strategy";
 
 type LogsDashboardProps = {
   uptime: UptimeStats;
@@ -168,52 +169,265 @@ function UptimeCard({
   );
 }
 
-// Simulated progress while the audit is running (Lighthouse's own CLI here
-// gives no streamable progress signal), asymptotically approaching 92% so it
-// never falsely claims completion before the real result lands. Jumps to the
-// real score the instant the request resolves.
-function SpeedTestCard({
-  latest,
-  running,
-  progress,
-  onRun,
-}: {
-  latest: LighthouseRun | null;
-  running: boolean;
-  progress: number;
-  onRun: () => void;
-}) {
-  const barPercent = running ? progress : (latest?.performanceScore ?? 0);
-  const barColor = running ? undefined : latest ? scoreGradientColor(latest.performanceScore) : undefined;
-
+function ScoreBar({ label, score }: { label: string; score: number }) {
+  const color = scoreGradientColor(score);
   return (
-    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5">
-      <div className="flex items-center gap-2 text-foreground/60">
-        <Gauge className="size-4" />
-        <p className="text-sm">سرعت سایت</p>
+    <div>
+      <div className="flex items-center justify-between text-xs text-foreground/60">
+        <span>{label}</span>
+        <span className="font-semibold" style={{ color }}>
+          {formatNumber(score)}
+        </span>
       </div>
-
-      <p className="mt-2 text-2xl font-bold" style={{ color: !running && latest ? barColor : undefined }}>
-        {running ? "…" : latest ? formatNumber(latest.performanceScore) : "—"}
-      </p>
-
-      <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-foreground/10">
+      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
         <div
-          className={`h-full rounded-full transition-[width,background-color] duration-300 ease-out ${running ? "bg-accent-500" : ""}`}
-          style={{ width: `${barPercent}%`, backgroundColor: running ? undefined : barColor }}
+          className="h-full rounded-full transition-[width] duration-300 ease-out"
+          style={{ width: `${score}%`, backgroundColor: color }}
         />
       </div>
+    </div>
+  );
+}
 
-      <p className="mt-2 text-xs text-foreground/40">
-        {running ? "در حال اجرای تست..." : latest ? `آخرین تست: ${formatJalaliDateTime(latest.timestamp)}` : "هنوز تستی اجرا نشده است"}
-      </p>
-      <p className="mt-1 text-[11px] text-foreground/35">۰–۴۹: نیاز به بهبود · ۵۰–۸۹: متوسط · ۹۰–۱۰۰: عالی</p>
+// Core Web Vitals: real measured values, colored by web.dev's official
+// per-metric thresholds (vitalTierTextClass) — a separate scale from the
+// 0-100 category scores above (see score-tier.ts).
+const VITAL_META: Record<VitalKey, { label: string; format: (v: number) => string }> = {
+  lcp: { label: "LCP", format: (v) => `${toPersianDigits(v.toFixed(1))} ثانیه` },
+  fcp: { label: "FCP", format: (v) => `${toPersianDigits(v.toFixed(1))} ثانیه` },
+  cls: { label: "CLS", format: (v) => toPersianDigits(v.toFixed(3)) },
+  tbt: { label: "TBT", format: (v) => `${formatNumber(Math.round(v))} میلی‌ثانیه` },
+};
+
+function VitalChip({ vitalKey, value }: { vitalKey: VitalKey; value: number | null }) {
+  if (value === null) return null;
+  const meta = VITAL_META[vitalKey];
+  return (
+    <div className="rounded-lg border border-foreground/10 bg-foreground/[0.02] px-2 py-2 text-center">
+      <p className="text-[10px] text-foreground/40">{meta.label}</p>
+      <p className={`text-sm font-bold ${vitalTierTextClass(vitalKey, value)}`}>{meta.format(value)}</p>
+    </div>
+  );
+}
+
+function OpportunityList({ opportunities }: { opportunities: LighthouseOpportunity[] }) {
+  if (opportunities.length === 0) return null;
+  return (
+    <div className="mt-4 border-t border-foreground/10 pt-3">
+      <p className="mb-2 text-xs font-semibold text-foreground/50">پیشنهادهای بهبود (به ترتیب بیشترین صرفه‌جویی زمانی)</p>
+      <ul className="space-y-2.5">
+        {opportunities.map((op) => (
+          <li key={op.id} className="text-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium text-foreground/80">{op.title}</span>
+              {op.savingsMs !== null && (
+                <span dir="ltr" className="shrink-0 text-foreground/40">
+                  ~{formatNumber(Math.round(op.savingsMs))}ms
+                </span>
+              )}
+            </div>
+            {op.description && (
+              <p dir="ltr" className="mt-0.5 text-left text-[11px] leading-relaxed text-foreground/40">
+                {op.description}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// One card per strategy (mobile/desktop) — shows the 4 category scores, the
+// 4 raw Core Web Vitals, and the opportunity list for that strategy's most
+// recent run. `running` only dims/labels the card; it doesn't animate a fake
+// progress fill per-card anymore (see SpeedTestPanel's single overall bar) —
+// with up to 4 score bars + 4 vitals per card, per-card fake progress on
+// everything would be more visual noise than signal.
+function StrategyResultCard({ strategyLabel, run, running }: { strategyLabel: string; run: LighthouseRun | null; running: boolean }) {
+  return (
+    <div className={`rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-5 ${running ? "opacity-60" : ""}`}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-foreground/70">{strategyLabel}</p>
+        <p className="text-[11px] text-foreground/40">
+          {running ? "در حال اجرا..." : run ? formatJalaliDateTime(run.timestamp) : "هنوز تستی اجرا نشده است"}
+        </p>
+      </div>
+
+      {!run && (
+        <p className="mt-6 text-center text-xs text-foreground/35">برای مشاهده‌ی نتایج، تست را اجرا کنید.</p>
+      )}
+
+      {run && (
+        <>
+          <div className="mt-4 space-y-3">
+            {run.scores ? (
+              <>
+                <ScoreBar label="عملکرد" score={run.scores.performance} />
+                <ScoreBar label="دسترس‌پذیری" score={run.scores.accessibility} />
+                <ScoreBar label="بهترین شیوه‌ها" score={run.scores.bestPractices} />
+                <ScoreBar label="سئو" score={run.scores.seo} />
+              </>
+            ) : (
+              <ScoreBar label="عملکرد" score={run.performanceScore} />
+            )}
+          </div>
+          <p className="mt-2 text-[11px] text-foreground/35">۰–۴۹: نیاز به بهبود · ۵۰–۸۹: متوسط · ۹۰–۱۰۰: عالی</p>
+
+          {run.vitals && (
+            <div className="mt-4 grid grid-cols-4 gap-2">
+              <VitalChip vitalKey="lcp" value={run.vitals.lcp} />
+              <VitalChip vitalKey="cls" value={run.vitals.cls} />
+              <VitalChip vitalKey="tbt" value={run.vitals.tbt} />
+              <VitalChip vitalKey="fcp" value={run.vitals.fcp} />
+            </div>
+          )}
+
+          {run.opportunities && <OpportunityList opportunities={run.opportunities} />}
+        </>
+      )}
+    </div>
+  );
+}
+
+type StrategySelection = LighthouseStrategy | "both";
+
+function StrategyTabs({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: StrategySelection;
+  onChange: (v: StrategySelection) => void;
+  disabled?: boolean;
+}) {
+  const options: { value: StrategySelection; label: string }[] = [
+    { value: "mobile", label: "موبایل" },
+    { value: "desktop", label: "دسکتاپ" },
+    { value: "both", label: "هر دو" },
+  ];
+  return (
+    <div role="tablist" aria-label="استراتژی تست سرعت" className="inline-flex rounded-lg border border-foreground/10 bg-foreground/5 p-0.5 text-xs">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          role="tab"
+          aria-selected={value === opt.value}
+          disabled={disabled}
+          onClick={() => onChange(opt.value)}
+          className={`min-h-9 rounded-md px-3 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            value === opt.value ? "bg-accent-500 text-white" : "text-foreground/60 hover:text-foreground/80"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Simulated progress while the audit is running (Lighthouse's own CLI/the
+// PageSpeed API here give no streamable progress signal), asymptotically
+// approaching 92% so it never falsely claims completion before the real
+// result lands — scaled to roughly double the expected wait when running
+// both strategies back-to-back.
+function SpeedTestPanel({ history, onHistoryChange }: { history: LighthouseRun[]; onHistoryChange: (next: LighthouseRun[]) => void }) {
+  const { showToast } = useToast();
+  const [selection, setSelection] = useState<StrategySelection>("desktop");
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const latestByStrategy: Partial<Record<LighthouseStrategy, LighthouseRun>> = {};
+  for (const run of history) {
+    latestByStrategy[run.strategy] = run; // history is chronological — the last write per strategy wins
+  }
+
+  // If the admin navigates away mid-test, runSpeedTest's own `finally` never
+  // runs (the async function is still suspended on the in-flight fetch) —
+  // without this, the 200ms progress interval would keep ticking against an
+  // unmounted component until the request itself resolves.
+  useEffect(() => {
+    return () => {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+    };
+  }, []);
+
+  const runSpeedTest = async () => {
+    setRunning(true);
+    setProgress(0);
+    const startedAt = Date.now();
+    const expectedSeconds = selection === "both" ? 16 : 8;
+    progressTimer.current = setInterval(() => {
+      const elapsedSeconds = (Date.now() - startedAt) / 1000;
+      setProgress(92 * (1 - Math.exp(-elapsedSeconds / expectedSeconds)));
+    }, 200);
+
+    try {
+      const res = await fetch("/api/admin/logs/lighthouse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ strategy: selection }),
+      });
+      const body = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        showToast(body?.error ?? "اجرای تست سرعت ناموفق بود.", "error");
+        return;
+      }
+
+      const runs = (body?.runs ?? []) as LighthouseRun[];
+      setProgress(100);
+      onHistoryChange([...history, ...runs]);
+
+      const errors = (body?.errors ?? []) as { strategy: LighthouseStrategy; error: string }[];
+      for (const err of errors) {
+        showToast(`${STRATEGY_LABELS_FA[err.strategy]}: ${err.error}`, "error");
+      }
+      if (runs.length > 0) {
+        showToast(`تست سرعت اجرا شد — ${runs.map((r) => `${STRATEGY_LABELS_FA[r.strategy]}: ${formatNumber(r.performanceScore)}`).join("، ")}`);
+      }
+    } catch {
+      showToast("اجرای تست سرعت ناموفق بود — اتصال برقرار نشد.", "error");
+    } finally {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+      setRunning(false);
+    }
+  };
+
+  const activeStrategies: LighthouseStrategy[] = selection === "both" ? ["mobile", "desktop"] : [selection];
+
+  return (
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-foreground/60">
+          <Gauge className="size-4" />
+          <p className="text-sm font-semibold">تست سرعت سایت</p>
+        </div>
+        <StrategyTabs value={selection} onChange={setSelection} disabled={running} />
+      </div>
+
+      {running && (
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
+          <div
+            className="h-full rounded-full bg-accent-500 transition-[width] duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
+
+      <div className={`mt-4 grid grid-cols-1 gap-4 ${activeStrategies.length === 2 ? "lg:grid-cols-2" : ""}`}>
+        {activeStrategies.map((s) => (
+          <StrategyResultCard key={s} strategyLabel={STRATEGY_LABELS_FA[s]} run={latestByStrategy[s] ?? null} running={running} />
+        ))}
+      </div>
 
       <button
         type="button"
-        onClick={onRun}
+        onClick={runSpeedTest}
         disabled={running}
-        className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-3.5 text-xs font-medium text-accent-400 transition-colors hover:bg-accent-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-accent-500/30 bg-accent-500/10 px-3.5 text-xs font-medium text-accent-400 transition-colors hover:bg-accent-500/20 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {running ? "در حال اجرا..." : "اجرای تست سرعت"}
       </button>
@@ -230,51 +444,7 @@ export default function LogsDashboard({
   lighthouseHistory,
   initialTrend,
 }: LogsDashboardProps) {
-  const { showToast } = useToast();
   const [history, setHistory] = useState(lighthouseHistory);
-  const [running, setRunning] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const latest = history[history.length - 1] ?? null;
-
-  // If the admin navigates away mid-test, runSpeedTest's own `finally` never
-  // runs (the async function is still suspended on the in-flight fetch) —
-  // without this, the 200ms progress interval would keep ticking against an
-  // unmounted component until the Lighthouse request itself resolves.
-  useEffect(() => {
-    return () => {
-      if (progressTimer.current) clearInterval(progressTimer.current);
-    };
-  }, []);
-
-  const runSpeedTest = async () => {
-    setRunning(true);
-    setProgress(0);
-    const startedAt = Date.now();
-    progressTimer.current = setInterval(() => {
-      const elapsedSeconds = (Date.now() - startedAt) / 1000;
-      setProgress(92 * (1 - Math.exp(-elapsedSeconds / 8)));
-    }, 200);
-
-    try {
-      const res = await fetch("/api/admin/logs/lighthouse", { method: "POST" });
-      const body = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        showToast(body?.error ?? "اجرای تست سرعت ناموفق بود.", "error");
-        return;
-      }
-
-      setProgress(100);
-      setHistory((prev) => [...prev, body.run as LighthouseRun]);
-      showToast(`تست سرعت اجرا شد — امتیاز Performance: ${formatNumber(body.run.performanceScore)}`);
-    } catch {
-      showToast("اجرای تست سرعت ناموفق بود — اتصال برقرار نشد.", "error");
-    } finally {
-      if (progressTimer.current) clearInterval(progressTimer.current);
-      setRunning(false);
-    }
-  };
 
   return (
     <div className="mb-8 space-y-4">
@@ -282,7 +452,7 @@ export default function LogsDashboard({
 
       <UptimeCard uptime={uptime} segments={uptimeSegments} summaryPercent={uptimeSummaryPercent} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <CategoryStatCard
           icon={AlertTriangle}
           colorClass="text-red-400/80"
@@ -300,9 +470,9 @@ export default function LogsDashboard({
           label="هشدار (مهم و امنیتی)"
           stats={warningStats}
         />
-
-        <SpeedTestCard latest={latest} running={running} progress={progress} onRun={runSpeedTest} />
       </div>
+
+      <SpeedTestPanel history={history} onHistoryChange={setHistory} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -316,9 +486,7 @@ export default function LogsDashboard({
           <Search className="size-4" />
           <p className="text-sm font-semibold">سئو و بک‌لینک</p>
         </div>
-        <p className="mt-1.5 text-xs text-foreground/40">
-          نیاز به اتصال به Google Search Console و PageSpeed API — بعد از آنلاین شدن سایت تنظیم می‌شود.
-        </p>
+        <p className="mt-1.5 text-xs text-foreground/40">نیاز به اتصال به Google Search Console — بعد از آنلاین شدن سایت تنظیم می‌شود.</p>
       </div>
     </div>
   );

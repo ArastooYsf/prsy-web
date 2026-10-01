@@ -122,7 +122,7 @@ export default function CheckoutFlow({ contact, isStaff }: { contact: Contact; i
 
   return (
     <div>
-      <StepIndicator steps={isStaff ? STEPS_STAFF : STEPS_CUSTOMER} currentStep={step} />
+      <StepIndicator steps={isStaff ? STEPS_STAFF : STEPS_CUSTOMER} currentStep={step} onStepClick={setStep} />
 
       {step === 1 && (
         <div>

@@ -5,8 +5,9 @@ const STEPS = ["نوع حساب", "اطلاعات فردی", "ایمیل و رم
 type RegisterStepperProps = {
   /** 1-indexed current step. */
   currentStep: number;
+  onStepClick?: (step: number) => void;
 };
 
-export default function RegisterStepper({ currentStep }: RegisterStepperProps) {
-  return <StepIndicator steps={STEPS} currentStep={currentStep} />;
+export default function RegisterStepper({ currentStep, onStepClick }: RegisterStepperProps) {
+  return <StepIndicator steps={STEPS} currentStep={currentStep} onStepClick={onStepClick} />;
 }

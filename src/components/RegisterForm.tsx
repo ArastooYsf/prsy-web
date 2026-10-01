@@ -152,7 +152,7 @@ export default function RegisterForm() {
 
   return (
     <div>
-      <RegisterStepper currentStep={step} />
+      <RegisterStepper currentStep={step} onStepClick={(s) => setStep(s as 1 | 2 | 3)} />
 
       {step === 1 && (
         <div>

@@ -58,3 +58,17 @@ export function formatPercent(value: number): string {
   const rounded = value < 1 && value > 0 ? value.toFixed(1) : Math.round(value).toString();
   return toPersianDigits(`${rounded}٪`);
 }
+
+// "همین الان" / "۵ دقیقه پیش" / "۲ ساعت پیش" / "۳ روز پیش" — shared by
+// NotificationBell and CourierLocationMap for any "time since an ISO
+// timestamp" display.
+export function timeAgoFa(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return "همین الان";
+  if (minutes < 60) return toPersianDigits(`${minutes} دقیقه پیش`);
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return toPersianDigits(`${hours} ساعت پیش`);
+  const days = Math.floor(hours / 24);
+  return toPersianDigits(`${days} روز پیش`);
+}

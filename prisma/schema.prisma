@@ -11,6 +11,7 @@ enum Role {
   ADMIN
   SUPPORT
   CUSTOMER
+  COURIER
 }
 
 enum CustomerType {
@@ -109,16 +110,73 @@ model User {
   ticketReplies         TicketReply[]
   contracts             Contract[]
   orders                Order[]
+  courierOrders         Order[]          @relation("OrderCourier")
   cannedResponses       CannedResponse[]
   notifications         Notification[]
   productComments       ProductComment[]
   customerFiles         CustomerFile[]   @relation("CustomerFiles")
   uploadedCustomerFiles CustomerFile[]   @relation("UploadedCustomerFiles")
+  // The customer's own saved address book (src/components/account/SavedContactPicker.tsx).
+  // `phone`/`address` above stay in sync with whichever row here is
+  // isDefault (see src/lib/user-contacts.ts) — every other reader in the
+  // app (SMS, PDFs, admin customer screens, order creation) keeps reading
+  // those two scalar columns unchanged and transparently sees "whichever
+  // saved entry the customer currently has selected".
+  phones                UserPhone[]
+  addresses             UserAddress[]
 
   // Backs the private-file lookup in src/app/api/files/[id]/route.ts, which
   // disambiguates a storage key by querying this column (among others).
   @@index([avatarUrl])
   @@map("users")
+}
+
+// One of a customer's several saved phone numbers — see the `phones`
+// relation on User above for why `User.phone` still exists alongside this.
+model UserPhone {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String
+  // Optional "خانه"/"محل کار" tag shown in the picker list — never required.
+  label     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_phones")
+}
+
+// One of a customer's several saved addresses — see the `addresses`
+// relation on User above for why `User.address` still exists alongside this.
+model UserAddress {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Auto-composed from the structured fields below when saved (see
+  // AddressMapPicker.tsx / SavedContactPicker.tsx) — kept as the one string
+  // every other consumer (PDFs, admin screens, User.address sync) reads,
+  // so none of them need to know the structured fields exist.
+  address String @db.Text
+  // Structured fields, filled from the map's reverse-geocode result but
+  // always manually editable afterward. All optional: a user can still
+  // save an address without ever touching the map.
+  province   String?
+  city       String?
+  street     String? @db.Text
+  plaque     String?
+  postalCode String?
+  // The map point the user picked, if any — not required for the address
+  // to be valid, just carried along for a possible future "show on map".
+  lat Float?
+  lng Float?
+
+  label     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_addresses")
 }
 
 model Notification {
@@ -262,9 +320,24 @@ model Order {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  // Delivery tracking — only meaningful once status is SHIPPED. courierId is
+  // a User with role COURIER; location fields are reported by the courier's
+  // own portal (see /account/courier) and reset whenever the courier is
+  // reassigned, since a new courier hasn't reported a position yet.
+  courierId                String?
+  courier                  User?     @relation("OrderCourier", fields: [courierId], references: [id])
+  courierLat               Float?
+  courierLng               Float?
+  courierLocationUpdatedAt DateTime?
+  // Auto-generated once a courier is first assigned; the customer reads this
+  // aloud/shows it to the courier on arrival, who confirms it to mark DELIVERED.
+  deliveryCode             String?
+  deliveryCodeVerifiedAt   DateTime?
+
   items OrderItem[]
 
   @@index([userId])
+  @@index([courierId])
   @@map("orders")
 }
 

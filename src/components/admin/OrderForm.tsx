@@ -22,11 +22,13 @@ type Item = { productId: string | null; productName: string; quantity: number | 
 type OrderFormProps = {
   mode: "create" | "edit";
   customers: Customer[];
+  couriers: Customer[];
   order?: {
     id: string;
     userId: string;
     orderNumber: string;
     status: string;
+    courierId: string | null;
     items: Item[];
   };
 };
@@ -39,12 +41,13 @@ const STATUS_OPTIONS = [
   { value: "CANCELLED", label: "لغوشده" },
 ];
 
-export default function OrderForm({ mode, customers, order }: OrderFormProps) {
+export default function OrderForm({ mode, customers, couriers, order }: OrderFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
   const [userId, setUserId] = useState(order?.userId ?? customers[0]?.id ?? "");
   const [status, setStatus] = useState(order?.status ?? "PENDING");
+  const [courierId, setCourierId] = useState(order?.courierId ?? "");
   const [items, setItems] = useState<Item[]>(
     order?.items && order.items.length > 0 ? order.items : [{ productId: null, productName: "", quantity: 1, price: "" }],
   );
@@ -129,7 +132,7 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
 
     setSaving(true);
 
-    const payload = { userId, status, items: validItems };
+    const payload = { userId, status, items: validItems, courierId: courierId || null };
 
     const res = await fetch(mode === "create" ? "/api/admin/orders" : `/api/admin/orders/${order!.id}`, {
       method: mode === "create" ? "POST" : "PATCH",
@@ -182,6 +185,23 @@ export default function OrderForm({ mode, customers, order }: OrderFormProps) {
               </option>
             ))}
           </select>
+        </div>
+      )}
+
+      {mode === "edit" && (
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground/80">پیک</label>
+          <select value={courierId} onChange={(e) => setCourierId(e.target.value)} className={inputClass}>
+            <option value="" className="bg-background">
+              بدون پیک
+            </option>
+            {couriers.map((c) => (
+              <option key={c.id} value={c.id} className="bg-background">
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1.5 text-xs text-foreground/40">برای وضعیت «ارسال‌شده» انتخاب پیک الزامی است.</p>
         </div>
       )}
 

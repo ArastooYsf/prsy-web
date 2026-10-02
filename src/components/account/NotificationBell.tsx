@@ -5,7 +5,7 @@ import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Bell, Check } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
-import { formatNumber, toPersianDigits } from "@/lib/format-number";
+import { formatNumber, timeAgoFa } from "@/lib/format-number";
 import { useScrollIntoViewOnOpen } from "@/hooks/useScrollIntoViewOnOpen";
 import { useSiteTheme } from "@/components/RouteThemeScope";
 import { popoverAnimation } from "@/lib/motion";
@@ -21,17 +21,6 @@ type Notification = {
   read: boolean;
   createdAt: string;
 };
-
-function timeAgoFa(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 1) return "همین الان";
-  if (minutes < 60) return toPersianDigits(`${minutes} دقیقه پیش`);
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return toPersianDigits(`${hours} ساعت پیش`);
-  const days = Math.floor(hours / 24);
-  return toPersianDigits(`${days} روز پیش`);
-}
 
 // notification=null (still polling for the first time) falls back to a
 // Skeleton per field, so the placeholder row is always this row's real shape.

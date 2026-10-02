@@ -130,7 +130,12 @@ export function Header({
 	// products mega-menu, a gallery lightbox, ...) opens while it's open, and
 	// vice versa — see OverlayCoordinator.
 	useExclusiveOverlay('mobile-nav-drawer', open, () => setOpen(false));
-	const isAccountArea = pathname?.startsWith('/account');
+	// The account area has its own shell (AccountSidebar) and the
+	// registration wizard renders its own minimal logo-only header (see
+	// src/app/register/page.tsx) — both need the full site Header/Footer
+	// gone entirely, not just visually squeezed, so a multi-step form reads
+	// as a focused task rather than one more page on the marketing site.
+	const hideSiteChrome = pathname?.startsWith('/account') || pathname === '/register';
 	const siteTheme = useSiteTheme();
 	const isLightTheme = siteTheme?.theme !== 'dark';
 	const isOffline = useOnlineStatus();
@@ -345,8 +350,8 @@ export function Header({
 	// Client-side navigation can change `scrolled` (the new page mounts
 	// scrolled to the top) without the mouse ever leaving the hovered link —
 	// Header lives in the root layout, so it isn't remounted by a normal
-	// route change, only unmounted outright on `/account` routes (see
-	// `isAccountArea` below), which would otherwise leave the platform
+	// route change, only unmounted outright on chromeless routes (see
+	// `hideSiteChrome` below), which would otherwise leave the platform
 	// sitting at full opacity at whatever position it last had. Hiding it
 	// outright on every pathname change is simpler and safer than trying to
 	// recompute through both cases: reset the "first hover" flag too, so the
@@ -441,7 +446,7 @@ export function Header({
 		return () => window.removeEventListener('popstate', onPopState);
 	}, [open]);
 
-	if (isAccountArea) return null;
+	if (hideSiteChrome) return null;
 
 	return (
 		<motion.header

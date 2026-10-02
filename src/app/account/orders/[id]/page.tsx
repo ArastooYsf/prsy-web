@@ -7,6 +7,7 @@ import { formatNumber } from "@/lib/format-number";
 import OrderProgress from "@/components/account/OrderProgress";
 import StatusBadge from "@/components/ui/StatusBadge";
 import OrderItemRemoveButton from "@/components/account/OrderItemRemoveButton";
+import ShippingTracker from "@/components/account/ShippingTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
 
   const order = await prisma.order.findFirst({
     where: { id: params.id, userId, deletedAt: null },
-    include: { items: true },
+    include: { items: true, courier: { select: { name: true, phone: true } } },
   });
 
   if (!order) {
@@ -35,6 +36,18 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
       <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 sm:p-8">
         <OrderProgress status={order.status} />
       </div>
+
+      {order.status === "SHIPPED" && (
+        <ShippingTracker
+          orderId={order.id}
+          courierName={order.courier?.name ?? null}
+          courierPhone={order.courier?.phone ?? null}
+          courierLat={order.courierLat}
+          courierLng={order.courierLng}
+          courierLocationUpdatedAt={order.courierLocationUpdatedAt?.toISOString() ?? null}
+          deliveryCode={order.deliveryCode}
+        />
+      )}
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-foreground/10">
         <table className="w-full min-w-[420px] text-sm">

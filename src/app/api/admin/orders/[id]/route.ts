@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { ORDER_STATUS } from "@/lib/status-labels";
 import { notifyOrderStatusChange } from "@/lib/notifications/events";
+import { generateDeliveryCode } from "@/lib/delivery-code";
 
 type ItemInput = { productId: string | null; productName: string; quantity: number; price: number };
 
@@ -45,6 +46,31 @@ async function resolveProductLinks(items: ItemInput[]): Promise<ItemInput[]> {
   return items.map((item) => (item.productId && !validIds.has(item.productId) ? { ...item, productId: null } : item));
 }
 
+// Owns the courier-assignment lifecycle (validate → generate the delivery
+// code once → reset the previous courier's location on reassignment) as one
+// unit, separate from the general "diff + persist" PATCH flow below.
+async function resolveCourierAssignment(
+  courierId: string | null,
+  existing: { courierId: string | null; deliveryCode: string | null },
+): Promise<{ error: string } | { data: Record<string, unknown> }> {
+  if (courierId) {
+    const courier = await prisma.user.findFirst({ where: { id: courierId, deletedAt: null } });
+    if (!courier || courier.role !== "COURIER") {
+      return { error: "پیک معتبر نیست." };
+    }
+  }
+
+  const courierChanged = courierId !== existing.courierId;
+
+  return {
+    data: {
+      courierId,
+      ...(courierId && !existing.deliveryCode ? { deliveryCode: generateDeliveryCode() } : {}),
+      ...(courierChanged ? { courierLat: null, courierLng: null, courierLocationUpdatedAt: null } : {}),
+    },
+  };
+}
+
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
@@ -60,22 +86,38 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const body = await request.json().catch(() => null);
   const userId = typeof body?.userId === "string" ? body.userId : "";
   const status = VALID_STATUSES.includes(body?.status) ? body.status : existing.status;
-  const items = await resolveProductLinks(parseItems(body?.items));
+  const courierId = typeof body?.courierId === "string" && body.courierId ? body.courierId : null;
 
-  if (!userId || items.length === 0) {
+  if (!userId || !Array.isArray(body?.items) || body.items.length === 0) {
     return NextResponse.json({ error: "مشتری و حداقل یک قلم کالا الزامی است." }, { status: 400 });
   }
 
-  const customer = await prisma.user.findUnique({ where: { id: userId } });
+  if (status === "SHIPPED" && !courierId) {
+    return NextResponse.json({ error: "برای وضعیت «ارسال‌شده»، انتخاب پیک الزامی است." }, { status: 400 });
+  }
+
+  // Independent lookups/validation — run together rather than one after another.
+  const [items, customer, courierAssignment] = await Promise.all([
+    resolveProductLinks(parseItems(body.items)),
+    prisma.user.findUnique({ where: { id: userId } }),
+    resolveCourierAssignment(courierId, existing),
+  ]);
+
   if (!customer || customer.role !== "CUSTOMER") {
     return NextResponse.json({ error: "مشتری معتبر نیست." }, { status: 400 });
+  }
+  if ("error" in courierAssignment) {
+    return NextResponse.json({ error: courierAssignment.error }, { status: 400 });
+  }
+  if (items.length === 0) {
+    return NextResponse.json({ error: "مشتری و حداقل یک قلم کالا الزامی است." }, { status: 400 });
   }
 
   const order = await prisma.$transaction(async (tx) => {
     await tx.orderItem.deleteMany({ where: { orderId: params.id } });
     return tx.order.update({
       where: { id: params.id },
-      data: { userId, status, items: { create: items } },
+      data: { userId, status, items: { create: items }, ...courierAssignment.data },
       include: { items: true },
     });
   });

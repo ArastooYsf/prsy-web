@@ -2,25 +2,22 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { formatUserLabel } from "@/lib/user-label";
 import OrderForm from "@/components/admin/OrderForm";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrderDetailPage({ params }: { params: { id: string } }) {
-  const order = await prisma.order.findFirst({
-    where: { id: params.id, deletedAt: null },
-    include: { user: true, items: true },
-  });
+  const [order, customers, couriers] = await Promise.all([
+    prisma.order.findFirst({ where: { id: params.id, deletedAt: null }, include: { user: true, items: true } }),
+    prisma.user.findMany({ where: { role: "CUSTOMER", deletedAt: null }, orderBy: { createdAt: "desc" } }),
+    prisma.user.findMany({ where: { role: "COURIER", deletedAt: null }, orderBy: { createdAt: "desc" } }),
+  ]);
 
   if (!order) {
     notFound();
   }
-
-  const customers = await prisma.user.findMany({
-    where: { role: "CUSTOMER", deletedAt: null },
-    orderBy: { createdAt: "desc" },
-  });
 
   return (
     <div>
@@ -46,12 +43,14 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
       <div className="mx-auto max-w-xl">
         <OrderForm
           mode="edit"
-          customers={customers.map((c) => ({ id: c.id, label: c.name ? `${c.name} (${c.email})` : c.email }))}
+          customers={customers.map((c) => ({ id: c.id, label: formatUserLabel(c) }))}
+          couriers={couriers.map((c) => ({ id: c.id, label: formatUserLabel(c, { preferPhone: true }) }))}
           order={{
             id: order.id,
             userId: order.userId,
             orderNumber: order.orderNumber,
             status: order.status,
+            courierId: order.courierId,
             items: order.items.map((i) => ({
               productId: i.productId,
               productName: i.productName,

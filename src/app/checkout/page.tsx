@@ -20,7 +20,7 @@ export default async function CheckoutPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, email: true, phone: true, address: true },
+    select: { name: true, email: true },
   });
 
   return (
@@ -28,12 +28,7 @@ export default async function CheckoutPage() {
       <div className="mx-auto max-w-2xl">
         <h1 className="mb-8 text-2xl font-bold sm:text-3xl">ثبت سفارش</h1>
         <CheckoutFlow
-          contact={{
-            name: user?.name ?? "",
-            email: user?.email ?? "",
-            phone: user?.phone ?? "",
-            address: user?.address ?? "",
-          }}
+          contact={{ name: user?.name ?? "", email: user?.email ?? "" }}
           isStaff={session.user.role === "ADMIN" || session.user.role === "SUPPORT"}
         />
       </div>

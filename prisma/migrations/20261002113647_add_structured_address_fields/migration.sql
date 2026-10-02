@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `user_addresses` ADD COLUMN `city` VARCHAR(191) NULL,
+    ADD COLUMN `lat` DOUBLE NULL,
+    ADD COLUMN `lng` DOUBLE NULL,
+    ADD COLUMN `plaque` VARCHAR(191) NULL,
+    ADD COLUMN `postalCode` VARCHAR(191) NULL,
+    ADD COLUMN `province` VARCHAR(191) NULL,
+    ADD COLUMN `street` TEXT NULL;

@@ -17,7 +17,6 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  Menu,
   X,
   Gauge,
   Headset,
@@ -30,17 +29,25 @@ import {
   Home,
   Plug,
   FolderOpen,
+  Truck,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MenuToggleIcon } from "@/components/layout/MenuToggleIcon";
 
-const PERSONAL_LINKS: { href: string; label: string; icon: LucideIcon }[] = [
-  { href: "/account", label: "نمای کلی", icon: LayoutDashboard },
-  { href: "/account/tickets", label: "تیکت‌ها", icon: MessageSquare },
-  { href: "/account/contracts", label: "قراردادها", icon: FileText },
-  { href: "/account/orders", label: "سفارش‌ها", icon: Package },
-  { href: "/account/files", label: "دانلود فایل‌ها", icon: Download },
-  { href: "/account/profile", label: "پروفایل", icon: User },
+// Personal account pages (tickets/contracts/orders as a customer) only make
+// sense for CUSTOMER — an ADMIN/SUPPORT isn't a customer of their own site,
+// and a COURIER has their own delivery list instead. Profile stays for
+// everyone since staff/couriers also need to change their own name/password.
+// Same roles-array + filter shape as ADMIN_LINKS below.
+const PERSONAL_LINKS: { href: string; label: string; icon: LucideIcon; roles: string[] }[] = [
+  { href: "/account", label: "نمای کلی", icon: LayoutDashboard, roles: ["CUSTOMER"] },
+  { href: "/account/tickets", label: "تیکت‌ها", icon: MessageSquare, roles: ["CUSTOMER"] },
+  { href: "/account/contracts", label: "قراردادها", icon: FileText, roles: ["CUSTOMER"] },
+  { href: "/account/orders", label: "سفارش‌ها", icon: Package, roles: ["CUSTOMER"] },
+  { href: "/account/files", label: "دانلود فایل‌ها", icon: Download, roles: ["CUSTOMER"] },
+  { href: "/account/courier", label: "سفارش‌های تحویلی", icon: Truck, roles: ["COURIER"] },
+  { href: "/account/profile", label: "پروفایل", icon: User, roles: ["CUSTOMER", "ADMIN", "SUPPORT", "COURIER"] },
 ];
 
 // Same permission split the old admin panel nav had: SUPPORT gets
@@ -111,11 +118,7 @@ function SidebarContents({
   onNavigate?: () => void;
 }) {
   const adminLinks = ADMIN_LINKS.filter((link) => link.roles.includes(role));
-  // Personal account pages (tickets/contracts/orders as a customer) only make
-  // sense for CUSTOMER — an ADMIN/SUPPORT isn't a customer of their own site.
-  // Profile stays for everyone since staff also need to change their own name/password.
-  const personalLinks =
-    role === "CUSTOMER" ? PERSONAL_LINKS : PERSONAL_LINKS.filter((link) => link.href === "/account/profile");
+  const personalLinks = PERSONAL_LINKS.filter((link) => link.roles.includes(role));
 
   return (
     <div className="flex h-full flex-col">
@@ -227,11 +230,12 @@ export default function AccountSidebar({ role }: AccountSidebarProps) {
         <span className="text-xs font-semibold text-foreground/40">حساب کاربری</span>
         <button
           type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="باز کردن منو"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
+          aria-expanded={mobileOpen}
           className="flex h-11 w-11 items-center justify-center rounded-lg border border-foreground/10 text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
         >
-          <Menu className="size-[18px]" />
+          <MenuToggleIcon open={mobileOpen} className="size-[18px]" duration={300} />
         </button>
       </div>
 

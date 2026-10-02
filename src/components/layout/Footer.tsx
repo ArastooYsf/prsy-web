@@ -55,7 +55,9 @@ export default function Footer({
   const pathname = usePathname();
   const year = new Date().getFullYear();
 
-  if (pathname?.startsWith("/account")) return null;
+  // See the matching check in Header.tsx for why /register is included here
+  // too — its own minimal header replaces the site chrome entirely.
+  if (pathname?.startsWith("/account") || pathname === "/register") return null;
 
   const contactItems = [
     { label: contact.address },

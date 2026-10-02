@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { formatUserLabel } from "@/lib/user-label";
 import OrderForm from "@/components/admin/OrderForm";
 
 export const metadata: Metadata = {
@@ -21,7 +22,8 @@ export default async function NewOrderPage() {
       <div className="mx-auto max-w-xl">
         <OrderForm
           mode="create"
-          customers={customers.map((c) => ({ id: c.id, label: c.name ? `${c.name} (${c.email})` : c.email }))}
+          customers={customers.map((c) => ({ id: c.id, label: formatUserLabel(c) }))}
+          couriers={[]}
         />
       </div>
     </div>

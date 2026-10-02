@@ -13,6 +13,7 @@ import { getMediaUrl } from "@/lib/media";
 import { formatNumber } from "@/lib/format-number";
 import { isValidIranPhone } from "@/lib/validation";
 import CustomerPicker, { type SelectedCustomer } from "@/components/checkout/CustomerPicker";
+import SavedContactPicker from "@/components/account/SavedContactPicker";
 
 const STEPS_CUSTOMER = ["بازبینی سبد", "اطلاعات تماس", "تأیید نهایی"];
 // ADMIN/SUPPORT never see their own contact-info step here — an order they
@@ -23,7 +24,7 @@ const STEPS_STAFF = ["بازبینی سبد", "انتخاب مشتری", "تأی
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
-type Contact = { name: string; email: string; phone: string; address: string };
+type Contact = { name: string; email: string };
 type ManualCustomer = { name: string; phone: string; address: string };
 
 export default function CheckoutFlow({ contact, isStaff }: { contact: Contact; isStaff: boolean }) {
@@ -51,8 +52,6 @@ export default function CheckoutFlow({ contact, isStaff }: { contact: Contact; i
       </div>
     );
   }
-
-  const contactMissing = !contact.phone || !contact.address;
 
   const goToStep3 = () => {
     if (!isStaff) {
@@ -215,23 +214,16 @@ export default function CheckoutFlow({ contact, isStaff }: { contact: Contact; i
                   {contact.email || "—"}
                 </dd>
               </div>
-              <div className="flex items-baseline gap-2">
-                <dt className="shrink-0 text-foreground/50">شماره تماس:</dt>
-                <dd dir="ltr" className="font-medium">
-                  {contact.phone || "ثبت نشده"}
-                </dd>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <dt className="shrink-0 text-foreground/50">آدرس:</dt>
-                <dd className="font-medium">{contact.address || "ثبت نشده"}</dd>
-              </div>
             </dl>
 
-            {contactMissing && (
-              <p className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
-                برای هماهنگی تحویل، بهتر است شماره تماس و آدرس خود را کامل کنید.
-              </p>
-            )}
+            {/* Picking (or adding) a saved phone/address here marks it the
+                account default — the same thing /account/profile manages —
+                so order creation, which still just reads the live
+                user.phone/user.address at submit time, needs no changes. */}
+            <div className="mt-5 space-y-5 border-t border-foreground/10 pt-5">
+              <SavedContactPicker kind="phone" />
+              <SavedContactPicker kind="address" />
+            </div>
 
             <Link
               href="/account/profile"

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AvatarUploader from "@/components/account/AvatarUploader";
-import NationalIdInquiryField, { type InquiredCompany } from "@/components/NationalIdInquiryField";
+import NationalIdInquiryField from "@/components/NationalIdInquiryField";
 import EmailChangeSection from "@/components/account/EmailChangeSection";
+import SavedContactPicker from "@/components/account/SavedContactPicker";
 import { useToast } from "@/components/ToastProvider";
 import FormErrorBanner from "@/components/ui/FormErrorBanner";
-import { isValidIranPhone } from "@/lib/validation";
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
@@ -16,12 +16,9 @@ type ProfileFormProps = {
   role: string;
   customerType: string | null;
   initialName: string;
-  initialPhone: string;
   initialEmail: string;
   initialEmailVerified: boolean;
   initialPendingEmail: string | null;
-  initialAlternatePhone: string;
-  initialAddress: string;
   initialAvatarUrl: string;
   initialCompanyName: string;
   initialNationalId: string;
@@ -31,12 +28,9 @@ export default function ProfileForm({
   role,
   customerType,
   initialName,
-  initialPhone,
   initialEmail,
   initialEmailVerified,
   initialPendingEmail,
-  initialAlternatePhone,
-  initialAddress,
   initialAvatarUrl,
   initialCompanyName,
   initialNationalId,
@@ -44,9 +38,6 @@ export default function ProfileForm({
   const router = useRouter();
   const { showToast } = useToast();
   const [name, setName] = useState(initialName);
-  const [phone, setPhone] = useState(initialPhone);
-  const [alternatePhone, setAlternatePhone] = useState(initialAlternatePhone);
-  const [address, setAddress] = useState(initialAddress);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [companyName, setCompanyName] = useState(initialCompanyName);
   const [nationalId, setNationalId] = useState(initialNationalId);
@@ -60,27 +51,8 @@ export default function ProfileForm({
   const isCustomer = role === "CUSTOMER";
   const isLegalCustomer = isCustomer && customerType === "LEGAL";
 
-  // Convenience only, never overwrites what the customer already typed —
-  // if `address` is already non-empty this is a no-op. Built from
-  // province+city+address since the registry keeps them as separate
-  // fields but this form has just one free-text address box.
-  const fillAddressFromRegistry = (company: InquiredCompany) => {
-    if (address.trim()) return;
-    const parts = [company.province, company.city, company.address].filter(Boolean);
-    if (parts.length > 0) setAddress(parts.join("، "));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (phone && !isValidIranPhone(phone)) {
-      showToast("شماره تماس معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
-      return;
-    }
-    if (alternatePhone && !isValidIranPhone(alternatePhone)) {
-      showToast("شماره تماس جایگزین معتبر نیست. مثال: ۰۹۱۲۳۴۵۶۷۸۹", "error");
-      return;
-    }
 
     setSaving(true);
     setSaveError(null);
@@ -90,7 +62,7 @@ export default function ProfileForm({
       res = await fetch("/api/account/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, alternatePhone, address, avatarUrl, companyName, nationalId }),
+        body: JSON.stringify({ name, avatarUrl, companyName, nationalId }),
       });
     } catch {
       setSaving(false);
@@ -123,50 +95,21 @@ export default function ProfileForm({
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">شماره تماس</label>
-          <input
-            dir="ltr"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className={inputClass}
-            placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-          />
-        </div>
-
-        <div className={isCustomer ? "" : "sm:col-span-2"}>
           <EmailChangeSection
             currentEmail={initialEmail}
             emailVerified={initialEmailVerified}
             pendingEmail={initialPendingEmail}
           />
         </div>
-
-        {isCustomer && (
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-foreground/80">شماره تماس جایگزین</label>
-            <input
-              dir="ltr"
-              value={alternatePhone}
-              onChange={(e) => setAlternatePhone(e.target.value)}
-              className={inputClass}
-              placeholder="اختیاری"
-            />
-          </div>
-        )}
       </div>
 
-      {isCustomer && (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">آدرس</label>
-          <textarea
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            rows={2}
-            className={inputClass}
-            placeholder="آدرس پستی برای ارسال سفارش‌ها و مکاتبات"
-          />
-        </div>
-      )}
+      {/* Phone stays available to every role (staff included) — only the
+          address book is customer-only, same scoping the old single-value
+          fields had (phone always shown, alternatePhone/address customer-only). */}
+      <div className="space-y-5 border-t border-foreground/10 pt-5">
+        <SavedContactPicker kind="phone" />
+        {isCustomer && <SavedContactPicker kind="address" />}
+      </div>
 
       {isLegalCustomer && (
         <div className="grid grid-cols-1 gap-5 border-t border-foreground/10 pt-5 sm:grid-cols-2">
@@ -174,7 +117,7 @@ export default function ProfileForm({
             <label className="mb-1.5 block text-sm font-medium text-foreground/80">نام شرکت</label>
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={inputClass} />
           </div>
-          <NationalIdInquiryField value={nationalId} onChange={setNationalId} onVerified={fillAddressFromRegistry} />
+          <NationalIdInquiryField value={nationalId} onChange={setNationalId} />
         </div>
       )}
 

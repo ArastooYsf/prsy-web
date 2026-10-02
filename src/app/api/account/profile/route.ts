@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizePlainText } from "@/lib/sanitize";
-import { isValidIranPhone } from "@/lib/validation";
 import { verifyNationalId, summarizeOutcome } from "@/lib/national-id-verification";
 import { actorFromSession, logEvent } from "@/lib/logger";
 
@@ -16,22 +15,11 @@ export async function PATCH(request: Request) {
 
   const body = await request.json().catch(() => null);
   const name = typeof body?.name === "string" ? sanitizePlainText(body.name).slice(0, 100) : "";
-  const phone = typeof body?.phone === "string" ? sanitizePlainText(body.phone).slice(0, 30) : "";
-  const alternatePhone =
-    typeof body?.alternatePhone === "string" ? sanitizePlainText(body.alternatePhone).slice(0, 30) : "";
-  const address = typeof body?.address === "string" ? sanitizePlainText(body.address).slice(0, 300) : "";
   const avatarUrl = typeof body?.avatarUrl === "string" ? body.avatarUrl.trim().slice(0, 300) : "";
   const companyName =
     typeof body?.companyName === "string" ? sanitizePlainText(body.companyName).slice(0, 150) : "";
   const nationalId =
     typeof body?.nationalId === "string" ? sanitizePlainText(body.nationalId).slice(0, 50) : "";
-
-  if (phone && !isValidIranPhone(phone)) {
-    return NextResponse.json({ error: "شماره تماس معتبر نیست." }, { status: 400 });
-  }
-  if (alternatePhone && !isValidIranPhone(alternatePhone)) {
-    return NextResponse.json({ error: "شماره تماس جایگزین معتبر نیست." }, { status: 400 });
-  }
 
   const current = await prisma.user.findUnique({ where: { id: session.user.id } });
 
@@ -52,9 +40,6 @@ export async function PATCH(request: Request) {
     where: { id: session.user.id },
     data: {
       name: name || null,
-      phone: phone || null,
-      alternatePhone: alternatePhone || null,
-      address: address || null,
       avatarUrl: avatarUrl || null,
       companyName: companyName || null,
       ...(fields ?? { nationalId: nationalId || null }),
@@ -73,10 +58,7 @@ export async function PATCH(request: Request) {
   return NextResponse.json({
     user: {
       name: user.name,
-      phone: user.phone,
       email: user.email,
-      alternatePhone: user.alternatePhone,
-      address: user.address,
       avatarUrl: user.avatarUrl,
       companyName: user.companyName,
       nationalId: user.nationalId,

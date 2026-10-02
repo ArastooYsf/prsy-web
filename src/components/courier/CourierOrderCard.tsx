@@ -2,8 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, CheckCircle } from "lucide-react";
+import { MapPin, CheckCircle, Navigation } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
+import { buildMapLinks } from "@/lib/map-deep-links";
+import { DELIVERY_STAGE } from "@/lib/status-labels";
+import { cn } from "@/lib/utils";
+import SignaturePad from "@/components/courier/SignaturePad";
+
+// Single source of truth for the 4 stage values is DELIVERY_STAGE
+// (src/lib/status-labels.tsx) — its key order is the display order too.
+const STAGE_ORDER = Object.keys(DELIVERY_STAGE);
 
 type CourierOrder = {
   id: string;
@@ -11,19 +19,79 @@ type CourierOrder = {
   itemCount: number;
   customerName: string | null;
   customerPhone: string | null;
+  recipientAddress: string | null;
+  recipientPostalCode: string | null;
+  recipientLat: number | null;
+  recipientLng: number | null;
   courierLocationUpdatedAt: string | null;
+  deliveryStage: string | null;
+  deliveryCodeVerifiedAt: string | null;
 };
+
+type Sender = { name: string; phone: string };
 
 const inputClass =
   "w-full rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 outline-none transition-colors focus:border-accent-500/50";
 
-export default function CourierOrderCard({ order }: { order: CourierOrder }) {
+function ContactLine({ label, name, phone }: { label: string; name: string | null; phone: string | null }) {
+  return (
+    <p className="text-sm text-foreground/70">
+      {label}: {name ?? "—"}
+      {phone && (
+        <>
+          {" "}
+          —{" "}
+          <a href={`tel:${phone}`} dir="ltr" className="text-accent-400 hover:underline">
+            {phone}
+          </a>
+        </>
+      )}
+    </p>
+  );
+}
+
+function RouteLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-foreground/10 px-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+    >
+      <Navigation className="size-3.5" />
+      {label}
+    </a>
+  );
+}
+
+export default function CourierOrderCard({ order, sender }: { order: CourierOrder; sender: Sender }) {
   const router = useRouter();
+  const mapLinks = buildMapLinks({ lat: order.recipientLat, lng: order.recipientLng, address: order.recipientAddress });
   const { showToast } = useToast();
   const [locating, setLocating] = useState(false);
   const [lastSentAt, setLastSentAt] = useState<string | null>(order.courierLocationUpdatedAt);
   const [code, setCode] = useState("");
   const [confirming, setConfirming] = useState(false);
+  const [codeVerified, setCodeVerified] = useState(!!order.deliveryCodeVerifiedAt);
+  const [stage, setStageState] = useState(order.deliveryStage);
+  const [settingStage, setSettingStage] = useState<string | null>(null);
+  const [finalizing, setFinalizing] = useState(false);
+  const [delivered, setDelivered] = useState(false);
+
+  const setStage = async (next: string) => {
+    setSettingStage(next);
+    const res = await fetch("/api/courier/stage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.id, stage: next }),
+    });
+    setSettingStage(null);
+    if (!res.ok) {
+      showToast("ثبت وضعیت ناموفق بود.", "error");
+      return;
+    }
+    setStageState(next);
+  };
 
   const sendLocation = () => {
     if (!navigator.geolocation) {
@@ -68,10 +136,30 @@ export default function CourierOrderCard({ order }: { order: CourierOrder }) {
 
     if (!res.ok) {
       const body = await res.json().catch(() => null);
-      showToast(body?.error || "تأیید تحویل ناموفق بود.", "error");
+      showToast(body?.error || "تأیید کد ناموفق بود.", "error");
       return;
     }
 
+    setCodeVerified(true);
+    showToast("کد تأیید شد.");
+  };
+
+  const finalizeDelivery = async (signature: Blob) => {
+    setFinalizing(true);
+    const formData = new FormData();
+    formData.append("orderId", order.id);
+    formData.append("signature", signature, "signature.png");
+
+    const res = await fetch("/api/courier/finalize-delivery", { method: "POST", body: formData });
+    setFinalizing(false);
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      showToast(body?.error || "ثبت امضا ناموفق بود.", "error");
+      return;
+    }
+
+    setDelivered(true);
     showToast("سفارش تحویل داده شد.");
     router.refresh();
   };
@@ -85,19 +173,51 @@ export default function CourierOrderCard({ order }: { order: CourierOrder }) {
         <span className="text-xs text-foreground/50">{order.itemCount} قلم کالا</span>
       </div>
 
-      {(order.customerName || order.customerPhone) && (
-        <p className="mb-4 text-sm text-foreground/70">
-          مشتری: {order.customerName ?? "—"}
-          {order.customerPhone && (
-            <>
+      <div className="mb-4 space-y-1">
+        <ContactLine label="فرستنده" name={sender.name} phone={sender.phone} />
+        <ContactLine label="گیرنده" name={order.customerName} phone={order.customerPhone} />
+        <p className="text-sm text-foreground/70">
+          آدرس:{" "}
+          {order.recipientAddress ? (
+            <span className="text-foreground">{order.recipientAddress}</span>
+          ) : (
+            <span className="text-foreground/40">ثبت نشده</span>
+          )}
+          {order.recipientPostalCode && (
+            <span dir="ltr" className="text-foreground/50">
               {" "}
-              — <a href={`tel:${order.customerPhone}`} dir="ltr" className="text-accent-400 hover:underline">
-                {order.customerPhone}
-              </a>
-            </>
+              — کدپستی: {order.recipientPostalCode}
+            </span>
           )}
         </p>
-      )}
+        {mapLinks.google && (
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <RouteLink href={mapLinks.google} label="گوگل‌مپ" />
+            {mapLinks.neshan && <RouteLink href={mapLinks.neshan} label="نشان" />}
+            {mapLinks.balad && <RouteLink href={mapLinks.balad} label="بلد" />}
+          </div>
+        )}
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {STAGE_ORDER.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setStage(s)}
+            disabled={settingStage !== null}
+            className={cn(
+              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors disabled:cursor-not-allowed",
+              stage === s
+                ? DELIVERY_STAGE[s].className
+                : "border-foreground/10 text-foreground/60 hover:border-accent-500/40 hover:text-accent-400",
+            )}
+          >
+            {DELIVERY_STAGE[s].icon}
+            {DELIVERY_STAGE[s].label}
+          </button>
+        ))}
+      </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <button
@@ -114,25 +234,33 @@ export default function CourierOrderCard({ order }: { order: CourierOrder }) {
         )}
       </div>
 
-      <form onSubmit={confirmDelivery} className="flex flex-wrap items-center gap-2">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="کد تحویل مشتری"
-          aria-label="کد تحویل مشتری"
-          className={`${inputClass} w-40`}
-        />
-        <button
-          type="submit"
-          disabled={confirming || !code.trim()}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-4 text-xs font-semibold text-white transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <CheckCircle className="size-3.5" />
-          {confirming ? "در حال تأیید..." : "تأیید تحویل"}
-        </button>
-      </form>
+      {delivered ? (
+        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-center text-sm font-semibold text-emerald-400">
+          تحویل داده شد ✅
+        </p>
+      ) : codeVerified ? (
+        <SignaturePad onSubmit={finalizeDelivery} submitting={finalizing} />
+      ) : (
+        <form onSubmit={confirmDelivery} className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="کد تحویل مشتری"
+            aria-label="کد تحویل مشتری"
+            className={`${inputClass} w-40`}
+          />
+          <button
+            type="submit"
+            disabled={confirming || !code.trim()}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-500 px-4 text-xs font-semibold text-white transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <CheckCircle className="size-3.5" />
+            {confirming ? "در حال تأیید..." : "تأیید کد"}
+          </button>
+        </form>
+      )}
     </div>
   );
 }

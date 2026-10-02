@@ -232,6 +232,24 @@ export async function notifyOrderCreated({
   }
 }
 
+/** A courier finished the delivery handoff (code + signature) — notify every ADMIN/SUPPORT user in-app, same shape as notifyStaffNewCustomerMessage. */
+export async function notifyStaffOrderDelivered({
+  order,
+  customerName,
+}: {
+  order: { id: string; orderNumber: string };
+  customerName: string;
+}): Promise<void> {
+  const staff = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPPORT"] }, deletedAt: null }, select: { id: true } });
+  if (staff.length === 0) return;
+
+  const link = `${SITE_URL}/account/admin/orders/${order.id}`;
+  const title = `سفارش «${order.orderNumber}» تحویل داده شد`;
+  const message = `پیک، تحویل به «${customerName}» را با امضای گیرنده تأیید کرد.`;
+
+  await Promise.all(staff.map((member) => createNotification({ userId: member.id, title, message, link }).catch(() => {})));
+}
+
 /** An order's status changed — notify the customer by email + in-app (no SMS, per spec). */
 export async function notifyOrderStatusChange({
   order,

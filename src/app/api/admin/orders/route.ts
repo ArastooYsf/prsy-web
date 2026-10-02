@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/order-number";
+import { snapshotRecipientAddress } from "@/lib/order-recipient";
 import { actorFromSession, logEvent } from "@/lib/logger";
 import { notifyOrderCreated } from "@/lib/notifications/events";
 
@@ -63,11 +64,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "مشتری معتبر نیست." }, { status: 400 });
   }
 
+  const recipient = await snapshotRecipientAddress(userId);
+
   const order = await prisma.order.create({
     data: {
       userId,
       orderNumber: generateOrderNumber(),
       items: { create: items },
+      recipientAddress: recipient.address,
+      recipientPostalCode: recipient.postalCode,
+      recipientLat: recipient.lat,
+      recipientLng: recipient.lng,
     },
     include: { items: true },
   });

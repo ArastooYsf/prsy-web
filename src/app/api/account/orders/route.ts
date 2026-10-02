@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateOrderNumber } from "@/lib/order-number";
+import { snapshotRecipientAddress } from "@/lib/order-recipient";
 import { notifyOrderCreated } from "@/lib/notifications/events";
 import { sanitizePlainText } from "@/lib/sanitize";
 import { isValidIranPhone } from "@/lib/validation";
@@ -149,11 +150,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const recipient = await snapshotRecipientAddress(customer.id);
+
   const order = await prisma.order.create({
     data: {
       userId: customer.id,
       orderNumber: generateOrderNumber(),
       items: { create: items },
+      recipientAddress: recipient.address,
+      recipientPostalCode: recipient.postalCode,
+      recipientLat: recipient.lat,
+      recipientLng: recipient.lng,
     },
     select: { id: true, orderNumber: true },
   });

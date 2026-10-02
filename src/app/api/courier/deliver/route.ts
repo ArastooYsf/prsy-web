@@ -3,8 +3,6 @@ import { getServerSession } from "next-auth";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { actorFromSession, logEvent } from "@/lib/logger";
-import { notifyOrderStatusChange } from "@/lib/notifications/events";
 
 // The delivery code is only 4 digits (10,000 combinations) — without this,
 // the courier assigned to an order could script every combination in
@@ -41,14 +39,7 @@ export async function POST(request: Request) {
 
   const order = await prisma.order.findFirst({
     where: { id: orderId, deletedAt: null },
-    select: {
-      id: true,
-      orderNumber: true,
-      courierId: true,
-      status: true,
-      deliveryCode: true,
-      user: { select: { id: true, email: true, phone: true, name: true } },
-    },
+    select: { id: true, courierId: true, status: true, deliveryCode: true },
   });
   if (!order || order.courierId !== session.user.id || order.status !== "SHIPPED") {
     return NextResponse.json({ error: "سفارش یافت نشد." }, { status: 404 });
@@ -58,22 +49,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "کد تحویل نادرست است." }, { status: 400 });
   }
 
-  const updated = await prisma.order.update({
+  // Matching the code only confirms the handoff is happening — it does NOT
+  // finalize the order. The recipient still has to sign (see
+  // /api/courier/finalize-delivery), which is what actually flips status to
+  // DELIVERED. This lets finalize-delivery trust deliveryCodeVerifiedAt as
+  // proof this step already happened, instead of re-checking the code.
+  await prisma.order.update({
     where: { id: orderId },
-    data: { status: "DELIVERED", deliveryCodeVerifiedAt: new Date() },
-  });
-
-  await logEvent({
-    actor: actorFromSession(session),
-    action: "status_change",
-    target: { type: "order", id: updated.id, label: `سفارش «${updated.orderNumber}»` },
-    summary: "از «ارسال‌شده» به «تحویل داده‌شده» (تأیید پیک)",
-  });
-
-  void notifyOrderStatusChange({
-    order: { id: updated.id, orderNumber: updated.orderNumber },
-    customer: { id: order.user.id, email: order.user.email, phone: order.user.phone, name: order.user.name },
-    newStatus: "DELIVERED",
+    data: { deliveryCodeVerifiedAt: new Date() },
   });
 
   return NextResponse.json({ ok: true });

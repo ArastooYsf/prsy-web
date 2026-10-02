@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { FileText } from "lucide-react";
+import { FileText, PenTool } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatUserLabel } from "@/lib/user-label";
+import { getPrivateFileUrl } from "@/lib/media";
 import OrderForm from "@/components/admin/OrderForm";
 import DeleteEntityButton from "@/components/admin/DeleteEntityButton";
 
@@ -32,6 +33,16 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
             <FileText className="size-3.5" />
             فاکتور / دانلود PDF
           </Link>
+          {order.recipientSignatureUrl && (
+            <Link
+              href={getPrivateFileUrl(order.recipientSignatureUrl)}
+              target="_blank"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/10 px-3.5 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
+            >
+              <PenTool className="size-3.5" />
+              امضای گیرنده
+            </Link>
+          )}
           <DeleteEntityButton
             endpoint={`/api/admin/orders/${order.id}`}
             title="حذف سفارش"

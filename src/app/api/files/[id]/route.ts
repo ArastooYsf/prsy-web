@@ -93,5 +93,17 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return respondWithFile(key, mimeFromExtension(ext), `avatar${ext}`);
   }
 
+  const signedOrder = await prisma.order.findFirst({
+    where: { recipientSignatureUrl: key, deletedAt: null },
+    select: { userId: true, courierId: true },
+  });
+  if (signedOrder) {
+    if (!isStaff && signedOrder.userId !== session.user.id && signedOrder.courierId !== session.user.id) {
+      return NextResponse.json({ error: "دسترسی غیرمجاز است." }, { status: 403 });
+    }
+    const ext = path.extname(key);
+    return respondWithFile(key, mimeFromExtension(ext), `signature${ext}`);
+  }
+
   return NextResponse.json({ error: "فایل یافت نشد." }, { status: 404 });
 }

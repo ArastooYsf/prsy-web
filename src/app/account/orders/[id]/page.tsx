@@ -46,6 +46,8 @@ export default async function AccountOrderDetailPage({ params }: { params: { id:
           courierLng={order.courierLng}
           courierLocationUpdatedAt={order.courierLocationUpdatedAt?.toISOString() ?? null}
           deliveryCode={order.deliveryCode}
+          deliveryCodeVerifiedAt={order.deliveryCodeVerifiedAt?.toISOString() ?? null}
+          deliveryStage={order.deliveryStage}
         />
       )}
 

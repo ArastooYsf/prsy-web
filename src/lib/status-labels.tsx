@@ -70,6 +70,15 @@ export const PRODUCT_AVAILABILITY: Record<string, StatusInfo> = {
 
 export const PRODUCT_AVAILABILITIES = Object.keys(PRODUCT_AVAILABILITY);
 
+// Courier-reported narrative progress within OrderStatus.SHIPPED — see the
+// DeliveryStage enum comment in prisma/schema.prisma.
+export const DELIVERY_STAGE: Record<string, StatusInfo> = {
+  PICKED_UP: { label: "تحویل گرفته شد", className: "border-accent-500/30 bg-accent-500/10 text-accent-400", icon: <Archive size={11} weight="bold" /> },
+  ON_THE_WAY: { label: "در راه", className: "border-brand-400/30 bg-brand-400/10 text-brand-300", icon: <Truck size={11} weight="bold" /> },
+  NEARBY: { label: "نزدیک مقصد", className: "border-brand-400/30 bg-brand-400/10 text-brand-300", icon: <Truck size={11} weight="fill" /> },
+  ARRIVED: { label: "رسیده‌ام", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400", icon: <CheckCircle size={11} weight="fill" /> },
+};
+
 export const CONNECTION_STATUS: Record<string, StatusInfo> = {
   CONNECTED: { label: "متصل", className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400", icon: <CheckCircle size={11} weight="fill" /> },
   NOT_CONFIGURED: { label: "پیکربندی نشده", className: "border-red-500/30 bg-red-500/10 text-red-400", icon: <XCircle size={11} weight="fill" /> },

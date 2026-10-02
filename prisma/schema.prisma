@@ -310,6 +310,17 @@ enum OrderStatus {
   CANCELLED
 }
 
+// Courier-reported narrative progress within the SHIPPED status — distinct
+// from OrderStatus, which is too coarse ("SHIPPED" covers everything from
+// "left the warehouse" to "at the door") for the live play-by-play the
+// customer's tracker shows.
+enum DeliveryStage {
+  PICKED_UP
+  ON_THE_WAY
+  NEARBY
+  ARRIVED
+}
+
 model Order {
   id          String      @id @default(cuid())
   orderNumber String      @unique
@@ -330,9 +341,26 @@ model Order {
   courierLng               Float?
   courierLocationUpdatedAt DateTime?
   // Auto-generated once a courier is first assigned; the customer reads this
-  // aloud/shows it to the courier on arrival, who confirms it to mark DELIVERED.
+  // aloud/shows it to the courier on arrival. Matching it only confirms the
+  // handoff is happening — the recipient's signature (below) is what finally
+  // flips status to DELIVERED.
   deliveryCode             String?
   deliveryCodeVerifiedAt   DateTime?
+  deliveryStage            DeliveryStage?
+
+  // Snapshot of the customer's default saved address at order-creation time
+  // (see src/lib/order-recipient.ts) — orders don't live-reference
+  // UserAddress, the same reasoning OrderItem snapshots productName/price
+  // instead of referencing a live Product: a later address edit must not
+  // rewrite where an already-placed order says it was shipped. All nullable
+  // since orders placed before this feature, or by a user with no saved
+  // address, simply have none.
+  recipientAddress         String?        @db.Text
+  recipientPostalCode      String?
+  recipientLat             Float?
+  recipientLng             Float?
+  // Set once the courier finalizes delivery (see /api/courier/finalize-delivery).
+  recipientSignatureUrl    String?
 
   items OrderItem[]
 

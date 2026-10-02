@@ -13,7 +13,6 @@ export const metadata: Metadata = {
     "راه‌های ارتباطی با پویش راه صنعت یاشار؛ آدرس، تلفن، ایمیل و شبکه‌های اجتماعی.",
 };
 
-const ADDRESS_ICON = <MapPin size={22} />;
 const PHONE_ICON = <PhoneIcon size={22} />;
 const EMAIL_ICON = <EnvelopeSimple size={22} />;
 
@@ -24,9 +23,13 @@ export default async function ContactPage() {
     getContactHeroContent(),
   ]);
 
+  // Address isn't in this grid — it's shown as a caption under the map
+  // below (that's what the map is pointing at), which also keeps this grid
+  // to 2 short items that fit comfortably side by side on mobile. A 3-column
+  // grid with the full street address squeezed into one third of the row
+  // used to overflow/compress badly at the `sm` breakpoint.
   type ContactItem = { label: string; value: string; href?: string; icon: React.ReactNode };
   const rawContactItems: (ContactItem | null)[] = [
-    { label: "آدرس", value: contact.address, href: undefined, icon: ADDRESS_ICON },
     contact.phone
       ? { label: "تلفن", value: toPersianDigits(contact.phone), href: contact.phoneHref || undefined, icon: PHONE_ICON }
       : null,
@@ -55,7 +58,7 @@ export default async function ContactPage() {
 
       <section className="relative pb-20 pt-4 sm:pb-28">
         <div className="container">
-          <div className="mx-auto mb-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+          <div className="mx-auto mb-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             {contactItems.map((item) => (
               <div
                 key={item.label}
@@ -83,6 +86,10 @@ export default async function ContactPage() {
           </div>
 
           <ContactMapCard address={contact.address} mapLabel={hero.mapLabel} mapUrl={contact.mapUrl} />
+          <p className="mx-auto mt-4 flex max-w-2xl items-center justify-center gap-2 text-center text-sm text-foreground/70">
+            <MapPin size={18} className="shrink-0 text-accent-400" />
+            {contact.address}
+          </p>
 
           {socials.length > 0 && (
             <div className="mx-auto mt-10 max-w-2xl text-center">

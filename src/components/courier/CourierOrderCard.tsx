@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, CheckCircle, Navigation } from "lucide-react";
 import { useToast } from "@/components/ToastProvider";
-import { buildMapLinks } from "@/lib/map-deep-links";
+import { buildMapLinks, openMapLink } from "@/lib/map-deep-links";
 import { DELIVERY_STAGE } from "@/lib/status-labels";
 import { cn } from "@/lib/utils";
 import SignaturePad from "@/components/courier/SignaturePad";
@@ -50,12 +50,24 @@ function ContactLine({ label, name, phone }: { label: string; name: string | nul
   );
 }
 
-function RouteLink({ href, label }: { href: string; label: string }) {
+// Deliberately same-tab (no target="_blank") — see the comment on
+// openMapLink in map-deep-links.ts for why a new tab breaks the back button
+// on iOS once an installed app claims the link. href stays set to the web
+// fallback for accessibility/right-click/middle-click; onClick intercepts a
+// normal tap to run the platform-aware app-first logic.
+function RouteLink({
+  href,
+  label,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      onClick={onClick}
       className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-foreground/10 px-3 text-xs font-medium text-foreground/70 transition-colors hover:border-accent-500/40 hover:text-accent-400"
     >
       <Navigation className="size-3.5" />
@@ -192,9 +204,34 @@ export default function CourierOrderCard({ order, sender }: { order: CourierOrde
         </p>
         {mapLinks.google && (
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <RouteLink href={mapLinks.google} label="گوگل‌مپ" />
-            {mapLinks.neshan && <RouteLink href={mapLinks.neshan} label="نشان" />}
-            {mapLinks.balad && <RouteLink href={mapLinks.balad} label="بلد" />}
+            <RouteLink
+              href={mapLinks.google}
+              label="گوگل‌مپ"
+              onClick={(e) => {
+                e.preventDefault();
+                openMapLink("google", order.recipientLat, order.recipientLng, mapLinks);
+              }}
+            />
+            {mapLinks.neshan && (
+              <RouteLink
+                href={mapLinks.neshan}
+                label="نشان"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openMapLink("neshan", order.recipientLat, order.recipientLng, mapLinks);
+                }}
+              />
+            )}
+            {mapLinks.balad && (
+              <RouteLink
+                href={mapLinks.balad}
+                label="بلد"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openMapLink("balad", order.recipientLat, order.recipientLng, mapLinks);
+                }}
+              />
+            )}
           </div>
         )}
       </div>
